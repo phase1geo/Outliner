@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Outliner
+Comment=Organize your words
+Icon=com.github.phase1geo.outliner
+Exec=com.github.phase1geo.outliner
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;
+Keywords=app;vala;

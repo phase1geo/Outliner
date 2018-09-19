@@ -1,0 +1,15 @@
+Source: com.github.phase1geo.outliner
+Section: x11
+Priority: extra
+Maintainer: Trevor Williams <phase1geo@gmail.com>
+Build-Depends: meson,
+               valac,
+               debhelper,
+               libgranite-dev,
+               libgtk-3-dev
+
+Standards-Version: 3.9.3
+Package: com.github.phase1geo.outliner
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Organize your words
