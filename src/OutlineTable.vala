@@ -23,14 +23,62 @@ using Gtk;
 
 public class OutlineTable : TreeView {
 
+  private TreeStore        _store;
+  private CellRendererText _cell;
+
   public UndoBuffer undo_buffer { get; set; }
   public Theme      theme       { get; set; default = new Theme(); }
 
   /* Default constructor */
   public OutlineTable() {
 
+    /* Allocate storage item */
+    _store = new TreeStore( 1, typeof (string) );
+
+    /* Allocate cell renderer */
+    _cell          = new CellRendererText();
+    _cell.editable = true;
+    _cell.edited.connect((path, txt) => {
+      TreeIter iter;
+      if( _store.get_iter_from_string( out iter, path ) ) {
+        Value val = Value( typeof( string ) );
+        val.set_string( txt );
+        _store.set_value( iter, 0, val );
+      }
+    });
+
     /* Allocate memory for the undo buffer */
     undo_buffer = new UndoBuffer( this );
+
+    /* Enable the expanders in the tree */
+    this.insert_column_with_attributes( -1, "Something", _cell, "markup", 0, null );
+    this.model           = _store;
+    this.show_expanders  = true;
+    this.reorderable     = true;
+    this.activate_on_single_click = false;
+    this.expander_column = get_column( 0 );
+
+    row_activated.connect((path, col) => {
+      set_cursor( path, col, true );
+      grab_focus();
+    });
+    drag_motion.connect((ctx, x, y, t) => {
+      TreePath             path;
+      TreeViewDropPosition pos;
+      if( get_dest_row_at_pos( x, y, out path, out pos ) ) {
+        stdout.printf( "path: %s, pos: %s\n", path.to_string(), pos.to_string() );
+        set_drag_dest_row( path, pos );
+      } else {
+        set_drag_dest_row( null, pos );
+      }
+      return( false );
+    });
+    
+    /*
+     Add some test data so that we can test things before we add the
+     ability to save and load data.
+    */
+    add_test_data();
 
   }
 
@@ -58,6 +106,34 @@ public class OutlineTable : TreeView {
   /* Finds the rows that match the given search criteria */
   public void get_match_items( string pattern, bool[] opts, ref Gtk.ListStore items ) {
     // TBD
+  }
+
+  /* Temporary function which gives us some test data */
+  private void add_test_data() {
+
+    /* Let's display some stuff to see how things work */
+    TreeIter level0;
+    TreeIter level1;
+    TreeIter level2;
+
+    _store.append( out level0, null );
+    _store.set( level0, 0, "Main Idea", -1 );
+
+    _store.append( out level1, level0 );
+    _store.set( level1, 0, "First things", -1 );
+    _store.append( out level1, level0 );
+    _store.set( level1, 0, "Second things", -1 );
+
+    _store.append( out level2, level1 );
+    _store.set( level2, 0, "Subitem A", -1 );
+    _store.append( out level2, level1 );
+    _store.set( level2, 0, "Subitem B", -1 );
+
+    _store.append( out level1, level0 );
+    _store.set( level1, 0, "Third things", -1 );
+
+    this.expand_all();
+
   }
 
 }

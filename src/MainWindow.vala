@@ -139,7 +139,8 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the horizontal box that will contain the table and the properties sidebar */
     var hbox = new Box( Orientation.HORIZONTAL, 0 );
-    hbox.pack_start( _table,     true,  true, 0 );
+
+    hbox.pack_start( _table, true, true, 0 );
     // hbox.pack_start( _inspector, false, true, 0 );
 
     /* Display the UI */
