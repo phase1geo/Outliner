@@ -26,6 +26,8 @@ public class Theme : Object {
 
   public    string name               { protected set; get; }
   public    Image  icon               { protected set; get; }
+  public    RGBA   even               { protected set; get; }
+  public    RGBA   odd                { protected set; get; }
   public    RGBA   background         { protected set; get; }
   public    RGBA   foreground         { protected set; get; }
   public    RGBA   root_background    { protected set; get; }
@@ -53,7 +55,7 @@ public class Theme : Object {
     CssProvider provider = new CssProvider();
     try {
       var css_data = ".theme-selected { background: #087DFF; } " +
-                     ".canvas { background: " + background.to_string() + "; }";
+                     ".treeview { even-row-color: " + even.to_string() + "; odd-row-color: " + odd.to_string() + "}";
       provider.load_from_data( css_data );
     } catch( GLib.Error e ) {
       stdout.printf( "Unable to load background color: %s", e.message );

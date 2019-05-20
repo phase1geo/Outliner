@@ -74,6 +74,10 @@ case $1 in
     initialize
     ./com.github.phase1geo.outliner "${@:2}"
     ;;
+"debug")
+    initialize
+    G_DEBUG=fatal-criticals gdb ./com.github.phase1geo.outliner "${@:2}"
+    ;;
 "test")
     test
     ;;
@@ -95,6 +99,7 @@ case $1 in
     echo "  install           Builds and installs application to the system (requires sudo)"
     echo "  install-deps      Installs missing build dependencies"
     echo "  run               Builds and runs the application"
+    echo "  debug             Builds and runs the application within gdb for debugging purposes"
     echo "  test              Builds and runs testing for the application"
     echo "  test-run          Builds application, runs testing and if successful application is started"
     echo "  uninstall         Removes the application from the system (requires sudo)"

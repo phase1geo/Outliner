@@ -45,6 +45,8 @@ public class MainWindow : ApplicationWindow {
   private Popover?       _export         = null;
   private Button?        _undo_btn       = null;
   private Button?        _redo_btn       = null;
+  private Button?        _indent         = null;
+  private Button?        _unindent       = null;
   private Button?        _prop_btn       = null;
   private Image?         _prop_show      = null;
   private Image?         _prop_hide      = null;
@@ -132,19 +134,31 @@ public class MainWindow : ApplicationWindow {
     _redo_btn.clicked.connect( do_redo );
     _header.pack_start( _redo_btn );
 
+    _indent = new Button.from_icon_name( "format-indent-more", IconSize.LARGE_TOOLBAR );
+    _indent.set_tooltip_markup( _( "Indent  <i>Tab</i>" ) );
+    //_indent.set_sensitive( false );
+    _indent.clicked.connect( do_indent );
+    _header.pack_start( _indent );
+
+    _unindent = new Button.from_icon_name( "format-indent-less", IconSize.LARGE_TOOLBAR );
+    _unindent.set_tooltip_markup( _( "Unindent  <i>Shift-Tab</i>" ) );
+    // _unindent.set_sensitive( false );
+    _unindent.clicked.connect( do_unindent );
+    _header.pack_start( _unindent );
+
     /* Add the buttons on the right side in the reverse order */
     add_property_button();
     add_export_button();
     add_search_button();
 
-    /* Create the horizontal box that will contain the table and the properties sidebar */
-    var hbox = new Box( Orientation.HORIZONTAL, 0 );
-
-    hbox.pack_start( _table, true, true, 0 );
-    // hbox.pack_start( _inspector, false, true, 0 );
+    /* Create the scrolled window for the treeview */
+    var scroll = new ScrolledWindow( null, null );
+    // scroll.height_request = 200;
+    scroll.hscrollbar_policy = PolicyType.EXTERNAL;
+    scroll.add( _table );
 
     /* Display the UI */
-    add( hbox );
+    add( scroll );
     show_all();
 
   }
@@ -568,6 +582,16 @@ public class MainWindow : ApplicationWindow {
   public void do_redo() {
     _table.undo_buffer.redo();
     _table.grab_focus();
+  }
+
+  /* Performs an indent operation on the currently selected row */
+  public void do_indent() {
+    _table.indent();
+  }
+
+  /* Performs an unindent operation on the currently selected row */
+  public void do_unindent() {
+    _table.unindent();
   }
 
   private bool on_table_mapped( Gdk.EventAny e ) {

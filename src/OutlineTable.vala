@@ -57,6 +57,7 @@ public class OutlineTable : TreeView {
     this.reorderable     = true;
     this.activate_on_single_click = false;
     this.expander_column = get_column( 0 );
+    this.enable_tree_lines = true;
 
     row_activated.connect((path, col) => {
       set_cursor( path, col, true );
@@ -106,6 +107,46 @@ public class OutlineTable : TreeView {
   /* Finds the rows that match the given search criteria */
   public void get_match_items( string pattern, bool[] opts, ref Gtk.ListStore items ) {
     // TBD
+  }
+
+  /* Indents the currently selected row such that it becomes the child of the sibling row above it */
+  public void indent() {
+    TreeModel model;
+    TreeIter  iter;
+    TreeIter  other;
+    Value     val;
+    get_selection().get_selected( out model, out iter );
+    _store.get_value( iter, 0, out val );
+    other = iter;
+    if( model.iter_previous( ref iter ) ) {
+      TreeIter new_iter;
+      _store.remove( ref other );
+      _store.append( out new_iter, iter );
+      _store.set( new_iter, 0, (string)val, -1 );
+      expand_to_path( _store.get_path( iter ) );
+      get_selection().select_iter( new_iter );
+    }
+  }
+
+  /* Removes the currently selected row from its parent and places itself just below its parent */
+  public void unindent() {
+    TreeModel model;
+    TreeIter  iter;
+    TreeIter  parent;
+    TreeIter? grandparent;
+    Value     val;
+    get_selection().get_selected( out model, out iter );
+    _store.get_value( iter, 0, out val );
+    if( model.iter_parent( out parent, iter ) ) {
+      TreeIter new_iter;
+      if( !model.iter_parent( out grandparent, parent ) ) {
+        grandparent = null;
+      }
+      _store.remove( ref iter );
+      _store.insert_after( out new_iter, grandparent, parent );
+      _store.set( new_iter, 0, (string)val, -1 );
+      get_selection().select_iter( new_iter );
+    }
   }
 
   /* Temporary function which gives us some test data */
