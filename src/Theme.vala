@@ -25,7 +25,6 @@ using Gdk;
 public class Theme : Object {
 
   public    string name               { protected set; get; }
-  public    Image  icon               { protected set; get; }
   public    RGBA   even               { protected set; get; }
   public    RGBA   odd                { protected set; get; }
   public    RGBA   background         { protected set; get; }
@@ -41,45 +40,39 @@ public class Theme : Object {
   public    bool   prefer_dark        { protected set; get; }
 
   /* Default constructor */
-  public Theme() {
-    stdout.printf( "In theme\n" );
-    even = {1.0, 0, 0, 1.0};
-    odd  = {0, 1.0, 0, 1.0};
-    stdout.printf( "even: %s, odd: %s\n", even.to_string(), odd.to_string() );
-  }
+  public Theme() {}
 
   /* Returns the RGBA color for the given color value */
   protected RGBA get_color( string value ) {
+
     RGBA c = {1.0, 1.0, 1.0, 1.0};
     c.parse( value );
+
     return( c );
+
   }
 
   /* Returns the CSS provider for this theme */
   public CssProvider get_css_provider() {
-    CssProvider provider = new CssProvider();
-    try {
-      var css_data = ".theme-selected { background: #087DFF; } " +
-                     "treeview {" + "background-color: " + even.to_string() + "; } " +
 
-      /*
-                       "even-row-color: " + even.to_string() + ";" +
-                       "odd-row-color: " + odd.to_string() + ";" +
-                     "}" +
-                     */
-                     // "treeview row.dragged:selected { background-color: blue; opacity:0.2; }";
-                     "treeview row.dragged { background-color: blue; opacity:0.2; }";
+    CssProvider provider = new CssProvider();
+
+    try {
+      var css_data = ".theme-selected { background: #087DFF; }";
       provider.load_from_data( css_data );
-      stdout.printf( "HERE!!!!\n" );
     } catch( GLib.Error e ) {
       stdout.printf( "Unable to load background color: %s\n", e.message );
     }
+
     return( provider );
+
   }
 
   /* Sets the context color based on the theme RGBA color */
   private void set_context_color( Cairo.Context ctx, RGBA color ) {
+
     ctx.set_source_rgba( color.red, color.green, color.blue, color.alpha );
+
   }
 
 }

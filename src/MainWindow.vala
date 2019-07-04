@@ -599,10 +599,10 @@ public class MainWindow : ApplicationWindow {
   }
 
   /* Called whenever the theme is changed */
-  private void on_theme_changed() {
+  private void on_theme_changed( OutlineTable ot ) {
     Gtk.Settings? settings = Gtk.Settings.get_default();
     if( settings != null ) {
-      settings.gtk_application_prefer_dark_theme = _table.theme.prefer_dark;
+      settings.gtk_application_prefer_dark_theme = ot.get_theme().prefer_dark;
     }
   }
 
