@@ -20,6 +20,7 @@
 */
 
 using Gtk;
+using Gdk;
 
 public class OutlineTable : TreeView {
 
@@ -67,7 +68,7 @@ public class OutlineTable : TreeView {
       TreePath             path;
       TreeViewDropPosition pos;
       if( get_dest_row_at_pos( x, y, out path, out pos ) ) {
-        stdout.printf( "path: %s, pos: %s\n", path.to_string(), pos.to_string() );
+        // stdout.printf( "path: %s, pos: %s\n", path.to_string(), pos.to_string() );
         set_drag_dest_row( path, pos );
       } else {
         set_drag_dest_row( null, pos );
@@ -81,7 +82,32 @@ public class OutlineTable : TreeView {
     */
     add_test_data();
 
+    /*
+    Theme theme = new Theme();
+    stdout.printf( "HERE A\n" );
+    StyleContext.add_provider_for_screen( Screen.get_default(), theme.get_css_provider(), STYLE_PROVIDER_PRIORITY_APPLICATION );
+    stdout.printf( "HERE B\n" );
+    */
+
   }
+
+  /* Sets the theme to the given value */
+  /*
+  public void set_theme( string name ) {
+    Theme? orig_theme = _theme;
+    _theme = themes.get_theme( name );
+    StyleContext.add_provider_for_screen(
+      Screen.get_default(),
+      _theme.get_css_provider(),
+      STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
+    if( orig_theme != null ) {
+      map_theme_colors( orig_theme );
+    }
+    theme_changed();
+    queue_draw();
+  }
+  */
 
   /* Called by this class when a change is made to the table */
   public signal void changed();

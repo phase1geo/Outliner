@@ -1,9 +1,12 @@
 sources += files(
   'Application.vala',
+  'CanvasText.vala',
   'Document.vala',
   'MainWindow.vala',
-  'OutlineTable.vala',
+  'Node.vala',
+  'OutlineTable2.vala',
   'Theme.vala',
   'UndoBuffer.vala',
-  'UndoItem.vala'
+  'UndoItem.vala',
+  'Utils.vala'
 )
