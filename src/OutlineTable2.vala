@@ -627,7 +627,13 @@ public class OutlineTable : DrawingArea {
 
     if( selected == null ) return;
 
+    var next = selected.get_next_node() ?? selected.get_previous_node();
+
     selected.parent.remove_child( selected );
+
+    if( next != null ) {
+      selected = next;
+    }
 
     queue_draw();
     changed();
