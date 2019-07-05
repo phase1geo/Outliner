@@ -21,13 +21,23 @@
 
 using Gtk;
 
+public enum TabAddReason {
+  NEW,
+  OPEN,
+  IMPORT,
+  LOAD
+}
+
 public class MainWindow : ApplicationWindow {
 
-  private GLib.Settings  _settings;
-  private HeaderBar?     _header         = null;
-  private OutlineTable?  _table          = null;
-  private Document?      _doc            = null;
-  private Revealer?      _inspector      = null;
+  private const string DESKTOP_SCHEMA = "io.elementary.desktop";
+  private const string DARK_KEY       = "prefer-dark";
+
+  private GLib.Settings   _settings;
+  private HeaderBar?      _header         = null;
+  private DynamicNotebook _nb;
+  private Document?       _doc            = null;
+  private Revealer?       _inspector      = null;
   // private NodeInspector  _node_inspector = null;
   private Stack?         _stack          = null;
   private Popover?       _search         = null;
@@ -50,6 +60,8 @@ public class MainWindow : ApplicationWindow {
   private Button?        _prop_btn       = null;
   private Image?         _prop_show      = null;
   private Image?         _prop_hide      = null;
+  private bool           _debug          = false;
+  private bool           _prefer_dark    = false;
 
   private const GLib.ActionEntry[] action_entries = {
     { "action_new",           action_new },
@@ -66,6 +78,8 @@ public class MainWindow : ApplicationWindow {
 
   private delegate void ChangedFunc();
 
+  public signal void canvas_changed( OutlineTable? ot );
+
   /* Create the main window UI */
   public MainWindow( Gtk.Application app, GLib.Settings settings ) {
 
@@ -81,7 +95,6 @@ public class MainWindow : ApplicationWindow {
     /* Create the header bar */
     _header = new HeaderBar();
     _header.set_show_close_button( true );
-    update_title();
 
     /* Set the main window data */
     title = _( "Outliner" );
@@ -103,8 +116,12 @@ public class MainWindow : ApplicationWindow {
     /* Add keyboard shortcuts */
     add_keyboard_shortcuts( app );
 
-    /* Create and pack the table */
-    _table = new OutlineTable();
+    _nb = new DynamicNotebook();
+    _nb.add_button_visible = false;
+    _nb.tab_bar_behavior   = DynamicNotebook.TabBarBehavior.SINGLE;
+    _nb.tab_switched.connect( tab_switched );
+    _nb.tab_reordered.connect( tab_reordered );
+    _nb.close_tab_requested.connect( close_tab_requested );
 
     /* Create title toolbar */
     var new_btn = new Button.from_icon_name( "document-new", IconSize.LARGE_TOOLBAR );
@@ -151,26 +168,211 @@ public class MainWindow : ApplicationWindow {
     add_export_button();
     add_search_button();
 
-    /* Create the scrolled window for the treeview */
-    var scroll = new ScrolledWindow( null, null );
-    // scroll.height_request = 200;
-    scroll.hscrollbar_policy = PolicyType.EXTERNAL;
-    scroll.add( _table );
-
     /* Display the UI */
-    add( scroll );
+    add( _nb );
     show_all();
 
   }
 
+  /* Returns the current drawing area */
+  public OutlineTable? get_current_table( string? caller = null ) {
+    if( _debug && (caller != null) ) {
+      stdout.printf( "get_current_table called from %s\n", caller );
+    }
+    if( _nb.current == null ) { return( null ); }
+    var bin1 = (Gtk.Bin)_nb.current.page;
+    var bin2 = bin1.get_child() as Gtk.Bin;
+    return( bin2.get_child() as OutlineTable );
+  }
+
+  /* Handles any changes to the dark mode preference gsettings for the desktop */
+  private void handle_prefer_dark_changes() {
+    var lookup = SettingsSchemaSource.get_default().lookup( DESKTOP_SCHEMA, false );
+    if( lookup != null ) {
+      var desktop_settings = new GLib.Settings( DESKTOP_SCHEMA );
+      _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
+      desktop_settings.changed.connect(() => {
+        _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
+        on_theme_changed( get_current_table( "handle_prefer_dark_changes" ) );
+      });
+    }
+  }
+
   /* Updates the title */
-  private void update_title() {
+  private void update_title( OutlineTable? ot ) {
     string suffix = " \u2014 Outliner";
+    if( (ot == null) || !ot.document.is_saved() ) {
+      _header.set_title( _( "Unnamed Document" ) + suffix );
+    } else {
+      _header.set_title( GLib.Path.get_basename( ot.document.filename ) + suffix );
+    }
+
     if( (_doc == null) || !_doc.is_saved() ) {
       _header.set_title( _( "Unnamed Document" ) + suffix );
     } else {
       _header.set_title( GLib.Path.get_basename( _doc.filename ) + suffix );
     }
+  }
+
+  /* This needs to be called whenever the tab is changed */
+  private void tab_changed( Tab tab ) {
+    var bin1 = (Gtk.Bin)tab.page;
+    var bin2 = bin1.get_child() as Gtk.Bin;
+    var ot   = bin2.get_child() as OutlineTable;
+    do_buffer_changed( ot );
+    update_title( ot );
+    canvas_changed( ot );
+    save_tab_state( tab );
+  }
+
+  /* Called whenever the current tab is switched in the notebook */
+  private void tab_switched( Tab? old_tab, Tab new_tab ) {
+    tab_changed( new_tab );
+  }
+
+  /* Called whenever the current tab is moved to a new position */
+  private void tab_reordered( Tab? tab, int new_pos ) {
+    save_tab_state( tab );
+  }
+
+  /* Called whenever the user clicks on the close button and the tab is unnamed */
+  private bool close_tab_requested( Tab tab ) {
+    var bin1 = (Gtk.Bin)tab.page;
+    var bin2 = bin1.get_child() as Gtk.Bin;
+    var ot   = bin2.get_child() as OutlineTable;
+    var ret  = ot.document.is_saved() || show_save_warning( ot );
+    return( ret );
+  }
+
+   /* Adds a new tab to the notebook */
+  public OutlineTable add_tab( string? fname, TabAddReason reason ) {
+
+    /* Create and pack the canvas */
+    var ot = new OutlineTable( _settings );
+//    ot.current_changed.connect( on_current_changed );
+//    ot.show_properties.connect( show_properties );
+//    ot.hide_properties.connect( hide_properties );
+    ot.map_event.connect( on_table_mapped );
+    ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
+    ot.theme_changed.connect( on_theme_changed );
+
+    if( fname != null ) {
+      ot.document.filename = fname;
+    }
+
+    /* Create the overlay that will hold the canvas so that we can put an entry box for emoji support */
+    var overlay = new Overlay();
+    overlay.add( ot );
+
+    /* Create the scrolled window for the treeview */
+    var scroll = new ScrolledWindow( null, null );
+    // scroll.height_request = 200;
+    scroll.hscrollbar_policy = PolicyType.EXTERNAL;
+    scroll.add( overlay );
+
+    var tab = new Tab( ot.document.label, null, scroll );
+    tab.pinnable = false;
+    tab.tooltip  = fname;
+
+    /* Add the page to the notebook */
+    _nb.insert_tab( tab, _nb.n_tabs );
+
+    /* Update the titlebar */
+    update_title( ot );
+
+    /* Make the drawing area new */
+    if( reason == TabAddReason.NEW ) {
+      ot.initialize_for_new();
+    } else {
+      ot.initialize_for_open();
+    }
+
+    /* Indicate that the tab has changed */
+    if( reason != TabAddReason.LOAD ) {
+      _nb.current = tab;
+    }
+
+    ot.grab_focus();
+
+    return( ot );
+
+  }
+
+  /* Save the current tab state */
+  private void save_tab_state( Tab current_tab ) {
+
+    var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
+
+    if( DirUtils.create_with_parents( dir, 0775 ) != 0 ) {
+      return;
+    }
+
+    var       fname        = GLib.Path.build_filename( dir, "tab_state.xml" );
+    var       selected_tab = -1;
+    var       i            = 0;
+    Xml.Doc*  doc          = new Xml.Doc( "1.0" );
+    Xml.Node* root         = new Xml.Node( null, "tabs" );
+
+    doc->set_root_element( root );
+
+    _nb.tabs.foreach((tab) => {
+      var       bin1  = (Gtk.Bin)tab.page;
+      var       bin2  = bin1.get_child() as Gtk.Bin;
+      var       table = bin2.get_child() as OutlineTable;
+      Xml.Node* node  = new Xml.Node( null, "tab" );
+      node->new_prop( "path",  table.document.filename );
+      node->new_prop( "saved", table.document.is_saved().to_string() );
+      root->add_child( node );
+      if( tab == current_tab ) {
+        selected_tab = i;
+      }
+      i++;
+    });
+
+    if( selected_tab > -1 ) {
+      root->new_prop( "selected", selected_tab.to_string() );
+    }
+
+    /* Save the file */
+    doc->save_format_file( fname, 1 );
+
+    delete doc;
+
+  }
+
+  /* Loads the tab state */
+  public bool load_tab_state() {
+
+    var tab_state = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner", "tab_state.xml" );
+
+    /* If the file does not exist, skip the rest and return false */
+    if( !FileUtils.test( tab_state, FileTest.EXISTS ) ) return( false );
+
+    Xml.Doc* doc = Xml.Parser.parse_file( tab_state );
+
+    if( doc == null ) { return( false ); }
+
+    var root = doc->get_root_element();
+    for( Xml.Node* it = root->children; it != null; it = it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "tab") ) {
+        var fname = it->get_prop( "path" );
+        var saved = it->get_prop( "saved" );
+        var table = add_tab( fname, TabAddReason.LOAD );
+        table.document.load_filename( fname, bool.parse( saved ) );
+        table.document.load();
+      }
+    }
+
+    var s = root->get_prop( "selected" );
+    if( s != null ) {
+      _nb.current = _nb.get_tab_by_index( int.parse( s ) );
+      tab_changed( _nb.current );
+    }
+
+    delete doc;
+
+    return( _nb.n_tabs > 0 );
+
   }
 
   /* Adds keyboard shortcuts for the menu actions */
@@ -414,7 +616,7 @@ public class MainWindow : ApplicationWindow {
   }
 
   /* Displays the save warning dialog window */
-  public void show_save_warning( string type ) {
+  public bool show_save_warning( OutlineTable ot ) {
 
     var dialog = new Granite.MessageDialog.with_image_from_icon_name(
       _( "Save current unnamed document?" ),
@@ -437,85 +639,36 @@ public class MainWindow : ApplicationWindow {
     dialog.set_default_response( ResponseType.ACCEPT );
     dialog.set_title( "" );
 
-    dialog.response.connect((id) => {
-      dialog.destroy();
-      if( id == ResponseType.ACCEPT ) {
-        if( !save_file() ) {
-          id = ResponseType.CANCEL;
-        }
-      }
-      if( (id == ResponseType.CLOSE) || (id == ResponseType.ACCEPT) ) {
-        switch( type ) {
-          case "new"  :  create_new_file();       break;
-          case "open" :  select_and_open_file();  break;
-        }
-      }
-    });
-
     dialog.show_all();
 
-  }
+    var res = dialog.run();
 
-  /*
-   Allow the user to create a new Outliner file.  Checks to see if the current
-   document needs to be saved and saves it (if necessary).
-  */
-  public void do_new_file() {
+    dialog.destroy();
 
-    /* Save any changes to the current document */
-    if( _doc != null ) {
-      if( _doc.is_saved() ) {
-        _doc.auto_save();
-      } else {
-        show_save_warning( "new" );
-        return;
-      }
+    switch( res ) {
+      case ResponseType.ACCEPT :  save_file( ot );       break;
+      case ResponseType.CLOSE  :  ot.document.remove();  break;
     }
 
-    create_new_file();
+    return( false );
 
   }
 
-  /*
-   Creates a new file
-  */
-  private void create_new_file() {
+  /* Creates a new document and adds it to the notebook */
+  public void do_new_file() {
 
-    /* Create a new document */
-    _doc = new Document( _table, _settings );
-    _table.initialize_for_new();
-    _table.grab_focus();
+    var ot = add_tab( null, TabAddReason.NEW );
 
-    /* Set the title to indicate that we have an unnamed document */
-    update_title();
+    /* Set the title to indicate that we have a new document */
+    update_title( ot );
 
   }
 
   /* Allow the user to open a Outliner file */
   public void do_open_file() {
 
-    /* Automatically save the current file if one exists */
-    if( _doc != null ) {
-      if( _doc.is_saved() ) {
-        _doc.auto_save();
-      } else {
-        show_save_warning( "open" );
-        return;
-      }
-    }
-
-    select_and_open_file();
-
-  }
-
-  /*
-   Allows the user to select a file to open and opens it in the same window.
-  */
-  private void select_and_open_file() {
-
     /* Get the file to open from the user */
-    FileChooserDialog dialog = new FileChooserDialog( _( "Open File" ), this, FileChooserAction.OPEN,
-      _( "Cancel" ), ResponseType.CANCEL, _( "Open" ), ResponseType.ACCEPT );
+    FileChooserNative dialog = new FileChooserNative( _( "Open File" ), this, FileChooserAction.OPEN, _( "Open" ), _( "Cancel" ) );
 
     /* Create file filters */
     var filter = new FileFilter();
@@ -524,8 +677,8 @@ public class MainWindow : ApplicationWindow {
     dialog.add_filter( filter );
 
     filter = new FileFilter();
-    filter.set_filter_name( "OPML" );
-    filter.add_pattern( "*.opml" );
+    filter.set_filter_name( "Freemind / Freeplane" );
+    filter.add_pattern( "*.mm" );
     dialog.add_filter( filter );
 
     filter = new FileFilter();
@@ -533,12 +686,16 @@ public class MainWindow : ApplicationWindow {
     filter.add_pattern( "*.minder" );
     dialog.add_filter( filter );
 
+    filter = new FileFilter();
+    filter.set_filter_name( "OPML" );
+    filter.add_pattern( "*.opml" );
+    dialog.add_filter( filter );
+
     if( dialog.run() == ResponseType.ACCEPT ) {
       open_file( dialog.get_filename() );
     }
 
-    dialog.close();
-    _table.grab_focus();
+    get_current_table( "do_open_file" ).grab_focus();
 
   }
 
@@ -574,27 +731,30 @@ public class MainWindow : ApplicationWindow {
 
   /* Perform an undo action */
   public void do_undo() {
-    _table.undo_buffer.undo();
-    _table.grab_focus();
+    var table = get_current_table( "do_undo" );
+    table.undo_buffer.undo();
+    table.grab_focus();
   }
 
   /* Perform a redo action */
   public void do_redo() {
-    _table.undo_buffer.redo();
-    _table.grab_focus();
+    var table = get_current_table( "do_redo" );
+    table.undo_buffer.redo();
+    table.grab_focus();
   }
 
   /* Performs an indent operation on the currently selected row */
   public void do_indent() {
-    _table.indent();
+    get_current_table( "do_indent" ).indent();
   }
 
   /* Performs an unindent operation on the currently selected row */
   public void do_unindent() {
-    _table.unindent();
+    get_current_table( "do_unindent" ).unindent();
   }
 
   private bool on_table_mapped( Gdk.EventAny e ) {
+    get_current_table().queue_draw();
     return( false );
   }
 
@@ -610,15 +770,15 @@ public class MainWindow : ApplicationWindow {
    Called whenever the undo buffer changes state.  Updates the state of
    the undo and redo buffer buttons.
   */
-  public void do_buffer_changed() {
-    _undo_btn.set_sensitive( _table.undo_buffer.undoable() );
-    _undo_btn.set_tooltip_text( _table.undo_buffer.undo_tooltip() );
-    _redo_btn.set_sensitive( _table.undo_buffer.redoable() );
-    _redo_btn.set_tooltip_text( _table.undo_buffer.redo_tooltip() );
+  public void do_buffer_changed( OutlineTable ot ) {
+    _undo_btn.set_sensitive( ot.undo_buffer.undoable() );
+    _undo_btn.set_tooltip_text( ot.undo_buffer.undo_tooltip() );
+    _redo_btn.set_sensitive( ot.undo_buffer.redoable() );
+    _redo_btn.set_tooltip_text( ot.undo_buffer.redo_tooltip() );
   }
 
   /* Allow the user to select a filename to save the document as */
-  public bool save_file() {
+  public bool save_file( OutlineTable ot ) {
     FileChooserDialog dialog = new FileChooserDialog( _( "Save File" ), this, FileChooserAction.SAVE,
       _( "Cancel" ), ResponseType.CANCEL, _( "Save" ), ResponseType.ACCEPT );
     FileFilter        filter = new FileFilter();
@@ -633,17 +793,17 @@ public class MainWindow : ApplicationWindow {
       }
       _doc.filename = fname;
       _doc.save();
-      update_title();
+      update_title( ot );
       retval = true;
     }
     dialog.close();
-    _table.grab_focus();
+    ot.grab_focus();
     return( retval );
   }
 
   /* Called when the save as button is clicked */
   public void do_save_as_file() {
-    save_file();
+    save_file( get_current_table( "do_save_as_file" ) );
   }
 
   /* Called whenever the row selection changes in the table */
@@ -693,10 +853,11 @@ public class MainWindow : ApplicationWindow {
 
   /* Called when the user uses the Control-s keyboard shortcut */
   private void action_save() {
-    if( _doc.is_saved() ) {
-      _doc.save();
+    var table = get_current_table( "action_save" );
+    if( table.document.is_saved() ) {
+      table.document.save();
     } else {
-      save_file();
+      save_file( table );
     }
   }
 
@@ -737,7 +898,7 @@ public class MainWindow : ApplicationWindow {
     };
     _search_items.clear();
     if( _search_entry.get_text() != "" ) {
-      _table.get_match_items(
+      get_current_table( "on_search_change" ).get_match_items(
         _search_entry.get_text().casefold(),
         search_opts,
         ref _search_items
@@ -761,7 +922,7 @@ public class MainWindow : ApplicationWindow {
 */
     }
     _search.closed();
-    _table.grab_focus();
+    get_current_table( "on_search_clicked" ).grab_focus();
   }
 
   /* Exports the model to various formats */
@@ -782,6 +943,12 @@ public class MainWindow : ApplicationWindow {
     md_filter.add_pattern( "*.md" );
     md_filter.add_pattern( "*.markdown" );
     dialog.add_filter( md_filter );
+
+    /* Minder */
+    FileFilter minder_filter = new FileFilter();
+    minder_filter.set_filter_name( _( "Minder" ) );
+    minder_filter.add_pattern( "*.minder" );
+    dialog.add_filter( minder_filter );
 
     /* OPML */
     FileFilter opml_filter = new FileFilter();
@@ -805,19 +972,22 @@ public class MainWindow : ApplicationWindow {
 
       var fname  = dialog.get_filename();
       var filter = dialog.get_filter();
+      var table  = get_current_table( "action_export" );
 
 /* TBD
       if( csv_filter == filter ) {
-        ExportCSV.export( repair_filename( fname, {".csv"} ), _table );
+        ExportCSV.export( repair_filename( fname, {".csv"} ), table );
       } else if( md_filter == filter ) {
-        ExportMarkdown.export( repair_filename( fname, {".md", ".markdown"} ), _table );
+        ExportMarkdown.export( repair_filename( fname, {".md", ".markdown"} ), table );
+      } else if( minder_filter == filter ) {
+        ExportMinder.export( repair_filename( fname, {".minder"} ), table );
       } else if( opml_filter == filter ) {
-        ExportOPML.export( repair_filename( fname, {".opml"} ), _table );
+        ExportOPML.export( repair_filename( fname, {".opml"} ), table );
       } else if( pdf_filter == filter ) {
-        ExportPDF.export( repair_filename( fname, {".pdf"} ), _table );
+        ExportPDF.export( repair_filename( fname, {".pdf"} ), table );
       } else if( txt_filter == filter ) {
-        ExportText.export( repair_filename( fname, {".txt"} ), _table );
-      }
+        ExportText.export( repair_filename( fname, {".txt"} ), table );
+      } else if( 
 */
     }
 

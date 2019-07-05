@@ -61,10 +61,10 @@ public class Outliner : Granite.Application {
       }
 
     /*
-     If the user specified that a new file should be created or the
-     saved last-file string is empty, create a new map.
+     If the user specified that a new file should be created or the saved tab state
+     was not loadable, create a new map.
     */
-    } else if( new_file || (last_file == "") || !appwin.open_file( last_file ) ) {
+    } else if( new_file || !appwin.load_tab_state() ) {
       appwin.do_new_file();
     }
 

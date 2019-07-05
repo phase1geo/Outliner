@@ -25,6 +25,7 @@ using Cairo;
 
 public class OutlineTable : DrawingArea {
 
+  private Document        _doc;
   private Array<Node>     _nodes;
   private Node?           _selected = null;
   private Node?           _active   = null;
@@ -36,6 +37,7 @@ public class OutlineTable : DrawingArea {
   private Theme           _theme;
   private IMContextSimple _im_context;
 
+  public Document   document    { get { return( _doc ); } }
   public UndoBuffer undo_buffer { get; set; }
   public Themes     themes      { get; set; default = new Themes(); }
   public Node?      selected {
@@ -58,7 +60,10 @@ public class OutlineTable : DrawingArea {
   public signal void theme_changed( OutlineTable ot );
 
   /* Default constructor */
-  public OutlineTable() {
+  public OutlineTable( GLib.Settings settings ) {
+ 
+    /* Create the document for this table */
+    _doc = new Document( this, settings );
 
     /* Allocate storage item */
     _nodes = new Array<Node>();
@@ -67,7 +72,7 @@ public class OutlineTable : DrawingArea {
     undo_buffer = new UndoBuffer( this );
 
     /* Set the default theme */
-    set_theme( "Default" );
+    set_theme( _( "Solarized Dark" ) );
 
     /* Add event listeners */
     this.draw.connect( on_draw );

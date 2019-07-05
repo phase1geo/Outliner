@@ -46,6 +46,11 @@ public class Document : Object {
       return( _filename );
     }
   }
+  public string label {
+    owned get {
+      return( GLib.Path.get_basename( _filename ) );
+    }
+  }
   public bool save_needed { private set; get; default = false; }
 
   /* Default constructor */
@@ -78,6 +83,12 @@ public class Document : Object {
     return( _from_user );
   }
 
+  /* Called when a document filename is loaded from the tab state file */
+  public void load_filename( string fname, bool saved ) {
+    filename   = fname;
+    _from_user = saved;
+  }
+
   /* Opens the given filename */
   public bool load() {
     Xml.Doc* doc = Xml.Parser.parse_file( filename );
@@ -106,6 +117,14 @@ public class Document : Object {
     if( save_needed ) {
       save();
     }
+  }
+
+  /* Deletes the given unnamed file when called */
+  public bool remove() {
+    if( !_from_user ) {
+      FileUtils.unlink( _filename );
+    }
+    return( true );
   }
 
 }

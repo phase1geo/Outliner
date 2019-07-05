@@ -7,6 +7,7 @@ sources += files(
   'Application.vala',
   'CanvasText.vala',
   'Document.vala',
+  'DynamicNotebook.vala',
   'MainWindow.vala',
   'Node.vala',
   'OutlineTable2.vala',
