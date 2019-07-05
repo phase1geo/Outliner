@@ -174,15 +174,21 @@ public class MainWindow : ApplicationWindow {
 
   }
 
+  /* Returns the OutlineTable from the given tab */
+  private OutlineTable? get_table( Tab tab ) {
+    var bin1 = (Gtk.Bin)tab.page;
+    var bin2 = bin1.get_child() as Gtk.Bin;
+    var bin3 = bin2.get_child() as Gtk.Bin;
+    return( bin3.get_child() as OutlineTable );
+  }
+
   /* Returns the current drawing area */
   public OutlineTable? get_current_table( string? caller = null ) {
     if( _debug && (caller != null) ) {
       stdout.printf( "get_current_table called from %s\n", caller );
     }
     if( _nb.current == null ) { return( null ); }
-    var bin1 = (Gtk.Bin)_nb.current.page;
-    var bin2 = bin1.get_child() as Gtk.Bin;
-    return( bin2.get_child() as OutlineTable );
+    return( get_table( _nb.current ) );
   }
 
   /* Handles any changes to the dark mode preference gsettings for the desktop */
@@ -216,9 +222,7 @@ public class MainWindow : ApplicationWindow {
 
   /* This needs to be called whenever the tab is changed */
   private void tab_changed( Tab tab ) {
-    var bin1 = (Gtk.Bin)tab.page;
-    var bin2 = bin1.get_child() as Gtk.Bin;
-    var ot   = bin2.get_child() as OutlineTable;
+    var ot = get_table( tab );
     do_buffer_changed( ot );
     update_title( ot );
     canvas_changed( ot );
@@ -237,10 +241,8 @@ public class MainWindow : ApplicationWindow {
 
   /* Called whenever the user clicks on the close button and the tab is unnamed */
   private bool close_tab_requested( Tab tab ) {
-    var bin1 = (Gtk.Bin)tab.page;
-    var bin2 = bin1.get_child() as Gtk.Bin;
-    var ot   = bin2.get_child() as OutlineTable;
-    var ret  = ot.document.is_saved() || show_save_warning( ot );
+    var ot  = get_table( tab );
+    var ret = ot.document.is_saved() || show_save_warning( ot );
     return( ret );
   }
 
@@ -316,9 +318,7 @@ public class MainWindow : ApplicationWindow {
     doc->set_root_element( root );
 
     _nb.tabs.foreach((tab) => {
-      var       bin1  = (Gtk.Bin)tab.page;
-      var       bin2  = bin1.get_child() as Gtk.Bin;
-      var       table = bin2.get_child() as OutlineTable;
+      var       table = get_table( tab );
       Xml.Node* node  = new Xml.Node( null, "tab" );
       node->new_prop( "path",  table.document.filename );
       node->new_prop( "saved", table.document.is_saved().to_string() );

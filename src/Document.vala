@@ -62,9 +62,11 @@ public class Document : Object {
     /* Create the temporary file */
     var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
     if( DirUtils.create_with_parents( dir, 0775 ) == 0 ) {
-      _filename  = GLib.Path.build_filename( dir, "unnamed.outliner" );
+      int i = 1;
+      do {
+        _filename = GLib.Path.build_filename( dir, "unnamed%d.minder".printf( i++ ) );
+      } while( GLib.FileUtils.test( _filename, FileTest.EXISTS ) );
       _from_user = false;
-      _settings.set_string( "last-file", _filename );
     }
 
     /* Listen for any changes from the canvas */

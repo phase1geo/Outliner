@@ -37,6 +37,7 @@ subdir('tests')
 dependencies = [
   dependency('gobject-2.0'),
   dependency('glib-2.0'),
+  dependency('cairo'),
   dependency('granite'),
   dependency('gtk+-3.0'),
   dependency('libxml-2.0')

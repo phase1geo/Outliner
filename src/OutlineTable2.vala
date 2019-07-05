@@ -100,12 +100,6 @@ public class OutlineTable : DrawingArea {
     _im_context = new IMContextSimple();
     _im_context.commit.connect( handle_printable );
 
-    /*
-     Add some test data so that we can test things before we add the
-     ability to save and load data.
-    */
-    add_test_data();
-
   }
 
   /* Returns true if the currently selected node is editable */
@@ -528,8 +522,15 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Creates a new, unnamed document */
   public void initialize_for_new() {
-    // TBD
+
+    /*
+     Add some test data so that we can test things before we add the
+     ability to save and load data.
+    */
+    add_test_data();
+
   }
 
   public void initialize_for_open() {

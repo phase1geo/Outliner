@@ -1,10 +1,18 @@
 [Desktop Entry]
 Name=Outliner
+GenericName=Outliner
 Comment=Organize your words
+Categories=Office;
+Exec=com.github.phase1geo.outliner %f
 Icon=com.github.phase1geo.outliner
-Exec=com.github.phase1geo.outliner
 Terminal=false
 Type=Application
-StartupNotify=true
-Categories=GNOME;GTK;
-Keywords=app;vala;
+MimeType=application/com.github.phase1geo.outliner;
+X-GNOME-Gettext-Domain=Outliner
+X-GNOME-UsesNotifications=true
+Keywords=outline;
+Actions=NewDocument;
+
+[Desktop Action NewDocument]
+Name=New Document
+Exec=com.github.phase1geo.outliner -n
