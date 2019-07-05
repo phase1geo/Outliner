@@ -13,9 +13,8 @@ gnome = import('gnome')
 i18n = import('i18n')
 
 gresource = gnome.compile_resources(
-    'as-resources', 'data/com.github.phase1geo.outliner.gresource.xml',
+    'outliner-resources', 'data/' + meson.project_name() + '.gresource.xml',
     source_dir: 'data',
-    c_name: 'as'
 )
 
 conf = configuration_data()
@@ -24,7 +23,7 @@ configure_file(output: 'config.h', configuration: conf)
 config_h_dir = include_directories('.')
 
 c_args = [
-  '-include', 'config.h'
+  '-include', 'config.h',
 ]
 
 sources = files()
@@ -34,13 +33,25 @@ subdir('po')
 subdir('src')
 subdir('tests')
 
+gtk_dep = dependency('gtk+-3.0')
+
+if gtk_dep.version().version_compare('>=3.22.0')
+  add_project_arguments(['--define=GTK322'], language: 'vala')
+endif
+
+# Add the math library
+cc = meson.get_compiler('c')
+math_dep = cc.find_library('m', required: false)
+
 dependencies = [
-  dependency('gobject-2.0'),
-  dependency('glib-2.0'),
-  dependency('cairo'),
-  dependency('granite'),
-  dependency('gtk+-3.0'),
-  dependency('libxml-2.0')
+    dependency('gobject-2.0'),
+    dependency('glib-2.0'),
+    dependency('cairo'),
+    dependency('gee-0.8'),
+    dependency('granite'),
+    dependency('gtk+-3.0'),
+    dependency('libxml-2.0'),
+    math_dep
 ]
 
 e = executable('com.github.phase1geo.outliner',

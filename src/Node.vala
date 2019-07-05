@@ -393,9 +393,8 @@ public class Node {
   public void remove_child( Node node ) {
 
     node.adjust_nodes( 0 - node._h );
-
-    node.parent = null;
     children.remove_index( node.index() );
+    node.parent = null;
 
   }
 

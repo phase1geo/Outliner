@@ -259,7 +259,7 @@ public class OutlineTable : DrawingArea {
       selected.name.backspace();
       queue_draw();
     } else if( selected != null ) {
-      /* TBD */
+      delete_node();
     }
   }
 
@@ -268,7 +268,7 @@ public class OutlineTable : DrawingArea {
       selected.name.delete();
       queue_draw();
     } else if( selected != null ) {
-      /* TBD */
+      delete_node();
     }
   }
 
@@ -616,6 +616,18 @@ public class OutlineTable : DrawingArea {
     if( selected == null ) return;
 
     selected.add_child( create_node() );
+
+    queue_draw();
+    changed();
+
+  }
+
+  /* Removes the selected node from the table */
+  public void delete_node() {
+
+    if( selected == null ) return;
+
+    selected.parent.remove_child( selected );
 
     queue_draw();
     changed();
