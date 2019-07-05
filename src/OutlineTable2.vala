@@ -71,8 +71,11 @@ public class OutlineTable : DrawingArea {
     /* Allocate memory for the undo buffer */
     undo_buffer = new UndoBuffer( this );
 
+    /* Set the style context */
+    get_style_context().add_class( "canvas" );
+
     /* Set the default theme */
-    set_theme( _( "Solarized Dark" ) );
+    set_theme( "solarized_dark" );
 
     /* Add event listeners */
     this.draw.connect( on_draw );
@@ -498,7 +501,7 @@ public class OutlineTable : DrawingArea {
     entry.insert_emoji();
   }
 
-  /* Returns the currently applied theme */
+  /* Returns the currently applied heme */
   public Theme get_theme() {
 
     return( _theme );
@@ -543,12 +546,73 @@ public class OutlineTable : DrawingArea {
 
   /* Loads the table information from the given XML node */
   public void load( Xml.Node* n ) {
-    // TBD
+
+    for( Xml.Node* it = n->children; it != null; it = it->next ) {
+      if( it->type == Xml.ElementType.ELEMENT_NODE ) {
+        switch( it->name ) {
+          case "theme" :  load_theme( it );  break;
+          case "nodes" :  load_nodes( it );  break;
+        }
+      }
+    }
+
+    queue_draw();
+
+  }
+
+  /* Loads the given theme from XML format */
+  private void load_theme( Xml.Node* n ) {
+
+    string? name = n->get_prop( "name" );
+    if( name != null ) {
+      set_theme( name );
+    }
+
+  }
+
+  /* Loads all of the nodes from the outliner XML document */
+  private void load_nodes( Xml.Node* n ) {
+
+    for( Xml.Node* it = n->children; it != null; it = it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
+        var node = new Node( this );
+        node.load( this, it );
+        _nodes.append_val( node );
+      }
+    }
+
   }
 
   /* Saves the table information to the given XML node */
   public void save( Xml.Node* n ) {
-    // TBD
+
+    n->add_child( save_theme() );
+    n->add_child( save_nodes() );
+
+  }
+
+  /* Saves the theme information in XML format */
+  private Xml.Node* save_theme() {
+
+    Xml.Node* theme = new Xml.Node( null, "theme" );
+
+    theme->new_prop( "name", _theme.name );
+
+    return( theme );
+
+  }
+
+  /* Saves the nodes in XML format and returns the <nodes> node */
+  private Xml.Node* save_nodes() {
+
+    Xml.Node* nodes = new Xml.Node( null, "nodes" );
+
+    for( int i=0; i<_nodes.length; i++ ) {
+      nodes->add_child( _nodes.index( i ).save() );
+    }
+
+    return( nodes );
+
   }
 
   /**************************/
@@ -568,9 +632,9 @@ public class OutlineTable : DrawingArea {
   private Node create_node() {
 
     var node = new Node( this );
-    node.mode = NodeMode.EDITABLE;
 
     selected = node;
+    node.mode = NodeMode.EDITABLE;
 
     return( node );
 
@@ -603,7 +667,10 @@ public class OutlineTable : DrawingArea {
 
     if( (selected == null) || selected.is_root() ) return;
 
-    selected.parent.add_child( create_node(), (selected.index() + 1) );
+    var index = selected.index();
+    var sel   = selected;
+
+    sel.parent.add_child( create_node(), (index + 1) );
 
     queue_draw();
     changed();
@@ -615,7 +682,9 @@ public class OutlineTable : DrawingArea {
 
     if( selected == null ) return;
 
-    selected.add_child( create_node() );
+    var sel = selected;
+
+    sel.add_child( create_node() );
 
     queue_draw();
     changed();

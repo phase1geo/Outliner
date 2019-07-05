@@ -25,6 +25,7 @@ using Gdk;
 public class Theme : Object {
 
   public    string name               { protected set; get; }
+  public    string label              { protected set; get; }
   public    RGBA   even               { protected set; get; }
   public    RGBA   odd                { protected set; get; }
   public    RGBA   background         { protected set; get; }
@@ -58,7 +59,10 @@ public class Theme : Object {
     CssProvider provider = new CssProvider();
 
     try {
-      var css_data = ".theme-selected { background: #087DFF; }";
+      var css_data = "@define-color colorPrimary @ORANGE_700; " +
+                     "@define-color textColorPrimary @SILVER_100; " +
+                     "@define-color colorAccent @ORANGE_700; " +
+                     ".canvas { background: " + background.to_string() + "; }";
       provider.load_from_data( css_data );
     } catch( GLib.Error e ) {
       stdout.printf( "Unable to load background color: %s\n", e.message );

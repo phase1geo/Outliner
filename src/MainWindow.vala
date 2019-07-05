@@ -121,6 +121,7 @@ public class MainWindow : ApplicationWindow {
     _nb.tab_bar_behavior   = DynamicNotebook.TabBarBehavior.SINGLE;
     _nb.tab_switched.connect( tab_switched );
     _nb.tab_reordered.connect( tab_reordered );
+    _nb.tab_removed.connect( tab_removed );
     _nb.close_tab_requested.connect( close_tab_requested );
 
     /* Create title toolbar */
@@ -236,6 +237,11 @@ public class MainWindow : ApplicationWindow {
 
   /* Called whenever the current tab is moved to a new position */
   private void tab_reordered( Tab? tab, int new_pos ) {
+    save_tab_state( tab );
+  }
+
+  /* Called whenever the current tab is moved to a new position */
+  private void tab_removed( Tab tab ) {
     save_tab_state( tab );
   }
 
@@ -646,8 +652,8 @@ public class MainWindow : ApplicationWindow {
     dialog.destroy();
 
     switch( res ) {
-      case ResponseType.ACCEPT :  save_file( ot );       break;
-      case ResponseType.CLOSE  :  ot.document.remove();  break;
+      case ResponseType.ACCEPT :  return( save_file( ot ) );
+      case ResponseType.CLOSE  :  return( ot.document.remove() );
     }
 
     return( false );

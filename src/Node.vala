@@ -289,13 +289,18 @@ public class Node {
     Xml.Node* n = new Xml.Node( null, "node" );
 
     n->new_prop( "expanded", expanded.to_string() );
-
     n->new_text_child( null, "name", name.text );
-    n->new_text_child( null, "note", note.text );
 
-    for( int i=0; i<children.length; i++ ) {
-      n->add_child( children.index( i ).save() );
+    if( note.text != "" ) {
+      n->new_text_child( null, "note", note.text );
     }
+
+    Xml.Node* nodes = new Xml.Node( null, "nodes" );
+    for( int i=0; i<children.length; i++ ) {
+      nodes->add_child( children.index( i ).save() );
+    }
+
+    n->add_child( nodes );
 
     return( n );
 
@@ -314,13 +319,7 @@ public class Node {
         switch( it->name ) {
           case "name"  :  load_name( it );  break;
           case "note"  :  load_note( it );  break;
-          case "node"  :
-            {
-              var child = new Node( da );
-              child.load( da, it );
-              add_child( child );
-            }
-            break;
+          case "nodes" :  load_nodes( da, it );  break;
         }
       }
     }
@@ -341,6 +340,19 @@ public class Node {
 
     if( (n->children != null) && (n->children->type == Xml.ElementType.TEXT_NODE) ) {
       note.text = n->children->get_content();
+    }
+
+  }
+
+  /* Loads the given child node information */
+  private void load_nodes( DrawingArea da, Xml.Node* n ) {
+
+    for( Xml.Node* it = n->children; it != null; it = it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
+        var child = new Node( da );
+        add_child( child );
+        child.load( da, it );
+      }
     }
 
   }
