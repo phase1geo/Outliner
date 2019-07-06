@@ -42,6 +42,8 @@ public class ThemeSolarizedDark : Theme {
     textsel_background = get_color( "#657B83" );  // Done
     textsel_foreground = get_color( "#002B36" );  // Done
     text_cursor        = get_color( "#93A1A1" );  // Done
+    symbol_color       = get_color( "#B58900" );
+    note_color         = get_color( "#000080" );
     attachable_color   = get_color( "#9bdb4d" );
     prefer_dark        = true;
 

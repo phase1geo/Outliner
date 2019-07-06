@@ -42,6 +42,8 @@ public class ThemeDefault : Theme {
     textsel_background = get_color( "#0d52bf" );
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "Black" );
+    symbol_color       = get_color( "#444444" );
+    note_color         = get_color( "Blue" );
     attachable_color   = get_color( "#9bdb4d" );
     prefer_dark        = false;
 

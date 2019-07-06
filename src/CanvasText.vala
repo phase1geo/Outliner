@@ -34,6 +34,7 @@ public class CanvasText : Object {
   private int          _cursor       = 0;   /* Location of the cursor when editing */
   private int          _column       = 0;   /* Character column to use when moving vertically */
   private Pango.Layout _pango_layout = null;
+  private Pango.Layout _line_layout  = null;
   private int          _selstart     = 0;
   private int          _selend       = 0;
   private int          _selanchor    = 0;
@@ -68,6 +69,17 @@ public class CanvasText : Object {
       return( _height );
     }
   }
+  public double max_width {
+    get {
+      return( _max_width );
+    }
+    set {
+      if( _max_width != value ) {
+        _max_width = value;
+        _pango_layout.set_width( (int)value * Pango.SCALE );
+      }
+    }
+  }
   public bool markup {
     get {
       return( _markup );
@@ -94,6 +106,7 @@ public class CanvasText : Object {
   /* Default constructor */
   public CanvasText( DrawingArea da, double max_width ) {
     _max_width    = max_width;
+    _line_layout  = da.create_pango_layout( "M" );
     _pango_layout = da.create_pango_layout( null );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
@@ -103,6 +116,7 @@ public class CanvasText : Object {
   /* Constructor initializing string */
   public CanvasText.with_text( DrawingArea da, double max_width, string txt ) {
     _max_width    = max_width;
+    _line_layout  = da.create_pango_layout( "M" );
     _pango_layout = da.create_pango_layout( txt );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
@@ -116,20 +130,24 @@ public class CanvasText : Object {
     posy       = ct.posy;
     _max_width = ct._max_width;
     _text      = ct.text;
+    _line_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
     update_size( true );
   }
 
-  /* Returns the maximum width allowed for this node */
-  public int max_width() {
-    return( (int)_max_width );
-  }
-
   /* Sets the font description to the given value */
   public void set_font( FontDescription font ) {
+    _line_layout.set_font_description( font );
     _pango_layout.set_font_description( font );
     update_size( true );
+  }
+
+  public void set_font_size( int size ) {
+    var fd = _line_layout.get_font_description();
+    fd.set_size( size );
+    _line_layout.set_font_description( fd );
+    _pango_layout.set_font_description( fd );
   }
 
   /* Returns true if the text is currently wrapped */
@@ -185,6 +203,13 @@ public class CanvasText : Object {
       return( begtext + seltext + endtext );
     }
     return( (markup || edit) ? text : unmarkup( text ) );
+  }
+
+  /* Returns the height of a single line of text */
+  public double get_line_height() {
+    int width, height;
+    _line_layout.get_size( out width, out height );
+    return( height / Pango.SCALE );
   }
 
   /*

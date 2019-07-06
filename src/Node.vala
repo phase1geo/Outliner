@@ -42,6 +42,7 @@ public class Node {
   private double      _h        = 80;
   private int         _depth    = 0;
   private bool        _expanded = true;
+  private double      _da_width = 0;
 
   /* Properties */
   public NodeMode mode {
@@ -138,13 +139,35 @@ public class Node {
   /* Constructor */
   public Node( DrawingArea da ) {
 
-    _name = new CanvasText( da, _w );
-    _name.resized.connect( update_size );
+    var name_fd = new Pango.FontDescription();
+    name_fd.set_size( 12 * Pango.SCALE );
 
-    _note = new CanvasText( da, _w );
+    var note_fd = new Pango.FontDescription();
+    note_fd.set_size( 10 * Pango.SCALE );
+
+    _name = new CanvasText( da, da.get_allocated_width() );
+    _name.resized.connect( update_size );
+    _name.set_font( name_fd );
+
+    _note = new CanvasText( da, da.get_allocated_width() );
     _note.resized.connect( update_size );
+    _note.set_font( note_fd );
 
     position_name();
+
+    /* Detect any size changes by the drawing area */
+    da.size_allocate.connect( da_size_changed );
+
+  }
+
+  /* Called whenever the canvas width changes */
+  private void da_size_changed( Allocation alloc ) {
+
+    if( _w == alloc.width ) return;
+
+    _da_width = alloc.width;
+    _name.max_width = _da_width - _name.posx;
+    _note.max_width = _da_width - _note.posx;
 
   }
 
@@ -155,7 +178,7 @@ public class Node {
 
     _h = (padx * 2) + _name.height;
 
-    if( _note.text != "" ) {
+    if( (_note != null) && (_note.text != "") ) {
       _h += padx + _note.height;
     }
 
@@ -178,20 +201,16 @@ public class Node {
 
   /* Adjusts the posy value of all nodes that are descendants of the give node */
   private void adjust_descendants( double diff, int child_start ) {
-
     for( int i=child_start; i<children.length; i++ ) {
       children.index( i ).y += diff;
       children.index( i ).adjust_descendants( diff, 0 );
     }
-
   }
 
   /* Adjusts the position of the text object */
   private void position_name() {
-
     name.posx = x + (padx * 2) + (depth * indent) + 10;
     name.posy = y + pady;
-
   }
 
   /* Returns the root node of this node */
@@ -260,23 +279,17 @@ public class Node {
 
   /* Returns true if the given coordinates are within this node */
   public bool is_within( double x, double y ) {
-
     return( Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
-
   }
 
   /* Returns true if the given coordinates lie within the expander */
   public bool is_within_expander( double x, double y ) {
-
     return( Utils.is_within_bounds( x, y, (this.x + padx + (depth * indent)), (this.y + pady), 10, 10 ) );
-
   }
 
   /* Returns true if the given coordinates lie within the attach area */
   public bool is_within_attach( double x, double y ) {
-
     return( Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, ((this.y + _h) - 4) ) );
-
   }
 
   /*************************/
@@ -480,25 +493,30 @@ public class Node {
   /* Draw the expander icon */
   private void draw_expander( Cairo.Context ctx, Theme theme ) {
 
-    /* We won't draw the expander if we have no children */
-    if( children.length == 0 ) return;
+    var x  = _x + padx + (depth * indent);
+    var y  = _y + pady;
+    var r  = 2;
+    var lh = name.get_line_height();
 
-    double x = _x + padx + (depth * indent);
-    double y = _y + pady;
+    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, alpha );
 
-    Utils.set_context_color_with_alpha( ctx, theme.foreground, alpha );
-
-    ctx.move_to( x, y );
-
-    if( expanded ) {
-      ctx.line_to( (x + 10), y );
-      ctx.line_to( (x + 5), (y + 10) );
+    if( children.length == 0 ) {
+      var mid = y + (lh / 2);
+      ctx.arc( (x + 4), mid, r, 0, (2 * Math.PI) );
+    } else if( expanded ) {
+      var mody = y + ((lh - 6) / 2);
+      ctx.move_to( x, mody );
+      ctx.line_to( (x + 8), mody );
+      ctx.line_to( (x + 4), (mody + 6) );
+      ctx.close_path();
     } else {
-      ctx.line_to( (x + 10), (y + 5) );
-      ctx.line_to( x, (y + 10) );
+      var mody = y + ((lh - 6) / 2);
+      ctx.move_to( x, mody );
+      ctx.line_to( (x + 8), (mody + 4) );
+      ctx.line_to( x, (mody + 8) );
+      ctx.close_path();
     }
 
-    ctx.close_path();
     ctx.fill();
 
   }
@@ -510,12 +528,22 @@ public class Node {
 
   }
 
+  /* Draw the note */
+  private void draw_note( Cairo.Context ctx, Theme theme ) {
+
+    if( _note.text != "" ) {
+      _note.draw( ctx, theme, theme.note_color, alpha );
+    }
+
+  }
+
   /* Draw the node to the screen */
   private void draw( Cairo.Context ctx, Theme theme ) {
 
     draw_background( ctx, theme );
     draw_expander( ctx, theme );
     draw_name( ctx, theme );
+    draw_note( ctx, theme );
 
   }
 

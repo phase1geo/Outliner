@@ -37,6 +37,8 @@ public class Theme : Object {
   public    RGBA   textsel_background { protected set; get; }
   public    RGBA   textsel_foreground { protected set; get; }
   public    RGBA   text_cursor        { protected set; get; }
+  public    RGBA   symbol_color       { protected set; get; }
+  public    RGBA   note_color         { protected set; get; }
   public    RGBA   attachable_color   { protected set; get; }
   public    bool   prefer_dark        { protected set; get; }
 
@@ -59,9 +61,9 @@ public class Theme : Object {
     CssProvider provider = new CssProvider();
 
     try {
-      var css_data = "@define-color colorPrimary @ORANGE_700; " +
+      var css_data = "@define-color colorPrimary #d29034; " +
                      "@define-color textColorPrimary @SILVER_100; " +
-                     "@define-color colorAccent @ORANGE_700; " +
+                     "@define-color colorAccent #d29034; " +
                      ".canvas { background: " + background.to_string() + "; }";
       provider.load_from_data( css_data );
     } catch( GLib.Error e ) {

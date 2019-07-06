@@ -42,6 +42,8 @@ public class ThemeDark : Theme {
     textsel_background = get_color( "#0d52bf" );
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "White" );
+    symbol_color       = get_color( "#cccccc" );
+    note_color         = get_color( "#000080" );
     attachable_color   = get_color( "#9bdb4d" );
     prefer_dark        = true;
 

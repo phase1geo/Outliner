@@ -240,6 +240,7 @@ public class OutlineTable : DrawingArea {
           case 65307 :  handle_escape();            break;
           case 65293 :  handle_return();            break;
           case 65289 :  handle_tab();               break;
+          case 65056 :  handle_shift_tab();         break;
           case 65363 :  handle_right( shift );      break;
           case 65361 :  handle_left( shift );       break;
           case 65360 :  handle_home();              break;
@@ -300,9 +301,17 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Handles a tab key hit when a node is selected */
   private void handle_tab() {
     if( selected != null ) {
-      add_child_node();
+      indent();
+    }
+  }
+
+  /* Handles a shift tab keypress when a node is selected */
+  private void handle_shift_tab() {
+    if( selected != null ) {
+      unindent();
     }
   }
 
