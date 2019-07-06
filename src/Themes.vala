@@ -63,4 +63,15 @@ public class Themes : Object {
     return( _themes.index( 0 ) );
   }
 
+  /* Adds the theme CSS to the screen */
+  public void add_css() {
+    var provider = new Gtk.CssProvider ();
+    var css      = "";
+    for( int i=0; i<_themes.length; i++ ) {
+      css += "." + _themes.index( i ).name + " radio { background: " + _themes.index( i ).background.to_string() + "; color: " + _themes.index( i ).foreground.to_string() + "; } ";
+    }
+    provider.load_from_data( css );
+    Gtk.StyleContext.add_provider_for_screen( Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION );
+  }
+
 }

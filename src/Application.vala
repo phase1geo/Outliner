@@ -39,11 +39,14 @@ public class Outliner : Granite.Application {
     /* Initialize the settings */
     settings = new GLib.Settings( "com.github.phase1geo.outliner" );
 
-    var last_file = settings.get_string( "last-file" );
-
     /* Add the application-specific icons */
     weak IconTheme default_theme = IconTheme.get_default();
     default_theme.add_resource_path( "/com/github/phase1geo/outliner" );
+
+    /* Add the application CSS */
+    var provider = new Gtk.CssProvider ();
+    provider.load_from_resource( "/com/github/phase1geo/outliner/css/style.css" );
+    Gtk.StyleContext.add_provider_for_screen( Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION );
 
     /* Create the main window */
     var appwin = new MainWindow( this, settings );

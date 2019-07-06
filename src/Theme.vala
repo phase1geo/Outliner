@@ -61,9 +61,9 @@ public class Theme : Object {
     CssProvider provider = new CssProvider();
 
     try {
-      var css_data = "@define-color colorPrimary #d29034; " +
+      var css_data = "@define-color colorPrimary @ORANGE_700; " +
                      "@define-color textColorPrimary @SILVER_100; " +
-                     "@define-color colorAccent #d29034; " +
+                     "@define-color colorAccent @ORANGE_700; " +
                      ".canvas { background: " + background.to_string() + "; }";
       provider.load_from_data( css_data );
     } catch( GLib.Error e ) {

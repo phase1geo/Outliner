@@ -39,7 +39,6 @@ public class OutlineTable : DrawingArea {
 
   public Document   document    { get { return( _doc ); } }
   public UndoBuffer undo_buffer { get; set; }
-  public Themes     themes      { get; set; default = new Themes(); }
   public Node?      selected {
     get {
       return( _selected );
@@ -57,7 +56,6 @@ public class OutlineTable : DrawingArea {
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
-  public signal void theme_changed( OutlineTable ot );
 
   /* Default constructor */
   public OutlineTable( GLib.Settings settings ) {
@@ -75,7 +73,7 @@ public class OutlineTable : DrawingArea {
     get_style_context().add_class( "canvas" );
 
     /* Set the default theme */
-    set_theme( "solarized_dark" );
+    set_theme( MainWindow.themes.get_theme( "solarized_dark" ) );
 
     /* Add event listeners */
     this.draw.connect( on_draw );
@@ -518,9 +516,9 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Sets the theme to the given value */
-  public void set_theme( string name ) {
+  public void set_theme( Theme theme ) {
 
-    _theme = themes.get_theme( name );
+    _theme = theme;
 
     StyleContext.add_provider_for_screen(
       Screen.get_default(),
@@ -528,7 +526,6 @@ public class OutlineTable : DrawingArea {
       STYLE_PROVIDER_PRIORITY_APPLICATION
     );
 
-    theme_changed( this );
     queue_draw();
     changed();
 
@@ -574,7 +571,7 @@ public class OutlineTable : DrawingArea {
 
     string? name = n->get_prop( "name" );
     if( name != null ) {
-      set_theme( name );
+      set_theme( MainWindow.themes.get_theme( name ) );
     }
 
   }

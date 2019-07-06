@@ -36,32 +36,26 @@ public class MainWindow : ApplicationWindow {
   private GLib.Settings   _settings;
   private HeaderBar?      _header         = null;
   private DynamicNotebook _nb;
-  private Document?       _doc            = null;
-  private Revealer?       _inspector      = null;
-  // private NodeInspector  _node_inspector = null;
-  private Stack?         _stack          = null;
-  private Popover?       _search         = null;
-  private MenuButton?    _search_btn     = null;
-  private SearchEntry?   _search_entry   = null;
-  private TreeView       _search_list;
-  private Gtk.ListStore  _search_items;
-  private ScrolledWindow _search_scroll;
-  private CheckButton    _search_titles;
-  private CheckButton    _search_notes;
-  private CheckButton    _search_folded;
-  private CheckButton    _search_unfolded;
-  private CheckButton    _search_tasks;
-  private CheckButton    _search_nontasks;
-  private Popover?       _export         = null;
-  private Button?        _undo_btn       = null;
-  private Button?        _redo_btn       = null;
-  private Button?        _indent         = null;
-  private Button?        _unindent       = null;
-  private Button?        _prop_btn       = null;
-  private Image?         _prop_show      = null;
-  private Image?         _prop_hide      = null;
-  private bool           _debug          = false;
-  private bool           _prefer_dark    = false;
+  private Popover?        _search         = null;
+  private MenuButton?     _search_btn     = null;
+  private SearchEntry?    _search_entry   = null;
+  private TreeView        _search_list;
+  private Gtk.ListStore   _search_items;
+  private ScrolledWindow  _search_scroll;
+  private CheckButton     _search_titles;
+  private CheckButton     _search_notes;
+  private CheckButton     _search_folded;
+  private CheckButton     _search_unfolded;
+  private CheckButton     _search_tasks;
+  private CheckButton     _search_nontasks;
+  private Popover?        _export         = null;
+  private Button?         _undo_btn       = null;
+  private Button?         _redo_btn       = null;
+  private SpinButton      _zoom;
+  private bool            _debug          = false;
+  private bool            _prefer_dark    = false;
+
+  public static Themes themes = new Themes();
 
   private const GLib.ActionEntry[] action_entries = {
     { "action_new",           action_new },
@@ -91,6 +85,9 @@ public class MainWindow : ApplicationWindow {
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
+
+    /* Add the theme CSS */
+    themes.add_css();
 
     /* Create the header bar */
     _header = new HeaderBar();
@@ -126,46 +123,34 @@ public class MainWindow : ApplicationWindow {
 
     /* Create title toolbar */
     var new_btn = new Button.from_icon_name( "document-new", IconSize.LARGE_TOOLBAR );
-    new_btn.set_tooltip_markup( _( "New File   <i>(Control-N)</i>" ) );
+    new_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "New File" ), "Ctrl + N" ) );
     new_btn.clicked.connect( do_new_file );
     _header.pack_start( new_btn );
 
     var open_btn = new Button.from_icon_name( "document-open", IconSize.LARGE_TOOLBAR );
-    open_btn.set_tooltip_markup( _( "Open File   <i>(Control-O)</i>" ) );
+    open_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Open File" ), "Ctrl + O" ) );
     open_btn.clicked.connect( do_open_file );
     _header.pack_start( open_btn );
 
     var save_btn = new Button.from_icon_name( "document-save-as", IconSize.LARGE_TOOLBAR );
-    save_btn.set_tooltip_markup( _( "Save File As   <i>(Control-Shift-S)</i>" ) );
+    save_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Save File As" ), "Ctrl + Shift + S" ) );
     save_btn.clicked.connect( do_save_as_file );
     _header.pack_start( save_btn );
 
     _undo_btn = new Button.from_icon_name( "edit-undo", IconSize.LARGE_TOOLBAR );
-    _undo_btn.set_tooltip_markup( _( "Undo   <i>(Control-Z)</i>" ) );
+    _undo_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Undo" ), "Ctrl + Z" ) );
     _undo_btn.set_sensitive( false );
     _undo_btn.clicked.connect( do_undo );
     _header.pack_start( _undo_btn );
 
     _redo_btn = new Button.from_icon_name( "edit-redo", IconSize.LARGE_TOOLBAR );
-    _redo_btn.set_tooltip_markup( _( "Redo   <i>(Control-Shift-Z)</i>" ) );
+    _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Redo" ), "Ctrl + Shift + Z" ) );
     _redo_btn.set_sensitive( false );
     _redo_btn.clicked.connect( do_redo );
     _header.pack_start( _redo_btn );
 
-    _indent = new Button.from_icon_name( "format-indent-more", IconSize.LARGE_TOOLBAR );
-    _indent.set_tooltip_markup( _( "Indent  <i>Tab</i>" ) );
-    //_indent.set_sensitive( false );
-    _indent.clicked.connect( do_indent );
-    _header.pack_start( _indent );
-
-    _unindent = new Button.from_icon_name( "format-indent-less", IconSize.LARGE_TOOLBAR );
-    _unindent.set_tooltip_markup( _( "Unindent  <i>Shift-Tab</i>" ) );
-    // _unindent.set_sensitive( false );
-    _unindent.clicked.connect( do_unindent );
-    _header.pack_start( _unindent );
-
     /* Add the buttons on the right side in the reverse order */
-    add_property_button();
+    add_properties_button();
     add_export_button();
     add_search_button();
 
@@ -200,7 +185,7 @@ public class MainWindow : ApplicationWindow {
       _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
       desktop_settings.changed.connect(() => {
         _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
-        on_theme_changed( get_current_table( "handle_prefer_dark_changes" ) );
+        theme_changed( get_current_table( "handle_prefer_dark_changes" ) );
       });
     }
   }
@@ -212,12 +197,6 @@ public class MainWindow : ApplicationWindow {
       _header.set_title( _( "Unnamed Document" ) + suffix );
     } else {
       _header.set_title( GLib.Path.get_basename( ot.document.filename ) + suffix );
-    }
-
-    if( (_doc == null) || !_doc.is_saved() ) {
-      _header.set_title( _( "Unnamed Document" ) + suffix );
-    } else {
-      _header.set_title( GLib.Path.get_basename( _doc.filename ) + suffix );
     }
   }
 
@@ -258,11 +237,8 @@ public class MainWindow : ApplicationWindow {
     /* Create and pack the canvas */
     var ot = new OutlineTable( _settings );
 //    ot.current_changed.connect( on_current_changed );
-//    ot.show_properties.connect( show_properties );
-//    ot.hide_properties.connect( hide_properties );
     ot.map_event.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
-    ot.theme_changed.connect( on_theme_changed );
 
     if( fname != null ) {
       ot.document.filename = fname;
@@ -558,67 +534,70 @@ public class MainWindow : ApplicationWindow {
   }
 
   /* Adds the property functionality */
-  private void add_property_button() {
+  private void add_properties_button() {
 
-    /* Add the menubutton */
-    _prop_show = new Image.from_icon_name( "pane-show-symbolic", IconSize.LARGE_TOOLBAR );
-    _prop_hide = new Image.from_icon_name( "pane-hide-symbolic", IconSize.LARGE_TOOLBAR );
-    _prop_btn  = new Button();
-    _prop_btn.image = _prop_show;
-    _prop_btn.set_tooltip_text( _( "Properties" ) );
-    _prop_btn.clicked.connect( inspector_clicked );
-    _header.pack_end( _prop_btn );
+    /* Add the button */
+    var prop_btn = new MenuButton();
+    prop_btn.set_image( new Image.from_icon_name( "open-menu", IconSize.LARGE_TOOLBAR ) );
+    prop_btn.set_tooltip_text( _( "Properties" ) );
+    prop_btn.clicked.connect( properties_clicked );
+    _header.pack_end( prop_btn );
 
-/* TBD - Sidebar created here
-    var box = new Box( Orientation.VERTICAL, 20 );
-    var sb  = new StackSwitcher();
+    var box = new Box( Orientation.VERTICAL, 0 );
 
-    // TBD - _node_inspector = new NodeInspector( _table );
+    var zoom_box = new Box( Orientation.HORIZONTAL, 0 );
+    var zoom_lbl = new Label( _( "Zoom" ) + " %:" );
 
-    _stack = new Stack();
-    _stack.set_transition_type( StackTransitionType.SLIDE_LEFT_RIGHT );
-    _stack.set_transition_duration( 500 );
-    _stack.add_titled( _node_inspector, "node", _("Node") );
-    _stack.add_titled( new MapInspector( _table, _settings ),  "map",  _("Map") );
+    _zoom = new SpinButton.with_range( 25, 200, 25 );
+    _zoom.set_value( 100 );
+    _zoom.value_changed.connect( zoom_changed );
 
-    _stack.notify.connect((ps) => {
-      if( ps.name == "visible-child" ) {
-        _settings.set_boolean( "node-properties-shown", (_stack.visible_child_name == "node") );
-        _settings.set_boolean( "map-properties-shown",  (_stack.visible_child_name == "map") );
+    zoom_box.pack_start( zoom_lbl, false, false, 10 );
+    zoom_box.pack_start( _zoom,    true,  true,  10 );
+
+    box.pack_start( zoom_box, false, false, 10 );
+
+    /* Add theme selector */
+    var names     = new Array<string>();
+    var theme_box = new Box( Orientation.HORIZONTAL, 0 );
+    RadioButton? rb = null;
+    themes.names( ref names );
+    for( int i=0; i<names.length; i++ ) {
+      var theme  = themes.get_theme( names.index( i ) );
+      var button = new RadioButton.from_widget( rb );
+      button.halign       = Align.CENTER;
+      button.tooltip_text = theme.label;
+      button.get_style_context().add_class( theme.name );
+      button.get_style_context().add_class( "color-button" );
+      button.clicked.connect(() => {
+        var table = get_current_table();
+        table.set_theme( theme );
+        theme_changed( table );
+      });
+      theme_box.pack_start( button, false, false, 10 );
+      if( rb == null ) {
+        rb = button;
       }
-    });
+    }
+    box.pack_start( theme_box, false, false, 10 );
 
-    sb.homogeneous = true;
-    sb.set_stack( _stack );
-
-    box.margin = 5;
-    box.pack_start( sb,     false, true, 0 );
-    box.pack_start( _stack, true,  true, 0 );
     box.show_all();
 
-    _inspector = new Revealer();
-    _inspector.set_transition_type( RevealerTransitionType.SLIDE_LEFT );
-    _inspector.set_transition_duration( 500 );
-    _inspector.child = box;
-
-    if( _settings.get_boolean( "node-properties-shown" ) ) {
-      show_properties( "node", false );
-    } else if( _settings.get_boolean( "map-properties-shown" ) ) {
-      show_properties( "map", false );
-    }
-*/
+    /* Create the popover and associate it with the menu button */
+    var prop_popover = new Popover( null );
+    prop_popover.add( box );
+    prop_btn.popover = prop_popover;
 
   }
 
-  /* Show or hides the inspector sidebar */
-  private void inspector_clicked() {
-/*
-    if( _inspector.child_revealed ) {
-      hide_properties();
-    } else {
-      show_properties( null, false );
-    }
-*/
+  /* Called whenever the user changes the zoom level */
+  private void zoom_changed() {
+
+    var table = get_current_table( "zoom_changed" );
+    var zoom  = _zoom.get_value();
+
+    stdout.printf( "zoom: %g\n", zoom );
+
   }
 
   /* Displays the save warning dialog window */
@@ -749,23 +728,13 @@ public class MainWindow : ApplicationWindow {
     table.grab_focus();
   }
 
-  /* Performs an indent operation on the currently selected row */
-  public void do_indent() {
-    get_current_table( "do_indent" ).indent();
-  }
-
-  /* Performs an unindent operation on the currently selected row */
-  public void do_unindent() {
-    get_current_table( "do_unindent" ).unindent();
-  }
-
   private bool on_table_mapped( Gdk.EventAny e ) {
     get_current_table().queue_draw();
     return( false );
   }
 
   /* Called whenever the theme is changed */
-  private void on_theme_changed( OutlineTable ot ) {
+  private void theme_changed( OutlineTable ot ) {
     Gtk.Settings? settings = Gtk.Settings.get_default();
     if( settings != null ) {
       settings.gtk_application_prefer_dark_theme = ot.get_theme().prefer_dark;
@@ -797,8 +766,8 @@ public class MainWindow : ApplicationWindow {
       if( fname.substring( -7, -1 ) != ".outliner" ) {
         fname += ".outliner";
       }
-      _doc.filename = fname;
-      _doc.save();
+      ot.document.filename = fname;
+      ot.document.save();
       update_title( ot );
       retval = true;
     }
@@ -814,37 +783,6 @@ public class MainWindow : ApplicationWindow {
 
   /* Called whenever the row selection changes in the table */
   private void on_row_changed() {
-  }
-
-  /* Displays the node properties panel for the current node */
-  private void show_properties( string? tab, bool grab_note ) {
-    if( _inspector.reveal_child && ((tab == null) || (_stack.visible_child_name == tab)) ) return;
-    _prop_btn.image = _prop_hide;
-    if( tab != null ) {
-      _stack.visible_child_name = tab;
-    }
-    if( !_inspector.reveal_child ) {
-      _inspector.reveal_child = true;
-    }
-    _settings.set_boolean( (_stack.visible_child_name + "-properties-shown"), true );
-/*
-    if( _stack.visible_child_name == "node" ) {
-      if( grab_note ) {
-        _node_inspector.grab_note();
-      } else {
-        _node_inspector.grab_name();
-      }
-    }
-*/
-  }
-
-  /* Hides the node properties panel */
-  private void hide_properties() {
-    if( !_inspector.reveal_child ) return;
-    _prop_btn.image = _prop_show;
-    _inspector.reveal_child = false;
-    _settings.set_boolean( "node-properties-shown", false );
-    _settings.set_boolean( "map-properties-shown",  false );
   }
 
   /* Called when the user uses the Control-n keyboard shortcut */
@@ -1021,6 +959,10 @@ public class MainWindow : ApplicationWindow {
     var print = new ExportPrint();
     print.print( _canvas, this );
 */
+  }
+
+  private void properties_clicked() {
+
   }
 
 }
