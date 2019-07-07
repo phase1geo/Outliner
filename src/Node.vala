@@ -113,18 +113,10 @@ public class Node {
     set {
       if( value && !_expanded ) {
         _expanded = value;
-        if( parent != null ) {
-          var last = get_last_node();
-          var diff = (last.y + last._h) - (y + _h);
-          parent.adjust_nodes( (y + _h), false, (index() + 1) );
-        }
+        adjust_nodes( (y + _h), false );
       } else if( !value && _expanded ) {
-        if( parent != null ) {
-          var last = get_last_node();
-          var diff = 0 - ((last.y + last._h) - (y + _h));
-          parent.adjust_nodes( (y + _h), false, (index() + 1) );
-        }
         _expanded = value;
+        adjust_nodes( (y + _h), false );
       }
     }
   }
@@ -145,14 +137,15 @@ public class Node {
     note_fd.set_size( 10 * Pango.SCALE );
 
     _name = new CanvasText( da, da.get_allocated_width() );
-    _name.resized.connect( update_size );
+    _name.resized.connect( update_height );
     _name.set_font( name_fd );
 
     _note = new CanvasText( da, da.get_allocated_width() );
-    _note.resized.connect( update_size );
+    _note.resized.connect( update_height );
     _note.set_font( note_fd );
 
     position_name();
+    update_width( da.get_allocated_width() );
 
     /* Detect any size changes by the drawing area */
     da.size_allocate.connect( da_size_changed );
@@ -162,16 +155,23 @@ public class Node {
   /* Called whenever the canvas width changes */
   private void da_size_changed( Allocation alloc ) {
 
-    if( _w == alloc.width ) return;
+    update_width( alloc.width );
 
-    _w = alloc.width;
+  }
+
+  /* Called whenever the canvas width changes */
+  private void update_width( double width ) {
+
+    if( _w == width ) return;
+
+    _w = width;
     _name.max_width = _w - _name.posx;
     _note.max_width = _w - _note.posx;
 
   }
 
   /* Updates the size of this node */
-  private void update_size() {
+  private void update_height() {
 
     var orig_height = _h;
 
@@ -287,7 +287,12 @@ public class Node {
 
   /* Returns true if the given coordinates lie within the expander */
   public bool is_within_expander( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, (this.x + padx + (depth * indent)), (this.y + pady), 10, 10 ) );
+    if( !is_leaf() ) {
+      var lh   = name.get_line_height();
+      var mody = this.y + ((lh - 6) / 2);
+      return( Utils.is_within_bounds( x, y, (this.x + padx + (depth * indent)), (mody + pady), 10, 10 ) );
+    }
+    return( false );
   }
 
   /* Returns true if the given coordinates lie within the attach area */
@@ -516,7 +521,7 @@ public class Node {
     } else {
       var mody = y + ((lh - 6) / 2);
       ctx.move_to( x, mody );
-      ctx.line_to( (x + 8), (mody + 4) );
+      ctx.line_to( (x + 6), (mody + 4) );
       ctx.line_to( x, (mody + 8) );
       ctx.close_path();
     }

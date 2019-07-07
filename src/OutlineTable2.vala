@@ -130,6 +130,7 @@ public class OutlineTable : DrawingArea {
 
     if( clicked != null ) {
       if( clicked.is_within_expander( x, y ) ) {
+        stdout.printf( "A WITHIN_EXPANDER\n" );
         _active = clicked;
         return( false );
       } else if( (clicked == selected) && (clicked.mode == NodeMode.EDITABLE) ) {
@@ -239,6 +240,7 @@ public class OutlineTable : DrawingArea {
 
       /* If the user clicked in an expander, toggle the expander */
       if( !_motion && _active.is_within_expander( e.x, e.y ) ) {
+        stdout.printf( "B WITHIN_EXPANDER\n" );
         _active.expanded = !_active.expanded;
         queue_draw();
         changed();
