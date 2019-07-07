@@ -239,7 +239,6 @@ public class MainWindow : ApplicationWindow {
 
     /* Create and pack the canvas */
     var ot = new OutlineTable( _settings );
-//    ot.current_changed.connect( on_current_changed );
     ot.map_event.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
 
@@ -253,7 +252,6 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the scrolled window for the treeview */
     var scroll = new ScrolledWindow( null, null );
-    // scroll.height_request = 200;
     scroll.hscrollbar_policy = PolicyType.EXTERNAL;
     scroll.add( overlay );
 
@@ -270,8 +268,6 @@ public class MainWindow : ApplicationWindow {
     /* Make the drawing area new */
     if( reason == TabAddReason.NEW ) {
       ot.initialize_for_new();
-    } else {
-      ot.initialize_for_open();
     }
 
     /* Indicate that the tab has changed */
@@ -704,14 +700,12 @@ public class MainWindow : ApplicationWindow {
     if( !FileUtils.test( fname, FileTest.IS_REGULAR ) ) {
       return( false );
     }
-/* TBD
     if( fname.has_suffix( ".outliner" ) ) {
-      _doc = new Document( _table, _settings );
-      _table.initialize_for_open();
-      _doc.filename = fname;
-      update_title();
-      _doc.load();
+      var table = add_tab( fname, TabAddReason.OPEN );
+      update_title( table );
+      table.document.load();
       return( true );
+ /*
     } else if( fname.has_suffix( ".opml" ) ) {
       _doc = new Document( _table, _settings );
       _table.initialize_for_open();
@@ -724,8 +718,8 @@ public class MainWindow : ApplicationWindow {
       update_title();
       ExportMinder.import( fname, _table );
       return( true );
-    }
 */
+    }
     return( false );
   }
 

@@ -113,10 +113,10 @@ public class Node {
     set {
       if( value && !_expanded ) {
         _expanded = value;
-        adjust_nodes( (y + _h), false );
+        adjust_nodes( last_y, false );
       } else if( !value && _expanded ) {
         _expanded = value;
-        adjust_nodes( (y + _h), false );
+        adjust_nodes( last_y, false );
       }
     }
   }
@@ -126,6 +126,7 @@ public class Node {
   public double      indent   { get; set; default = 20; }
   public Node?       parent   { get; set; default = null; }
   public Array<Node> children { get; set; default = new Array<Node>(); }
+  public double      last_y   { get { return( _y + _h ); } }
 
   /* Constructor */
   public Node( OutlineTable ot ) {
@@ -188,21 +189,23 @@ public class Node {
     }
 
     if( orig_height != _h ) {
-      adjust_nodes( y + _h, false );
+      adjust_nodes( last_y, false );
     }
 
   }
 
   /* Adjusts the posy value of all of the nodes displayed below this node */
-  private void adjust_nodes( double last_y, bool deleted, int child_start = 0 ) {
+  public double adjust_nodes( double last_y, bool deleted, int child_start = 0 ) {
 
     if( expanded && !deleted ) {
       last_y = adjust_descendants( last_y, child_start );
     }
 
     if( parent != null ) {
-      parent.adjust_nodes( last_y, false, (index() + 1) );
+      last_y = parent.adjust_nodes( last_y, false, (index() + 1) );
     }
+
+    return( last_y );
 
   }
 
@@ -211,7 +214,7 @@ public class Node {
     for( int i=child_start; i<children.length; i++ ) {
       var child = children.index( i );
       child.y = last_y;
-      last_y  = child.adjust_descendants( (child.y + child._h), 0 );
+      last_y  = child.adjust_descendants( child.last_y, 0 );
     }
     return( last_y );
   }
@@ -234,7 +237,7 @@ public class Node {
   }
 
   /* Returns the last node in the current node tree */
-  private Node? get_last_node() {
+  public Node? get_last_node() {
     if( is_leaf() || !expanded ) {
       return( this );
     } else {
@@ -418,9 +421,9 @@ public class Node {
 
     child.depth  = this.depth + 1;
     child.x      = 0;
-    child.y      = (prev == null) ? 0 : (prev.y + prev._h);
+    child.y      = (prev == null) ? 0 : prev.last_y;
 
-    child.adjust_nodes( (child.y + child._h), false );
+    child.adjust_nodes( child.last_y, false );
 
   }
 
@@ -429,7 +432,7 @@ public class Node {
 
     var prev = node.get_previous_node();
 
-    node.adjust_nodes( (prev == null) ? 0 : (prev.y + prev._h), true );
+    node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true );
     children.remove_index( node.index() );
     node.parent = null;
 
@@ -496,7 +499,7 @@ public class Node {
     /* If we are attaching below this node, draw the below indicator */
     if( mode == NodeMode.ATTACHBELOW ) {
       Utils.set_context_color( ctx, theme.attachable_color );
-      ctx.rectangle( _x, ((_y + _h) - 4), _w, 4 );
+      ctx.rectangle( _x, (last_y - 4), _w, 4 );
       ctx.fill();
     }
 

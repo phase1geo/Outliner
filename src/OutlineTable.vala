@@ -587,16 +587,14 @@ public class OutlineTable : DrawingArea {
   /* Creates a new, unnamed document */
   public void initialize_for_new() {
 
-    /*
-     Add some test data so that we can test things before we add the
-     ability to save and load data.
-    */
-    add_test_data();
+    /* Create the main idea node */
+    selected = new Node( this );
+    selected.mode = NodeMode.EDITABLE;
+    _nodes.append_val( selected );
 
-  }
+    /* Redraw the canvas */
+    queue_draw();
 
-  public void initialize_for_open() {
-    // TBD
   }
 
   /***************************/
@@ -702,19 +700,28 @@ public class OutlineTable : DrawingArea {
   /* Adds a new root node */
   public void add_root_node() {
 
-    uint insert_index = _nodes.length;
+    uint   insert_index = _nodes.length;
+    double last_y       = 0;
 
     if( selected != null ) {
       var root = selected.get_root_node();
+      last_y = root.get_last_node().last_y;
       for( uint i=0; i<_nodes.length; i++ ) {
         if( _nodes.index( i ) == root ) {
           insert_index = (i + 1);
+          break;
         }
       }
     }
 
     /* Create the new node and add it to the nodes array */
     _nodes.insert_val( insert_index, create_node() );
+
+    /* Adjust all of the nodes down */
+    for( uint i=insert_index; i<_nodes.length; i++ ) {
+      _nodes.index( i ).y = last_y;
+      last_y = _nodes.index( i ).adjust_nodes( _nodes.index( i ).last_y, false );
+    }
 
     queue_draw();
     changed();
@@ -768,36 +775,69 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Returns the index of the selected root node */
+  private int selected_root_index() {
+    if( selected == null ) return( -1 );
+    var root = selected.get_root_node();
+    for( int i=0; i<_nodes.length; i++ ) {
+      if( _nodes.index( i ) == root ) {
+        return( i );
+      }
+    }
+    return( -1 );
+  }
+
+  /* Adjusts the nodes starting at the root node with index "index" */
+  private void adjust_nodes( int index, bool deleted ) {
+    if( index >= _nodes.length ) return;
+    double last_y = (index == 0) ? 0 : _nodes.index( index - 1 ).get_last_node().last_y;
+    for( int i=index; i<_nodes.length; i++ ) {
+      _nodes.index( i ).y = last_y;
+      last_y = _nodes.index( i ).adjust_nodes( last_y, deleted );
+    }
+  }
+
   /* Indents the currently selected row such that it becomes the child of the sibling row above it */
   public void indent() {
-    if( (selected == null) || selected.is_root() ) return;
-    var index = selected.index();
-    if( index > 0 ) {
+    if( selected == null ) return;
+    if( !selected.is_root() ) {
+      var index = selected.index();
+      if( index == 0 ) return;
       var parent = selected.parent;
-      if( selected.is_root() ) {
-        _nodes.remove_index( index );
-      } else {
-        parent.remove_child( selected );
-      }
+      parent.remove_child( selected );
       parent.children.index( index - 1 ).add_child( selected );
+    } else {
+      var index = selected_root_index();
+      if( index == 0 ) return;
+      _nodes.remove_index( index );
+      _nodes.index( index - 1 ).add_child( selected ); 
     }
+    adjust_nodes( (selected_root_index() + 1), false );
     queue_draw();
     changed();
   }
       
   /* Removes the currently selected row from its parent and places itself just below its parent */
   public void unindent() {
-    if( (selected == null) || selected.is_root() ) return;
-    var index        = selected.index();
-    var parent       = selected.parent;
-    var parent_index = parent.index();
-    var grandparent  = parent.parent;
-    parent.remove_child( selected );
-    if( grandparent == null ) {
-      _nodes.insert_val( (parent_index + 1), selected );
+    if( selected == null ) return;
+    if( !selected.is_root() ) {
+      var index        = selected.index();
+      var parent       = selected.parent;
+      var parent_index = parent.index();
+      var grandparent  = parent.parent;
+      parent.remove_child( selected );
+      if( grandparent == null ) {
+        _nodes.insert_val( (parent_index + 1), selected );
+      } else {
+        grandparent.add_child( selected, (parent_index + 1) );
+      }
     } else {
-      grandparent.add_child( selected, (parent_index + 1) );
+      var index = selected_root_index();
+      if( index == 0 ) return;
+      _nodes.index( index ).remove_child( selected ); 
+      _nodes.insert_val( (index + 1), selected );
     }
+    adjust_nodes( (selected_root_index() + 1), false );
     queue_draw();
     changed();
   }
