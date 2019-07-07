@@ -70,8 +70,12 @@ public class Themes : Object {
     for( int i=0; i<_themes.length; i++ ) {
       css += "." + _themes.index( i ).name + " radio { background: " + _themes.index( i ).background.to_string() + "; color: " + _themes.index( i ).foreground.to_string() + "; } ";
     }
-    provider.load_from_data( css );
-    Gtk.StyleContext.add_provider_for_screen( Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION );
+    try {
+      provider.load_from_data( css );
+      Gtk.StyleContext.add_provider_for_screen( Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION );
+    } catch( GLib.Error e ) {
+      stdout.printf( "Unable to load theme CSS: %s\n", e.message );
+    }
   }
 
 }

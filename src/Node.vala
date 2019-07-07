@@ -128,7 +128,7 @@ public class Node {
   public Array<Node> children { get; set; default = new Array<Node>(); }
 
   /* Constructor */
-  public Node( DrawingArea da ) {
+  public Node( OutlineTable ot ) {
 
     var name_fd = new Pango.FontDescription();
     name_fd.set_size( 12 * Pango.SCALE );
@@ -136,27 +136,33 @@ public class Node {
     var note_fd = new Pango.FontDescription();
     note_fd.set_size( 10 * Pango.SCALE );
 
-    _name = new CanvasText( da, da.get_allocated_width() );
+    _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height );
     _name.set_font( name_fd );
 
-    _note = new CanvasText( da, da.get_allocated_width() );
+    _note = new CanvasText( ot, ot.get_allocated_width() );
     _note.resized.connect( update_height );
     _note.set_font( note_fd );
 
     position_name();
-    update_width( da.get_allocated_width() );
+    update_width( ot.get_allocated_width() );
 
     /* Detect any size changes by the drawing area */
-    da.size_allocate.connect( da_size_changed );
+    ot.size_allocate.connect( table_size_changed );
+    ot.zoom_changed.connect( table_zoom_changed );
 
   }
 
   /* Called whenever the canvas width changes */
-  private void da_size_changed( Allocation alloc ) {
-
+  private void table_size_changed( Allocation alloc ) {
     update_width( alloc.width );
+  }
 
+  /* Updates the size of the name and note information */
+  private void table_zoom_changed( int name_size, int note_size, int pady ) {
+    _name.set_font_size( name_size );
+    _note.set_font_size( note_size );
+    this.pady = (double)pady;
   }
 
   /* Called whenever the canvas width changes */
@@ -175,10 +181,10 @@ public class Node {
 
     var orig_height = _h;
 
-    _h = (padx * 2) + _name.height;
+    _h = (pady * 2) + _name.height;
 
     if( (_note != null) && (_note.text != "") ) {
-      _h += padx + _note.height;
+      _h += pady + _note.height;
     }
 
     if( orig_height != _h ) {
@@ -328,7 +334,7 @@ public class Node {
   }
 
   /* Loads the current node and its children from XML Outliner format */
-  public void load( DrawingArea da, Xml.Node* n ) {
+  public void load( OutlineTable ot, Xml.Node* n ) {
 
     string? e = n->get_prop( "expanded" );
     if( e != null ) {
@@ -340,7 +346,7 @@ public class Node {
         switch( it->name ) {
           case "name"  :  load_name( it );  break;
           case "note"  :  load_note( it );  break;
-          case "nodes" :  load_nodes( da, it );  break;
+          case "nodes" :  load_nodes( ot, it );  break;
         }
       }
     }
@@ -366,13 +372,13 @@ public class Node {
   }
 
   /* Loads the given child node information */
-  private void load_nodes( DrawingArea da, Xml.Node* n ) {
+  private void load_nodes( OutlineTable ot, Xml.Node* n ) {
 
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
-        var child = new Node( da );
+        var child = new Node( ot );
         add_child( child );
-        child.load( da, it );
+        child.load( ot, it );
       }
     }
 

@@ -81,6 +81,9 @@ public class MainWindow : ApplicationWindow {
 
     _settings = settings;
 
+    /* Handle any changes to the dark mode preference setting */
+    handle_prefer_dark_changes();
+
     var window_x = settings.get_int( "window-x" );
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
@@ -594,9 +597,21 @@ public class MainWindow : ApplicationWindow {
   private void zoom_changed() {
 
     var table = get_current_table( "zoom_changed" );
-    var zoom  = _zoom.get_value();
+    var zoom  = (int)_zoom.get_value();
 
-    stdout.printf( "zoom: %g\n", zoom );
+    switch( zoom ) {
+      case 25  :  table.zoom_changed(  9, 7,  2 );   break;
+      case 50  :  table.zoom_changed( 10, 8,  3 );   break;
+      case 75  :  table.zoom_changed( 11, 9,  4 );   break;
+      case 100 :  table.zoom_changed( 12, 10, 5 );   break;
+      case 125 :  table.zoom_changed( 13, 11, 6 );   break;
+      case 150 :  table.zoom_changed( 14, 12, 7 );   break;
+      case 175 :  table.zoom_changed( 15, 13, 8 );   break;
+      case 200 :  table.zoom_changed( 16, 14, 9 );   break;
+      default  :  table.zoom_changed( 12, 10, 10 );  break;
+    }
+
+    queue_draw();
 
   }
 
@@ -857,16 +872,15 @@ public class MainWindow : ApplicationWindow {
   private void on_search_clicked( TreePath path, TreeViewColumn col ) {
     TreeIter it;
     Node?    node = null;
+    var      table = get_current_table( "on_search_clicked" );
     _search_items.get_iter( out it, path );
     _search_items.get( it, 2, &node, -1 );
     if( node != null ) {
-/*
-      _canvas.set_current_node( node );
-      _canvas.see();
-*/
+      table.selected = node;
+      // table.see();
     }
     _search.closed();
-    get_current_table( "on_search_clicked" ).grab_focus();
+    table.grab_focus();
   }
 
   /* Exports the model to various formats */

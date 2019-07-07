@@ -145,9 +145,10 @@ public class CanvasText : Object {
 
   public void set_font_size( int size ) {
     var fd = _line_layout.get_font_description();
-    fd.set_size( size );
+    fd.set_size( size * Pango.SCALE );
     _line_layout.set_font_description( fd );
     _pango_layout.set_font_description( fd );
+    update_size( true );
   }
 
   /* Returns true if the text is currently wrapped */

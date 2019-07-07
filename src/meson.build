@@ -10,7 +10,7 @@ sources += files(
   'DynamicNotebook.vala',
   'MainWindow.vala',
   'Node.vala',
-  'OutlineTable2.vala',
+  'OutlineTable.vala',
   'Theme.vala',
   'Themes.vala',
   'UndoBuffer.vala',
