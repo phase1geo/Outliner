@@ -110,24 +110,28 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Returns the node at the given coordinates */
+  private Node? node_at_coordinates( double x, double y ) {
+    for( int i=0; i<_nodes.length; i++ ) {
+      var clicked = _nodes.index( i ).get_containing_node( x, y );
+      if( clicked != null ) {
+        return( clicked );
+      }
+    }
+    return( null );
+  }
+
   /* Selects the node at the given coordinates */
   private bool set_current_at_position( double x, double y, EventButton e ) {
 
-    Node? clicked = null;
+    var clicked = node_at_coordinates( x, y );;
 
     _active = null;
-
-    /* Get the active node */
-    for( int i=0; i<_nodes.length; i++ ) {
-      clicked = _nodes.index( i ).get_containing_node( x, y );
-      if( clicked != null ) {
-        break;
-      }
-    }
 
     if( clicked != null ) {
       if( clicked.is_within_expander( x, y ) ) {
         _active = clicked;
+        return( false );
       } else if( (clicked == selected) && (clicked.mode == NodeMode.EDITABLE) ) {
         bool shift = (bool) e.state & ModifierType.SHIFT_MASK;
         switch( e.type ) {
@@ -172,8 +176,32 @@ public class OutlineTable : DrawingArea {
   /* Handle mouse motion */
   private bool on_motion( EventMotion e ) {
 
+    _motion = true;
+
     if( _pressed ) {
-      // TBD
+      if( selected != null ) {
+        if( selected.mode == NodeMode.SELECTED ) {
+          selected.mode = NodeMode.MOVETO;
+          selected.parent.remove_child( selected );
+        }
+        selected.x = e.x;
+        selected.y = e.y;
+        var current = node_at_coordinates( e.x, e.y );
+        if( current != null ) {
+          if( current.is_within_attach( e.x, e.y ) ) {
+            current.mode = NodeMode.ATTACHTO;
+          } else {
+            current.mode = NodeMode.ATTACHBELOW;
+          }
+          if( current != _active ) {
+            if( _active != null ) {
+              _active.mode = NodeMode.NONE;
+            }
+            _active = current;
+          }
+        }
+        queue_draw();
+      }
     }
 
     return( false );
@@ -186,14 +214,35 @@ public class OutlineTable : DrawingArea {
     if( _pressed ) {
 
       if( _active != null ) {
-        if( _active.is_within_expander( e.x, e.y ) ) {
-          _active.expanded = !_active.expanded;
+        if( _motion ) {
+          switch( _active.mode ) {
+            case NodeMode.ATTACHTO :
+              _active.add_child( selected );
+              break;
+            case NodeMode.ATTACHBELOW :
+              if( !_active.is_leaf() ) {
+                _active.add_child( selected, 0 );
+              } else {
+                _active.parent.add_child( selected, (_active.index() + 1) );
+              }
+              break;
+          }
+          selected.mode = NodeMode.SELECTED;
+          _active.mode  = NodeMode.NONE;
+          _active       = null;
           queue_draw();
           changed();
         }
       }
 
     } else {
+
+      /* If the user clicked in an expander, toggle the expander */
+      if( !_motion && _active.is_within_expander( e.x, e.y ) ) {
+        _active.expanded = !_active.expanded;
+        queue_draw();
+        changed();
+      }
 
     }
 
@@ -516,7 +565,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Sets the theme to the given value */
-  public void set_theme( Theme theme ) {
+  public void set_theme( Theme theme, bool save = true ) {
 
     _theme = theme;
 
@@ -527,7 +576,10 @@ public class OutlineTable : DrawingArea {
     );
 
     queue_draw();
-    changed();
+
+    if( save ) {
+      changed();
+    }
 
   }
 
@@ -571,7 +623,7 @@ public class OutlineTable : DrawingArea {
 
     string? name = n->get_prop( "name" );
     if( name != null ) {
-      set_theme( MainWindow.themes.get_theme( name ) );
+      set_theme( MainWindow.themes.get_theme( name ), false );
     }
 
   }
@@ -773,6 +825,9 @@ public class OutlineTable : DrawingArea {
     for( int i=0; i<_nodes.length; i++ ) {
       _nodes.index( i ).draw_tree( ctx, _theme );
     }
+    if( selected != null ) {
+      selected.draw( ctx, _theme );
+    }
   }
 
   /* Temporary function which gives us some test data */
@@ -793,6 +848,8 @@ public class OutlineTable : DrawingArea {
     level1 = new Node( this );  level1.name.text = "Third things";  level0.add_child( level1 );
 
     _nodes.append_val( level0 );
+
+    changed();
 
   }
 

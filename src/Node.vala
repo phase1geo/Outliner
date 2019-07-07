@@ -42,7 +42,6 @@ public class Node {
   private double      _h        = 80;
   private int         _depth    = 0;
   private bool        _expanded = true;
-  private double      _da_width = 0;
 
   /* Properties */
   public NodeMode mode {
@@ -117,13 +116,13 @@ public class Node {
         if( parent != null ) {
           var last = get_last_node();
           var diff = (last.y + last._h) - (y + _h);
-          parent.adjust_nodes( diff, (index() + 1) );
+          parent.adjust_nodes( (y + _h), false, (index() + 1) );
         }
       } else if( !value && _expanded ) {
         if( parent != null ) {
           var last = get_last_node();
           var diff = 0 - ((last.y + last._h) - (y + _h));
-          parent.adjust_nodes( diff, (index() + 1) );
+          parent.adjust_nodes( (y + _h), false, (index() + 1) );
         }
         _expanded = value;
       }
@@ -165,9 +164,9 @@ public class Node {
 
     if( _w == alloc.width ) return;
 
-    _da_width = alloc.width;
-    _name.max_width = _da_width - _name.posx;
-    _note.max_width = _da_width - _note.posx;
+    _w = alloc.width;
+    _name.max_width = _w - _name.posx;
+    _note.max_width = _w - _note.posx;
 
   }
 
@@ -183,28 +182,32 @@ public class Node {
     }
 
     if( orig_height != _h ) {
-      adjust_nodes( (_h - orig_height) );
+      adjust_nodes( y + _h, false );
     }
 
   }
 
   /* Adjusts the posy value of all of the nodes displayed below this node */
-  private void adjust_nodes( double diff, int child_start = 0 ) {
+  private void adjust_nodes( double last_y, bool deleted, int child_start = 0 ) {
 
-    adjust_descendants( diff, child_start );
+    if( expanded && !deleted ) {
+      last_y = adjust_descendants( last_y, child_start );
+    }
 
     if( parent != null ) {
-      parent.adjust_nodes( diff, (index() + 1) );
+      parent.adjust_nodes( last_y, false, (index() + 1) );
     }
 
   }
 
   /* Adjusts the posy value of all nodes that are descendants of the give node */
-  private void adjust_descendants( double diff, int child_start ) {
+  private double adjust_descendants( double last_y, int child_start ) {
     for( int i=child_start; i<children.length; i++ ) {
-      children.index( i ).y += diff;
-      children.index( i ).adjust_descendants( diff, 0 );
+      var child = children.index( i );
+      child.y = last_y;
+      last_y  = child.adjust_descendants( (child.y + child._h), 0 );
     }
+    return( last_y );
   }
 
   /* Adjusts the position of the text object */
@@ -289,7 +292,7 @@ public class Node {
 
   /* Returns true if the given coordinates lie within the attach area */
   public bool is_within_attach( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, ((this.y + _h) - 4) ) );
+    return( Utils.is_within_bounds( x, y, this.x, this.y, width, (_h - 8) ) );
   }
 
   /*************************/
@@ -392,32 +395,30 @@ public class Node {
   /* Adds a child to this node */
   public void add_child( Node child, int index = -1 ) {
 
-    Node last;
-
     if( index < 0 ) {
-      last = get_last_node();
       _children.append_val( child );
     } else {
-      if( index == 0 ) {
-        last = this;
-      } else {
-        last = children.index( index - 1 ).get_last_node();
-      }
       children.insert_val( index, child );
     }
 
     child.parent = this;
-    child.depth  = this.depth + 1;
-    child.y      = last.y + last._h;
 
-    child.adjust_nodes( child._h );
+    var prev = child.get_previous_node();
+
+    child.depth  = this.depth + 1;
+    child.x      = 0;
+    child.y      = (prev == null) ? 0 : (prev.y + prev._h);
+
+    child.adjust_nodes( (child.y + child._h), false );
 
   }
 
   /* Removes the child at the given index from this node */
   public void remove_child( Node node ) {
 
-    node.adjust_nodes( 0 - node._h );
+    var prev = node.get_previous_node();
+
+    node.adjust_nodes( (prev == null) ? 0 : (prev.y + prev._h), true );
     children.remove_index( node.index() );
     node.parent = null;
 
@@ -493,6 +494,9 @@ public class Node {
   /* Draw the expander icon */
   private void draw_expander( Cairo.Context ctx, Theme theme ) {
 
+    /* Don't draw the expander if we are moving a node */
+    if( mode == NodeMode.MOVETO ) return;
+
     var x  = _x + padx + (depth * indent);
     var y  = _y + pady;
     var r  = 2;
@@ -524,7 +528,7 @@ public class Node {
   /* Draw the node title */
   private void draw_name( Cairo.Context ctx, Theme theme ) {
 
-    _name.draw( ctx, theme, theme.foreground, alpha );
+    _name.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.foreground), alpha );
 
   }
 
@@ -532,13 +536,13 @@ public class Node {
   private void draw_note( Cairo.Context ctx, Theme theme ) {
 
     if( _note.text != "" ) {
-      _note.draw( ctx, theme, theme.note_color, alpha );
+      _note.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.note_color), alpha );
     }
 
   }
 
   /* Draw the node to the screen */
-  private void draw( Cairo.Context ctx, Theme theme ) {
+  public void draw( Cairo.Context ctx, Theme theme ) {
 
     draw_background( ctx, theme );
     draw_expander( ctx, theme );
