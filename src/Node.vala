@@ -28,20 +28,23 @@ public enum NodeMode {
   ATTACHTO,      // Shows the node as something that can be attached as a child
   ATTACHBELOW,   // Shows the node as something that can be attached as a sibling
   MOVETO,        // Indicates that the node is being dragged by the user
-  EDITABLE       // Indicates that the node text is being edited
+  EDITABLE,      // Indicates that the node text is being edited
+  NOTEEDIT,      // Indicates that the note text is being edited
+  HOVER          // Indicates that the cursor is hovering over this node
 }
 
 public class Node {
 
-  private CanvasText  _name;
-  private NodeMode    _mode     = NodeMode.NONE;
-  private CanvasText? _note     = null;
-  private double      _x        = 0;
-  private double      _y        = 0;
-  private double      _w        = 500;
-  private double      _h        = 80;
-  private int         _depth    = 0;
-  private bool        _expanded = true;
+  private CanvasText _name;
+  private CanvasText _note;
+  private NodeMode   _mode      = NodeMode.NONE;
+  private double     _x         = 0;
+  private double     _y         = 0;
+  private double     _w         = 500;
+  private double     _h         = 80;
+  private int        _depth     = 0;
+  private bool       _expanded  = true;
+  private bool       _hide_note = true;
 
   /* Properties */
   public NodeMode mode {
@@ -51,6 +54,8 @@ public class Node {
     set {
       _mode = value;
       name.edit = (_mode == NodeMode.EDITABLE);
+      note.edit = (_mode == NodeMode.NOTEEDIT);
+      update_height();
     }
   }
   public CanvasText name {
@@ -111,22 +116,31 @@ public class Node {
       return( _expanded );
     }
     set {
-      if( value && !_expanded ) {
-        _expanded = value;
-        adjust_nodes( last_y, false );
-      } else if( !value && _expanded ) {
+      if( value != _expanded ) {
         _expanded = value;
         adjust_nodes( last_y, false );
       }
     }
   }
-  public double      alpha    { get; set; default = 1.0; }
-  public double      padx     { get; set; default = 5; }
-  public double      pady     { get; set; default = 5; }
-  public double      indent   { get; set; default = 20; }
-  public Node?       parent   { get; set; default = null; }
-  public Array<Node> children { get; set; default = new Array<Node>(); }
-  public double      last_y   { get { return( _y + _h ); } }
+  public bool hide_note {
+    get {
+      return( _hide_note );
+    }
+    set {
+      if( value != _hide_note ) {
+        _hide_note = value;
+        update_height();
+        adjust_nodes( last_y, false );
+      }
+    }
+  }
+  public double      alpha     { get; set; default = 1.0; }
+  public double      padx      { get; set; default = 5; }
+  public double      pady      { get; set; default = 5; }
+  public double      indent    { get; set; default = 20; }
+  public Node?       parent    { get; set; default = null; }
+  public Array<Node> children  { get; set; default = new Array<Node>(); }
+  public double      last_y    { get { return( _y + _h ); } }
 
   /* Constructor */
   public Node( OutlineTable ot ) {
@@ -184,7 +198,7 @@ public class Node {
 
     _h = (pady * 2) + _name.height;
 
-    if( (_note != null) && (_note.text != "") ) {
+    if( !_hide_note && (mode != NodeMode.MOVETO) ) {
       _h += pady + _note.height;
     }
 
@@ -221,8 +235,9 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_name() {
-    name.posx = x + (padx * 2) + (depth * indent) + 10;
+    name.posx = note.posx = x + (padx * 3) + (depth * indent) + 20;
     name.posy = y + pady;
+    note.posy = y + (pady * 2) + name.height;
   }
 
   /* Returns the root node of this node */
@@ -289,6 +304,22 @@ public class Node {
     return( null );
   }
 
+  /* Returns the area where we will draw the note icon */
+  private void note_bbox( out double x, out double y, out double w, out double h ) {
+    x = this.x + padx;
+    y = this.y + ((name.get_line_height() - 5) / 2);
+    w = 10;
+    h = 10;
+  }
+
+  /* Returns the area where the expander will draw the expander icon */
+  private void expander_bbox( out double x, out double y, out double w, out double h ) {
+    x = this.x + (padx * 2) + 10 + (depth * indent);
+    y = this.y + pady + ((name.get_line_height() - 6) / 2);
+    w = 10;
+    h = 10;
+  }
+
   /* Returns true if the given coordinates are within this node */
   public bool is_within( double x, double y ) {
     return( Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
@@ -297,11 +328,28 @@ public class Node {
   /* Returns true if the given coordinates lie within the expander */
   public bool is_within_expander( double x, double y ) {
     if( !is_leaf() ) {
-      var lh   = name.get_line_height();
-      var mody = this.y + ((lh - 6) / 2);
-      return( Utils.is_within_bounds( x, y, (this.x + padx + (depth * indent)), (mody + pady), 10, 10 ) );
+      double ex, ey, ew, eh;
+      expander_bbox( out ex, out ey, out ew, out eh );
+      return( Utils.is_within_bounds( x, y, ex, ey, ew, eh ) );
     }
     return( false );
+  }
+
+  /* Returns true if the given coordinates reside within the note icon boundaries */
+  public bool is_within_note_icon( double x, double y ) {
+    double nx, ny, nw, nh;
+    note_bbox( out nx, out ny, out nw, out nh );
+    return( Utils.is_within_bounds( x, y, nx, ny, nw, nh ) );
+  }
+
+  /* Returns true if the given coordinates reside within the name text area */
+  public bool is_within_name( double x, double y ) {
+    return( Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
+  }
+
+  /* Returns true if the given coordinates reside within the note text area */
+  public bool is_within_note( double x, double y ) {
+    return( Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
   }
 
   /* Returns true if the given coordinates lie within the attach area */
@@ -319,6 +367,8 @@ public class Node {
     Xml.Node* n = new Xml.Node( null, "node" );
 
     n->new_prop( "expanded", expanded.to_string() );
+    n->new_prop( "hidenote", hide_note.to_string() );
+
     n->new_text_child( null, "name", name.text );
 
     if( note.text != "" ) {
@@ -342,6 +392,11 @@ public class Node {
     string? e = n->get_prop( "expanded" );
     if( e != null ) {
       expanded = bool.parse( e );
+    }
+
+    string? h = n->get_prop( "hidenote" );
+    if( h != null ) {
+      hide_note = bool.parse( h );
     }
 
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
@@ -511,27 +566,26 @@ public class Node {
     /* Don't draw the expander if we are moving a node */
     if( mode == NodeMode.MOVETO ) return;
 
-    var x  = _x + padx + (depth * indent);
-    var y  = _y + pady;
+    double ex, ey, ew, eh;
     var r  = 2;
     var lh = name.get_line_height();
+
+    expander_bbox( out ex, out ey, out ew, out eh );
 
     Utils.set_context_color_with_alpha( ctx, theme.symbol_color, alpha );
 
     if( children.length == 0 ) {
-      var mid = y + (lh / 2);
-      ctx.arc( (x + 4), mid, r, 0, (2 * Math.PI) );
+      var mid = y + pady + (lh / 2);
+      ctx.arc( (ex + 4), mid, r, 0, (2 * Math.PI) );
     } else if( expanded ) {
-      var mody = y + ((lh - 6) / 2);
-      ctx.move_to( x, mody );
-      ctx.line_to( (x + 8), mody );
-      ctx.line_to( (x + 4), (mody + 6) );
+      ctx.move_to( ex, ey );
+      ctx.line_to( (ex + 8), ey );
+      ctx.line_to( (ex + 4), (ey + 6) );
       ctx.close_path();
     } else {
-      var mody = y + ((lh - 6) / 2);
-      ctx.move_to( x, mody );
-      ctx.line_to( (x + 6), (mody + 4) );
-      ctx.line_to( x, (mody + 8) );
+      ctx.move_to( ex, ey );
+      ctx.line_to( (ex + 6), (ey + 4) );
+      ctx.line_to( ex, (ey + 8) );
       ctx.close_path();
     }
 
@@ -546,12 +600,40 @@ public class Node {
 
   }
 
+  private void draw_note_icon( Cairo.Context ctx, Theme theme ) {
+
+    if( (mode == NodeMode.MOVETO) || ((_note.text == "") && (mode != NodeMode.HOVER) && (mode != NodeMode.SELECTED)) ) return;
+
+    double x, y, w, h;
+    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text == "")) ? 0.3 : this.alpha;
+
+    note_bbox( out x, out y, out w, out h );
+
+    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, alpha );
+
+    ctx.new_path();
+    ctx.set_line_width( 1 );
+    ctx.move_to( (x + 2), y );
+    ctx.line_to( (x + w), y );
+    ctx.stroke();
+    ctx.move_to( x, (y + 3) );
+    ctx.line_to( (x + w), (y + 3) );
+    ctx.stroke();
+    ctx.move_to( x, (y + 6) );
+    ctx.line_to( (x + w), (y + 6) );
+    ctx.stroke();
+    ctx.move_to( x, (y + 9) );
+    ctx.line_to( (x + w), (y + 9) );
+    ctx.stroke();
+
+  }
+
   /* Draw the note */
   private void draw_note( Cairo.Context ctx, Theme theme ) {
 
-    if( _note.text != "" ) {
-      _note.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.note_color), alpha );
-    }
+    if( hide_note || (mode == NodeMode.MOVETO) ) return;
+
+    _note.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.note_color), alpha );
 
   }
 
@@ -559,6 +641,7 @@ public class Node {
   public void draw( Cairo.Context ctx, Theme theme ) {
 
     draw_background( ctx, theme );
+    draw_note_icon( ctx, theme );
     draw_expander( ctx, theme );
     draw_name( ctx, theme );
     draw_note( ctx, theme );
@@ -567,12 +650,15 @@ public class Node {
 
   /* Draws the entire node tree */
   public void draw_tree( Cairo.Context ctx, Theme theme ) {
+
     draw( ctx, theme );
+
     if( expanded ) {
       for( int i=0; i<children.length; i++ ) {
         children.index( i ).draw_tree( ctx, theme );
       }
     }
+
   }
 
 }
