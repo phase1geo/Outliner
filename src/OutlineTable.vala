@@ -909,6 +909,7 @@ public class OutlineTable : DrawingArea {
         adjust = true;
       }
     }
+    set_size_request( get_allocated_width(), (int)last_y );
   }
 
   /* Adds a new root node */
