@@ -810,6 +810,10 @@ public class OutlineTable : DrawingArea {
       }
     }
 
+    if( _nodes.length > 0 ) {
+      _nodes.index( 0 ).adjust_nodes_all( _nodes.index( 0 ).last_y, false );
+    }
+
   }
 
   /* Saves the table information to the given XML node */
@@ -857,6 +861,18 @@ public class OutlineTable : DrawingArea {
   /* TREE-RELATED METHODS */
   /************************/
 
+  /* Returns the index of the selected root node */
+  private int root_index( Node? node ) {
+    if( node == null ) return( -1 );
+    var root = node.get_root_node();
+    for( int i=0; i<_nodes.length; i++ ) {
+      if( _nodes.index( i ) == root ) {
+        return( i );
+      }
+    }
+    return( -1 );
+  }
+
   /* Creates a new node that is ready to be edited */
   private Node create_node() {
 
@@ -869,22 +885,37 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Retrieves the node prior to the given root node */
+  public Node? get_previous_node( Node root ) {
+    stdout.printf( "In get_previous_node, root: %s, index: %g\n", root.name.text, root_index( root ) );
+    int index = root_index( root );
+    return( (index == 0) ? null : _nodes.index( index - 1 ).get_last_node() );
+  }
+
+  /* Retrieves the node after to the given root node */
+  public Node? get_next_node( Node root ) {
+    int index = root_index( root );
+    return( ((index + 1) == _nodes.length) ? null : _nodes.index( index + 1 ) );
+  }
+
+  /* Adjusts the nodes starting at the root node with index "index" */
+  public void adjust_nodes( Node last_root, double last_y, bool deleted ) {
+    var adjust = false;
+    for( int i=0; i<_nodes.length; i++ ) {
+      if( adjust ) {
+        _nodes.index( i ).y = last_y;
+        last_y = _nodes.index( i ).adjust_nodes( _nodes.index( i ).last_y, deleted );
+      } else if( last_root == _nodes.index( i ) ) {
+        adjust = true;
+      }
+    }
+  }
+
   /* Adds a new root node */
   public void add_root_node() {
 
-    uint   insert_index = _nodes.length;
-    double last_y       = 0;
-
-    if( selected != null ) {
-      var root = selected.get_root_node();
-      last_y = root.get_last_node().last_y;
-      for( uint i=0; i<_nodes.length; i++ ) {
-        if( _nodes.index( i ) == root ) {
-          insert_index = (i + 1);
-          break;
-        }
-      }
-    }
+    int    insert_index = (selected != null) ? (root_index( selected ) + 1) : (int)_nodes.length;
+    double last_y       = (selected != null) ? selected.get_root_node().get_last_node().last_y : 0;
 
     /* Create the new node and add it to the nodes array */
     _nodes.insert_val( insert_index, create_node() );
@@ -931,42 +962,21 @@ public class OutlineTable : DrawingArea {
 
   /* Removes the selected node from the table */
   public void delete_node() {
-
     if( selected == null ) return;
-
-    var next = selected.get_next_node() ?? selected.get_previous_node();
-
-    selected.parent.remove_child( selected );
-
-    if( next != null ) {
+    if( selected.is_root() ) {
+      var index = root_index( selected );
+      _nodes.remove_index( index );
+      _nodes.index( index ).y = (index == 0) ? 0 : _nodes.index( index - 1 ).get_last_node().last_y;
+      _nodes.index( index ).adjust_nodes_all( _nodes.index( index ).last_y, true );
+      selected = (index == _nodes.length) ? _nodes.index( index - 1 ).get_last_node() : _nodes.index( index );
+    } else {
+      var next = selected.get_next_node() ?? selected.get_previous_node();
+      selected.parent.remove_child( selected );
       selected = next;
     }
-
     queue_draw();
     changed();
 
-  }
-
-  /* Returns the index of the selected root node */
-  private int selected_root_index() {
-    if( selected == null ) return( -1 );
-    var root = selected.get_root_node();
-    for( int i=0; i<_nodes.length; i++ ) {
-      if( _nodes.index( i ) == root ) {
-        return( i );
-      }
-    }
-    return( -1 );
-  }
-
-  /* Adjusts the nodes starting at the root node with index "index" */
-  private void adjust_nodes( int index, bool deleted ) {
-    if( index >= _nodes.length ) return;
-    double last_y = (index == 0) ? 0 : _nodes.index( index - 1 ).get_last_node().last_y;
-    for( int i=index; i<_nodes.length; i++ ) {
-      _nodes.index( i ).y = last_y;
-      last_y = _nodes.index( i ).adjust_nodes( last_y, deleted );
-    }
   }
 
   /* Indents the currently selected row such that it becomes the child of the sibling row above it */
@@ -979,12 +989,11 @@ public class OutlineTable : DrawingArea {
       parent.remove_child( selected );
       parent.children.index( index - 1 ).add_child( selected );
     } else {
-      var index = selected_root_index();
+      var index = root_index( selected );
       if( index == 0 ) return;
       _nodes.remove_index( index );
       _nodes.index( index - 1 ).add_child( selected ); 
     }
-    adjust_nodes( (selected_root_index() + 1), false );
     queue_draw();
     changed();
   }
@@ -1004,12 +1013,11 @@ public class OutlineTable : DrawingArea {
         grandparent.add_child( selected, (parent_index + 1) );
       }
     } else {
-      var index = selected_root_index();
+      var index = root_index( selected );
       if( index == 0 ) return;
       _nodes.index( index ).remove_child( selected ); 
       _nodes.insert_val( (index + 1), selected );
     }
-    adjust_nodes( (selected_root_index() + 1), false );
     queue_draw();
     changed();
   }

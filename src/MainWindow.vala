@@ -252,6 +252,7 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the scrolled window for the treeview */
     var scroll = new ScrolledWindow( null, null );
+    scroll.vscrollbar_policy = PolicyType.ALWAYS;
     scroll.hscrollbar_policy = PolicyType.EXTERNAL;
     scroll.add( overlay );
 

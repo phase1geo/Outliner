@@ -35,16 +35,17 @@ public enum NodeMode {
 
 public class Node {
 
-  private CanvasText _name;
-  private CanvasText _note;
-  private NodeMode   _mode      = NodeMode.NONE;
-  private double     _x         = 0;
-  private double     _y         = 0;
-  private double     _w         = 500;
-  private double     _h         = 80;
-  private int        _depth     = 0;
-  private bool       _expanded  = true;
-  private bool       _hide_note = true;
+  private OutlineTable _ot;
+  private CanvasText   _name;
+  private CanvasText   _note;
+  private NodeMode     _mode      = NodeMode.NONE;
+  private double       _x         = 0;
+  private double       _y         = 0;
+  private double       _w         = 500;
+  private double       _h         = 80;
+  private int          _depth     = 0;
+  private bool         _expanded  = true;
+  private bool         _hide_note = true;
 
   /* Properties */
   public NodeMode mode {
@@ -118,7 +119,7 @@ public class Node {
     set {
       if( value != _expanded ) {
         _expanded = value;
-        adjust_nodes( last_y, false );
+        adjust_nodes_all( last_y, false );
       }
     }
   }
@@ -130,7 +131,7 @@ public class Node {
       if( value != _hide_note ) {
         _hide_note = value;
         update_height();
-        adjust_nodes( last_y, false );
+        adjust_nodes_all( last_y, false );
       }
     }
   }
@@ -144,6 +145,8 @@ public class Node {
 
   /* Constructor */
   public Node( OutlineTable ot ) {
+
+    _ot = ot;
 
     var name_fd = new Pango.FontDescription();
     name_fd.set_size( 12 * Pango.SCALE );
@@ -203,7 +206,7 @@ public class Node {
     }
 
     if( orig_height != _h ) {
-      adjust_nodes( last_y, false );
+      adjust_nodes_all( last_y, false );
     }
 
   }
@@ -221,6 +224,12 @@ public class Node {
 
     return( last_y );
 
+  }
+
+  /* Adjusts all of the nodes in the document */
+  public void adjust_nodes_all( double last_y, bool deleted, int child_start = 0 ) {
+    last_y = adjust_nodes( last_y, deleted, child_start );
+    _ot.adjust_nodes( get_root_node(), last_y, deleted );
   }
 
   /* Adjusts the posy value of all nodes that are descendants of the give node */
@@ -264,7 +273,7 @@ public class Node {
   public Node? get_previous_node() {
     var index = index();
     if( index == -1 ) {
-      return( null );
+      return( _ot.get_previous_node( this ) );
     } else if( index == 0 ) {
       return( parent );
     } else {
@@ -285,7 +294,7 @@ public class Node {
         }
         child = child.parent;
       }
-      return( null );
+      return( _ot.get_next_node( child ) );
     }
   }
 
@@ -478,7 +487,7 @@ public class Node {
     child.x      = 0;
     child.y      = (prev == null) ? 0 : prev.last_y;
 
-    child.adjust_nodes( child.last_y, false );
+    child.adjust_nodes_all( child.last_y, false );
 
   }
 
@@ -487,7 +496,7 @@ public class Node {
 
     var prev = node.get_previous_node();
 
-    node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true );
+    node.adjust_nodes_all( ((prev == null) ? 0 : prev.last_y), true );
     children.remove_index( node.index() );
     node.parent = null;
 
@@ -537,7 +546,7 @@ public class Node {
   private void draw_background( Cairo.Context ctx, Theme theme ) {
 
 
-    RGBA   background = theme.background;
+    RGBA   background = is_root() ? theme.root_background : theme.background;
     double alpha      = this.alpha;
     
     switch( mode ) {
@@ -596,7 +605,9 @@ public class Node {
   /* Draw the node title */
   private void draw_name( Cairo.Context ctx, Theme theme ) {
 
-    _name.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.foreground), alpha );
+    RGBA color = is_root() ? theme.root_foreground : theme.foreground;
+
+    _name.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : color), alpha );
 
   }
 
