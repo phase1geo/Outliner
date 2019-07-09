@@ -21,7 +21,7 @@
 
 using GLib;
 
-public class ExportOPML : Object {
+public class ExportMinder : Object {
 
   /* Exports the given drawing area to the file of the given name */
   public static bool export( string fname, OutlineTable table ) {
@@ -72,9 +72,9 @@ public class ExportOPML : Object {
     Xml.Node* n = new Xml.Node( null, "outline" );
     n->new_prop( "text", node.name.text );
     /*
-    if( node.is_leaf() && (node._task_count > 0) ) {
-      bool checked = node._task_done > 0;
-      n->new_prop( "checked", checked.to_string() );
+    if( is_leaf() && (_task_count > 0) ) {
+      bool checked = _task_done > 0;
+      node->new_prop( "checked", checked.to_string() );
     }
     */
     if( node.note.text != "" ) {

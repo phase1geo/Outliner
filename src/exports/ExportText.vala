@@ -24,12 +24,12 @@ using GLib;
 public class ExportText : Object {
 
   /* Exports the given drawing area to the file of the given name */
-  public static bool export( string fname, DrawArea da ) {
+  public static bool export( string fname, OutlineTable table ) {
     var  file   = File.new_for_path( fname );
     bool retval = true;
     try {
       var os = file.create( FileCreateFlags.PRIVATE );
-      export_top_nodes( os, da );
+      export_top_nodes( os, table );
     } catch( Error e ) {
       retval = false;
     }
@@ -37,15 +37,15 @@ public class ExportText : Object {
   }
 
   /* Draws each of the top-level nodes */
-  private static void export_top_nodes( FileOutputStream os, DrawArea da ) {
+  private static void export_top_nodes( FileOutputStream os, OutlineTable table ) {
 
     try {
 
-      var nodes = da.get_nodes();
+      var nodes = table.nodes;
       for( int i=0; i<nodes.length; i++ ) {
-        string title = nodes.index( i ).name + "\n";
+        string title = nodes.index( i ).name.text + "\n";
         os.write( title.data );
-        var children = nodes.index( i ).children();
+        var children = nodes.index( i ).children;
         for( int j=0; j<children.length; j++ ) {
           export_node( os, children.index( j ) );
         }
@@ -64,6 +64,7 @@ public class ExportText : Object {
 
       string title = prefix;
 
+      /*
       if( node.is_task() ) {
         if( node.is_task_done() ) {
           title += "- [x] ";
@@ -71,17 +72,18 @@ public class ExportText : Object {
           title += "- [ ] ";
         }
       }
+      */
 
-      title += node.name + "\n";
+      title += node.name.text + "\n";
 
       os.write( title.data );
 
-      if( node.note != "" ) {
-        string note = prefix + "  " + node.note + "\n";
+      if( node.note.text != "" ) {
+        string note = prefix + "  " + node.note.text + "\n";
         os.write( note.data );
       }
 
-      var children = node.children();
+      var children = node.children;
       for( int i=0; i<children.length; i++ ) {
         export_node( os, children.index( i ), prefix + "        " );
       }

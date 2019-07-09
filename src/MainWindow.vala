@@ -252,6 +252,7 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the scrolled window for the treeview */
     var scroll = new ScrolledWindow( null, null );
+    // scroll.vscrollbar_policy = PolicyType.AUTOMATIC;
     scroll.vscrollbar_policy = PolicyType.ALWAYS;
     scroll.hscrollbar_policy = PolicyType.EXTERNAL;
     scroll.add( overlay );
@@ -791,10 +792,6 @@ public class MainWindow : ApplicationWindow {
     save_file( get_current_table( "do_save_as_file" ) );
   }
 
-  /* Called whenever the row selection changes in the table */
-  private void on_row_changed() {
-  }
-
   /* Called when the user uses the Control-n keyboard shortcut */
   private void action_new() {
     do_new_file();
@@ -872,7 +869,7 @@ public class MainWindow : ApplicationWindow {
     _search_items.get( it, 2, &node, -1 );
     if( node != null ) {
       table.selected = node;
-      // table.see();
+      table.see( node );
     }
     _search.closed();
     table.grab_focus();
@@ -883,12 +880,6 @@ public class MainWindow : ApplicationWindow {
 
     FileChooserDialog dialog = new FileChooserDialog( _( "Export As" ), this, FileChooserAction.SAVE,
       _( "Cancel" ), ResponseType.CANCEL, _( "Export" ), ResponseType.ACCEPT );
-
-    /* CSV */
-    FileFilter csv_filter = new FileFilter();
-    csv_filter.set_filter_name( _( "CSV" ) );
-    csv_filter.add_pattern( "*.csv" );
-    dialog.add_filter( csv_filter );
 
     /* Markdown */
     FileFilter md_filter = new FileFilter();
@@ -927,10 +918,7 @@ public class MainWindow : ApplicationWindow {
       var filter = dialog.get_filter();
       var table  = get_current_table( "action_export" );
 
-/* TBD
-      if( csv_filter == filter ) {
-        ExportCSV.export( repair_filename( fname, {".csv"} ), table );
-      } else if( md_filter == filter ) {
+      if( md_filter == filter ) {
         ExportMarkdown.export( repair_filename( fname, {".md", ".markdown"} ), table );
       } else if( minder_filter == filter ) {
         ExportMinder.export( repair_filename( fname, {".minder"} ), table );
@@ -940,8 +928,8 @@ public class MainWindow : ApplicationWindow {
         ExportPDF.export( repair_filename( fname, {".pdf"} ), table );
       } else if( txt_filter == filter ) {
         ExportText.export( repair_filename( fname, {".txt"} ), table );
-      } else if( 
-*/
+      }
+
     }
 
     dialog.close();

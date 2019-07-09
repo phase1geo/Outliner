@@ -74,11 +74,4 @@ public class Theme : Object {
 
   }
 
-  /* Sets the context color based on the theme RGBA color */
-  private void set_context_color( Cairo.Context ctx, RGBA color ) {
-
-    ctx.set_source_rgba( color.red, color.green, color.blue, color.alpha );
-
-  }
-
 }

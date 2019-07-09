@@ -35,7 +35,10 @@ public enum NodeMode {
 
 public class Node {
 
+  private static int next_id = 0;
+
   private OutlineTable _ot;
+  private int          _id        = next_id++;
   private CanvasText   _name;
   private CanvasText   _note;
   private NodeMode     _mode      = NodeMode.NONE;
@@ -48,6 +51,11 @@ public class Node {
   private bool         _hide_note = true;
 
   /* Properties */
+  public int id {
+    get {
+      return( _id );
+    }
+  }
   public NodeMode mode {
     get {
       return( _mode );
@@ -171,6 +179,12 @@ public class Node {
 
   }
 
+  /* Destructor */
+  ~Node() {
+    _ot.size_allocate.disconnect( table_size_changed );
+    _ot.zoom_changed.disconnect( table_zoom_changed );
+  }
+
   /* Called whenever the canvas width changes */
   private void table_size_changed( Allocation alloc ) {
     update_width( alloc.width );
@@ -207,6 +221,7 @@ public class Node {
 
     if( orig_height != _h ) {
       adjust_nodes_all( last_y, false );
+      _ot.see( this );
     }
 
   }

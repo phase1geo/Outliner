@@ -1,4 +1,11 @@
 sources += files(
+  'exports/ExportMarkdown.vala',
+  'exports/ExportMinder.vala',
+  'exports/ExportOPML.vala',
+  'exports/ExportPDF.vala',
+  'exports/ExportPrint.vala',
+  'exports/ExportText.vala',
+
   'themes/ThemeDark.vala',
   'themes/ThemeDefault.vala',
   'themes/ThemeSolarizedDark.vala',

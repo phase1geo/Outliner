@@ -23,18 +23,17 @@ using Gtk;
 
 public class ExportPrint : Object {
 
-  private DrawArea _da;
+  private OutlineTable _table;
 
   /* Default constructor */
   public ExportPrint() {}
 
   /* Perform print operation */
-  public void print( DrawArea da, MainWindow main ) {
+  public void print( OutlineTable table, MainWindow main ) {
 
-    _da = da;
+    _table = table;
 
     var op       = new PrintOperation();
-    // var settings = new PrintSettings().from_file( fname );
     var settings = new PrintSettings();
     op.set_print_settings( settings );
     op.set_n_pages( 1 );
@@ -72,21 +71,17 @@ public class ExportPrint : Object {
     var margin_x    = 0.5 * context.get_dpi_x();
     var margin_y    = 0.5 * context.get_dpi_y();
 
-    /* Get the rectangle holding the entire document */
-    double x, y, w, h;
-    _da.document_rectangle( out x, out y, out w, out h );
-
     /* Calculate the required scaling factor to get the document to fit */
-    double width  = (page_width  - (2 * margin_x)) / w;
-    double height = (page_height - (2 * margin_y)) / h;
+    double width  = (page_width  - (2 * margin_x)) / _table.get_allocated_width();
+    double height = (page_height - (2 * margin_y)) / _table.get_allocated_height();
     double sf     = (width < height) ? width : height;
 
     /* Scale and translate the image */
     ctx.scale( sf, sf );
-    ctx.translate( ((0 - x) + margin_x), ((0 - y) + margin_y) );
+    ctx.translate( margin_x, margin_y );
 
     /* Draw the map */
-    _da.draw_all( ctx );
+    _table.draw_all( ctx );
 
   }
 
