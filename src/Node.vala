@@ -144,9 +144,9 @@ public class Node {
     }
   }
   public double      alpha     { get; set; default = 1.0; }
-  public double      padx      { get; set; default = 5; }
-  public double      pady      { get; set; default = 5; }
-  public double      indent    { get; set; default = 20; }
+  public double      padx      { get; set; default = 10; }
+  public double      pady      { get; set; default = 10; }
+  public double      indent    { get; set; default = 25; }
   public Node?       parent    { get; set; default = null; }
   public Array<Node> children  { get; set; default = new Array<Node>(); }
   public double      last_y    { get { return( _y + _h ); } }
@@ -591,7 +591,7 @@ public class Node {
     if( mode == NodeMode.MOVETO ) return;
 
     double ex, ey, ew, eh;
-    var r  = 2;
+    var r  = 3;
     var lh = name.get_line_height();
 
     expander_bbox( out ex, out ey, out ew, out eh );
@@ -600,16 +600,20 @@ public class Node {
 
     if( children.length == 0 ) {
       var mid = y + pady + (lh / 2);
-      ctx.arc( (ex + 4), mid, r, 0, (2 * Math.PI) );
+      if( (depth % 2) == 0 ) {
+        ctx.rectangle( (ex + 2), (ey + 2), 6, 6 );
+      } else {
+        ctx.arc( (ex + 4), mid, r, 0, (2 * Math.PI) );
+      }
     } else if( expanded ) {
       ctx.move_to( ex, ey );
-      ctx.line_to( (ex + 8), ey );
-      ctx.line_to( (ex + 4), (ey + 6) );
+      ctx.line_to( (ex + 10), ey );
+      ctx.line_to( (ex + 5), (ey + 8) );
       ctx.close_path();
     } else {
       ctx.move_to( ex, ey );
-      ctx.line_to( (ex + 6), (ey + 4) );
-      ctx.line_to( ex, (ey + 8) );
+      ctx.line_to( (ex + 8), (ey + 5) );
+      ctx.line_to( ex, (ey + 10) );
       ctx.close_path();
     }
 

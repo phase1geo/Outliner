@@ -1033,26 +1033,34 @@ public class OutlineTable : DrawingArea {
     queue_draw();
     changed();
   }
+
+  /* Handles inserting the given node into the list of root nodes at the given index */
+  private void insert_root( Node node, int index ) {
+    nodes.insert_val( index, node );
+    node.depth = 0;
+    node.y     = (index == 0) ? 0 : nodes.index( index - 1 ).get_last_node().last_y;
+    node.adjust_nodes_all( node.last_y, true );
+  }
       
   /* Removes the currently selected row from its parent and places itself just below its parent */
   public void unindent() {
-    if( selected == null ) return;
-    if( !selected.is_root() ) {
-      var parent       = selected.parent;
+    if( (selected == null) || selected.is_root() ) return;
+    var parent = selected.parent;
+    if( !parent.is_root() ) {
       var parent_index = parent.index();
       var grandparent  = parent.parent;
       parent.remove_child( selected );
       if( grandparent == null ) {
-        nodes.insert_val( (parent_index + 1), selected );
+        insert_root( selected, (parent_index + 1) );
       } else {
         grandparent.add_child( selected, (parent_index + 1) );
       }
     } else {
       var index = root_index( selected );
-      if( index == 0 ) return;
-      nodes.index( index ).remove_child( selected ); 
-      nodes.insert_val( (index + 1), selected );
+      parent.remove_child( selected );
+      insert_root( selected, (index + 1) );
     }
+    see( selected );
     queue_draw();
     changed();
   }
