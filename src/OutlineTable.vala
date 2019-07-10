@@ -35,6 +35,7 @@ public class OutlineTable : DrawingArea {
   private bool            _motion     = false;
   private Theme           _theme;
   private IMContextSimple _im_context;
+  private double          _scroll_adjust = -1;
 
   public Document   document    { get { return( _doc ); } }
   public UndoBuffer undo_buffer { get; set; }
@@ -83,6 +84,9 @@ public class OutlineTable : DrawingArea {
     this.button_release_event.connect( on_release );
     this.key_press_event.connect( on_keypress );
     // TBD - this.scroll_event.connect( on_scroll );
+    this.size_allocate.connect( (a) => {
+      see_internal();
+    });
 
     /* Make sure the above events are listened for */
     this.add_events(
@@ -106,18 +110,28 @@ public class OutlineTable : DrawingArea {
 
   /* Make sure that the given node is fully in view */
   public void see( Node node ) {
-    if( (nodes.length == 0) && (root_index( node ) != -1) ) return;
+    if( (nodes.length == 0) || (root_index( node ) == -1) ) return;
     var vp = parent.parent as Viewport;
     var vh = vp.get_allocated_height();
     var sw = parent.parent.parent as ScrolledWindow;
-    var sb = sw.get_vscrollbar() as Scrollbar;
-    var y1 = sb.get_value();
+    var y1 = sw.vadjustment.value;
     var y2 = y1 + vh;
     if( node.y < y1 ) {
-      sb.set_value( node.y );
+      _scroll_adjust = node.y;
     } else if( node.last_y > y2 ) {
-      sb.set_value( node.last_y - vh );
+      _scroll_adjust = node.last_y - vh;
     }
+    if( node.last_y <= get_allocated_height() ) {
+      see_internal();
+    }
+  }
+
+  /* Internal see command that is called after this has been resized */
+  private void see_internal() {
+    if( _scroll_adjust == -1 ) return;
+    var sw = parent.parent.parent as ScrolledWindow;
+    sw.vadjustment.value = _scroll_adjust;
+    _scroll_adjust = -1;
   }
 
   /* Returns true if the currently selected node is editable */
