@@ -369,7 +369,7 @@ public class OutlineTable : DrawingArea {
           case 65288 :  handle_backspace();         break;
           case 65535 :  handle_delete();            break;
           case 65307 :  handle_escape();            break;
-          case 65293 :  handle_return();            break;
+          case 65293 :  handle_return( shift );     break;
           case 65289 :  handle_tab();               break;
           case 65056 :  handle_shift_tab();         break;
           case 65363 :  handle_right( shift );      break;
@@ -435,10 +435,15 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Handles a return keypress */
-  private void handle_return() {
+  private void handle_return( bool shift ) {
     if( is_note_editable() ) {
       selected.note.insert( "\n" );
       queue_draw();
+      see( selected );
+    } else if( is_node_editable() && shift ) {
+      selected.name.insert( "\n" );
+      queue_draw();
+      see( selected );
     } else if( selected != null ) {
       if( selected.is_root() ) {
         add_root_node();
@@ -451,8 +456,10 @@ public class OutlineTable : DrawingArea {
   /* Handles a Control-Return keypress */
   private void handle_control_return() {
     if( is_node_editable() ) {
-      selected.name.insert( "\n" );
-      queue_draw();
+      string name   = selected.name.text;
+      int    curpos = selected.name.cursor;
+      selected.name.text = name.substring( 0, curpos );
+      add_sibling_node( name.substring( curpos ) );
     } else if( is_note_editable() ) {
       selected.note.insert( "\n" );
       queue_draw();
@@ -904,9 +911,13 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Creates a new node that is ready to be edited */
-  private Node create_node() {
+  private Node create_node( string? title = null ) {
 
     var node = new Node( this );
+
+    if( title != null ) {
+      node.name.text = title;
+    }
 
     selected = node;
     node.mode = NodeMode.EDITABLE;
@@ -964,13 +975,13 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Adds a sibling node of the currently selected node */
-  public void add_sibling_node() {
+  public void add_sibling_node( string? title = null ) {
 
     if( (selected == null) || selected.is_root() ) return;
 
     var index = selected.index();
     var sel   = selected;
-    var node  = create_node();
+    var node  = create_node( title );
 
     sel.parent.add_child( node, (index + 1) );
 

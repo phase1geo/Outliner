@@ -102,6 +102,11 @@ public class CanvasText : Object {
       }
     }
   }
+  public int cursor {
+    get {
+      return( text.index_of_nth_char( _cursor ) );
+    }
+  }
 
   /* Default constructor */
   public CanvasText( DrawingArea da, double max_width ) {
