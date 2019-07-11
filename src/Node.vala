@@ -61,9 +61,13 @@ public class Node {
       return( _mode );
     }
     set {
+      var note_was_edited = _mode == NodeMode.NOTEEDIT;
       _mode = value;
       name.edit = (_mode == NodeMode.EDITABLE);
       note.edit = (_mode == NodeMode.NOTEEDIT);
+      if( !note.edit && note_was_edited && (note.text == "") ) {
+        hide_note = true;
+      }
       update_height();
     }
   }
@@ -331,7 +335,7 @@ public class Node {
   /* Returns the area where we will draw the note icon */
   private void note_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + padx;
-    y = this.y + ((name.get_line_height() - 5) / 2);
+    y = this.y + pady + ((name.get_line_height() / 2) - 5);
     w = 10;
     h = 10;
   }
@@ -339,7 +343,7 @@ public class Node {
   /* Returns the area where the expander will draw the expander icon */
   private void expander_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 2) + 10 + (depth * indent);
-    y = this.y + pady + ((name.get_line_height() - 6) / 2);
+    y = this.y + pady + ((name.get_line_height() / 2) - 5);
     w = 10;
     h = 10;
   }
@@ -561,7 +565,7 @@ public class Node {
   private void draw_background( Cairo.Context ctx, Theme theme ) {
 
 
-    RGBA   background = is_root() ? theme.root_background : theme.background;
+    RGBA   background = theme.background;
     double alpha      = this.alpha;
     
     switch( mode ) {
@@ -571,7 +575,6 @@ public class Node {
     }
 
     Utils.set_context_color_with_alpha( ctx, background, alpha );
-
     ctx.rectangle( _x, _y, _w, _h );
     ctx.fill();
 
@@ -624,7 +627,14 @@ public class Node {
   /* Draw the node title */
   private void draw_name( Cairo.Context ctx, Theme theme ) {
 
-    RGBA color = is_root() ? theme.root_foreground : theme.foreground;
+    RGBA color = theme.foreground;
+
+    if( mode == NodeMode.EDITABLE ) {
+      Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
+      ctx.set_line_width( 1 );
+      ctx.rectangle( (name.posx - (padx / 2)), name.posy, name.max_width, name.height );
+      ctx.stroke();
+    }
 
     _name.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : color), alpha );
 
@@ -632,7 +642,7 @@ public class Node {
 
   private void draw_note_icon( Cairo.Context ctx, Theme theme ) {
 
-    if( (mode == NodeMode.MOVETO) || ((_note.text == "") && (mode != NodeMode.HOVER) && (mode != NodeMode.SELECTED)) ) return;
+    if( (mode == NodeMode.MOVETO) || ((_note.text == "") && (mode != NodeMode.HOVER) && (mode != NodeMode.SELECTED) && (mode != NodeMode.NOTEEDIT)) ) return;
 
     double x, y, w, h;
     double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text == "")) ? 0.3 : this.alpha;
@@ -662,6 +672,13 @@ public class Node {
   private void draw_note( Cairo.Context ctx, Theme theme ) {
 
     if( hide_note || (mode == NodeMode.MOVETO) ) return;
+
+    if( mode == NodeMode.NOTEEDIT ) {
+      Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
+      ctx.set_line_width( 1 );
+      ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      ctx.stroke();
+    }
 
     _note.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.note_color), alpha );
 

@@ -558,6 +558,20 @@ public class CanvasText : Object {
     ybot = ytop + (int)(rect.height / Pango.SCALE);
   }
 
+  /* Formats the given text */
+  public void format_text( string pre, string post ) {
+    if( _selstart == _selend ) {
+      var spos = text.index_of_nth_char( _selstart );
+      text = text.splice( spos, spos, pre + post );
+      _cursor = _selstart + pre.length;
+    } else {
+      var spos = text.index_of_nth_char( _selstart );
+      var epos = text.index_of_nth_char( _selend );
+      text = text.splice( epos, epos, post );
+      text = text.splice( spos, spos, pre );
+    }
+  }
+
   /* Draws the node font to the screen */
   public void draw( Cairo.Context ctx, Theme theme, RGBA fg, double alpha ) {
 

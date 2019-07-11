@@ -15,6 +15,7 @@ sources += files(
   'CanvasText.vala',
   'Document.vala',
   'DynamicNotebook.vala',
+  'FormatBar.vala',
   'MainWindow.vala',
   'Node.vala',
   'OutlineTable.vala',

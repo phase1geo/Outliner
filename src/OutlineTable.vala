@@ -46,6 +46,7 @@ public class OutlineTable : DrawingArea {
     set {
       if( _selected != null ) {
         _selected.mode = NodeMode.NONE;
+        show_format_bar( false );
       }
       if( (value != null) && (_selected != value) ) {
         see( value );
@@ -181,6 +182,7 @@ public class OutlineTable : DrawingArea {
           selected = clicked;
           if( e.type == EventType.DOUBLE_BUTTON_PRESS ) {
             clicked.mode = NodeMode.EDITABLE;
+            show_format_bar( true );
           }
         }
       } else if( clicked.is_within_note( x, y ) ) {
@@ -195,6 +197,7 @@ public class OutlineTable : DrawingArea {
           selected = clicked;
           if( e.type == EventType.DOUBLE_BUTTON_PRESS ) {
             clicked.mode = NodeMode.NOTEEDIT;
+            show_format_bar( true );
           }
         }
       } else {
@@ -257,6 +260,7 @@ public class OutlineTable : DrawingArea {
           }
         }
         queue_draw();
+        show_format_bar( false );
       }
 
     } else {
@@ -301,6 +305,7 @@ public class OutlineTable : DrawingArea {
           selected.mode = NodeMode.SELECTED;
           _active.mode  = NodeMode.NONE;
           _active       = null;
+          show_format_bar( false );
           queue_draw();
           changed();
         } else {
@@ -322,6 +327,7 @@ public class OutlineTable : DrawingArea {
           if( !_active.hide_note && (_active.note.text == "") ) {
             selected      = _active;
             selected.mode = NodeMode.NOTEEDIT;
+            show_format_bar( true );
           }
           queue_draw();
           changed();
@@ -431,6 +437,7 @@ public class OutlineTable : DrawingArea {
       selected.mode = NodeMode.SELECTED;
       queue_draw();
       changed();
+      show_format_bar( false );
     }
   }
 
@@ -446,9 +453,9 @@ public class OutlineTable : DrawingArea {
       see( selected );
     } else if( selected != null ) {
       if( selected.is_root() ) {
-        add_root_node();
+        add_root_node( !shift );
       } else {
-        add_sibling_node();
+        add_sibling_node( !shift );
       }
     }
   }
@@ -459,7 +466,7 @@ public class OutlineTable : DrawingArea {
       string name   = selected.name.text;
       int    curpos = selected.name.cursor;
       selected.name.text = name.substring( 0, curpos );
-      add_sibling_node( name.substring( curpos ) );
+      add_sibling_node( true, name.substring( curpos ) );
     } else if( is_note_editable() ) {
       selected.note.insert( "\n" );
       queue_draw();
@@ -733,6 +740,7 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Handles any printable characters */
   private void handle_printable( string str ) {
     if( !str.get_char( 0 ).isprint() ) return;
     if( is_node_editable() ) {
@@ -742,8 +750,38 @@ public class OutlineTable : DrawingArea {
       selected.note.insert( str );
       queue_draw();
     } else if( selected != null ) {
-      /* TBD */
+      switch( str ) {
+        case "e" :  edit_selected( true );  break;
+        case "E" :  edit_selected( false );  break;
+        case "m" :  change_selected( selected.get_root_node() );  break;
+        case "j" :  change_selected( selected.get_next_node() );  break;
+        case "h" :  unindent();  break;
+        case "k" :  change_selected( selected.get_previous_node() );  break;
+        case "l" :  indent();  break;
+        case "a" :  change_selected( selected.parent );  break;
+      }
     }
+  }
+
+  /* Edit the selected node */
+  private void edit_selected( bool title ) {
+    if( selected == null ) return;
+    if( title ) {
+      selected.mode = NodeMode.EDITABLE;
+    } else {
+      selected.mode = NodeMode.NOTEEDIT;
+      selected.hide_note = false;
+    }
+    show_format_bar( true );
+    queue_draw();
+  }
+
+  /* Change the selected node to the given node */
+  private void change_selected( Node? node ) {
+    if( node == null ) return;
+    selected = node;
+    queue_draw();
+    see( selected );
   }
 
   /*************************/
@@ -801,9 +839,17 @@ public class OutlineTable : DrawingArea {
     selected.mode = NodeMode.EDITABLE;
     nodes.append_val( selected );
 
-    /* Redraw the canvas */
     queue_draw();
+    show_format_bar( true );
 
+
+  }
+
+  /* Shows/Hides the formatting toolbar */
+  private void show_format_bar( bool show ) {
+    var box = get_parent().get_parent().get_parent().get_parent() as Gtk.Container;
+    var rev = box.get_children().nth_data( 0 ) as Gtk.Revealer;
+    rev.reveal_child = show;
   }
 
   /***************************/
@@ -921,6 +967,7 @@ public class OutlineTable : DrawingArea {
 
     selected = node;
     node.mode = NodeMode.EDITABLE;
+    show_format_bar( true );
 
     return( node );
 
@@ -953,9 +1000,9 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Adds a new root node */
-  public void add_root_node() {
+  public void add_root_node( bool below ) {
 
-    var insert_index = (selected != null) ? (root_index( selected ) + 1) : (int)nodes.length;
+    var insert_index = (selected != null) ? (root_index( selected ) + (below ? 1 : 0)) : (int)nodes.length;
     var last_y       = (selected != null) ? selected.get_root_node().get_last_node().last_y : 0;
     var node         = create_node();
 
@@ -975,7 +1022,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Adds a sibling node of the currently selected node */
-  public void add_sibling_node( string? title = null ) {
+  public void add_sibling_node( bool below, string? title = null ) {
 
     if( (selected == null) || selected.is_root() ) return;
 
@@ -983,7 +1030,11 @@ public class OutlineTable : DrawingArea {
     var sel   = selected;
     var node  = create_node( title );
 
-    sel.parent.add_child( node, (index + 1) );
+    if( below ) {
+      sel.parent.add_child( node, (index + 1) );
+    } else {
+      sel.parent.add_child( node, index );
+    }
 
     queue_draw();
     changed();
