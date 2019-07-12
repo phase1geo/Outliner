@@ -28,19 +28,20 @@ using Pango;
 public class CanvasText : Object {
 
   /* Member variables */
-  private string       _text         = "";
-  private bool         _markup       = true;
-  private bool         _edit         = false;
-  private int          _cursor       = 0;   /* Location of the cursor when editing */
-  private int          _column       = 0;   /* Character column to use when moving vertically */
-  private Pango.Layout _pango_layout = null;
-  private Pango.Layout _line_layout  = null;
-  private int          _selstart     = 0;
-  private int          _selend       = 0;
-  private int          _selanchor    = 0;
-  private double       _max_width    = 200;
-  private double       _width        = 0;
-  private double       _height       = 0;
+  private string         _text         = "";
+  private bool           _markup       = true;
+  private bool           _edit         = false;
+  private int            _cursor       = 0;   /* Location of the cursor when editing */
+  private int            _column       = 0;   /* Character column to use when moving vertically */
+  private Pango.Layout   _pango_layout = null;
+  private Pango.Layout   _line_layout  = null;
+  private Pango.AttrList _attrs;
+  private int            _selstart     = 0;
+  private int            _selend       = 0;
+  private int            _selanchor    = 0;
+  private double         _max_width    = 200;
+  private double         _width        = 0;
+  private double         _height       = 0;
 
   /* Signals */
   public signal void resized();
@@ -186,7 +187,13 @@ public class CanvasText : Object {
     }
 
     if( (n->children != null) && (n->children->type == Xml.ElementType.TEXT_NODE) ) {
-      text = n->children->get_content();
+      try {
+        unichar accel_char;
+        Pango.parse_markup( n->children->get_content(), -1, 0, out _attrs, out _text, out accel_char );
+        stdout.printf( "After parsing markup, text: %s\n", text );
+      } catch( GLib.Error e ) {
+        /* TBD */
+      }
     }
 
   }

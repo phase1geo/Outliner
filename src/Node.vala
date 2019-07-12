@@ -444,6 +444,23 @@ public class Node {
 
     if( (n->children != null) && (n->children->type == Xml.ElementType.TEXT_NODE) ) {
       name.text = n->children->get_content();
+      try {
+        Pango.AttrList attrs;
+        string   text;
+        unichar  accel_char;
+        Pango.parse_markup( n->children->get_content(), -1, 0, out attrs, out text, out accel_char );
+        stdout.printf( "After parsing markup, text: %s\n", text );
+        Pango.AttrIterator it = attrs.get_iterator();
+        while( it.next() ) {
+          int start, end;
+          it.range( out start, out end );
+          it.get_attrs().foreach((attr) => {
+            stdout.printf( "attr.class: %s, start: %d, end: %d\n", attr.klass.type.to_string(), start, end );
+          });
+        }
+      } catch( GLib.Error e ) {
+        /* TBD */
+      }
     }
 
   }
