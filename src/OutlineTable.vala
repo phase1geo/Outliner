@@ -209,6 +209,15 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Changes the text selection for the specified canvas text element */
+  private void change_selection( CanvasText ct, double x, double y ) {
+    switch( _press_type ) {
+      case EventType.BUTTON_PRESS        :  ct.set_cursor_at_char( x, y, true );  break;
+      case EventType.DOUBLE_BUTTON_PRESS :  ct.set_cursor_at_word( x, y, true );  break;
+    }
+    queue_draw();
+  }
+
   /* Handle button press event */
   private bool on_press( EventButton e ) {
 
@@ -239,28 +248,36 @@ public class OutlineTable : DrawingArea {
     if( _pressed ) {
 
       if( selected != null ) {
-        if( selected.mode == NodeMode.SELECTED ) {
-          selected.mode = NodeMode.MOVETO;
-          selected.parent.remove_child( selected );
-        }
-        selected.x = e.x;
-        selected.y = e.y;
-        var current = node_at_coordinates( e.x, e.y );
-        if( current != null ) {
-          if( current.is_within_attach( e.x, e.y ) ) {
-            current.mode = NodeMode.ATTACHTO;
-          } else {
-            current.mode = NodeMode.ATTACHBELOW;
+
+        /* If we are dragging out a text selection, handle it here */
+        if( (selected.mode == NodeMode.EDITABLE) || (selected.mode == NodeMode.NOTEEDIT) ) {
+          change_selection( ((selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note), e.x, e.y );
+
+        /* Otherwise, we are moving the current node */
+        } else {
+          if( selected.mode == NodeMode.SELECTED ) {
+            selected.mode = NodeMode.MOVETO;
+            selected.parent.remove_child( selected );
           }
-          if( current != _active ) {
-            if( _active != null ) {
-              _active.mode = NodeMode.NONE;
+          selected.x = e.x;
+          selected.y = e.y;
+          var current = node_at_coordinates( e.x, e.y );
+          if( current != null ) {
+            if( current.is_within_attach( e.x, e.y ) ) {
+              current.mode = NodeMode.ATTACHTO;
+            } else {
+              current.mode = NodeMode.ATTACHBELOW;
             }
-            _active = current;
+            if( current != _active ) {
+              if( _active != null ) {
+                _active.mode = NodeMode.NONE;
+              }
+              _active = current;
+            }
           }
+          queue_draw();
+          show_format_bar( false );
         }
-        queue_draw();
-        show_format_bar( false );
       }
 
     } else {
@@ -833,6 +850,9 @@ public class OutlineTable : DrawingArea {
 
   /* Creates a new, unnamed document */
   public void initialize_for_new() {
+
+    /* Initialize variables */
+    _press_type = EventType.NOTHING;
 
     /* Create the main idea node */
     selected = new Node( this );
