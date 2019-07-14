@@ -1,62 +1,127 @@
-public enum FormattedType {
+using Gdk;
+
+public enum FormattedTag {
   BOLD = 0,
   ITALICS,
-  ULINE,
-  STRIKE;
+  UNDERLINE,
+  STRIKETHROUGH,
+  COLOR,
+  HILITE,
+  SELECT
+}
 
-  public string tag() {
-    switch( this ) {
-      case BOLD    :  return( "b" );
-      case ITALICS :  return( "i" );
-      case ULINE   :  return( "u" );
-      case STRIKE  :  return( "s" );
-    }
-    return( "b" );
+public class FormattedType {
+  public FormattedTag tag { get; private set; }
+  public FormattedType( FormattedTag t ) { tag = t; }
+  public virtual string start_tag() { return( "" ); }
+  public virtual string end_tag() { return( "" ); }
+  public virtual bool matches( FormattedType type ) { return( type.tag == tag ); }
+}
+
+public class BoldType : FormattedType {
+  public BoldType() { base( FormattedTag.BOLD ); }
+  public override string start_tag() { return( "<b>" ); }
+  public override string end_tag() { return( "</b>" ); }
+}
+
+public class ItalicsType : FormattedType {
+  public ItalicsType() { base( FormattedTag.ITALICS ); }
+  public override string start_tag() { return( "<i>" ); }
+  public override string end_tag() { return( "</i>" ); }
+}
+
+public class UnderlineType : FormattedType {
+  public UnderlineType() { base( FormattedTag.UNDERLINE ); }
+  public override string start_tag() { return( "<u>" ); }
+  public override string end_tag() { return( "</u>" ); }
+}
+
+public class StrikethroughType : FormattedType {
+  public StrikethroughType() { base( FormattedTag.STRIKETHROUGH ); }
+  public override string start_tag() { return( "<s>" ); }
+  public override string end_tag() { return( "</s>" ); }
+}
+
+public class ColorType : FormattedType {
+  private string _color;
+  public ColorType( string color ) {
+    base( FormattedTag.COLOR );
+    _color = color;
   }
+  public override string start_tag() { return( "<span foreground='%s'>".printf( _color ) ); }
+  public override string end_tag() { return( "</span>" ); }
+  public override bool matches( FormattedType type ) { return( base.matches( type ) && ((type as ColorType)._color == _color) ); }
+}
+
+public class HighlightType : FormattedType {
+  private string _color;
+  public HighlightType( string color ) {
+    base( FormattedTag.HILITE );
+    _color = color;
+  }
+  public override string start_tag() { return( "<span background='%s'>".printf( _color ) ); }
+  public override string end_tag() { return( "</span>" ); }
+  public override bool matches( FormattedType type ) { return( base.matches( type ) && ((type as HighlightType)._color == _color) ); }
+}
+
+public class SelectedType : FormattedType {
+  private string _foreground;
+  private string _background;
+  public SelectedType( string foreground, string background ) {
+    base( FormattedTag.SELECT );
+    _foreground = foreground;
+    _background = background;
+  }
+  public override string start_tag() { return( "<span foreground='%s' background='%s'>".printf( _foreground, _background ) ); }
+  public override string end_tag() { return( "</span>" ); }
 }
 
 public class FormattedText {
 
   private class Chunk {
-    public string               text  { get; set; default = ""; }
-    public int                  start { get; set; default = 0; }
-    public Array<FormattedType> stags { get; set; default = new Array<FormattedType>(); }
-    public Array<FormattedType> etags { get; set; default = new Array<FormattedType>(); }
+    public string               text   { get; set; default = ""; }
+    public Array<FormattedType> stags  { get; set; default = new Array<FormattedType>(); }
+    public Array<FormattedType> etags  { get; set; default = new Array<FormattedType>(); }
+    public int                  length { get { return( text.length ); } }
+
     public Chunk() {}
+
     public bool is_within( int index ) {
-      return( (start <= index) && (index < (start + text.length)) );
+      return( index < text.length );
     }
-    public bool contains_type( FormattedType type ) {
+    public bool contains_start_tag( FormattedType tag ) {
       for( int i=0; i<stags.length; i++ ) {
-        if( stags.index( i ) == type ) return( true );
+        if( stags.index( i ).matches( tag ) ) return( true );
+      }
+      return( false );
+    }
+    public bool contains_end_tag( FormattedType tag ) {
+      for( int i=0; i<etags.length; i++ ) {
+        if( etags.index( i ).matches( tag ) ) return( true );
       }
       return( false );
     }
     public bool insert( string str, int index ) {
       if( !is_within( index ) ) return( false );
-      int offset = index - start;
-      text = text.splice( offset, offset, str );
+      text = text.splice( index, index, str );
       return( true );
     }
     public bool delete( int index ) {
       if( !is_within( index ) ) return( false );
-      int offset = index - start;
-      text = text.splice( offset, (offset + 1) );
+      text = text.splice( index, (index + 1) );
       return( true );
     }
-    public bool delete_range( ref int s, int e ) {
+    public bool delete_range( int s, int e ) {
       if( is_within( s ) ) {
         if( is_within( e ) ) {
-          text = text.splice( (s - start), (e - start) );
+          text = text.splice( s, e );
           return( true );
         } else {
-          text = text.splice( (s - start), (text.length - 1) );
-          s   += (text.length - s);
-          return( s == e );
+          text = text.splice( s, text.length );
         }
       } else {
         if( is_within( e ) ) {
-          text = text.splice( 0, ((e - 1) - start) );
+          text = text.splice( 0, e );
           return( true );
         }
       }
@@ -68,11 +133,11 @@ public class FormattedText {
     public string get_markup() {
       var str = "";
       for( int i=0; i<stags.length; i++ ) {
-        str += "<" + stags.index( i ).tag() + ">";
+        str += stags.index( i ).start_tag();
       }
       str += text;
       for( int i=0; i<etags.length; i++ ) {
-        str += "</" + etags.index( i ).tag() + ">";
+        str += etags.index( i ).end_tag();
       }
       return( str );
     }
@@ -80,40 +145,41 @@ public class FormattedText {
 
   private Array<Chunk> _chunks;
 
-  public uint num_chunks() {
-    return( _chunks.length );
-  }
-
   public FormattedText() {
     _chunks = new Array<Chunk>();
     _chunks.append_val( new Chunk() );
   }
 
   public void insert_text( string str, int index ) {
+    Chunk chunk = _chunks.index( 0 );
     for( int i=0; i<_chunks.length; i++ ) {
-      if( _chunks.index( i ).insert( str, index ) ) return;
+      chunk = _chunks.index( i );
+      if( chunk.insert( str, index ) ) return;
+      index -= chunk.length;
     }
-    _chunks.index( _chunks.length - 1 ).text += str;
+    chunk.text += str;
   }
 
   public void delete( int index ) {
     for( int i=0; i<_chunks.length; i++ ) {
       if( _chunks.index( i ).delete( index ) ) return;
+      index -= _chunks.index( i ).length;
     }
   }
 
   public void delete_range( int start, int end ) {
-    int last_start = start;
-    int i          = 0;
+    int i = 0;
     while( i < _chunks.length ) {
-      if( _chunks.index( i ).delete_range( ref start, end ) ) {
+      var chunk = _chunks.index( i );
+      if( chunk.delete_range( start, end ) ) {
         return;
-      } else if( (start != last_start) && _chunks.index( i ).is_empty() ) {
+      } else if( chunk.is_empty() ) {
         _chunks.remove_index( i ); 
       } else {
+        start -= chunk.length;
+        end   -= chunk.length;
         i++;
       }
-      last_start = start;
     }
   }
 
@@ -122,13 +188,14 @@ public class FormattedText {
     for( int i=0; i<_chunks.length; i++ ) {
       var stags = "";
       var etags = "";
-      for( int j=0; j<_chunks.index( i ).stags.length; j++ ) {
-        stags += _chunks.index( i ).stags.index( j ).tag();
+      var chunk = _chunks.index( i );
+      for( int j=0; j<chunk.stags.length; j++ ) {
+        stags += chunk.stags.index( j ).start_tag();
       }
-      for( int j=0; j<_chunks.index( i ).etags.length; j++ ) {
-        etags += _chunks.index( i ).etags.index( j ).tag();
+      for( int j=0; j<chunk.etags.length; j++ ) {
+        etags += chunk.etags.index( j ).end_tag();
       }
-      stdout.printf( "%d:  %d %s %s %s\n", i, _chunks.index( i ).start, stags, _chunks.index( i ).text, etags );
+      stdout.printf( "%d:  %s %s %s\n", i, stags, chunk.text, etags );
     }
 
   }
@@ -136,21 +203,19 @@ public class FormattedText {
   private void add_within_chunk( Chunk chunk, int chunk_index, FormattedType type, int start, int end ) {
 
     /* If the current chunk already has the given type applied, we don't need to do anything else */
-    if( chunk.contains_type( type ) ) return;
+    if( chunk.contains_start_tag( type ) ) return;
 
     /* Create new chunk */
-    var new_chunk1   = new Chunk();
-    new_chunk1.text  = chunk.text.substring( (start - chunk.start), (end - chunk.start) );
-    new_chunk1.start = start - chunk.start;
+    var new_chunk1  = new Chunk();
+    new_chunk1.text = chunk.text.substring( start, end );
     new_chunk1.stags.append_val( type );
     new_chunk1.etags.append_val( type );
     _chunks.insert_val( (chunk_index + 1), new_chunk1 );
 
     /* Split the current chunk */
     var new_chunk2   = new Chunk();
-    new_chunk2.text  = chunk.text.substring( (end - chunk.start), (chunk.text.length - (end - chunk.start)) );
+    new_chunk2.text  = chunk.text.substring( end );
     if( new_chunk2.text.length > 0 ) {
-      new_chunk2.start = end - chunk.start;
       for( int i=0; i<chunk.etags.length; i++ ) {
         new_chunk2.etags.append_val( chunk.etags.index( i ) );
       }
@@ -158,7 +223,7 @@ public class FormattedText {
     }
 
     /* Clean up chunk */
-    chunk.text = chunk.text.substring( 0, (start - chunk.start) );
+    chunk.text = chunk.text.substring( 0, start );
     if( (chunk.text.length == 0) && (chunk.stags.length == 0) ) {
       _chunks.remove_index( chunk_index );
     } else {
@@ -171,8 +236,7 @@ public class FormattedText {
 
     /* Create the new chunk and insert it into the list of chunks */
     var new_chunk = new Chunk();
-    new_chunk.text  = chunk.text.substring( start - chunk.start );
-    new_chunk.start = start - chunk.start;
+    new_chunk.text  = chunk.text.substring( start );
     new_chunk.stags.append_val( type );
     new_chunk.etags.append_val( type );
     for( int i=0; i<chunk.etags.length; i++ ) {
@@ -181,7 +245,7 @@ public class FormattedText {
     _chunks.insert_val( (chunk_index + 1), new_chunk );
 
     /* Update the original chunk */
-    chunk.text = chunk.text.splice( (start - chunk.start), chunk.text.length );
+    chunk.text = chunk.text.splice( start, chunk.length );
     chunk.etags.remove_range( 0, chunk.etags.length );
     if( chunk.text.length == 0 ) {
       _chunks.remove_index( chunk_index );
@@ -195,19 +259,16 @@ public class FormattedText {
 
     /* Create the new chunk and insert it into the list of chunks */
     var new_chunk = new Chunk();
-    new_chunk.text  = chunk.text.substring( 0, (end - chunk.start) );
-    new_chunk.start = chunk.start;
+    new_chunk.text  = chunk.text.substring( 0, end );
     new_chunk.stags.append_val( type );
     new_chunk.etags.prepend_val( type );
     for( int j=0; j<chunk.stags.length; j++ ) {
       new_chunk.stags.append_val( chunk.stags.index( j ) );
     }
-    stdout.printf( "  new_chunk: %s\n", new_chunk.get_markup() );
     _chunks.insert_val( chunk_index, new_chunk );
 
     /* Update the original chunk */
-    chunk.text  = chunk.text.splice( 0, (end - chunk.start) );
-    chunk.start = end - chunk.start;
+    chunk.text = chunk.text.splice( 0, end );
     if( new_chunk.etags.index( 0 ) == chunk.stags.index( 0 ) ) {
       chunk.stags.remove_index( 0 );
     }
@@ -223,7 +284,7 @@ public class FormattedText {
 
   /* Adds the formatting */
   public void add_format_range( FormattedType type, int start, int end ) {
-    int  i = 0;
+    int  i           = 0;
     bool start_found = false;
     while( i < _chunks.length ) {
       var chunk = _chunks.index( i );
@@ -251,12 +312,23 @@ public class FormattedText {
       } else if( start_found ) {
         add_between_chunk( chunk, i, type );
       }
+      start -= chunk.length;
+      end   -= chunk.length;
       i++;
     }
   }
 
   public void remove_format( int start, int end ) {
     /* TBD */
+  }
+
+  /* Returns the raw text without formatting applied */
+  public string get_text() {
+    string str = "";
+    for( int i=0; i<_chunks.length; i++ ) {
+      str += _chunks.index( i ).text;
+    }
+    return( str );
   }
 
   /* Returns the markup string for the stored text */
