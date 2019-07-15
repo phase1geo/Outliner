@@ -42,6 +42,16 @@ public class Theme : Object {
   public    RGBA   attachable_color   { protected set; get; }
   public    bool   prefer_dark        { protected set; get; }
 
+  public    RGBA   color1             { protected set; get; }
+  public    RGBA   color2             { protected set; get; }
+  public    RGBA   color3             { protected set; get; }
+  public    RGBA   color4             { protected set; get; }
+  public    RGBA   hilite1            { protected set; get; }
+  public    RGBA   hilite2            { protected set; get; }
+  public    RGBA   hilite3            { protected set; get; }
+  public    RGBA   hilite4            { protected set; get; }
+  public    RGBA   url                { protected set; get; }
+
   /* Default constructor */
   public Theme() {}
 
