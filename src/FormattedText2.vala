@@ -1,3 +1,24 @@
+/*
+* Copyright (c) 2019 (https://github.com/phase1geo/Outliner)
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public
+* License along with this program; if not, write to the
+* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA
+*
+* Authored by: Trevor Williams <phase1geo@gmail.com>
+*/
+
 using Pango;
 using Gdk;
 
@@ -16,7 +37,46 @@ public enum FormatTag {
   HILITE4,
   URL,
   SELECT,
-  LENGTH
+  LENGTH;
+
+  public string to_string() {
+    switch( this ) {
+      case BOLD       :  return( "bold" );
+      case ITALICS    :  return( "italics" );
+      case UNDERLINE  :  return( "underline" );
+      case STRIKETHRU :  return( "strikethru" );
+      case COLOR1     :  return( "color1" );
+      case COLOR2     :  return( "color2" );
+      case COLOR3     :  return( "color3" );
+      case COLOR4     :  return( "color4" );
+      case HILITE1    :  return( "hilite1" );
+      case HILITE2    :  return( "hilite2" );
+      case HILITE3    :  return( "hilite3" );
+      case HILITE4    :  return( "hilite4" );
+      case URL        :  return( "url" );
+    }
+    return( "bold" );
+  }
+
+  public static FormatTag from_string( string str ) {
+    switch( str ) {
+      case "bold"       :  return( BOLD );
+      case "italics"    :  return( ITALICS );
+      case "underline"  :  return( UNDERLINE );
+      case "strikethru" :  return( STRIKETHRU );
+      case "color1"     :  return( COLOR1 );
+      case "color2"     :  return( COLOR2 );
+      case "color3"     :  return( COLOR3 );
+      case "color4"     :  return( COLOR4 );
+      case "hilite1"    :  return( HILITE1 );
+      case "hilite2"    :  return( HILITE2 );
+      case "hilite3"    :  return( HILITE3 );
+      case "hilite4"    :  return( HILITE4 );
+      case "url"        :  return( URL );
+    }
+    return( BOLD );
+  }
+
 }
 
 public class FormattedText {
@@ -44,12 +104,10 @@ public class FormattedText {
       }
     }
 
-    private   Array<FormattedRange> _info;
-    protected Array<Attribute>      _attrs;
+    private Array<FormattedRange> _info;
 
     public TagInfo() {
-      _info  = new Array<FormattedRange>();
-      _attrs = new Array<Attribute>();
+      _info = new Array<FormattedRange>();
     }
 
     /* Returns true if this info array is empty */
@@ -107,92 +165,129 @@ public class FormattedText {
     }
 
     /* Inserts all of the attributes for this tag */
-    public void get_attributes( ref AttrList attrs ) {
+    public void get_attributes( int tag_index, ref AttrList attrs, TagAttrs[] tag ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
-        for( int j=0; j<_attrs.length; j++ ) {
-          var attr = _attrs.index( j ).copy();
+        for( int j=0; j<tag[tag_index].attrs.length; j++ ) {
+          var attr = tag[tag_index].attrs.index( j ).copy();
           attr.start_index = info.start;
           attr.end_index   = info.end;
-          attrs.insert( attr );
+          attrs.change( (owned)attr );
         }
+      }
+    }
+
+    /* Returns the list of ranges this tag is associated with */
+    public string get_ranges() {
+      var ranges = "";
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        ranges += " %d %d".printf( info.start, info.end );
+      }
+      return( ranges.chug() );
+    }
+
+    /* Stores the given range information to this class */
+    public void store_ranges( string? str ) {
+      if( str == null ) return;
+      string[] ranges = str.split( " " );
+      for( int i=0; i<ranges.length; i+=2 ) {
+        _info.append_val( new FormattedRange( int.parse( ranges[i+0] ), int.parse( ranges[i+1] ) ) );
       }
     }
 
   }
 
-  private class BoldInfo : TagInfo {
+  private class TagAttrs {
+    public Array<Pango.Attribute> attrs;
+    public TagAttrs() {
+      attrs = new Array<Pango.Attribute>();
+    }
+  }
+
+  private class BoldInfo : TagAttrs {
     public BoldInfo() {
-      _attrs.append_val( attr_weight_new( Weight.BOLD ) );
+      attrs.append_val( attr_weight_new( Weight.BOLD ) );
     }
   }
 
-  private class ItalicsInfo : TagInfo {
+  private class ItalicsInfo : TagAttrs {
     public ItalicsInfo() {
-      _attrs.append_val( attr_style_new( Style.ITALIC ) );
+      attrs.append_val( attr_style_new( Style.ITALIC ) );
     }
   }
 
-  private class UnderlineInfo : TagInfo {
+  private class UnderlineInfo : TagAttrs {
     public UnderlineInfo() {
-      _attrs.append_val( attr_underline_new( Underline.SINGLE ) );
+      attrs.append_val( attr_underline_new( Underline.SINGLE ) );
     }
   }
 
-  private class StrikeThruInfo : TagInfo {
+  private class StrikeThruInfo : TagAttrs {
     public StrikeThruInfo() {
-      _attrs.append_val( attr_strikethrough_new( true ) );
+      attrs.append_val( attr_strikethrough_new( true ) );
     }
   }
 
-  private class ColorInfo : TagInfo {
+  private class ColorInfo : TagAttrs {
     public ColorInfo( RGBA color ) {
-      _attrs.append_val( attr_foreground_new( (uint16)(color.red * 255), (uint16)(color.green * 255), (uint16)(color.blue * 255) ) );
+      set_color( color );
     }
-    public void set_color( RGBA color ) {
-      _attrs.remove_index( 0 );
-      _attrs.append_val( attr_foreground_new( (uint16)(color.red * 255), (uint16)(color.green * 255), (uint16)(color.blue * 255) ) );
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+    }
+    public void update_color( RGBA color ) {
+      attrs.remove_index( 0 );
+      set_color( color );
     }
   }
 
-  private class HighlightInfo : TagInfo {
+  private class HighlightInfo : TagAttrs {
     public HighlightInfo( RGBA color ) {
-      _attrs.append_val( attr_background_new( (uint16)(color.red * 255), (uint16)(color.green * 255), (uint16)(color.blue * 255) ) );
-      _attrs.append_val( attr_background_alpha_new( (uint16)(color.alpha * 255) ) );
+      set_color( color );
     }
-    public void set_color( RGBA color ) {
-      _attrs.remove_range( 0, 2 );
-      _attrs.append_val( attr_background_new( (uint16)(color.red * 255), (uint16)(color.green * 255), (uint16)(color.blue * 255) ) );
-      _attrs.append_val( attr_background_alpha_new( (uint16)(color.alpha * 255) ) );
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_background_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+      attrs.append_val( attr_background_alpha_new( (uint16)(65536 / 2) ) );
+    }
+    public void update_color( RGBA color ) {
+      attrs.remove_range( 0, 2 );
+      set_color( color );
     }
   }
 
-  private class UrlInfo : TagInfo {
+  private class UrlInfo : TagAttrs {
     public UrlInfo( RGBA color ) {
-      _attrs.append_val( attr_foreground_new( (uint16)(color.red * 255), (uint16)(color.green * 255), (uint16)(color.blue * 255) ) );
-      _attrs.append_val( attr_underline_new( Underline.SINGLE ) );
+      set_color( color );
     }
-    public void set_color( RGBA color ) {
-      _attrs.remove_range( 0, 2 );
-      _attrs.append_val( attr_foreground_new( (uint16)(color.red * 255), (uint16)(color.green * 255), (uint16)(color.blue * 255) ) );
-      _attrs.append_val( attr_underline_new( Underline.SINGLE ) );
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+      attrs.append_val( attr_underline_new( Underline.SINGLE ) );
     }
+    public void update_color( RGBA color ) {
+      attrs.remove_range( 0, 2 );
+      set_color( color );
+    }
+
   }
 
-  private class SelectInfo : TagInfo {
+  private class SelectInfo : TagAttrs {
     public SelectInfo( RGBA f, RGBA b ) {
-      _attrs.append_val( attr_foreground_new( (uint16)(f.red * 255), (uint16)(f.green * 255), (uint16)(f.blue * 255) ) );
-      _attrs.append_val( attr_background_new( (uint16)(b.red * 255), (uint16)(b.green * 255), (uint16)(b.blue * 255) ) );
+      set_color( f, b );
     }
-    public void set_color( RGBA f, RGBA b ) {
-      _attrs.remove_range( 0, 2 );
-      _attrs.append_val( attr_foreground_new( (uint16)(f.red * 255), (uint16)(f.green * 255), (uint16)(f.blue * 255) ) );
-      _attrs.append_val( attr_background_new( (uint16)(b.red * 255), (uint16)(b.green * 255), (uint16)(b.blue * 255) ) );
+    private void set_color( RGBA f, RGBA b ) {
+      attrs.append_val( attr_foreground_new( (uint16)(f.red * 65535), (uint16)(f.green * 65535), (uint16)(f.blue * 65535) ) );
+      attrs.append_val( attr_background_new( (uint16)(b.red * 65535), (uint16)(b.green * 65535), (uint16)(b.blue * 65535) ) );
+    }
+    public void update_color( RGBA f, RGBA b ) {
+      attrs.remove_range( 0, 2 );
+      set_color( f, b );
     }
   }
 
-  private TagInfo[] _formats = new TagInfo[FormatTag.LENGTH];
-  private string    _text;
+  private static TagAttrs[] _attr_tags = null;
+  private TagInfo[]         _formats   = new TagInfo[FormatTag.LENGTH];
+  private string            _text      = "";
 
   public string text {
     get {
@@ -201,33 +296,39 @@ public class FormattedText {
   }
 
   public FormattedText( Theme theme ) {
-    _formats[FormatTag.BOLD]       = new BoldInfo();
-    _formats[FormatTag.ITALICS]    = new ItalicsInfo();
-    _formats[FormatTag.UNDERLINE]  = new UnderlineInfo();
-    _formats[FormatTag.STRIKETHRU] = new StrikeThruInfo();
-    _formats[FormatTag.COLOR1]     = new ColorInfo( theme.color1 );
-    _formats[FormatTag.COLOR2]     = new ColorInfo( theme.color2 );
-    _formats[FormatTag.COLOR3]     = new ColorInfo( theme.color3 );
-    _formats[FormatTag.COLOR4]     = new ColorInfo( theme.color4 );
-    _formats[FormatTag.HILITE1]    = new HighlightInfo( theme.hilite1 );
-    _formats[FormatTag.HILITE2]    = new HighlightInfo( theme.hilite2 );
-    _formats[FormatTag.HILITE3]    = new HighlightInfo( theme.hilite3 );
-    _formats[FormatTag.HILITE4]    = new HighlightInfo( theme.hilite4 );
-    _formats[FormatTag.URL]        = new UrlInfo( theme.url );
-    _formats[FormatTag.SELECT]     = new SelectInfo( theme.textsel_foreground, theme.textsel_background );
+    if( _attr_tags == null ) {
+      _attr_tags = new TagAttrs[FormatTag.LENGTH];
+      _attr_tags[FormatTag.BOLD]       = new BoldInfo();
+      _attr_tags[FormatTag.ITALICS]    = new ItalicsInfo();
+      _attr_tags[FormatTag.UNDERLINE]  = new UnderlineInfo();
+      _attr_tags[FormatTag.STRIKETHRU] = new StrikeThruInfo();
+      _attr_tags[FormatTag.COLOR1]     = new ColorInfo( theme.color1 );
+      _attr_tags[FormatTag.COLOR2]     = new ColorInfo( theme.color2 );
+      _attr_tags[FormatTag.COLOR3]     = new ColorInfo( theme.color3 );
+      _attr_tags[FormatTag.COLOR4]     = new ColorInfo( theme.color4 );
+      _attr_tags[FormatTag.HILITE1]    = new HighlightInfo( theme.hilite1 );
+      _attr_tags[FormatTag.HILITE2]    = new HighlightInfo( theme.hilite2 );
+      _attr_tags[FormatTag.HILITE3]    = new HighlightInfo( theme.hilite3 );
+      _attr_tags[FormatTag.HILITE4]    = new HighlightInfo( theme.hilite4 );
+      _attr_tags[FormatTag.URL]        = new UrlInfo( theme.url );
+      _attr_tags[FormatTag.SELECT]     = new SelectInfo( theme.textsel_foreground, theme.textsel_background );
+    }
+    for( int i=0; i<FormatTag.LENGTH; i++ ) {
+      _formats[i] = new TagInfo();
+    }
   }
 
-  public void set_theme( Theme theme ) {
-    (_formats[FormatTag.COLOR1] as ColorInfo).set_color( theme.color1 );
-    (_formats[FormatTag.COLOR2] as ColorInfo).set_color( theme.color2 );
-    (_formats[FormatTag.COLOR3] as ColorInfo).set_color( theme.color3 );
-    (_formats[FormatTag.COLOR4] as ColorInfo).set_color( theme.color4 );
-    (_formats[FormatTag.HILITE1] as HighlightInfo).set_color( theme.hilite1 );
-    (_formats[FormatTag.HILITE2] as HighlightInfo).set_color( theme.hilite2 );
-    (_formats[FormatTag.HILITE3] as HighlightInfo).set_color( theme.hilite3 );
-    (_formats[FormatTag.HILITE4] as HighlightInfo).set_color( theme.hilite4 );
-    (_formats[FormatTag.URL] as UrlInfo).set_color( theme.url );
-    (_formats[FormatTag.SELECT] as SelectInfo).set_color( theme.textsel_foreground, theme.textsel_background );
+  public static void set_theme( Theme theme ) {
+    (_attr_tags[FormatTag.COLOR1] as ColorInfo).update_color( theme.color1 );
+    (_attr_tags[FormatTag.COLOR2] as ColorInfo).update_color( theme.color2 );
+    (_attr_tags[FormatTag.COLOR3] as ColorInfo).update_color( theme.color3 );
+    (_attr_tags[FormatTag.COLOR4] as ColorInfo).update_color( theme.color4 );
+    (_attr_tags[FormatTag.HILITE1] as HighlightInfo).update_color( theme.hilite1 );
+    (_attr_tags[FormatTag.HILITE2] as HighlightInfo).update_color( theme.hilite2 );
+    (_attr_tags[FormatTag.HILITE3] as HighlightInfo).update_color( theme.hilite3 );
+    (_attr_tags[FormatTag.HILITE4] as HighlightInfo).update_color( theme.hilite4 );
+    (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
+    (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
   }
 
   /* Inserts a string into the given text */
@@ -284,10 +385,42 @@ public class FormattedText {
   */
   public AttrList get_attributes() {
     var attrs = new AttrList();
-    foreach( TagInfo f in _formats ) {
-      f.get_attributes( ref attrs );
+    for( int i=0; i<FormatTag.LENGTH; i++ ) {
+      _formats[i].get_attributes( i, ref attrs, _attr_tags );
     }
     return( attrs );
+  }
+
+  /* Saves the text as the given XML node */
+  public Xml.Node* save() {
+    Xml.Node* n = new Xml.Node( null, "text" );
+    n->new_prop( "str", text );
+    for( int i=0; i<(FormatTag.LENGTH - 1); i++ ) {
+      if( !_formats[i].is_empty() ) {
+        Xml.Node* f   = new Xml.Node( null, "format" );
+        var       tag = (FormatTag)i;
+        f->new_prop( "type", tag.to_string() );
+        f->new_prop( "ranges", _formats[i].get_ranges() );
+        n->add_child( f );
+      }
+    }
+    return( n );
+  }
+
+  /* Loads the given XML information */
+  public void load( Xml.Node* n ) {
+    string? t = n->get_prop( "str" );
+    if( t != null ) {
+      _text = t;
+    }
+    for( Xml.Node* it = n->children; it != null; it = it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "format") ) {
+        string? type = it->get_prop( "type" );
+        if( type != null ) {
+          _formats[FormatTag.from_string( type )].store_ranges( n->get_prop( "ranges" ) );
+        }
+      }
+    }
   }
 
 }

@@ -36,15 +36,6 @@ public class Outliner : Granite.Application {
 
   protected override void activate() {
 
-    /*
-    FormattedText text = new FormattedText();
-    text.insert_text( "This is very good indeed", 0 );
-    text.add_format_range( new BoldType(), 0, 7 );
-    text.add_format_range( new BoldType(), 8, 12 );
-    text.add_format_range( new SelectedType( "#ffffff", "#000000" ), 0, 15 );
-    stdout.printf( "MARKUP: %s\n", text.get_markup() );
-    */
-
     /* Initialize the settings */
     settings = new GLib.Settings( "com.github.phase1geo.outliner" );
 

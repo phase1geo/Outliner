@@ -1174,6 +1174,47 @@ public class OutlineTable : DrawingArea {
     if( selected != null ) {
       selected.draw( ctx, _theme );
     }
+    // run_test( ctx );
+  }
+
+  private void run_test( Context ctx ) {
+
+    var theme  = get_theme();
+    var layout = create_pango_layout( null );
+    var txt    = new FormattedText( theme );
+
+    layout.set_wrap( Pango.WrapMode.WORD_CHAR );
+    layout.set_width( 300 * Pango.SCALE );
+    layout.set_font_description( Pango.FontDescription.from_string( "Sans 18" ) );
+
+    /* Prepare the text */
+    txt.insert_text( "This is just a test", 0 );
+    txt.add_tag( FormatTag.BOLD,       8, 14 );
+    txt.add_tag( FormatTag.UNDERLINE, 12, 19 );
+    txt.add_tag( FormatTag.STRIKETHRU, 8, 12 );
+    txt.add_tag( FormatTag.COLOR1,     5,  9 );
+    txt.add_tag( FormatTag.HILITE2,    0, 19 );
+    txt.add_tag( FormatTag.SELECT,     0,  7 );
+
+    /* Update the layout */
+    layout.set_text( txt.text, -1 );
+    layout.set_attributes( txt.get_attributes() );
+
+    /* Display the layout */
+    ctx.move_to( 500, 500 );
+    Utils.set_context_color_with_alpha( ctx, theme.foreground, 1.0 );
+    Pango.cairo_show_layout( ctx, layout );
+    ctx.new_path();
+
+    Xml.Doc* doc = new Xml.Doc( "1.0" );
+    string   mem;
+    int      len;
+    doc->set_root_element( txt.save() );
+    doc->dump_memory_format( out mem, out len );
+    delete doc;
+
+    stdout.printf( "%s\n", mem );
+
   }
 
 }

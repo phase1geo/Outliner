@@ -47,6 +47,15 @@ public class ThemeDefault : Theme {
     attachable_color   = get_color( "#9bdb4d" );
     prefer_dark        = false;
 
+    color1             = get_color( "#c6262e" );
+    color2             = get_color( "#f37329" );
+    color3             = get_color( "#f9c440" );
+    color4             = get_color( "#68b723" );
+    hilite1            = get_color( "#3689e6" );
+    hilite2            = get_color( "#7a36b1" );
+    hilite3            = get_color( "#715344" );
+    hilite4            = get_color( "#333333" );
+
   }
 
 }
