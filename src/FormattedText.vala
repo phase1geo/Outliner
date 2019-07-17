@@ -1,344 +1,426 @@
+/*
+* Copyright (c) 2019 (https://github.com/phase1geo/Outliner)
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public
+* License along with this program; if not, write to the
+* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA
+*
+* Authored by: Trevor Williams <phase1geo@gmail.com>
+*/
+
+using Pango;
 using Gdk;
 
-public enum FormattedTag {
+public enum FormatTag {
   BOLD = 0,
   ITALICS,
   UNDERLINE,
-  STRIKETHROUGH,
-  COLOR,
-  HILITE,
-  SELECT
-}
+  STRIKETHRU,
+  COLOR1,
+  COLOR2,
+  COLOR3,
+  COLOR4,
+  HILITE1,
+  HILITE2,
+  HILITE3,
+  HILITE4,
+  URL,
+  SELECT,
+  LENGTH;
 
-public class FormattedType {
-  public FormattedTag tag { get; private set; }
-  public FormattedType( FormattedTag t ) { tag = t; }
-  public virtual string start_tag() { return( "" ); }
-  public virtual string end_tag() { return( "" ); }
-  public virtual bool matches( FormattedType type ) { return( type.tag == tag ); }
-}
-
-public class BoldType : FormattedType {
-  public BoldType() { base( FormattedTag.BOLD ); }
-  public override string start_tag() { return( "<b>" ); }
-  public override string end_tag() { return( "</b>" ); }
-}
-
-public class ItalicsType : FormattedType {
-  public ItalicsType() { base( FormattedTag.ITALICS ); }
-  public override string start_tag() { return( "<i>" ); }
-  public override string end_tag() { return( "</i>" ); }
-}
-
-public class UnderlineType : FormattedType {
-  public UnderlineType() { base( FormattedTag.UNDERLINE ); }
-  public override string start_tag() { return( "<u>" ); }
-  public override string end_tag() { return( "</u>" ); }
-}
-
-public class StrikethroughType : FormattedType {
-  public StrikethroughType() { base( FormattedTag.STRIKETHROUGH ); }
-  public override string start_tag() { return( "<s>" ); }
-  public override string end_tag() { return( "</s>" ); }
-}
-
-public class ColorType : FormattedType {
-  private string _color;
-  public ColorType( string color ) {
-    base( FormattedTag.COLOR );
-    _color = color;
+  public string to_string() {
+    switch( this ) {
+      case BOLD       :  return( "bold" );
+      case ITALICS    :  return( "italics" );
+      case UNDERLINE  :  return( "underline" );
+      case STRIKETHRU :  return( "strikethru" );
+      case COLOR1     :  return( "color1" );
+      case COLOR2     :  return( "color2" );
+      case COLOR3     :  return( "color3" );
+      case COLOR4     :  return( "color4" );
+      case HILITE1    :  return( "hilite1" );
+      case HILITE2    :  return( "hilite2" );
+      case HILITE3    :  return( "hilite3" );
+      case HILITE4    :  return( "hilite4" );
+      case URL        :  return( "url" );
+    }
+    return( "bold" );
   }
-  public override string start_tag() { return( "<span foreground='%s'>".printf( _color ) ); }
-  public override string end_tag() { return( "</span>" ); }
-  public override bool matches( FormattedType type ) { return( base.matches( type ) && ((type as ColorType)._color == _color) ); }
-}
 
-public class HighlightType : FormattedType {
-  private string _color;
-  public HighlightType( string color ) {
-    base( FormattedTag.HILITE );
-    _color = color;
+  public static FormatTag from_string( string str ) {
+    switch( str ) {
+      case "bold"       :  return( BOLD );
+      case "italics"    :  return( ITALICS );
+      case "underline"  :  return( UNDERLINE );
+      case "strikethru" :  return( STRIKETHRU );
+      case "color1"     :  return( COLOR1 );
+      case "color2"     :  return( COLOR2 );
+      case "color3"     :  return( COLOR3 );
+      case "color4"     :  return( COLOR4 );
+      case "hilite1"    :  return( HILITE1 );
+      case "hilite2"    :  return( HILITE2 );
+      case "hilite3"    :  return( HILITE3 );
+      case "hilite4"    :  return( HILITE4 );
+      case "url"        :  return( URL );
+    }
+    return( BOLD );
   }
-  public override string start_tag() { return( "<span background='%s'>".printf( _color ) ); }
-  public override string end_tag() { return( "</span>" ); }
-  public override bool matches( FormattedType type ) { return( base.matches( type ) && ((type as HighlightType)._color == _color) ); }
-}
 
-public class SelectedType : FormattedType {
-  private string _foreground;
-  private string _background;
-  public SelectedType( string foreground, string background ) {
-    base( FormattedTag.SELECT );
-    _foreground = foreground;
-    _background = background;
-  }
-  public override string start_tag() { return( "<span foreground='%s' background='%s'>".printf( _foreground, _background ) ); }
-  public override string end_tag() { return( "</span>" ); }
 }
 
 public class FormattedText {
 
-  private class Chunk {
-    public string               text   { get; set; default = ""; }
-    public Array<FormattedType> stags  { get; set; default = new Array<FormattedType>(); }
-    public Array<FormattedType> etags  { get; set; default = new Array<FormattedType>(); }
-    public int                  length { get { return( text.length ); } }
+  private class TagInfo {
 
-    public Chunk() {}
+    private class FormattedRange {
+      public int start { get; set; default = 0; }
+      public int end   { get; set; default = 0; }
+      public FormattedRange( int s, int e ) {
+        start = s;
+        end   = e;
+      }
+      public bool combine( int s, int e ) {
+        bool changed = false;
+        if( (s <= end) && (e > end) ) {
+          end     = e;
+          changed = true;
+        }
+        if( (s < start) && (e >= start) ) {
+          start   = s;
+          changed = true;
+        }
+        return( changed );
+      }
+    }
 
-    public bool is_within( int index ) {
-      return( index < text.length );
+    private Array<FormattedRange> _info;
+
+    public TagInfo() {
+      _info = new Array<FormattedRange>();
     }
-    public bool contains_start_tag( FormattedType tag ) {
-      for( int i=0; i<stags.length; i++ ) {
-        if( stags.index( i ).matches( tag ) ) return( true );
-      }
-      return( false );
-    }
-    public bool contains_end_tag( FormattedType tag ) {
-      for( int i=0; i<etags.length; i++ ) {
-        if( etags.index( i ).matches( tag ) ) return( true );
-      }
-      return( false );
-    }
-    public bool insert( string str, int index ) {
-      if( !is_within( index ) ) return( false );
-      text = text.splice( index, index, str );
-      return( true );
-    }
-    public bool delete( int index ) {
-      if( !is_within( index ) ) return( false );
-      text = text.splice( index, (index + 1) );
-      return( true );
-    }
-    public bool delete_range( int s, int e ) {
-      if( is_within( s ) ) {
-        if( is_within( e ) ) {
-          text = text.splice( s, e );
-          return( true );
-        } else {
-          text = text.splice( s, text.length );
-        }
-      } else {
-        if( is_within( e ) ) {
-          text = text.splice( 0, e );
-          return( true );
-        }
-      }
-      return( false );
-    }
+
+    /* Returns true if this info array is empty */
     public bool is_empty() {
-      return( text.length == 0 );
-    }
-    public string get_markup() {
-      var str = "";
-      for( int i=0; i<stags.length; i++ ) {
-        str += stags.index( i ).start_tag();
-      }
-      str += text;
-      for( int i=0; i<etags.length; i++ ) {
-        str += etags.index( i ).end_tag();
-      }
-      return( str );
-    }
-  }
-
-  private Array<Chunk> _chunks;
-
-  public FormattedText() {
-    _chunks = new Array<Chunk>();
-    _chunks.append_val( new Chunk() );
-  }
-
-  public void insert_text( string str, int index ) {
-    Chunk chunk = _chunks.index( 0 );
-    for( int i=0; i<_chunks.length; i++ ) {
-      chunk = _chunks.index( i );
-      if( chunk.insert( str, index ) ) return;
-      index -= chunk.length;
-    }
-    chunk.text += str;
-  }
-
-  public void delete( int index ) {
-    for( int i=0; i<_chunks.length; i++ ) {
-      if( _chunks.index( i ).delete( index ) ) return;
-      index -= _chunks.index( i ).length;
-    }
-  }
-
-  public void delete_range( int start, int end ) {
-    int i = 0;
-    while( i < _chunks.length ) {
-      var chunk = _chunks.index( i );
-      if( chunk.delete_range( start, end ) ) {
-        return;
-      } else if( chunk.is_empty() ) {
-        _chunks.remove_index( i ); 
-      } else {
-        start -= chunk.length;
-        end   -= chunk.length;
-        i++;
-      }
-    }
-  }
-
-  private void dump() {
-
-    for( int i=0; i<_chunks.length; i++ ) {
-      var stags = "";
-      var etags = "";
-      var chunk = _chunks.index( i );
-      for( int j=0; j<chunk.stags.length; j++ ) {
-        stags += chunk.stags.index( j ).start_tag();
-      }
-      for( int j=0; j<chunk.etags.length; j++ ) {
-        etags += chunk.etags.index( j ).end_tag();
-      }
-      stdout.printf( "%d:  %s %s %s\n", i, stags, chunk.text, etags );
+      return( _info.length == 0 );
     }
 
-  }
-
-  private void add_within_chunk( Chunk chunk, int chunk_index, FormattedType type, int start, int end ) {
-
-    /* If the current chunk already has the given type applied, we don't need to do anything else */
-    if( chunk.contains_start_tag( type ) ) return;
-
-    /* Create new chunk */
-    var new_chunk1  = new Chunk();
-    new_chunk1.text = chunk.text.substring( start, end );
-    new_chunk1.stags.append_val( type );
-    new_chunk1.etags.append_val( type );
-    _chunks.insert_val( (chunk_index + 1), new_chunk1 );
-
-    /* Split the current chunk */
-    var new_chunk2   = new Chunk();
-    new_chunk2.text  = chunk.text.substring( end );
-    if( new_chunk2.text.length > 0 ) {
-      for( int i=0; i<chunk.etags.length; i++ ) {
-        new_chunk2.etags.append_val( chunk.etags.index( i ) );
-      }
-      _chunks.insert_val( (chunk_index + 2), new_chunk2 );
-    }
-
-    /* Clean up chunk */
-    chunk.text = chunk.text.substring( 0, start );
-    if( (chunk.text.length == 0) && (chunk.stags.length == 0) ) {
-      _chunks.remove_index( chunk_index );
-    } else {
-      chunk.etags.remove_range( 0, chunk.etags.length );
-    }
-
-  }
-
-  private void add_start_chunk( Chunk chunk, ref int chunk_index, FormattedType type, int start ) {
-
-    /* Create the new chunk and insert it into the list of chunks */
-    var new_chunk = new Chunk();
-    new_chunk.text  = chunk.text.substring( start );
-    new_chunk.stags.append_val( type );
-    new_chunk.etags.append_val( type );
-    for( int i=0; i<chunk.etags.length; i++ ) {
-      new_chunk.etags.append_val( chunk.etags.index( i ) );
-    }
-    _chunks.insert_val( (chunk_index + 1), new_chunk );
-
-    /* Update the original chunk */
-    chunk.text = chunk.text.splice( start, chunk.length );
-    chunk.etags.remove_range( 0, chunk.etags.length );
-    if( chunk.text.length == 0 ) {
-      _chunks.remove_index( chunk_index );
-    }
-
-    chunk_index++;
-
-  }
-
-  private void add_end_chunk( Chunk chunk, int chunk_index, FormattedType type, int end ) {
-
-    /* Create the new chunk and insert it into the list of chunks */
-    var new_chunk = new Chunk();
-    new_chunk.text  = chunk.text.substring( 0, end );
-    new_chunk.stags.append_val( type );
-    new_chunk.etags.prepend_val( type );
-    for( int j=0; j<chunk.stags.length; j++ ) {
-      new_chunk.stags.append_val( chunk.stags.index( j ) );
-    }
-    _chunks.insert_val( chunk_index, new_chunk );
-
-    /* Update the original chunk */
-    chunk.text = chunk.text.splice( 0, end );
-    if( new_chunk.etags.index( 0 ) == chunk.stags.index( 0 ) ) {
-      chunk.stags.remove_index( 0 );
-    }
-
-  }
-
-  private void add_between_chunk( Chunk chunk, int chunk_index, FormattedType type ) {
-
-    chunk.stags.append_val( type );
-    chunk.etags.prepend_val( type );
-
-  }
-
-  /* Adds the formatting */
-  public void add_format_range( FormattedType type, int start, int end ) {
-    int  i           = 0;
-    bool start_found = false;
-    while( i < _chunks.length ) {
-      var chunk = _chunks.index( i );
-
-      /* If the start index is with the current chunk, update the chunk */
-      if( chunk.is_within( start ) ) {
-
-        /* If both the start and end indices are within the current chunk, update the chunk and be done */
-        if( chunk.is_within( end ) ) {
-          add_within_chunk( chunk, i, type, start, end );
+    public void adjust( int index, int length ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (info.start <= index) && (index < info.end) ) {
+          info.end += length;
           return;
-
-        /* Otherwise, the chunk only contains the starting portion of the formatted text */
-        } else {
-          add_start_chunk( chunk, ref i, type, start );
-          start_found = true;
         }
-
-      /* If the chunk contains the end of the formatted text (but not the start), update the chunk */
-      } else if( chunk.is_within( end ) ) {
-        add_end_chunk( chunk, i, type, end );
-        return;
-
-      /* If this chunk is somewhere between the starting and ending indices, update the chunk accordingly */
-      } else if( start_found ) {
-        add_between_chunk( chunk, i, type );
       }
-      start -= chunk.length;
-      end   -= chunk.length;
-      i++;
+    }
+
+    /* Adds the given range from this format type */
+    public void add_tag( int start, int end ) {
+      for( int i=0; i<_info.length; i++ ) {
+        if( _info.index( i ).combine( start, end ) ) {
+          return;
+        }
+      }
+      _info.append_val( new FormattedRange( start, end ) );
+    }
+
+    /* Removes the given range from this format type */
+    public void remove_tag( int start, int end ) {
+      for( uint i=(_info.length - 1); i>=0; i-- ) {
+        var info = _info.index( i );
+        if( (start < info.end) && (end > info.end) ) {
+          if( start < info.start ) {
+            _info.remove_index( i );
+            continue;
+          } else {
+            info.end = start;
+          }
+        }
+        if( (end > info.start) && (start < info.start) ) {
+          info.start = end;
+        }
+      }
+    }
+
+    /* Returns true if the given index contains this tag */
+    public bool is_applied_at_index( int index ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (info.start <= index) && (index < info.end) ) {
+          return( true );
+        }
+      }
+      return( false );
+    }
+
+    /* Inserts all of the attributes for this tag */
+    public void get_attributes( int tag_index, ref AttrList attrs, TagAttrs[] tag ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        for( int j=0; j<tag[tag_index].attrs.length; j++ ) {
+          var attr = tag[tag_index].attrs.index( j ).copy();
+          attr.start_index = info.start;
+          attr.end_index   = info.end;
+          attrs.change( (owned)attr );
+        }
+      }
+    }
+
+    /* Returns the list of ranges this tag is associated with */
+    public string get_ranges() {
+      var ranges = "";
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        ranges += " %d %d".printf( info.start, info.end );
+      }
+      return( ranges.chug() );
+    }
+
+    /* Stores the given range information to this class */
+    public void store_ranges( string? str ) {
+      if( str == null ) return;
+      string[] ranges = str.split( " " );
+      for( int i=0; i<ranges.length; i+=2 ) {
+        _info.append_val( new FormattedRange( int.parse( ranges[i+0] ), int.parse( ranges[i+1] ) ) );
+      }
+    }
+
+  }
+
+  private class TagAttrs {
+    public Array<Pango.Attribute> attrs;
+    public TagAttrs() {
+      attrs = new Array<Pango.Attribute>();
     }
   }
 
-  public void remove_format( int start, int end ) {
-    /* TBD */
+  private class BoldInfo : TagAttrs {
+    public BoldInfo() {
+      attrs.append_val( attr_weight_new( Weight.BOLD ) );
+    }
   }
 
-  /* Returns the raw text without formatting applied */
-  public string get_text() {
-    string str = "";
-    for( int i=0; i<_chunks.length; i++ ) {
-      str += _chunks.index( i ).text;
+  private class ItalicsInfo : TagAttrs {
+    public ItalicsInfo() {
+      attrs.append_val( attr_style_new( Style.ITALIC ) );
     }
-    return( str );
   }
 
-  /* Returns the markup string for the stored text */
-  public string get_markup() {
-    string str = "";
-    for( int i=0; i<_chunks.length; i++ ) {
-      str += _chunks.index( i ).get_markup();
+  private class UnderlineInfo : TagAttrs {
+    public UnderlineInfo() {
+      attrs.append_val( attr_underline_new( Underline.SINGLE ) );
     }
-    return( str );
+  }
+
+  private class StrikeThruInfo : TagAttrs {
+    public StrikeThruInfo() {
+      attrs.append_val( attr_strikethrough_new( true ) );
+    }
+  }
+
+  private class ColorInfo : TagAttrs {
+    public ColorInfo( RGBA color ) {
+      set_color( color );
+    }
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+    }
+    public void update_color( RGBA color ) {
+      attrs.remove_index( 0 );
+      set_color( color );
+    }
+  }
+
+  private class HighlightInfo : TagAttrs {
+    public HighlightInfo( RGBA color ) {
+      set_color( color );
+    }
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_background_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+      attrs.append_val( attr_background_alpha_new( (uint16)(65536 / 2) ) );
+    }
+    public void update_color( RGBA color ) {
+      attrs.remove_range( 0, 2 );
+      set_color( color );
+    }
+  }
+
+  private class UrlInfo : TagAttrs {
+    public UrlInfo( RGBA color ) {
+      set_color( color );
+    }
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+      attrs.append_val( attr_underline_new( Underline.SINGLE ) );
+    }
+    public void update_color( RGBA color ) {
+      attrs.remove_range( 0, 2 );
+      set_color( color );
+    }
+
+  }
+
+  private class SelectInfo : TagAttrs {
+    public SelectInfo( RGBA f, RGBA b ) {
+      set_color( f, b );
+    }
+    private void set_color( RGBA f, RGBA b ) {
+      attrs.append_val( attr_foreground_new( (uint16)(f.red * 65535), (uint16)(f.green * 65535), (uint16)(f.blue * 65535) ) );
+      attrs.append_val( attr_background_new( (uint16)(b.red * 65535), (uint16)(b.green * 65535), (uint16)(b.blue * 65535) ) );
+    }
+    public void update_color( RGBA f, RGBA b ) {
+      attrs.remove_range( 0, 2 );
+      set_color( f, b );
+    }
+  }
+
+  private static TagAttrs[] _attr_tags = null;
+  private TagInfo[]         _formats   = new TagInfo[FormatTag.LENGTH];
+  private string            _text      = "";
+
+  public string text {
+    get {
+      return( _text );
+    }
+  }
+
+  public FormattedText( Theme theme ) {
+    if( _attr_tags == null ) {
+      _attr_tags = new TagAttrs[FormatTag.LENGTH];
+      _attr_tags[FormatTag.BOLD]       = new BoldInfo();
+      _attr_tags[FormatTag.ITALICS]    = new ItalicsInfo();
+      _attr_tags[FormatTag.UNDERLINE]  = new UnderlineInfo();
+      _attr_tags[FormatTag.STRIKETHRU] = new StrikeThruInfo();
+      _attr_tags[FormatTag.COLOR1]     = new ColorInfo( theme.color1 );
+      _attr_tags[FormatTag.COLOR2]     = new ColorInfo( theme.color2 );
+      _attr_tags[FormatTag.COLOR3]     = new ColorInfo( theme.color3 );
+      _attr_tags[FormatTag.COLOR4]     = new ColorInfo( theme.color4 );
+      _attr_tags[FormatTag.HILITE1]    = new HighlightInfo( theme.hilite1 );
+      _attr_tags[FormatTag.HILITE2]    = new HighlightInfo( theme.hilite2 );
+      _attr_tags[FormatTag.HILITE3]    = new HighlightInfo( theme.hilite3 );
+      _attr_tags[FormatTag.HILITE4]    = new HighlightInfo( theme.hilite4 );
+      _attr_tags[FormatTag.URL]        = new UrlInfo( theme.url );
+      _attr_tags[FormatTag.SELECT]     = new SelectInfo( theme.textsel_foreground, theme.textsel_background );
+    }
+    for( int i=0; i<FormatTag.LENGTH; i++ ) {
+      _formats[i] = new TagInfo();
+    }
+  }
+
+  public static void set_theme( Theme theme ) {
+    (_attr_tags[FormatTag.COLOR1] as ColorInfo).update_color( theme.color1 );
+    (_attr_tags[FormatTag.COLOR2] as ColorInfo).update_color( theme.color2 );
+    (_attr_tags[FormatTag.COLOR3] as ColorInfo).update_color( theme.color3 );
+    (_attr_tags[FormatTag.COLOR4] as ColorInfo).update_color( theme.color4 );
+    (_attr_tags[FormatTag.HILITE1] as HighlightInfo).update_color( theme.hilite1 );
+    (_attr_tags[FormatTag.HILITE2] as HighlightInfo).update_color( theme.hilite2 );
+    (_attr_tags[FormatTag.HILITE3] as HighlightInfo).update_color( theme.hilite3 );
+    (_attr_tags[FormatTag.HILITE4] as HighlightInfo).update_color( theme.hilite4 );
+    (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
+    (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
+  }
+
+  /* Inserts a string into the given text */
+  public void insert_text( string str, int index ) {
+    _text = _text.splice( index, index, str );
+    foreach( TagInfo f in _formats) {
+      f.adjust( index, str.length );
+    }
+  }
+
+  /* Removes characters from the current text, starting at the given index */
+  public void remove_text( int index, int chars ) {
+    _text = _text.splice( index, (index + chars) );
+    foreach( TagInfo f in _formats ) {
+      f.remove_tag( index, (index + chars) );
+    }
+  }
+
+  /* Adds the given tag */
+  public void add_tag( FormatTag tag, int start, int end ) {
+    _formats[tag].add_tag( start, end );
+  }
+
+  /* Removes the given tag */
+  public void remove_tag( FormatTag tag, int start, int end ) {
+    _formats[tag].remove_tag( start, end );
+  }
+
+  /* Removes all formatting from the text */
+  public void remove_all( int start, int end ) {
+    foreach( TagInfo f in _formats ) {
+      f.remove_tag( start, end );
+    }
+  }
+
+  /* Returns true if the given tag is applied at the given index */
+  public bool is_tag_applied_at_index( FormatTag tag, int index ) {
+    return( _formats[tag].is_applied_at_index( index ) );
+  }
+
+  /* Returns true if at least one tag is applied to the text */
+  public bool tags_exist() {
+    foreach( TagInfo f in _formats ) {
+      if( !f.is_empty() ) {
+        return( true );
+      }
+    }
+    return( false );
+  }
+
+  /*
+   Returns the Pango attribute list to apply to the Pango layout.  This
+   method should only be called if tags_exist returns true.
+  */
+  public AttrList get_attributes() {
+    var attrs = new AttrList();
+    for( int i=0; i<FormatTag.LENGTH; i++ ) {
+      _formats[i].get_attributes( i, ref attrs, _attr_tags );
+    }
+    return( attrs );
+  }
+
+  /* Saves the text as the given XML node */
+  public Xml.Node* save() {
+    Xml.Node* n = new Xml.Node( null, "text" );
+    n->new_prop( "str", text );
+    for( int i=0; i<(FormatTag.LENGTH - 1); i++ ) {
+      if( !_formats[i].is_empty() ) {
+        Xml.Node* f   = new Xml.Node( null, "format" );
+        var       tag = (FormatTag)i;
+        f->new_prop( "type", tag.to_string() );
+        f->new_prop( "ranges", _formats[i].get_ranges() );
+        n->add_child( f );
+      }
+    }
+    return( n );
+  }
+
+  /* Loads the given XML information */
+  public void load( Xml.Node* n ) {
+    string? t = n->get_prop( "str" );
+    if( t != null ) {
+      _text = t;
+    }
+    for( Xml.Node* it = n->children; it != null; it = it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "format") ) {
+        string? type = it->get_prop( "type" );
+        if( type != null ) {
+          _formats[FormatTag.from_string( type )].store_ranges( n->get_prop( "ranges" ) );
+        }
+      }
+    }
   }
 
 }
-
