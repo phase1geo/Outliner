@@ -70,15 +70,15 @@ public class ExportMinder : Object {
   /* Traverses the node tree exporting XML nodes in OPML format */
   private static Xml.Node* export_node( Node node, ref Array<int> expand_state ) {
     Xml.Node* n = new Xml.Node( null, "outline" );
-    n->new_prop( "text", node.name.text );
+    n->new_prop( "text", node.name.text.text );
     /*
     if( is_leaf() && (_task_count > 0) ) {
       bool checked = _task_done > 0;
       node->new_prop( "checked", checked.to_string() );
     }
     */
-    if( node.note.text != "" ) {
-      n->new_prop( "note", node.note.text );
+    if( node.note.text.text != "" ) {
+      n->new_prop( "note", node.note.text.text );
     }
     if( (node.children.length > 1) && node.expanded ) {
       expand_state.append_val( node.id );
@@ -162,7 +162,7 @@ public class ExportMinder : Object {
     /* Get the node name */
     string? t = n->get_prop( "text" );
     if( t != null ) {
-      node.name.text = t;
+      node.name.text.set_text( t );
     }
 
     /* Get the task information */
@@ -178,7 +178,7 @@ public class ExportMinder : Object {
     /* Get the note information */
     string? o = n->get_prop( "note" );
     if( o != null ) {
-      node.note.text = o;
+      node.note.text.set_text( o );
     }
 
     /* Figure out if this node is folded */

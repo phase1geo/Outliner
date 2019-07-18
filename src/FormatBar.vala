@@ -58,7 +58,7 @@ public class FormatBar : Box {
     _strike.image  = new Image.from_icon_name( "format-text-strikethrough-symbolic", IconSize.SMALL_TOOLBAR );
     _strike.relief = ReliefStyle.NONE;
     _strike.set_tooltip_text( _( "Strikethrough" ) );
-    _strike.toggled.connect( handle_strikethrough );
+    _strike.toggled.connect( handle_strikethru );
 
     pack_start( _bold,      false, false, 0 );
     pack_start( _italics,   false, false, 0 );
@@ -69,28 +69,28 @@ public class FormatBar : Box {
 
   }
 
-  private void format_text( string pre, string post ) {
+  private void format_text( FormatTag tag ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
-      _table.selected.name.format_text( pre, post );
+      _table.selected.name.add_tag( tag );
     } else {
-      _table.selected.note.format_text( pre, post );
+      _table.selected.note.add_tag( tag );
     }
   }
 
   private void handle_bold() {
-    format_text( "<b>", "</b>" );
+    format_text( FormatTag.BOLD );
   }
 
   private void handle_italics() {
-    format_text( "<i>", "</i>" );
+    format_text( FormatTag.ITALICS );
   }
 
   private void handle_underline() {
-    format_text( "<u>", "</u>" );
+    format_text( FormatTag.UNDERLINE );
   }
 
-  private void handle_strikethrough() {
-    format_text( "<s>", "</s>" );
+  private void handle_strikethru() {
+    format_text( FormatTag.STRIKETHRU );
   }
 
 }

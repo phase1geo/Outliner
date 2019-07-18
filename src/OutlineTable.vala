@@ -341,7 +341,7 @@ public class OutlineTable : DrawingArea {
           changed();
         } else if( _active.is_within_note_icon( e.x, e.y ) ) {
           _active.hide_note = !_active.hide_note;
-          if( !_active.hide_note && (_active.note.text == "") ) {
+          if( !_active.hide_note && (_active.note.text.text == "") ) {
             selected      = _active;
             selected.mode = NodeMode.NOTEEDIT;
             show_format_bar( true );
@@ -415,7 +415,7 @@ public class OutlineTable : DrawingArea {
   /* Handles a backspace keypress */
   private void handle_backspace() {
     if( is_node_editable() ) {
-      if( selected.name.text == "" ) {
+      if( selected.name.text.text == "" ) {
         var prev = selected.get_previous_node();
         if( prev != null ) {
           delete_node();
@@ -480,9 +480,9 @@ public class OutlineTable : DrawingArea {
   /* Handles a Control-Return keypress */
   private void handle_control_return() {
     if( is_node_editable() ) {
-      string name   = selected.name.text;
+      string name   = selected.name.text.text;
       int    curpos = selected.name.cursor;
-      selected.name.text = name.substring( 0, curpos );
+      selected.name.text.remove_text( curpos, (selected.name.text.text.length - curpos ) );
       add_sibling_node( true, name.substring( curpos ) );
     } else if( is_note_editable() ) {
       selected.note.insert( "\n" );
@@ -982,7 +982,7 @@ public class OutlineTable : DrawingArea {
     var node = new Node( this );
 
     if( title != null ) {
-      node.name.text = title;
+      node.name.text.set_text( title );
     }
 
     selected = node;
@@ -1188,7 +1188,7 @@ public class OutlineTable : DrawingArea {
     layout.set_font_description( Pango.FontDescription.from_string( "Sans 18" ) );
 
     /* Prepare the text */
-    txt.insert_text( "This is just a test", 0 );
+    txt.set_text( "This is just a test" );
     txt.add_tag( FormatTag.BOLD,       8, 14 );
     txt.add_tag( FormatTag.UNDERLINE, 12, 19 );
     txt.add_tag( FormatTag.STRIKETHRU, 8, 12 );
@@ -1209,7 +1209,7 @@ public class OutlineTable : DrawingArea {
     Xml.Doc* doc = new Xml.Doc( "1.0" );
     string   mem;
     int      len;
-    doc->set_root_element( txt.save() );
+    doc->set_root_element( txt.save( "text" ) );
     doc->dump_memory_format( out mem, out len );
     delete doc;
 

@@ -106,8 +106,18 @@ public class FormattedText {
 
     private Array<FormattedRange> _info;
 
+    /* Default constructor */
     public TagInfo() {
       _info = new Array<FormattedRange>();
+    }
+
+    /* Copies the given TagInfo structure to this one */
+    public void copy( TagInfo other ) {
+      _info.remove_range( 0, _info.length );
+      for( int i=0; i<other._info.length; i++ ) {
+        var other_info = other._info.index( i );
+        _info.append_val( new FormattedRange( other_info.start, other_info.end ) );
+      }
     }
 
     /* Returns true if this info array is empty */
@@ -135,9 +145,15 @@ public class FormattedText {
       _info.append_val( new FormattedRange( start, end ) );
     }
 
+    /* Replaces the given range(s) with the given range */
+    public void replace_tag( int start, int end ) {
+      _info.remove_range( 0, _info.length );
+      _info.append_val( new FormattedRange( start, end ) );
+    }
+
     /* Removes the given range from this format type */
     public void remove_tag( int start, int end ) {
-      for( uint i=(_info.length - 1); i>=0; i-- ) {
+      for( int i=((int)_info.length - 1); i>=0; i-- ) {
         var info = _info.index( i );
         if( (start < info.end) && (end > info.end) ) {
           if( start < info.start ) {
@@ -289,6 +305,8 @@ public class FormattedText {
   private TagInfo[]         _formats   = new TagInfo[FormatTag.LENGTH];
   private string            _text      = "";
 
+  public signal void changed();
+
   public string text {
     get {
       return( _text );
@@ -296,6 +314,16 @@ public class FormattedText {
   }
 
   public FormattedText( Theme theme ) {
+    initialize( theme );
+  }
+
+  public FormattedText.with_text( Theme theme, string txt ) {
+    initialize( theme );
+    _text = txt;
+  }
+
+  /* Initializes this instance */
+  private void initialize( Theme theme ) {
     if( _attr_tags == null ) {
       _attr_tags = new TagAttrs[FormatTag.LENGTH];
       _attr_tags[FormatTag.BOLD]       = new BoldInfo();
@@ -331,12 +359,37 @@ public class FormattedText {
     (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
   }
 
+  /* Copies the specified FormattedText instance to this one */
+  public void copy( FormattedText other ) {
+    _text = other._text;
+    for( int i=0; i<FormatTag.LENGTH; i++ ) {
+      _formats[i].copy( other._formats[i] );
+    }
+    changed();
+  }
+
+  /* Initializes the text to the given value */
+  public void set_text( string str ) {
+    _text = str;
+  }
+
   /* Inserts a string into the given text */
-  public void insert_text( string str, int index ) {
+  public void insert_text( int index, string str ) {
     _text = _text.splice( index, index, str );
     foreach( TagInfo f in _formats) {
       f.adjust( index, str.length );
     }
+    changed();
+  }
+
+  /* Replaces the given text range with the given string */
+  public void replace_text( int index, int chars, string str ) {
+    _text = _text.splice( index, (index + chars), str );
+    foreach( TagInfo f in _formats ) {
+      f.remove_tag( index, (index + chars) );
+      f.adjust( index, str.length );
+    }
+    changed();
   }
 
   /* Removes characters from the current text, starting at the given index */
@@ -345,23 +398,33 @@ public class FormattedText {
     foreach( TagInfo f in _formats ) {
       f.remove_tag( index, (index + chars) );
     }
+    changed();
   }
 
   /* Adds the given tag */
   public void add_tag( FormatTag tag, int start, int end ) {
     _formats[tag].add_tag( start, end );
+    changed();
+  }
+
+  /* Replaces the given tag with the given range */
+  public void replace_tag( FormatTag tag, int start, int end ) {
+    _formats[tag].replace_tag( start, end );
+    changed();
   }
 
   /* Removes the given tag */
   public void remove_tag( FormatTag tag, int start, int end ) {
     _formats[tag].remove_tag( start, end );
+    changed();
   }
 
   /* Removes all formatting from the text */
-  public void remove_all( int start, int end ) {
+  public void remove_all_tags( int start, int end ) {
     foreach( TagInfo f in _formats ) {
       f.remove_tag( start, end );
     }
+    changed();
   }
 
   /* Returns true if the given tag is applied at the given index */
@@ -392,9 +455,9 @@ public class FormattedText {
   }
 
   /* Saves the text as the given XML node */
-  public Xml.Node* save() {
-    Xml.Node* n = new Xml.Node( null, "text" );
-    n->new_prop( "str", text );
+  public Xml.Node* save( string node_title ) {
+    Xml.Node* n = new Xml.Node( null, node_title );
+    n->new_prop( "data", text );
     for( int i=0; i<(FormatTag.LENGTH - 1); i++ ) {
       if( !_formats[i].is_empty() ) {
         Xml.Node* f   = new Xml.Node( null, "format" );
@@ -409,7 +472,7 @@ public class FormattedText {
 
   /* Loads the given XML information */
   public void load( Xml.Node* n ) {
-    string? t = n->get_prop( "str" );
+    string? t = n->get_prop( "data" );
     if( t != null ) {
       _text = t;
     }
@@ -421,6 +484,7 @@ public class FormattedText {
         }
       }
     }
+    changed();
   }
 
 }

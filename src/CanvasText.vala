@@ -28,14 +28,12 @@ using Pango;
 public class CanvasText : Object {
 
   /* Member variables */
-  private string         _text         = "";
-  private bool           _markup       = true;
+  private FormattedText  _text;
   private bool           _edit         = false;
   private int            _cursor       = 0;   /* Location of the cursor when editing */
   private int            _column       = 0;   /* Character column to use when moving vertically */
   private Pango.Layout   _pango_layout = null;
   private Pango.Layout   _line_layout  = null;
-  private Pango.AttrList _attrs;
   private int            _selstart     = 0;
   private int            _selend       = 0;
   private int            _selanchor    = 0;
@@ -47,15 +45,9 @@ public class CanvasText : Object {
   public signal void resized();
 
   /* Properties */
-  public string text {
+  public FormattedText text {
     get {
       return( _text );
-    }
-    set {
-      if( _text != value ) {
-        _text = value;
-        update_size( true );
-      }
     }
   }
   public double posx   { get; set; default = 0; }
@@ -81,17 +73,6 @@ public class CanvasText : Object {
       }
     }
   }
-  public bool markup {
-    get {
-      return( _markup );
-    }
-    set {
-      if( _markup != value ) {
-        _markup = value;
-        update_size( true );
-      }
-    }
-  }
   public bool edit {
     get {
       return( _edit );
@@ -105,12 +86,14 @@ public class CanvasText : Object {
   }
   public int cursor {
     get {
-      return( text.index_of_nth_char( _cursor ) );
+      return( text.text.index_of_nth_char( _cursor ) );
     }
   }
 
   /* Default constructor */
-  public CanvasText( DrawingArea da, double max_width ) {
+  public CanvasText( OutlineTable da, double max_width ) {
+    _text         = new FormattedText( da.get_theme() );
+    _text.changed.connect( text_changed );
     _max_width    = max_width;
     _line_layout  = da.create_pango_layout( "M" );
     _pango_layout = da.create_pango_layout( null );
@@ -120,13 +103,14 @@ public class CanvasText : Object {
   }
 
   /* Constructor initializing string */
-  public CanvasText.with_text( DrawingArea da, double max_width, string txt ) {
+  public CanvasText.with_text( OutlineTable da, double max_width, string txt ) {
+    _text         = new FormattedText.with_text( da.get_theme(), txt );
+    _text.changed.connect( text_changed );
     _max_width    = max_width;
     _line_layout  = da.create_pango_layout( "M" );
     _pango_layout = da.create_pango_layout( txt );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
-    _text         = txt;
     update_size( false );
   }
 
@@ -135,7 +119,7 @@ public class CanvasText : Object {
     posx       = ct.posx;
     posy       = ct.posy;
     _max_width = ct._max_width;
-    _text      = ct.text;
+    _text.copy( ct.text );
     _line_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
@@ -186,36 +170,6 @@ public class CanvasText : Object {
       _pango_layout.set_width( (int)_max_width * Pango.SCALE );
     }
 
-    if( (n->children != null) && (n->children->type == Xml.ElementType.TEXT_NODE) ) {
-      try {
-        unichar accel_char;
-        Pango.parse_markup( n->children->get_content(), -1, 0, out _attrs, out _text, out accel_char );
-        stdout.printf( "After parsing markup, text: %s\n", text );
-      } catch( GLib.Error e ) {
-        /* TBD */
-      }
-    }
-
-  }
-
-  /* Removes <, > and & characters */
-  private string unmarkup( string markup ) {
-    return( markup.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ) );
-  }
-
-  /* Generates the marked up name that will be displayed in the node */
-  private string name_markup( Theme? theme ) {
-    if( (_selstart != _selend) && (theme != null) ) {
-      var fg      = Utils.color_from_rgba( theme.textsel_foreground );
-      var bg      = Utils.color_from_rgba( theme.textsel_background );
-      var spos    = text.index_of_nth_char( _selstart );
-      var epos    = text.index_of_nth_char( _selend );
-      var begtext = unmarkup( text.slice( 0, spos ) );
-      var endtext = unmarkup( text.slice( epos, text.char_count() ) );
-      var seltext = "<span foreground=\"" + fg + "\" background=\"" + bg + "\">" + unmarkup( text.slice( spos, epos ) ) + "</span>";
-      return( begtext + seltext + endtext );
-    }
-    return( (markup || edit) ? text : unmarkup( text ) );
   }
 
   /* Returns the height of a single line of text */
@@ -225,13 +179,19 @@ public class CanvasText : Object {
     return( height / Pango.SCALE );
   }
 
+  /* Called whenever the text changes */
+  private void text_changed() {
+    update_size( true );
+  }
+
   /*
    Updates the width and height based on the current text.
   */
-  public void update_size( bool call_resized ) {
+  public void update_size( bool call_resized = true ) {
     if( _pango_layout != null ) {
       int text_width, text_height;
-      _pango_layout.set_markup( name_markup( null ), -1 );
+      _pango_layout.set_text( _text.text, -1 );
+      _pango_layout.set_attributes( _text.get_attributes() );
       _pango_layout.get_size( out text_width, out text_height );
       _width  = (text_width  / Pango.SCALE);
       _height = (text_height / Pango.SCALE);
@@ -251,7 +211,7 @@ public class CanvasText : Object {
   /* Updates the column value */
   private void update_column() {
     int line;
-    var cpos = text.index_of_nth_char( _cursor );
+    var cpos = text.text.index_of_nth_char( _cursor );
     _pango_layout.index_to_line_x( cpos, false, out line, out _column );
   }
 
@@ -261,17 +221,25 @@ public class CanvasText : Object {
     int adjusted_x = (int)(x - posx) * Pango.SCALE;
     int adjusted_y = (int)(y - posy) * Pango.SCALE;
     if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
-      var cindex = text.char_count( cursor + trailing );
+      var cindex = text.text.char_count( cursor + trailing );
       if( motion ) {
         if( cindex > _selanchor ) {
           _selend = cindex;
+           _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
         } else if( cindex < _selanchor ) {
           _selstart = cindex;
+           _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
         } else {
+          if( _selstart != _selend ) {
+            _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+          }
           _selstart = cindex;
           _selend   = cindex;
         }
       } else {
+        if( _selstart != _selend ) {
+          _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+        }
         _selstart  = cindex;
         _selend    = cindex;
         _selanchor = cindex;
@@ -288,13 +256,20 @@ public class CanvasText : Object {
     int adjusted_y = (int)(y - posy) * Pango.SCALE;
     if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
       cursor += trailing;
-      var word_start = text.substring( 0, cursor ).last_index_of( " " );
-      var word_end   = text.index_of( " ", cursor );
-      if( word_start == -1 ) { _selstart = 0; } else { var windex = text.char_count( word_start ); if( !motion || (windex < _selanchor) ) { _selstart = windex + 1; } }
-      if( word_end == -1 ) {
-        _selend = text.char_count();
+      var word_start = text.text.substring( 0, cursor ).last_index_of( " " );
+      var word_end   = text.text.index_of( " ", cursor );
+      if( word_start == -1 ) {
+        _selstart = 0;
       } else {
-        var windex = text.char_count( word_end );
+        var windex = text.text.char_count( word_start );
+        if( !motion || (windex < _selanchor) ) {
+          _selstart = windex + 1;
+        }
+      }
+      if( word_end == -1 ) {
+        _selend = text.text.char_count();
+      } else {
+        var windex = text.text.char_count( word_end );
         if( !motion || (windex > _selanchor) ) {
           _selend = windex;
         }
@@ -306,6 +281,9 @@ public class CanvasText : Object {
 
   /* Called after the cursor has been moved, clears the selection */
   public void clear_selection() {
+    if( _selstart != _selend ) {
+      _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+    }
     _selstart = _selend = _cursor;
   }
 
@@ -327,6 +305,7 @@ public class CanvasText : Object {
         _selstart = _cursor;
       }
     }
+    _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
   }
 
   /* Deselects all of the text */
@@ -338,15 +317,20 @@ public class CanvasText : Object {
   public void set_cursor_all( bool motion ) {
     if( !motion ) {
       _selstart  = 0;
-      _selend    = text.char_count();
+      _selend    = text.text.char_count();
       _selanchor = _selend;
       _cursor    = _selend;
+      if( _selstart == _selend ) {
+        _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+      } else {
+        _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+      }
     }
   }
 
   /* Adjusts the cursor by the given amount of characters */
   private void cursor_by_char( int dir ) {
-    var last = text.char_count();
+    var last = text.text.char_count();
     _cursor += dir;
     if( _cursor < 0 ) {
       _cursor = 0;
@@ -372,18 +356,18 @@ public class CanvasText : Object {
   /* Moves the cursor up/down the text by a line */
   private void cursor_by_line( int dir ) {
     int line, x;
-    var cpos = text.index_of_nth_char( _cursor );
+    var cpos = text.text.index_of_nth_char( _cursor );
     _pango_layout.index_to_line_x( cpos, false, out line, out x );
     line += dir;
     if( line < 0 ) {
       _cursor = 0;
     } else if( line >= _pango_layout.get_line_count() ) {
-      _cursor = text.char_count();
+      _cursor = text.text.char_count();
     } else {
       int index, trailing;
       var line_layout = _pango_layout.get_line( line );
       line_layout.x_to_index( _column, out index, out trailing );
-      _cursor = text.char_count( index + trailing );
+      _cursor = text.text.char_count( index + trailing );
     }
   }
 
@@ -411,7 +395,7 @@ public class CanvasText : Object {
 
   /* Moves the cursor to the end of the name */
   public void move_cursor_to_end() {
-    _cursor = text.char_count();
+    _cursor = text.text.char_count();
     clear_selection();
   }
 
@@ -431,11 +415,11 @@ public class CanvasText : Object {
   public void selection_to_end() {
     if( _selstart == _selend ) {
       _selstart = _cursor;
-      _selend   = text.char_count();
-      _cursor   = text.char_count();
+      _selend   = text.text.char_count();
+      _cursor   = text.text.char_count();
     } else {
-      _selend = text.char_count();
-      _cursor = text.char_count();
+      _selend = text.text.char_count();
+      _cursor = text.text.char_count();
     }
   }
 
@@ -443,19 +427,19 @@ public class CanvasText : Object {
   private int find_word( int start, int dir ) {
     bool alnum_found = false;
     if( dir == 1 ) {
-      for( int i=start; i<text.char_count(); i++ ) {
-        int index = text.index_of_nth_char( i );
-        if( text.get_char( index ).isalnum() ) {
+      for( int i=start; i<text.text.char_count(); i++ ) {
+        int index = text.text.index_of_nth_char( i );
+        if( text.text.get_char( index ).isalnum() ) {
           alnum_found = true;
         } else if( alnum_found ) {
           return( i );
         }
       }
-      return( text.char_count() );
+      return( text.text.char_count() );
     } else {
       for( int i=(start - 1); i>=0; i-- ) {
-        int index = text.index_of_nth_char( i );
-        if( text.get_char( index ).isalnum() ) {
+        int index = text.text.index_of_nth_char( i );
+        if( text.text.get_char( index ).isalnum() ) {
           alnum_found = true;
         } else if( alnum_found ) {
           return( i + 1 );
@@ -496,15 +480,14 @@ public class CanvasText : Object {
   public void backspace() {
     if( _cursor > 0 ) {
       if( _selstart != _selend ) {
-        var spos = text.index_of_nth_char( _selstart );
-        var epos = text.index_of_nth_char( _selend );
-        text     = text.splice( spos, epos );
+        var spos = text.text.index_of_nth_char( _selstart );
+        var epos = text.text.index_of_nth_char( _selend );
+        text.remove_text( spos, ((epos - spos) + 1) );
         _cursor  = _selstart;
         _selend  = _selstart;
       } else {
-        var spos = text.index_of_nth_char( _cursor - 1 );
-        var epos = text.index_of_nth_char( _cursor );
-        text     = text.splice( spos, epos );
+        var spos = text.text.index_of_nth_char( _cursor - 1 );
+        text.remove_text( spos, 1 );
         _cursor--;
       }
     }
@@ -512,17 +495,16 @@ public class CanvasText : Object {
 
   /* Handles a delete key event */
   public void delete() {
-    if( _cursor < text.length ) {
+    if( _cursor < text.text.length ) {
       if( _selstart != _selend ) {
-        var spos = text.index_of_nth_char( _selstart );
-        var epos = text.index_of_nth_char( _selend );
-        text    = text.splice( spos, epos );
+        var spos = text.text.index_of_nth_char( _selstart );
+        var epos = text.text.index_of_nth_char( _selend );
+        text.remove_text( spos, ((epos - spos) + 1) );
         _cursor = _selstart;
         _selend = _selstart;
       } else {
-        var spos = text.index_of_nth_char( _cursor );
-        var epos = text.index_of_nth_char( _cursor + 1 );
-        text = text.splice( spos, epos );
+        var spos = text.text.index_of_nth_char( _cursor );
+        text.remove_text( spos, 1 );
       }
     }
   }
@@ -531,14 +513,14 @@ public class CanvasText : Object {
   public void insert( string s ) {
     var slen = s.char_count();
     if( _selstart != _selend ) {
-      var spos = text.index_of_nth_char( _selstart );
-      var epos = text.index_of_nth_char( _selend );
-      text    = text.splice( spos, epos, s );
+      var spos = text.text.index_of_nth_char( _selstart );
+      var epos = text.text.index_of_nth_char( _selend );
+      text.replace_text( spos, ((epos - epos) + 1), s );
       _cursor = _selstart + slen;
       _selend = _selstart;
     } else {
-      var cpos = text.index_of_nth_char( _cursor );
-      text = text.splice( cpos, cpos, s );
+      var cpos = text.text.index_of_nth_char( _cursor );
+      text.insert_text( cpos, s );
       _cursor += slen;
     }
   }
@@ -549,41 +531,45 @@ public class CanvasText : Object {
   */
   public string? get_selected_text() {
     if( _selstart != _selend ) {
-      var spos = text.index_of_nth_char( _selstart );
-      var epos = text.index_of_nth_char( _selend );
-      return( text.slice( spos, epos ) );
+      var spos = text.text.index_of_nth_char( _selstart );
+      var epos = text.text.index_of_nth_char( _selend );
+      return( text.text.slice( spos, epos ) );
     }
     return( null );
   }
 
   /* Returns the current cursor position */
   public void get_cursor_pos( out int x, out int ytop, out int ybot ) {
-    var index = text.index_of_nth_char( _cursor );
+    var index = text.text.index_of_nth_char( _cursor );
     var rect  = _pango_layout.index_to_pos( index );
     x    = (int)(posx + (rect.x / Pango.SCALE));
     ytop = (int)(posy + (rect.y / Pango.SCALE));
     ybot = ytop + (int)(rect.height / Pango.SCALE);
   }
 
-  /* Formats the given text */
-  public void format_text( string pre, string post ) {
-    if( _selstart == _selend ) {
-      var spos = text.index_of_nth_char( _selstart );
-      text = text.splice( spos, spos, pre + post );
-      _cursor = _selstart + pre.length;
-    } else {
-      var spos = text.index_of_nth_char( _selstart );
-      var epos = text.index_of_nth_char( _selend );
-      text = text.splice( epos, epos, post );
-      text = text.splice( spos, spos, pre );
-    }
+  /* Add tag to selected area */
+  public void add_tag( FormatTag tag ) {
+    var spos = text.text.index_of_nth_char( _selstart );
+    var epos = text.text.index_of_nth_char( _selend );
+    text.add_tag( tag, spos, epos );
+  }
+
+  /* Removes the specified tag for the selected range */
+  public void remove_tag( FormatTag tag ) {
+    var spos = text.text.index_of_nth_char( _selstart );
+    var epos = text.text.index_of_nth_char( _selend );
+    text.remove_tag( tag, spos, epos );
+  }
+
+  /* Removes the specified tag for the selected range */
+  public void remove_all_tags() {
+    var spos = text.text.index_of_nth_char( _selstart );
+    var epos = text.text.index_of_nth_char( _selend );
+    text.remove_all_tags( spos, epos );
   }
 
   /* Draws the node font to the screen */
   public void draw( Cairo.Context ctx, Theme theme, RGBA fg, double alpha ) {
-
-    /* Make sure the the size is up-to-date */
-    _pango_layout.set_markup( name_markup( theme ), -1 );
 
     /* Output the text */
     ctx.move_to( posx, posy );
@@ -593,7 +579,7 @@ public class CanvasText : Object {
 
     /* Draw the insertion cursor if we are in the 'editable' state */
     if( edit ) {
-      var cpos = text.index_of_nth_char( _cursor );
+      var cpos = text.text.index_of_nth_char( _cursor );
       var rect = _pango_layout.index_to_pos( cpos );
       Utils.set_context_color_with_alpha( ctx, theme.text_cursor, alpha );
       double ix, iy;

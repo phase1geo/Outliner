@@ -65,7 +65,7 @@ public class Node {
       _mode = value;
       name.edit = (_mode == NodeMode.EDITABLE);
       note.edit = (_mode == NodeMode.NOTEEDIT);
-      if( !note.edit && note_was_edited && (note.text == "") ) {
+      if( !note.edit && note_was_edited && (note.text.text == "") ) {
         hide_note = true;
       }
       update_height();
@@ -397,10 +397,10 @@ public class Node {
     n->new_prop( "expanded", expanded.to_string() );
     n->new_prop( "hidenote", hide_note.to_string() );
 
-    n->new_text_child( null, "name", name.text );
+    n->add_child( name.text.save( "name" ) );
 
-    if( note.text != "" ) {
-      n->new_text_child( null, "note", note.text );
+    if( note.text.text != "" ) {
+      n->add_child( note.text.save( "note" ) );
     }
 
     Xml.Node* nodes = new Xml.Node( null, "nodes" );
@@ -430,46 +430,11 @@ public class Node {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
-          case "name"  :  load_name( it );  break;
-          case "note"  :  load_note( it );  break;
+          case "name"  :  name.text.load( it );  break;
+          case "note"  :  note.text.load( it );  break;
           case "nodes" :  load_nodes( ot, it );  break;
         }
       }
-    }
-
-  }
-
-  /* Loads the node name */
-  private void load_name( Xml.Node* n ) {
-
-    if( (n->children != null) && (n->children->type == Xml.ElementType.TEXT_NODE) ) {
-      name.text = n->children->get_content();
-      try {
-        Pango.AttrList attrs;
-        string   text;
-        unichar  accel_char;
-        Pango.parse_markup( n->children->get_content(), -1, 0, out attrs, out text, out accel_char );
-        stdout.printf( "After parsing markup, text: %s\n", text );
-        Pango.AttrIterator it = attrs.get_iterator();
-        while( it.next() ) {
-          int start, end;
-          it.range( out start, out end );
-          it.get_attrs().foreach((attr) => {
-            stdout.printf( "attr.class: %s, start: %d, end: %d\n", attr.klass.type.to_string(), start, end );
-          });
-        }
-      } catch( GLib.Error e ) {
-        /* TBD */
-      }
-    }
-
-  }
-
-  /* Loads the node name */
-  private void load_note( Xml.Node* n ) {
-
-    if( (n->children != null) && (n->children->type == Xml.ElementType.TEXT_NODE) ) {
-      note.text = n->children->get_content();
     }
 
   }
@@ -659,10 +624,10 @@ public class Node {
 
   private void draw_note_icon( Cairo.Context ctx, Theme theme ) {
 
-    if( (mode == NodeMode.MOVETO) || ((_note.text == "") && (mode != NodeMode.HOVER) && (mode != NodeMode.SELECTED) && (mode != NodeMode.NOTEEDIT)) ) return;
+    if( (mode == NodeMode.MOVETO) || ((_note.text.text == "") && (mode != NodeMode.HOVER) && (mode != NodeMode.SELECTED) && (mode != NodeMode.NOTEEDIT)) ) return;
 
     double x, y, w, h;
-    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text == "")) ? 0.3 : this.alpha;
+    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text.text == "")) ? 0.3 : this.alpha;
 
     note_bbox( out x, out y, out w, out h );
 

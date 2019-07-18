@@ -43,7 +43,7 @@ public class ExportText : Object {
 
       var nodes = table.nodes;
       for( int i=0; i<nodes.length; i++ ) {
-        string title = nodes.index( i ).name.text + "\n";
+        string title = nodes.index( i ).name.text.text + "\n";
         os.write( title.data );
         var children = nodes.index( i ).children;
         for( int j=0; j<children.length; j++ ) {
@@ -74,12 +74,12 @@ public class ExportText : Object {
       }
       */
 
-      title += node.name.text + "\n";
+      title += node.name.text.text + "\n";
 
       os.write( title.data );
 
-      if( node.note.text != "" ) {
-        string note = prefix + "  " + node.note.text + "\n";
+      if( node.note.text.text != "" ) {
+        string note = prefix + "  " + node.note.text.text + "\n";
         os.write( note.data );
       }
 
