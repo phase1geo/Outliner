@@ -275,6 +275,7 @@ public class CanvasText : Object {
         }
       }
       _cursor = _selend;
+      _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
       update_column();
     }
   }

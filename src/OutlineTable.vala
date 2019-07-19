@@ -319,6 +319,9 @@ public class OutlineTable : DrawingArea {
               }
               break;
           }
+          if( selected == null ) {
+            selected = _active;
+          }
           selected.mode = NodeMode.SELECTED;
           _active.mode  = NodeMode.NONE;
           _active       = null;

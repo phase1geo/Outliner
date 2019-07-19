@@ -128,9 +128,14 @@ public class FormattedText {
     public void adjust( int index, int length ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
-        if( (info.start <= index) && (index < info.end) ) {
-          info.end += length;
-          return;
+        if( index <= info.start ) {
+          info.start += length;
+          info.end   += length;
+          if( info.end <= index ) {
+            _info.remove_index( i );
+          }
+        } else if( index < info.end ) {
+          info.end   += length;
         }
       }
     }
@@ -155,8 +160,8 @@ public class FormattedText {
     public void remove_tag( int start, int end ) {
       for( int i=((int)_info.length - 1); i>=0; i-- ) {
         var info = _info.index( i );
-        if( (start < info.end) && (end > info.end) ) {
-          if( start < info.start ) {
+        if( (start < info.end) && (end >= info.end) ) {
+          if( start <= info.start ) {
             _info.remove_index( i );
             continue;
           } else {
@@ -386,6 +391,7 @@ public class FormattedText {
   public void replace_text( int index, int chars, string str ) {
     _text = _text.splice( index, (index + chars), str );
     foreach( TagInfo f in _formats ) {
+      f.adjust( index, (0 - chars) );
       f.remove_tag( index, (index + chars) );
       f.adjust( index, str.length );
     }
@@ -396,6 +402,7 @@ public class FormattedText {
   public void remove_text( int index, int chars ) {
     _text = _text.splice( index, (index + chars) );
     foreach( TagInfo f in _formats ) {
+      f.adjust( index, (0 - chars) );
       f.remove_tag( index, (index + chars) );
     }
     changed();
