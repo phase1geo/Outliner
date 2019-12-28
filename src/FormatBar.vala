@@ -75,6 +75,8 @@ public class FormatBar : Box {
     } else {
       _table.selected.note.add_tag( tag );
     }
+    _table.queue_draw();
+    _table.changed();
   }
 
   private void handle_bold() {
@@ -91,6 +93,33 @@ public class FormatBar : Box {
 
   private void handle_strikethru() {
     format_text( FormatTag.STRIKETHRU );
+  }
+
+  /*
+   Updates the state of the format bar based on the state of the current
+   text.
+  */
+  private void update_from_text( CanvasText? text ) {
+    FormattedText? ft     = (text == null) ? null : text.text;
+    int            cursor = (text == null) ? 0    : text.cursor;
+    _bold.active      = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.BOLD,       cursor );
+    _italics.active   = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.ITALICS,    cursor );
+    _underline.active = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.UNDERLINE,  cursor );
+    _strike.active    = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.STRIKETHRU, cursor );
+  }
+
+  /*
+   Updates the state of the format bar based on which tags are applied at the
+   current cursor position.
+  */
+  public void update_state() {
+    if( _table.selected == null ) {
+      update_from_text( null );
+    } else if( _table.selected.mode == NodeMode.EDITABLE ) {
+      update_from_text( _table.selected.name );
+    } else {
+      update_from_text( _table.selected.note );
+    }
   }
 
 }
