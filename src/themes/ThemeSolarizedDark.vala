@@ -28,7 +28,7 @@ public class ThemeSolarizedDark : Theme {
   public ThemeSolarizedDark() {
 
     name  = "solarized_dark";
-    label = _( "Solarized Dark" ); 
+    label = _( "Solarized Dark" );
 
     /* Generate the non-link colors */
     even               = get_color( "#002B36" );
@@ -43,7 +43,7 @@ public class ThemeSolarizedDark : Theme {
     textsel_foreground = get_color( "#002B36" );  // Done
     text_cursor        = get_color( "#93A1A1" );  // Done
     symbol_color       = get_color( "#B58900" );
-    note_color         = get_color( "#000080" );
+    note_color         = get_color( "#f37329" );
     attachable_color   = get_color( "#6C71C4" );
     prefer_dark        = true;
 

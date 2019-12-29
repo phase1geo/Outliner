@@ -34,7 +34,7 @@ public class ThemeDark : Theme {
     even               = get_color( "#000000" );
     odd                = get_color( "#444444" );
     background         = get_color( "#000000" );
-    foreground         = get_color( "White" );
+    foreground         = get_color( "#e0e0e0" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );
     nodesel_background = get_color( "#64baff" );
@@ -43,7 +43,7 @@ public class ThemeDark : Theme {
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "White" );
     symbol_color       = get_color( "#cccccc" );
-    note_color         = get_color( "#000080" );
+    note_color         = get_color( "#f9c440" );
     attachable_color   = get_color( "#9bdb4d" );
     prefer_dark        = true;
 
