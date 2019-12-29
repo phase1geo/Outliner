@@ -1250,7 +1250,7 @@ public class OutlineTable : DrawingArea {
     Xml.Doc* doc = new Xml.Doc( "1.0" );
     string   mem;
     int      len;
-    doc->set_root_element( txt.save( "text" ) );
+    doc->set_root_element( txt.save() );
     doc->dump_memory_format( out mem, out len );
     delete doc;
 

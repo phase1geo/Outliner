@@ -151,6 +151,21 @@ public class CanvasText : Object {
     return( Utils.is_within_bounds( x, y, posx, posy, _width, _height ) );
   }
 
+  /* Saves the current instace into the given XML tree */
+  public virtual Xml.Node* save( string title ) {
+
+    Xml.Node* n = new Xml.Node( null, title );
+
+    n->set_prop( "posx",     posx.to_string() );
+    n->set_prop( "posy",     posy.to_string() );
+    n->set_prop( "maxwidth", _max_width.to_string() );
+
+    n->add_child( _text.save() );
+
+    return( n );
+
+  }
+
   /* Loads the file contents into this instance */
   public virtual void load( Xml.Node* n ) {
 
@@ -168,6 +183,14 @@ public class CanvasText : Object {
     if( mw != null ) {
       _max_width = double.parse( mw );
       _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    }
+
+    /* Load the text and formatting */
+    for( Xml.Node* it = n->children; it != null; it = it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "text" ) )  {
+        _text.load( it );
+        update_size( false );
+      }
     }
 
   }

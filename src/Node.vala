@@ -397,10 +397,10 @@ public class Node {
     n->new_prop( "expanded", expanded.to_string() );
     n->new_prop( "hidenote", hide_note.to_string() );
 
-    n->add_child( name.text.save( "name" ) );
+    n->add_child( name.save( "name" ) );
 
     if( note.text.text != "" ) {
-      n->add_child( note.text.save( "note" ) );
+      n->add_child( note.save( "note" ) );
     }
 
     Xml.Node* nodes = new Xml.Node( null, "nodes" );
@@ -430,8 +430,8 @@ public class Node {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
-          case "name"  :  name.text.load( it );  break;
-          case "note"  :  note.text.load( it );  break;
+          case "name"  :  name.load( it );  break;
+          case "note"  :  note.load( it );  break;
           case "nodes" :  load_nodes( ot, it );  break;
         }
       }
@@ -527,7 +527,7 @@ public class Node {
 
   /* Returns true if the node is a root node (has no parent) */
   public bool is_root() {
-    
+
     return( parent == null );
 
   }
@@ -549,7 +549,7 @@ public class Node {
 
     RGBA   background = theme.background;
     double alpha      = this.alpha;
-    
+
     switch( mode ) {
       case NodeMode.SELECTED :  background = theme.nodesel_background;  break;
       case NodeMode.ATTACHTO :  background = theme.attachable_color;    break;

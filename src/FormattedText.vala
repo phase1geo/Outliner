@@ -462,8 +462,8 @@ public class FormattedText {
   }
 
   /* Saves the text as the given XML node */
-  public Xml.Node* save( string node_title ) {
-    Xml.Node* n = new Xml.Node( null, node_title );
+  public Xml.Node* save() {
+    Xml.Node* n = new Xml.Node( null, "text" );
     n->new_prop( "data", text );
     for( int i=0; i<(FormatTag.LENGTH - 1); i++ ) {
       if( !_formats[i].is_empty() ) {
@@ -487,7 +487,7 @@ public class FormattedText {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "format") ) {
         string? type = it->get_prop( "type" );
         if( type != null ) {
-          _formats[FormatTag.from_string( type )].store_ranges( n->get_prop( "ranges" ) );
+          _formats[FormatTag.from_string( type )].store_ranges( it->get_prop( "ranges" ) );
         }
       }
     }
