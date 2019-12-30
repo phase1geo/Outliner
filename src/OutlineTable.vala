@@ -219,6 +219,7 @@ public class OutlineTable : DrawingArea {
       case EventType.BUTTON_PRESS        :  ct.set_cursor_at_char( x, y, true );  break;
       case EventType.DOUBLE_BUTTON_PRESS :  ct.set_cursor_at_word( x, y, true );  break;
     }
+    get_format_bar().update_state();
     queue_draw();
   }
 

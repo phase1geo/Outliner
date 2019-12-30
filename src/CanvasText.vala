@@ -80,6 +80,9 @@ public class CanvasText : Object {
     set {
       if( _edit != value ) {
         _edit = value;
+        if( !_edit ) {
+          clear_selection();
+        }
         update_size( true );
       }
     }
@@ -87,6 +90,16 @@ public class CanvasText : Object {
   public int cursor {
     get {
       return( text.text.index_of_nth_char( _cursor ) );
+    }
+  }
+  public int selstart {
+    get {
+      return( text.text.index_of_nth_char( _selstart ) );
+    }
+  }
+  public int selend {
+    get {
+      return( text.text.index_of_nth_char( _selend ) );
     }
   }
 
@@ -149,6 +162,11 @@ public class CanvasText : Object {
   /* Returns true if the given cursor coordinates lies within this node */
   public bool is_within( double x, double y ) {
     return( Utils.is_within_bounds( x, y, posx, posy, _width, _height ) );
+  }
+
+  /* Returns true if text is currently selected */
+  public bool is_selected() {
+    return( _selstart != _selend );
   }
 
   /* Saves the current instace into the given XML tree */

@@ -130,18 +130,27 @@ public class FormatBar : Box {
     }
   }
 
+  /* Returns true if the given tag button should be active */
+  private bool is_tag_active( CanvasText? text, FormatTag tag ) {
+    if( text == null ) {
+      return( false );
+    } else if( text.is_selected() ) {
+      return( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
+    } else {
+      return( text.text.is_tag_applied_at_index( tag, text.cursor ) );
+    }
+  }
+
   /*
    Updates the state of the format bar based on the state of the current
    text.
   */
   private void update_from_text( CanvasText? text ) {
-    FormattedText? ft     = (text == null) ? null : text.text;
-    int            cursor = (text == null) ? 0    : text.cursor;
     _ignore_active = true;
-    _bold.active      = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.BOLD,       cursor );
-    _italics.active   = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.ITALICS,    cursor );
-    _underline.active = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.UNDERLINE,  cursor );
-    _strike.active    = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.STRIKETHRU, cursor );
+    _bold.active      = is_tag_active( text, FormatTag.BOLD );
+    _italics.active   = is_tag_active( text, FormatTag.ITALICS );
+    _underline.active = is_tag_active( text, FormatTag.UNDERLINE );
+    _strike.active    = is_tag_active( text, FormatTag.STRIKETHRU );
     _ignore_active = false;
   }
 

@@ -188,6 +188,20 @@ public class FormattedText {
       return( false );
     }
 
+    /*
+     Returns true if the given range overlaps with any tag; otherwise,
+     returns false.
+    */
+    public bool is_applied_in_range( int start, int end ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (start < info.end) && (end > info.start) ) {
+          return( true );
+        }
+      }
+      return( false );
+    }
+
     /* Inserts all of the attributes for this tag */
     public void get_attributes( int tag_index, ref AttrList attrs, TagAttrs[] tag ) {
       for( int i=0; i<_info.length; i++ ) {
@@ -440,6 +454,11 @@ public class FormattedText {
   /* Returns true if the given tag is applied at the given index */
   public bool is_tag_applied_at_index( FormatTag tag, int index ) {
     return( _formats[tag].is_applied_at_index( index ) );
+  }
+
+  /* Returns true if the given tag is applied within the given range */
+  public bool is_tag_applied_in_range( FormatTag tag, int start, int end ) {
+    return( _formats[tag].is_applied_in_range( start, end ) );
   }
 
   /* Returns true if at least one tag is applied to the text */
