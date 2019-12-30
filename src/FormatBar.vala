@@ -28,6 +28,7 @@ public class FormatBar : Box {
   private ToggleButton _italics;
   private ToggleButton _underline;
   private ToggleButton _strike;
+  private bool         _ignore_active = false;
 
   /* Construct the formatting bar */
   public FormatBar( OutlineTable table ) {
@@ -79,20 +80,54 @@ public class FormatBar : Box {
     _table.changed();
   }
 
+  private void unformat_text( FormatTag tag ) {
+    if( _table.selected.mode == NodeMode.EDITABLE ) {
+      _table.selected.name.remove_tag( tag );
+    } else {
+      _table.selected.note.remove_tag( tag );
+    }
+    _table.queue_draw();
+    _table.changed();
+  }
+
   private void handle_bold() {
-    format_text( FormatTag.BOLD );
+    if( !_ignore_active ) {
+      if( _bold.active ) {
+        format_text( FormatTag.BOLD );
+      } else {
+        unformat_text( FormatTag.BOLD );
+      }
+    }
   }
 
   private void handle_italics() {
-    format_text( FormatTag.ITALICS );
+    if( !_ignore_active ) {
+      if( _italics.active ) {
+        format_text( FormatTag.ITALICS );
+      } else {
+        unformat_text( FormatTag.ITALICS );
+      }
+    }
   }
 
   private void handle_underline() {
-    format_text( FormatTag.UNDERLINE );
+    if( !_ignore_active ) {
+      if( _underline.active ) {
+        format_text( FormatTag.UNDERLINE );
+      } else {
+        unformat_text( FormatTag.UNDERLINE );
+      }
+    }
   }
 
   private void handle_strikethru() {
-    format_text( FormatTag.STRIKETHRU );
+    if( !_ignore_active ) {
+      if( _strike.active ) {
+        format_text( FormatTag.STRIKETHRU );
+      } else {
+        unformat_text( FormatTag.STRIKETHRU );
+      }
+    }
   }
 
   /*
@@ -102,10 +137,12 @@ public class FormatBar : Box {
   private void update_from_text( CanvasText? text ) {
     FormattedText? ft     = (text == null) ? null : text.text;
     int            cursor = (text == null) ? 0    : text.cursor;
+    _ignore_active = true;
     _bold.active      = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.BOLD,       cursor );
     _italics.active   = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.ITALICS,    cursor );
     _underline.active = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.UNDERLINE,  cursor );
     _strike.active    = (ft == null) ? false : ft.is_tag_applied_at_index( FormatTag.STRIKETHRU, cursor );
+    _ignore_active = false;
   }
 
   /*

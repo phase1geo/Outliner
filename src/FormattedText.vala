@@ -160,16 +160,19 @@ public class FormattedText {
     public void remove_tag( int start, int end ) {
       for( int i=((int)_info.length - 1); i>=0; i-- ) {
         var info = _info.index( i );
-        if( (start < info.end) && (end >= info.end) ) {
+        if( (start < info.end) && (end > info.start) ) {
           if( start <= info.start ) {
-            _info.remove_index( i );
-            continue;
+            if( info.end <= end ) {
+              _info.remove_index( i );
+            } else {
+              info.start = end;
+            }
           } else {
+            if( info.end > end ) {
+              _info.append_val( new FormattedRange( end, info.end ) );
+            }
             info.end = start;
           }
-        }
-        if( (end > info.start) && (start < info.start) ) {
-          info.start = end;
         }
       }
     }
