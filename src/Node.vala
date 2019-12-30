@@ -180,6 +180,7 @@ public class Node {
     /* Detect any size changes by the drawing area */
     ot.size_allocate.connect( table_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
+    ot.theme_changed.connect( table_theme_changed );
 
   }
 
@@ -199,6 +200,15 @@ public class Node {
     _name.set_font_size( name_size );
     _note.set_font_size( note_size );
     this.pady = (double)pady;
+  }
+
+  /*
+   If the theme has changed, all we need to do is alert the CanvasText to
+   rerender the text.
+  */
+  private void table_theme_changed( Theme theme ) {
+    _name.update_size( false );
+    _note.update_size( false );
   }
 
   /* Called whenever the canvas width changes */

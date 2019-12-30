@@ -28,7 +28,7 @@ public class ThemeSolarizedLight : Theme {
   public ThemeSolarizedLight() {
 
     name  = "solarized_light";
-    label = _( "Solarized Light" ); 
+    label = _( "Solarized Light" );
 
     /* Generate the non-link colors */
     even               = get_color( "#FDF6E3" );
@@ -46,6 +46,11 @@ public class ThemeSolarizedLight : Theme {
     note_color         = get_color( "#268BD2" );
     attachable_color   = get_color( "#9bdb4d" );
     prefer_dark        = false;
+
+    hilite2 = get_color( "red" );
+    hilite1 = get_color( "orange" );
+    hilite4 = get_color( "yellow" );
+    hilite3 = get_color( "green" );
 
   }
 

@@ -47,6 +47,11 @@ public class ThemeDark : Theme {
     attachable_color   = get_color( "#9bdb4d" );
     prefer_dark        = true;
 
+    hilite1 = get_color( "red" );
+    hilite2 = get_color( "orange" );
+    hilite3 = get_color( "yellow" );
+    hilite4 = get_color( "green" );
+
   }
 
 }

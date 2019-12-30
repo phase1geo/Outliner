@@ -62,6 +62,7 @@ public class OutlineTable : DrawingArea {
   /* Called by this class when a change is made to the table */
   public signal void changed();
   public signal void zoom_changed( int name_size, int note_size, int pady );
+  public signal void theme_changed( Theme theme );
 
   /* Default constructor */
   public OutlineTable( GLib.Settings settings ) {
@@ -874,6 +875,16 @@ public class OutlineTable : DrawingArea {
       STYLE_PROVIDER_PRIORITY_APPLICATION
     );
 
+    /* Change the theme of the formatted text */
+    FormattedText.set_theme( theme );
+
+    /* Changed the format bar */
+    get_format_bar().set_theme( theme );
+
+    /* Indicate that the theme has changed to anyone listening */
+    theme_changed( theme );
+
+    /* Update all nodes */
     queue_draw();
 
     if( save ) {

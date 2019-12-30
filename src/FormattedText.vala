@@ -286,7 +286,7 @@ public class FormattedText {
     }
     private void set_color( RGBA color ) {
       attrs.append_val( attr_background_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
-      attrs.append_val( attr_background_alpha_new( (uint16)(65536 / 2) ) );
+      attrs.append_val( attr_background_alpha_new( (uint16)(65536 * 0.5) ) );
     }
     public void update_color( RGBA color ) {
       attrs.remove_range( 0, 2 );
@@ -369,6 +369,7 @@ public class FormattedText {
   }
 
   public static void set_theme( Theme theme ) {
+    if( _attr_tags == null ) return;
     (_attr_tags[FormatTag.COLOR1] as ColorInfo).update_color( theme.color1 );
     (_attr_tags[FormatTag.COLOR2] as ColorInfo).update_color( theme.color2 );
     (_attr_tags[FormatTag.COLOR3] as ColorInfo).update_color( theme.color3 );

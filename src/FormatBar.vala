@@ -28,6 +28,7 @@ public class FormatBar : Box {
   private ToggleButton _italics;
   private ToggleButton _underline;
   private ToggleButton _strike;
+  private ColorButton  _hilite;
   private bool         _ignore_active = false;
 
   /* Construct the formatting bar */
@@ -61,13 +62,25 @@ public class FormatBar : Box {
     _strike.set_tooltip_text( _( "Strikethrough" ) );
     _strike.toggled.connect( handle_strikethru );
 
+    _hilite = new ColorButton();
+    _hilite.image = new Image.from_icon_name( "format-text-highlight", IconSize.SMALL_TOOLBAR );
+    _hilite.relief = ReliefStyle.NONE;
+    _hilite.set_tooltip_text( _( "Highlighters" ) );
+    _hilite.color_set.connect( handle_highlighter );
+
     pack_start( _bold,      false, false, 0 );
     pack_start( _italics,   false, false, 0 );
     pack_start( _underline, false, false, 0 );
     pack_start( _strike,    false, false, 0 );
+    pack_start( _hilite,    false, false, 0 );
 
     show_all();
 
+  }
+
+  public void set_theme( Theme theme ) {
+    _hilite.add_palette( Orientation.HORIZONTAL, 4, null );
+    _hilite.add_palette( Orientation.HORIZONTAL, 4, {theme.hilite1, theme.hilite2, theme.hilite3, theme.hilite4} );
   }
 
   private void format_text( FormatTag tag ) {
@@ -130,15 +143,34 @@ public class FormatBar : Box {
     }
   }
 
-  /* Returns true if the given tag button should be active */
-  private bool is_tag_active( CanvasText? text, FormatTag tag ) {
-    if( text == null ) {
-      return( false );
-    } else if( text.is_selected() ) {
-      return( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
+  private void handle_highlighter() {
+    var theme = _table.get_theme();
+    if( _hilite.rgba.equal( theme.hilite1 ) ) {
+      format_text( FormatTag.HILITE1 );
+    } else if( _hilite.rgba.equal( theme.hilite2 ) ) {
+      format_text( FormatTag.HILITE2 );
+    } else if( _hilite.rgba.equal( theme.hilite3 ) ) {
+      format_text( FormatTag.HILITE3 );
     } else {
-      return( text.text.is_tag_applied_at_index( tag, text.cursor ) );
+      format_text( FormatTag.HILITE4 );
     }
+  }
+
+  /* Returns true if the given tag button should be active */
+  private void set_toggle_button( CanvasText? text, FormatTag tag, ToggleButton btn ) {
+    if( text == null ) {
+      btn.set_sensitive( false );
+      btn.set_active( false );
+    } else if( text.is_selected() ) {
+      btn.set_sensitive( true );
+      btn.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
+    } else {
+      btn.set_sensitive( false );
+    }
+  }
+
+  private void set_color_button( CanvasText? text, FormatTag tag, Button btn ) {
+    btn.set_sensitive( (text != null) && text.is_selected() );
   }
 
   /*
@@ -147,10 +179,11 @@ public class FormatBar : Box {
   */
   private void update_from_text( CanvasText? text ) {
     _ignore_active = true;
-    _bold.active      = is_tag_active( text, FormatTag.BOLD );
-    _italics.active   = is_tag_active( text, FormatTag.ITALICS );
-    _underline.active = is_tag_active( text, FormatTag.UNDERLINE );
-    _strike.active    = is_tag_active( text, FormatTag.STRIKETHRU );
+    set_toggle_button( text, FormatTag.BOLD,       _bold );
+    set_toggle_button( text, FormatTag.ITALICS,    _italics );
+    set_toggle_button( text, FormatTag.UNDERLINE,  _underline );
+    set_toggle_button( text, FormatTag.STRIKETHRU, _strike );
+    set_color_button( text, FormatTag.HILITE1, _hilite );
     _ignore_active = false;
   }
 
