@@ -78,16 +78,15 @@ public class FormatBar : Box {
 
   }
 
+  /* TBD - This method may no longer be necessary */
   public void set_theme( Theme theme ) {
-    _hilite.add_palette( Orientation.HORIZONTAL, 4, null );
-    _hilite.add_palette( Orientation.HORIZONTAL, 4, {theme.hilite1, theme.hilite2, theme.hilite3, theme.hilite4} );
   }
 
-  private void format_text( FormatTag tag ) {
+  private void format_text( FormatTag tag, string? extra=null ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
-      _table.selected.name.add_tag( tag );
+      _table.selected.name.add_tag( tag, extra );
     } else {
-      _table.selected.note.add_tag( tag );
+      _table.selected.note.add_tag( tag, extra );
     }
     _table.queue_draw();
     _table.changed();
@@ -144,16 +143,8 @@ public class FormatBar : Box {
   }
 
   private void handle_highlighter() {
-    var theme = _table.get_theme();
-    if( _hilite.rgba.equal( theme.hilite1 ) ) {
-      format_text( FormatTag.HILITE1 );
-    } else if( _hilite.rgba.equal( theme.hilite2 ) ) {
-      format_text( FormatTag.HILITE2 );
-    } else if( _hilite.rgba.equal( theme.hilite3 ) ) {
-      format_text( FormatTag.HILITE3 );
-    } else {
-      format_text( FormatTag.HILITE4 );
-    }
+    format_text( FormatTag.HILITE, Utils.color_from_rgba( _hilite.rgba ) );
+    /* TBD - We need to create/detect the "no color" selection and call unformat_text if set */
   }
 
   /* Returns true if the given tag button should be active */
@@ -183,7 +174,7 @@ public class FormatBar : Box {
     set_toggle_button( text, FormatTag.ITALICS,    _italics );
     set_toggle_button( text, FormatTag.UNDERLINE,  _underline );
     set_toggle_button( text, FormatTag.STRIKETHRU, _strike );
-    set_color_button( text, FormatTag.HILITE1, _hilite );
+    set_color_button(  text, FormatTag.HILITE,     _hilite );
     _ignore_active = false;
   }
 

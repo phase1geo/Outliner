@@ -1245,8 +1245,8 @@ public class OutlineTable : DrawingArea {
     txt.add_tag( FormatTag.BOLD,       8, 14 );
     txt.add_tag( FormatTag.UNDERLINE, 12, 19 );
     txt.add_tag( FormatTag.STRIKETHRU, 8, 12 );
-    txt.add_tag( FormatTag.COLOR1,     5,  9 );
-    txt.add_tag( FormatTag.HILITE2,    0, 19 );
+    txt.add_tag( FormatTag.COLOR,      5,  9, "Red" );
+    txt.add_tag( FormatTag.HILITE,     0, 19, "White" );
     txt.add_tag( FormatTag.SELECT,     0,  7 );
 
     /* Update the layout */

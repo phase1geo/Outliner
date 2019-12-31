@@ -27,14 +27,8 @@ public enum FormatTag {
   ITALICS,
   UNDERLINE,
   STRIKETHRU,
-  COLOR1,
-  COLOR2,
-  COLOR3,
-  COLOR4,
-  HILITE1,
-  HILITE2,
-  HILITE3,
-  HILITE4,
+  COLOR,
+  HILITE,
   URL,
   SELECT,
   LENGTH;
@@ -45,14 +39,8 @@ public enum FormatTag {
       case ITALICS    :  return( "italics" );
       case UNDERLINE  :  return( "underline" );
       case STRIKETHRU :  return( "strikethru" );
-      case COLOR1     :  return( "color1" );
-      case COLOR2     :  return( "color2" );
-      case COLOR3     :  return( "color3" );
-      case COLOR4     :  return( "color4" );
-      case HILITE1    :  return( "hilite1" );
-      case HILITE2    :  return( "hilite2" );
-      case HILITE3    :  return( "hilite3" );
-      case HILITE4    :  return( "hilite4" );
+      case COLOR      :  return( "color" );
+      case HILITE     :  return( "hilite" );
       case URL        :  return( "url" );
     }
     return( "bold" );
@@ -64,17 +52,11 @@ public enum FormatTag {
       case "italics"    :  return( ITALICS );
       case "underline"  :  return( UNDERLINE );
       case "strikethru" :  return( STRIKETHRU );
-      case "color1"     :  return( COLOR1 );
-      case "color2"     :  return( COLOR2 );
-      case "color3"     :  return( COLOR3 );
-      case "color4"     :  return( COLOR4 );
-      case "hilite1"    :  return( HILITE1 );
-      case "hilite2"    :  return( HILITE2 );
-      case "hilite3"    :  return( HILITE3 );
-      case "hilite4"    :  return( HILITE4 );
+      case "color"      :  return( COLOR );
+      case "hilite"     :  return( HILITE );
       case "url"        :  return( URL );
     }
-    return( BOLD );
+    return( LENGTH );
   }
 
 }
@@ -84,11 +66,16 @@ public class FormattedText {
   private class TagInfo {
 
     private class FormattedRange {
-      public int start { get; set; default = 0; }
-      public int end   { get; set; default = 0; }
-      public FormattedRange( int s, int e ) {
+      public int     start { get; set; default = 0; }
+      public int     end   { get; set; default = 0; }
+      public string? extra { get; set; default = null; }
+      public FormattedRange( int s, int e, string? x ) {
         start = s;
         end   = e;
+        extra = x;
+      }
+      public FormattedRange.from_xml( Xml.Node* n ) {
+        load( n );
       }
       public bool combine( int s, int e ) {
         bool changed = false;
@@ -101,6 +88,26 @@ public class FormattedText {
           changed = true;
         }
         return( changed );
+      }
+      public Xml.Node* save() {
+        Xml.Node* n = new Xml.Node( null, "range" );
+        n->set_prop( "start", start.to_string() );
+        n->set_prop( "end",   end.to_string() );
+        if( extra != null ) {
+          n->set_prop( "extra", extra );
+        }
+        return( n );
+      }
+      public void load( Xml.Node* n ) {
+        string? s = n->get_prop( "start" );
+        if( s != null ) {
+          start = int.parse( s );
+        }
+        string? e = n->get_prop( "end" );
+        if( e != null ) {
+          end = int.parse( e );
+        }
+        extra = n->get_prop( "extra" );
       }
     }
 
@@ -116,7 +123,7 @@ public class FormattedText {
       _info.remove_range( 0, _info.length );
       for( int i=0; i<other._info.length; i++ ) {
         var other_info = other._info.index( i );
-        _info.append_val( new FormattedRange( other_info.start, other_info.end ) );
+        _info.append_val( new FormattedRange( other_info.start, other_info.end, other_info.extra ) );
       }
     }
 
@@ -141,19 +148,19 @@ public class FormattedText {
     }
 
     /* Adds the given range from this format type */
-    public void add_tag( int start, int end ) {
+    public void add_tag( int start, int end, string? extra ) {
       for( int i=0; i<_info.length; i++ ) {
-        if( _info.index( i ).combine( start, end ) ) {
+        if( (extra == null) && _info.index( i ).combine( start, end ) ) {
           return;
         }
       }
-      _info.append_val( new FormattedRange( start, end ) );
+      _info.append_val( new FormattedRange( start, end, extra ) );
     }
 
     /* Replaces the given range(s) with the given range */
-    public void replace_tag( int start, int end ) {
+    public void replace_tag( int start, int end, string? extra ) {
       _info.remove_range( 0, _info.length );
-      _info.append_val( new FormattedRange( start, end ) );
+      _info.append_val( new FormattedRange( start, end, extra ) );
     }
 
     /* Removes the given range from this format type */
@@ -169,7 +176,7 @@ public class FormattedText {
             }
           } else {
             if( info.end > end ) {
-              _info.append_val( new FormattedRange( end, info.end ) );
+              _info.append_val( new FormattedRange( end, info.end, info.extra ) );
             }
             info.end = start;
           }
@@ -206,31 +213,37 @@ public class FormattedText {
     public void get_attributes( int tag_index, ref AttrList attrs, TagAttrs[] tag ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
-        for( int j=0; j<tag[tag_index].attrs.length; j++ ) {
-          var attr = tag[tag_index].attrs.index( j ).copy();
-          attr.start_index = info.start;
-          attr.end_index   = info.end;
-          attrs.change( (owned)attr );
+        tag[tag_index].add_attrs( ref attrs, info.start, info.end, info.extra );
+      }
+    }
+
+    /* Returns the extra data associated with the given cursor position */
+    public string? get_extra( int index ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (info.start <= index) && (index < info.end) ) {
+          return( info.extra );
         }
       }
+      return( null );
     }
 
     /* Returns the list of ranges this tag is associated with */
-    public string get_ranges() {
-      var ranges = "";
+    public Xml.Node* save( string tag ) {
+      Xml.Node* n = new Xml.Node( null, tag );
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
-        ranges += " %d %d".printf( info.start, info.end );
+        n->add_child( info.save() );
       }
-      return( ranges.chug() );
+      return( n );
     }
 
-    /* Stores the given range information to this class */
-    public void store_ranges( string? str ) {
-      if( str == null ) return;
-      string[] ranges = str.split( " " );
-      for( int i=0; i<ranges.length; i+=2 ) {
-        _info.append_val( new FormattedRange( int.parse( ranges[i+0] ), int.parse( ranges[i+1] ) ) );
+    /* Loads the data from XML */
+    public void load( Xml.Node* n ) {
+      for( Xml.Node* it = n->children; it != null; it = it->next ) {
+        if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "range") ) {
+          _info.append_val( new FormattedRange.from_xml( it ) );
+        }
       }
     }
 
@@ -240,6 +253,19 @@ public class FormattedText {
     public Array<Pango.Attribute> attrs;
     public TagAttrs() {
       attrs = new Array<Pango.Attribute>();
+    }
+    public virtual void add_attrs( ref AttrList list, int start, int end, string? extra ) {
+      for( int i=0; i<attrs.length; i++ ) {
+        var attr = attrs.index( i ).copy();
+        attr.start_index = start;
+        attr.end_index   = end;
+        list.change( (owned)attr );
+      }
+    }
+    protected RGBA get_color( string value ) {
+      RGBA c = {1.0, 1.0, 1.0, 1.0};
+      c.parse( value );
+      return( c );
     }
   }
 
@@ -268,29 +294,28 @@ public class FormattedText {
   }
 
   private class ColorInfo : TagAttrs {
-    public ColorInfo( RGBA color ) {
-      set_color( color );
-    }
-    private void set_color( RGBA color ) {
-      attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
-    }
-    public void update_color( RGBA color ) {
-      attrs.remove_index( 0 );
-      set_color( color );
+    public ColorInfo() {}
+    public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
+      var color = get_color( extra );
+      var attr  = attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) );
+      attr.start_index = start;
+      attr.end_index   = end;
+      list.change( (owned)attr );
     }
   }
 
   private class HighlightInfo : TagAttrs {
-    public HighlightInfo( RGBA color ) {
-      set_color( color );
-    }
-    private void set_color( RGBA color ) {
-      attrs.append_val( attr_background_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
-      attrs.append_val( attr_background_alpha_new( (uint16)(65536 * 0.5) ) );
-    }
-    public void update_color( RGBA color ) {
-      attrs.remove_range( 0, 2 );
-      set_color( color );
+    public HighlightInfo() {}
+    public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
+      var color = get_color( extra );
+      var bg    = attr_background_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) );
+      var alpha = attr_background_alpha_new( (uint16)(65536 * 0.5) );
+      bg.start_index = start;
+      bg.end_index   = end;
+      list.change( (owned)bg );
+      alpha.start_index = start;
+      alpha.end_index   = end;
+      list.change( (owned)alpha );
     }
   }
 
@@ -352,14 +377,8 @@ public class FormattedText {
       _attr_tags[FormatTag.ITALICS]    = new ItalicsInfo();
       _attr_tags[FormatTag.UNDERLINE]  = new UnderlineInfo();
       _attr_tags[FormatTag.STRIKETHRU] = new StrikeThruInfo();
-      _attr_tags[FormatTag.COLOR1]     = new ColorInfo( theme.color1 );
-      _attr_tags[FormatTag.COLOR2]     = new ColorInfo( theme.color2 );
-      _attr_tags[FormatTag.COLOR3]     = new ColorInfo( theme.color3 );
-      _attr_tags[FormatTag.COLOR4]     = new ColorInfo( theme.color4 );
-      _attr_tags[FormatTag.HILITE1]    = new HighlightInfo( theme.hilite1 );
-      _attr_tags[FormatTag.HILITE2]    = new HighlightInfo( theme.hilite2 );
-      _attr_tags[FormatTag.HILITE3]    = new HighlightInfo( theme.hilite3 );
-      _attr_tags[FormatTag.HILITE4]    = new HighlightInfo( theme.hilite4 );
+      _attr_tags[FormatTag.COLOR]      = new ColorInfo();
+      _attr_tags[FormatTag.HILITE]     = new HighlightInfo();
       _attr_tags[FormatTag.URL]        = new UrlInfo( theme.url );
       _attr_tags[FormatTag.SELECT]     = new SelectInfo( theme.textsel_foreground, theme.textsel_background );
     }
@@ -370,14 +389,6 @@ public class FormattedText {
 
   public static void set_theme( Theme theme ) {
     if( _attr_tags == null ) return;
-    (_attr_tags[FormatTag.COLOR1] as ColorInfo).update_color( theme.color1 );
-    (_attr_tags[FormatTag.COLOR2] as ColorInfo).update_color( theme.color2 );
-    (_attr_tags[FormatTag.COLOR3] as ColorInfo).update_color( theme.color3 );
-    (_attr_tags[FormatTag.COLOR4] as ColorInfo).update_color( theme.color4 );
-    (_attr_tags[FormatTag.HILITE1] as HighlightInfo).update_color( theme.hilite1 );
-    (_attr_tags[FormatTag.HILITE2] as HighlightInfo).update_color( theme.hilite2 );
-    (_attr_tags[FormatTag.HILITE3] as HighlightInfo).update_color( theme.hilite3 );
-    (_attr_tags[FormatTag.HILITE4] as HighlightInfo).update_color( theme.hilite4 );
     (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
     (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
   }
@@ -427,14 +438,14 @@ public class FormattedText {
   }
 
   /* Adds the given tag */
-  public void add_tag( FormatTag tag, int start, int end ) {
-    _formats[tag].add_tag( start, end );
+  public void add_tag( FormatTag tag, int start, int end, string? extra=null ) {
+    _formats[tag].add_tag( start, end, extra );
     changed();
   }
 
   /* Replaces the given tag with the given range */
-  public void replace_tag( FormatTag tag, int start, int end ) {
-    _formats[tag].replace_tag( start, end );
+  public void replace_tag( FormatTag tag, int start, int end, string? extra=null ) {
+    _formats[tag].replace_tag( start, end, extra );
     changed();
   }
 
@@ -484,17 +495,22 @@ public class FormattedText {
     return( attrs );
   }
 
+  /*
+   Returns the URL stored at the given index location, if one exists.  If nothing
+   is found, returns null.
+  */
+  public string? get_url( int index ) {
+    return( _formats[FormatTag.URL].get_extra( index ) );
+  }
+
   /* Saves the text as the given XML node */
   public Xml.Node* save() {
     Xml.Node* n = new Xml.Node( null, "text" );
     n->new_prop( "data", text );
     for( int i=0; i<(FormatTag.LENGTH - 1); i++ ) {
       if( !_formats[i].is_empty() ) {
-        Xml.Node* f   = new Xml.Node( null, "format" );
-        var       tag = (FormatTag)i;
-        f->new_prop( "type", tag.to_string() );
-        f->new_prop( "ranges", _formats[i].get_ranges() );
-        n->add_child( f );
+        var tag = (FormatTag)i;
+        n->add_child( _formats[i].save( tag.to_string() ) );
       }
     }
     return( n );
@@ -507,10 +523,10 @@ public class FormattedText {
       _text = t;
     }
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
-      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "format") ) {
-        string? type = it->get_prop( "type" );
-        if( type != null ) {
-          _formats[FormatTag.from_string( type )].store_ranges( it->get_prop( "ranges" ) );
+      if( it->type == Xml.ElementType.ELEMENT_NODE ) {
+        var tag = FormatTag.from_string( it->name );
+        if( tag != FormatTag.LENGTH ) {
+          _formats[tag].load( it );
         }
       }
     }

@@ -590,10 +590,10 @@ public class CanvasText : Object {
   }
 
   /* Add tag to selected area */
-  public void add_tag( FormatTag tag ) {
+  public void add_tag( FormatTag tag, string? extra ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
-    text.add_tag( tag, spos, epos );
+    text.add_tag( tag, spos, epos, extra );
   }
 
   /* Removes the specified tag for the selected range */
