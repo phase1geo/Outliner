@@ -45,6 +45,7 @@ public class ThemeSolarizedLight : Theme {
     symbol_color       = get_color( "#B58900" );
     note_color         = get_color( "#268BD2" );
     attachable_color   = get_color( "#9bdb4d" );
+    url                = get_color( "Blue" );
     prefer_dark        = false;
 
     hilite2 = get_color( "red" );
