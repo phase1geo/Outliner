@@ -31,6 +31,7 @@ public class FormatBar : Box {
   private ColorButton  _hilite;
   private ToggleButton _link;
   private bool         _ignore_active = false;
+  private LinkEditor   _link_editor;
 
   /* Construct the formatting bar */
   public FormatBar( OutlineTable table ) {
@@ -41,6 +42,8 @@ public class FormatBar : Box {
 
     Gdk.RGBA init_hiliter = {1.0, 1.0, 1.0, 1.0};
     init_hiliter.parse( "Yellow" );
+
+    _link_editor = new LinkEditor( table );
 
     _bold = new ToggleButton();
     _bold.image  = new Image.from_icon_name( "format-text-bold-symbolic", IconSize.SMALL_TOOLBAR );
@@ -87,10 +90,6 @@ public class FormatBar : Box {
 
     show_all();
 
-  }
-
-  /* TBD - This method may no longer be necessary */
-  public void set_theme( Theme theme ) {
   }
 
   private void format_text( FormatTag tag, string? extra=null ) {
@@ -161,7 +160,13 @@ public class FormatBar : Box {
   private void handle_link() {
     if( !_ignore_active ) {
       if( _link.active ) {
-        format_text( FormatTag.URL );
+        if( _table.selected.mode == NodeMode.EDITABLE ) {
+          _link_editor.add_url( _table.selected.name );
+        } else {
+          _link_editor.add_url( _table.selected.note );
+        }
+        _table.queue_draw();
+        _table.changed();
       } else {
         unformat_text( FormatTag.URL );
       }

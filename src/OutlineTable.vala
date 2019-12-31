@@ -878,9 +878,6 @@ public class OutlineTable : DrawingArea {
     /* Change the theme of the formatted text */
     FormattedText.set_theme( theme );
 
-    /* Changed the format bar */
-    get_format_bar().set_theme( theme );
-
     /* Indicate that the theme has changed to anyone listening */
     theme_changed( theme );
 

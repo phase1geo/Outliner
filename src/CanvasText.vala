@@ -580,6 +580,13 @@ public class CanvasText : Object {
     return( null );
   }
 
+  /* Returns the current cursor, selection start and selection end values. */
+  public void get_cursor_info( out int cursor, out int start, out int end ) {
+    cursor = _cursor;
+    start  = _selstart;
+    end    = _selend;
+  }
+
   /* Returns the current cursor position */
   public void get_cursor_pos( out int x, out int ytop, out int ybot ) {
     var index = text.text.index_of_nth_char( _cursor );
@@ -587,6 +594,14 @@ public class CanvasText : Object {
     x    = (int)(posx + (rect.x / Pango.SCALE));
     ytop = (int)(posy + (rect.y / Pango.SCALE));
     ybot = ytop + (int)(rect.height / Pango.SCALE);
+  }
+
+  /* Returns the x and y position of the given character position */
+  public void get_char_pos( int pos, out double x, out double y ) {
+    var index = text.text.index_of_nth_char( pos );
+    var rect  = _pango_layout.index_to_pos( index );
+    x = posx + (rect.x / Pango.SCALE);
+    y = posy + (rect.y / Pango.SCALE);
   }
 
   /* Add tag to selected area */
