@@ -20,6 +20,7 @@
 */
 
 using Gtk;
+using Gdk;
 
 public class FormatBar : Box {
 
@@ -28,10 +29,13 @@ public class FormatBar : Box {
   private ToggleButton _italics;
   private ToggleButton _underline;
   private ToggleButton _strike;
-  private ColorButton  _hilite;
+  private ToggleButton _hilite;
+  private ColorButton  _hilite_chooser;
+  private ToggleButton _color;
+  private ColorButton  _color_chooser;
   private ToggleButton _link;
-  private bool         _ignore_active = false;
   private LinkEditor   _link_editor;
+  private bool         _ignore_active = false;
 
   /* Construct the formatting bar */
   public FormatBar( OutlineTable table ) {
@@ -39,9 +43,6 @@ public class FormatBar : Box {
     Object( orientation:Orientation.HORIZONTAL, spacing:0 );
 
     _table = table;
-
-    Gdk.RGBA init_hiliter = {1.0, 1.0, 1.0, 1.0};
-    init_hiliter.parse( "Yellow" );
 
     _link_editor = new LinkEditor( table );
 
@@ -69,11 +70,29 @@ public class FormatBar : Box {
     _strike.set_tooltip_text( _( "Strikethrough" ) );
     _strike.toggled.connect( handle_strikethru );
 
-    _hilite = new ColorButton.with_rgba( init_hiliter );
-    //_hilite.image = new Image.from_icon_name( "format-text-highlight", IconSize.SMALL_TOOLBAR );
+    _hilite = new ToggleButton();
     _hilite.relief = ReliefStyle.NONE;
-    _hilite.set_tooltip_text( _( "Highlight" ) );
-    _hilite.color_set.connect( handle_highlighter );
+    _hilite.set_tooltip_text( _( "Apply Highlight Color" ) );
+    _hilite.toggled.connect( handle_highlight );
+    _hilite.get_style_context().add_class( "hilite" );
+
+    _hilite_chooser = new ColorButton();
+    _hilite_chooser.label  = "\u23f7";
+    _hilite_chooser.relief = ReliefStyle.NONE;
+    _hilite_chooser.set_tooltip_text( _( "Change Highlight Color" ) );
+    _hilite_chooser.color_set.connect( handle_highlight_chooser );
+
+    _color = new ToggleButton();
+    _color.relief = ReliefStyle.NONE;
+    _color.set_tooltip_text( "Apply Font Color" );
+    _color.toggled.connect( handle_color );
+    _color.get_style_context().add_class( "color" );
+
+    _color_chooser = new ColorButton();
+    _color_chooser.label  = "\u23f7";
+    _color_chooser.relief = ReliefStyle.NONE;
+    _color_chooser.set_tooltip_text( _( "Change Font Color" ) );
+    _color_chooser.color_set.connect( handle_color_chooser );
 
     _link = new ToggleButton();
     _link.image = new Image.from_icon_name( "insert-link-symbolic", IconSize.SMALL_TOOLBAR );
@@ -81,12 +100,15 @@ public class FormatBar : Box {
     _link.set_tooltip_text( _( "Link" ) );
     _link.toggled.connect( handle_link );
 
-    pack_start( _bold,      false, false, 0 );
-    pack_start( _italics,   false, false, 0 );
-    pack_start( _underline, false, false, 0 );
-    pack_start( _strike,    false, false, 0 );
-    pack_start( _hilite,    false, false, 0 );
-    pack_start( _link,      false, false, 0 );
+    pack_start( _bold,           false, false, 0 );
+    pack_start( _italics,        false, false, 0 );
+    pack_start( _underline,      false, false, 0 );
+    pack_start( _strike,         false, false, 0 );
+    pack_start( _hilite,         false, false, 0 );
+    pack_start( _hilite_chooser, false, false, 0 );
+    pack_start( _color,          false, false, 0 );
+    pack_start( _color_chooser,  false, false, 0 );
+    pack_start( _link,           false, false, 0 );
 
     show_all();
 
@@ -95,8 +117,10 @@ public class FormatBar : Box {
   private void format_text( FormatTag tag, string? extra=null ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
       _table.selected.name.add_tag( tag, extra );
+      _table.selected.name.clear_selection();
     } else {
       _table.selected.note.add_tag( tag, extra );
+      _table.selected.note.clear_selection();
     }
     _table.queue_draw();
     _table.changed();
@@ -152,9 +176,34 @@ public class FormatBar : Box {
     }
   }
 
-  private void handle_highlighter() {
-    format_text( FormatTag.HILITE, Utils.color_from_rgba( _hilite.rgba ) );
-    /* TBD - We need to create/detect the "no color" selection and call unformat_text if set */
+  private void handle_highlight() {
+    if( !_ignore_active ) {
+      if( _hilite.active ) {
+        format_text( FormatTag.HILITE, _table.hilite_color );
+      } else {
+        unformat_text( FormatTag.HILITE );
+      }
+    }
+  }
+
+  private void handle_highlight_chooser() {
+    _table.hilite_color = Utils.color_from_rgba( _hilite_chooser.rgba );
+    format_text( FormatTag.HILITE, _table.hilite_color );
+  }
+
+  private void handle_color() {
+    if( !_ignore_active ) {
+      if( _color.active ) {
+        format_text( FormatTag.COLOR, _table.font_color );
+      } else {
+        unformat_text( FormatTag.COLOR );
+      }
+    }
+  }
+
+  private void handle_color_chooser() {
+    _table.font_color = Utils.color_from_rgba( _color_chooser.rgba );
+    format_text( FormatTag.COLOR, _table.font_color );
   }
 
   private void handle_link() {
@@ -201,6 +250,7 @@ public class FormatBar : Box {
     set_toggle_button( text, FormatTag.UNDERLINE,  _underline );
     set_toggle_button( text, FormatTag.STRIKETHRU, _strike );
     set_color_button(  text, FormatTag.HILITE,     _hilite );
+    set_color_button(  text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );
     _ignore_active = false;
   }

@@ -46,12 +46,8 @@ public class ThemeSolarizedDark : Theme {
     note_color         = get_color( "#f37329" );
     attachable_color   = get_color( "#6C71C4" );
     url                = get_color( "Blue" );
+    hilite             = get_color( "yellow" );
     prefer_dark        = true;
-
-    hilite4 = get_color( "red" );
-    hilite3 = get_color( "orange" );
-    hilite2 = get_color( "yellow" );
-    hilite1 = get_color( "green" );
 
   }
 

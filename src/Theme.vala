@@ -42,14 +42,8 @@ public class Theme : Object {
   public    RGBA   attachable_color   { protected set; get; }
   public    bool   prefer_dark        { protected set; get; }
 
-  public    RGBA   color1             { protected set; get; }
-  public    RGBA   color2             { protected set; get; }
-  public    RGBA   color3             { protected set; get; }
-  public    RGBA   color4             { protected set; get; }
-  public    RGBA   hilite1            { protected set; get; }
-  public    RGBA   hilite2            { protected set; get; }
-  public    RGBA   hilite3            { protected set; get; }
-  public    RGBA   hilite4            { protected set; get; }
+  public    RGBA   color              { protected set; get; }
+  public    RGBA   hilite             { protected set; get; }
   public    RGBA   url                { protected set; get; }
 
   /* Default constructor */
@@ -66,7 +60,7 @@ public class Theme : Object {
   }
 
   /* Returns the CSS provider for this theme */
-  public CssProvider get_css_provider() {
+  public CssProvider get_css_provider( string? hilite_color, string? font_color ) {
 
     CssProvider provider = new CssProvider();
 
@@ -74,10 +68,12 @@ public class Theme : Object {
       var css_data = "@define-color colorPrimary @ORANGE_700; " +
                      "@define-color textColorPrimary @SILVER_100; " +
                      "@define-color colorAccent @ORANGE_700; " +
-                     ".canvas { background: " + background.to_string() + "; }";
+                     ".canvas { background: " + background.to_string() + "; } " +
+                     ".hilite { background: " + hilite_color ?? hilite.to_string() + "; } " +
+                     ".color  { background: " + font_color ?? foreground.to_string() + "; }";
       provider.load_from_data( css_data );
     } catch( GLib.Error e ) {
-      stdout.printf( "Unable to load background color: %s\n", e.message );
+      stdout.printf( "Unable to load theme: %s\n", e.message );
     }
 
     return( provider );

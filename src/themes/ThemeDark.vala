@@ -46,12 +46,8 @@ public class ThemeDark : Theme {
     note_color         = get_color( "#f9c440" );
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
+    hilite             = get_color( "yellow" );
     prefer_dark        = true;
-
-    hilite1 = get_color( "red" );
-    hilite2 = get_color( "orange" );
-    hilite3 = get_color( "yellow" );
-    hilite4 = get_color( "green" );
 
   }
 

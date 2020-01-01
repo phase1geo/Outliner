@@ -36,6 +36,8 @@ public class OutlineTable : DrawingArea {
   private Theme           _theme;
   private IMContextSimple _im_context;
   private double          _scroll_adjust = -1;
+  private string?         _hilite_color  = null;
+  private string?         _font_color    = null;
 
   public Document   document    { get { return( _doc ); } }
   public UndoBuffer undo_buffer { get; set; }
@@ -58,6 +60,24 @@ public class OutlineTable : DrawingArea {
     }
   }
   public Array<Node> nodes { get; default = new Array<Node>(); }
+  public string? hilite_color {
+    get {
+      return( _hilite_color );
+    }
+    set {
+      _hilite_color = value;
+      update_css();
+    }
+  }
+  public string? font_color {
+    get {
+      return( _font_color );
+    }
+    set {
+      _font_color = value;
+      update_css();
+    }
+  }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -864,16 +884,23 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  private void update_css() {
+
+    StyleContext.add_provider_for_screen(
+      Screen.get_default(),
+      _theme.get_css_provider( _hilite_color, _font_color ),
+      STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
+
+  }
+
   /* Sets the theme to the given value */
   public void set_theme( Theme theme, bool save = true ) {
 
     _theme = theme;
 
-    StyleContext.add_provider_for_screen(
-      Screen.get_default(),
-      _theme.get_css_provider(),
-      STYLE_PROVIDER_PRIORITY_APPLICATION
-    );
+    /* Update the CSS */
+    update_css();
 
     /* Change the theme of the formatted text */
     FormattedText.set_theme( theme );
