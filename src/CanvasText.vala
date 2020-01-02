@@ -261,33 +261,35 @@ public class CanvasText : Object {
     int cursor, trailing;
     int adjusted_x = (int)(x - posx) * Pango.SCALE;
     int adjusted_y = (int)(y - posy) * Pango.SCALE;
-    if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
-      var cindex = text.text.char_count( cursor + trailing );
-      if( motion ) {
-        if( cindex > _selanchor ) {
-          _selend = cindex;
-           _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-        } else if( cindex < _selanchor ) {
-          _selstart = cindex;
-           _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-        } else {
-          if( _selstart != _selend ) {
-            _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-          }
-          _selstart = cindex;
-          _selend   = cindex;
-        }
+    if( !_pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
+      cursor   = text.text.index_of_nth_char( text.text.length );
+      trailing = 0;
+    }
+    var cindex = text.text.char_count( cursor + trailing );
+    if( motion ) {
+      if( cindex > _selanchor ) {
+        _selend = cindex;
+         _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+      } else if( cindex < _selanchor ) {
+        _selstart = cindex;
+         _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
       } else {
         if( _selstart != _selend ) {
           _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
         }
-        _selstart  = cindex;
-        _selend    = cindex;
-        _selanchor = cindex;
+        _selstart = cindex;
+        _selend   = cindex;
       }
-      _cursor = _selend;
-      update_column();
+    } else {
+      if( _selstart != _selend ) {
+        _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+      }
+      _selstart  = cindex;
+      _selend    = cindex;
+      _selanchor = cindex;
     }
+    _cursor = _selend;
+    update_column();
   }
 
   /* Selects the word at the current x/y position in the text */

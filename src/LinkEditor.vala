@@ -34,7 +34,7 @@ public class LinkEditor : Popover {
   public LinkEditor( OutlineTable ot ) {
 
     _ot         = ot;
-    relative_to = (Gtk.Window)ot.get_toplevel();
+    relative_to = ot;
 
     var box   = new Box( Orientation.VERTICAL, 5 );
     box.border_width = 5;

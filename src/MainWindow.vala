@@ -165,8 +165,7 @@ public class MainWindow : ApplicationWindow {
 
   /* Returns the OutlineTable from the given tab */
   private OutlineTable? get_table( Tab tab ) {
-    var box  = tab.page as Gtk.Box;
-    var bin1 = box.get_children().nth_data( 1 ) as Gtk.Bin;  // ScrolledWindow
+    var bin1  = tab.page as Gtk.ScrolledWindow;
     var bin2 = bin1.get_child() as Gtk.Bin;  // Viewport
     var bin3 = bin2.get_child() as Gtk.Bin;  // Overlay
     return( bin3.get_child() as OutlineTable );
@@ -257,21 +256,8 @@ public class MainWindow : ApplicationWindow {
     scroll.hscrollbar_policy = PolicyType.EXTERNAL;
     scroll.add( overlay );
 
-    /* Create format bar within a revealer */
-    var rev = new Revealer();
-    rev.reveal_child        = false;
-    rev.transition_type     = RevealerTransitionType.SLIDE_DOWN;
-    rev.transition_duration = 500;
-    rev.add( new FormatBar( ot ) );
-
-    /* Create the box that will hold the formatting bar and the outline table */
-    var box = new Box( Orientation.VERTICAL, 0 );
-    box.pack_start( rev,    false, false, 0 );
-    box.pack_start( scroll, true,  true,  0 );
-    box.show_all();
-
     /* Create the tab in the notebook */
-    var tab = new Tab( ot.document.label, null, box );
+    var tab = new Tab( ot.document.label, null, scroll );
     tab.pinnable = false;
     tab.tooltip  = fname;
 

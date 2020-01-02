@@ -22,7 +22,7 @@
 using Gtk;
 using Gdk;
 
-public class FormatBar : Box {
+public class FormatBar : Gtk.Popover {
 
   private OutlineTable _table;
   private ToggleButton _bold;
@@ -34,17 +34,20 @@ public class FormatBar : Box {
   private ToggleButton _color;
   private ColorButton  _color_chooser;
   private ToggleButton _link;
-  private LinkEditor   _link_editor;
   private bool         _ignore_active = false;
+  private LinkEditor   _link_editor;
 
   /* Construct the formatting bar */
   public FormatBar( OutlineTable table ) {
 
-    Object( orientation:Orientation.HORIZONTAL, spacing:0 );
-
     _table = table;
 
+    relative_to = table;
+
     _link_editor = new LinkEditor( table );
+
+    var box = new Box( Orientation.HORIZONTAL, 0 );
+    box.border_width = 5;
 
     _bold = new ToggleButton();
     _bold.image  = new Image.from_icon_name( "format-text-bold-symbolic", IconSize.SMALL_TOOLBAR );
@@ -70,29 +73,33 @@ public class FormatBar : Box {
     _strike.set_tooltip_text( _( "Strikethrough" ) );
     _strike.toggled.connect( handle_strikethru );
 
-    _hilite = new ToggleButton();
+    _hilite        = new ToggleButton();
+    _hilite.label  = " ";
     _hilite.relief = ReliefStyle.NONE;
     _hilite.set_tooltip_text( _( "Apply Highlight Color" ) );
     _hilite.toggled.connect( handle_highlight );
     _hilite.get_style_context().add_class( "hilite" );
 
-    _hilite_chooser = new ColorButton();
+    _hilite_chooser = new ColorButton.with_rgba( get_hilite_color() );
     _hilite_chooser.label  = "\u23f7";
     _hilite_chooser.relief = ReliefStyle.NONE;
     _hilite_chooser.set_tooltip_text( _( "Change Highlight Color" ) );
     _hilite_chooser.color_set.connect( handle_highlight_chooser );
+    _hilite_chooser.get_style_context().add_class( "color_chooser" );
 
-    _color = new ToggleButton();
+    _color        = new ToggleButton();
+    _color.label  = " ";
     _color.relief = ReliefStyle.NONE;
     _color.set_tooltip_text( "Apply Font Color" );
     _color.toggled.connect( handle_color );
-    _color.get_style_context().add_class( "color" );
+    _color.get_style_context().add_class( "fcolor" );
 
-    _color_chooser = new ColorButton();
+    _color_chooser = new ColorButton.with_rgba( get_font_color() );
     _color_chooser.label  = "\u23f7";
     _color_chooser.relief = ReliefStyle.NONE;
     _color_chooser.set_tooltip_text( _( "Change Font Color" ) );
     _color_chooser.color_set.connect( handle_color_chooser );
+    _color_chooser.get_style_context().add_class( "color_chooser" );
 
     _link = new ToggleButton();
     _link.image = new Image.from_icon_name( "insert-link-symbolic", IconSize.SMALL_TOOLBAR );
@@ -100,18 +107,47 @@ public class FormatBar : Box {
     _link.set_tooltip_text( _( "Link" ) );
     _link.toggled.connect( handle_link );
 
-    pack_start( _bold,           false, false, 0 );
-    pack_start( _italics,        false, false, 0 );
-    pack_start( _underline,      false, false, 0 );
-    pack_start( _strike,         false, false, 0 );
-    pack_start( _hilite,         false, false, 0 );
-    pack_start( _hilite_chooser, false, false, 0 );
-    pack_start( _color,          false, false, 0 );
-    pack_start( _color_chooser,  false, false, 0 );
-    pack_start( _link,           false, false, 0 );
+    var spacer = "    ";
+
+    box.pack_start( _bold,               false, false, 0 );
+    box.pack_start( _italics,            false, false, 0 );
+    box.pack_start( _underline,          false, false, 0 );
+    box.pack_start( _strike,             false, false, 0 );
+    box.pack_start( new Label( spacer ), false, false, 0 );
+    box.pack_start( _hilite,             false, false, 0 );
+    box.pack_start( _hilite_chooser,     false, false, 0 );
+    box.pack_start( new Label( spacer ), false, false, 0 );
+    box.pack_start( _color,              false, false, 0 );
+    box.pack_start( _color_chooser,      false, false, 0 );
+    box.pack_start( new Label( spacer ), false, false, 0 );
+    box.pack_start( _link,               false, false, 0 );
+
+    add( box );
 
     show_all();
 
+    initialize();
+
+  }
+
+  private RGBA get_hilite_color() {
+    if( _table.hilite_color == null ) {
+      return( _table.get_theme().hilite );
+    } else {
+      RGBA color = {1.0, 1.0, 1.0, 1.0};
+      color.parse( _table.hilite_color );
+      return( color );
+    }
+  }
+
+  private RGBA get_font_color() {
+    if( _table.font_color == null ) {
+      return( _table.get_theme().foreground );
+    } else {
+      RGBA color = {1.0, 1.0, 1.0, 1.0};
+      color.parse( _table.font_color );
+      return( color );
+    }
   }
 
   private void format_text( FormatTag tag, string? extra=null ) {
@@ -124,6 +160,11 @@ public class FormatBar : Box {
     }
     _table.queue_draw();
     _table.changed();
+#if GTK322
+    popdown();
+#else
+    hide();
+#endif
   }
 
   private void unformat_text( FormatTag tag ) {
@@ -223,20 +264,8 @@ public class FormatBar : Box {
   }
 
   /* Returns true if the given tag button should be active */
-  private void set_toggle_button( CanvasText? text, FormatTag tag, ToggleButton btn ) {
-    if( text == null ) {
-      btn.set_sensitive( false );
-      btn.set_active( false );
-    } else if( text.is_selected() ) {
-      btn.set_sensitive( true );
-      btn.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
-    } else {
-      btn.set_sensitive( false );
-    }
-  }
-
-  private void set_color_button( CanvasText? text, FormatTag tag, Button btn ) {
-    btn.set_sensitive( (text != null) && text.is_selected() );
+  private void set_toggle_button( CanvasText text, FormatTag tag, ToggleButton btn ) {
+    btn.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
   }
 
   /*
@@ -249,8 +278,8 @@ public class FormatBar : Box {
     set_toggle_button( text, FormatTag.ITALICS,    _italics );
     set_toggle_button( text, FormatTag.UNDERLINE,  _underline );
     set_toggle_button( text, FormatTag.STRIKETHRU, _strike );
-    set_color_button(  text, FormatTag.HILITE,     _hilite );
-    set_color_button(  text, FormatTag.COLOR,      _color );
+    set_toggle_button( text, FormatTag.HILITE,     _hilite );
+    set_toggle_button( text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );
     _ignore_active = false;
   }
@@ -259,10 +288,8 @@ public class FormatBar : Box {
    Updates the state of the format bar based on which tags are applied at the
    current cursor position.
   */
-  public void update_state() {
-    if( _table.selected == null ) {
-      update_from_text( null );
-    } else if( _table.selected.mode == NodeMode.EDITABLE ) {
+  public void initialize() {
+    if( _table.selected.mode == NodeMode.EDITABLE ) {
       update_from_text( _table.selected.name );
     } else {
       update_from_text( _table.selected.note );
