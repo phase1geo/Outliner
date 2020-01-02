@@ -25,6 +25,9 @@ using Gdk;
 public class FormatBar : Gtk.Popover {
 
   private OutlineTable _table;
+  private Button       _copy;
+  private Button       _cut;
+  private Button       _paste;
   private ToggleButton _bold;
   private ToggleButton _italics;
   private ToggleButton _underline;
@@ -43,11 +46,27 @@ public class FormatBar : Gtk.Popover {
     _table = table;
 
     relative_to = table;
+    can_focus   = false;
 
     _link_editor = new LinkEditor( table );
 
     var box = new Box( Orientation.HORIZONTAL, 0 );
     box.border_width = 5;
+
+    _copy = new Button.from_icon_name( "edit-copy-symbolic", IconSize.SMALL_TOOLBAR );
+    _copy.relief = ReliefStyle.NONE;
+    _copy.set_tooltip_markup( Utils.tooltip_with_accel( _( "Copy" ), "Ctrl + C" ) );
+    _copy.clicked.connect( handle_copy );
+
+    _cut = new Button.from_icon_name( "edit-cut-symbolic", IconSize.SMALL_TOOLBAR );
+    _cut.relief = ReliefStyle.NONE;
+    _cut.set_tooltip_markup( Utils.tooltip_with_accel( _( "Cut" ), "Ctrl + X" ) );
+    _cut.clicked.connect( handle_cut );
+
+    _paste = new Button.from_icon_name( "edit-paste-symbolic", IconSize.SMALL_TOOLBAR );
+    _paste.relief = ReliefStyle.NONE;
+    _paste.set_tooltip_markup( Utils.tooltip_with_accel( _( "Paste" ), "Ctrl + V" ) );
+    _paste.clicked.connect( handle_paste );
 
     _bold = new ToggleButton();
     _bold.image  = new Image.from_icon_name( "format-text-bold-symbolic", IconSize.SMALL_TOOLBAR );
@@ -109,6 +128,10 @@ public class FormatBar : Gtk.Popover {
 
     var spacer = "    ";
 
+    box.pack_start( _copy,               false, false, 0 );
+    box.pack_start( _cut,                false, false, 0 );
+    box.pack_start( _paste,              false, false, 0 );
+    box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _bold,               false, false, 0 );
     box.pack_start( _italics,            false, false, 0 );
     box.pack_start( _underline,          false, false, 0 );
@@ -150,6 +173,14 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  private void close() {
+#if GTK322
+    popdown();
+#else
+    hide();
+#endif
+  }
+
   private void format_text( FormatTag tag, string? extra=null ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
       _table.selected.name.add_tag( tag, extra );
@@ -160,11 +191,7 @@ public class FormatBar : Gtk.Popover {
     }
     _table.queue_draw();
     _table.changed();
-#if GTK322
-    popdown();
-#else
-    hide();
-#endif
+    close();
   }
 
   private void unformat_text( FormatTag tag ) {
@@ -175,6 +202,18 @@ public class FormatBar : Gtk.Popover {
     }
     _table.queue_draw();
     _table.changed();
+  }
+
+  private void handle_copy() {
+    close();
+  }
+
+  private void handle_cut() {
+    close();
+  }
+
+  private void handle_paste() {
+    close();
   }
 
   private void handle_bold() {

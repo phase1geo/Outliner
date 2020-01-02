@@ -199,33 +199,23 @@ public class OutlineTable : DrawingArea {
         _active = clicked;
         return( false );
       } else if( clicked.is_within_name( x, y ) ) {
-        if( clicked.mode == NodeMode.EDITABLE ) {
-          bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
-          switch( e.type ) {
-            case EventType.BUTTON_PRESS        :  clicked.name.set_cursor_at_char( e.x, e.y, shift );  break;
-            case EventType.DOUBLE_BUTTON_PRESS :  clicked.name.set_cursor_at_word( e.x, e.y, shift );  break;
-            case EventType.TRIPLE_BUTTON_PRESS :  clicked.name.set_cursor_all( false );                break;
-          }
-        } else {
-          selected = clicked;
-          if( e.type == EventType.DOUBLE_BUTTON_PRESS ) {
-            clicked.mode = NodeMode.EDITABLE;
-          }
+        bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
+        switch( e.type ) {
+          case EventType.BUTTON_PRESS        :  clicked.name.set_cursor_at_char( e.x, e.y, shift );  break;
+          case EventType.DOUBLE_BUTTON_PRESS :  clicked.name.set_cursor_at_word( e.x, e.y, shift );  break;
+          case EventType.TRIPLE_BUTTON_PRESS :  clicked.name.set_cursor_all( false );                break;
         }
+        selected = clicked;
+        clicked.mode = NodeMode.EDITABLE;
       } else if( clicked.is_within_note( x, y ) ) {
-        if( clicked.mode == NodeMode.NOTEEDIT ) {
-          bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
-          switch( e.type ) {
-            case EventType.BUTTON_PRESS        :  clicked.note.set_cursor_at_char( e.x, e.y, shift );  break;
-            case EventType.DOUBLE_BUTTON_PRESS :  clicked.note.set_cursor_at_word( e.x, e.y, shift );  break;
-            case EventType.TRIPLE_BUTTON_PRESS :  clicked.note.set_cursor_all( false );                break;
-          }
-        } else {
-          selected = clicked;
-          if( e.type == EventType.DOUBLE_BUTTON_PRESS ) {
-            clicked.mode = NodeMode.NOTEEDIT;
-          }
+        bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
+        switch( e.type ) {
+          case EventType.BUTTON_PRESS        :  clicked.note.set_cursor_at_char( e.x, e.y, shift );  break;
+          case EventType.DOUBLE_BUTTON_PRESS :  clicked.note.set_cursor_at_word( e.x, e.y, shift );  break;
+          case EventType.TRIPLE_BUTTON_PRESS :  clicked.note.set_cursor_all( false );                break;
         }
+        selected = clicked;
+        clicked.mode = NodeMode.NOTEEDIT;
       } else {
         _active = clicked;
       }
