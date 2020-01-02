@@ -813,7 +813,6 @@ public class OutlineTable : DrawingArea {
       selected.mode = NodeMode.NOTEEDIT;
       selected.hide_note = false;
     }
-    show_format_bar( true );
     queue_draw();
   }
 
