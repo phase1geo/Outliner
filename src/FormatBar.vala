@@ -46,7 +46,7 @@ public class FormatBar : Gtk.Popover {
     _table = table;
 
     relative_to = table;
-    can_focus   = false;
+    modal       = false;
 
     _link_editor = new LinkEditor( table );
 
