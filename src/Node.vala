@@ -50,6 +50,9 @@ public class Node {
   private bool         _expanded  = true;
   private bool         _hide_note = true;
 
+  /* Signals */
+  public signal void select_mode( bool name, bool mode );
+
   /* Properties */
   public int id {
     get {
@@ -168,10 +171,12 @@ public class Node {
 
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height );
+    _name.select_mode.connect( name_select_mode );
     _name.set_font( name_fd );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
     _note.resized.connect( update_height );
+    _note.select_mode.connect( note_select_mode );
     _note.set_font( note_fd );
 
     position_name();
@@ -209,6 +214,16 @@ public class Node {
   private void table_theme_changed( Theme theme ) {
     _name.update_size( false );
     _note.update_size( false );
+  }
+
+  /* Generates the select mode signal for the name field */
+  private void name_select_mode( bool mode ) {
+    select_mode( true, mode );
+  }
+
+  /* Generates the select mode signal for the note field */
+  private void note_select_mode( bool mode ) {
+    select_mode( false, mode );
   }
 
   /* Called whenever the canvas width changes */

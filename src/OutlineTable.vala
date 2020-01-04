@@ -39,6 +39,7 @@ public class OutlineTable : DrawingArea {
   private string?         _hilite_color  = null;
   private string?         _font_color    = null;
   private FormatBar?      _format_bar    = null;
+  private bool?           _show_format   = null;
 
   public Document   document    { get { return( _doc ); } }
   public UndoBuffer undo_buffer { get; set; }
@@ -49,6 +50,7 @@ public class OutlineTable : DrawingArea {
     set {
       if( _selected != null ) {
         _selected.mode = NodeMode.NONE;
+        _selected.select_mode.disconnect( select_mode_changed );
       }
       if( (value != null) && (_selected != value) ) {
         see( value );
@@ -56,6 +58,7 @@ public class OutlineTable : DrawingArea {
       _selected = value;
       if( _selected != null ) {
         _selected.mode = NodeMode.SELECTED;
+        _selected.select_mode.connect( select_mode_changed );
       }
     }
   }
@@ -125,6 +128,11 @@ public class OutlineTable : DrawingArea {
     _im_context = new IMContextSimple();
     _im_context.commit.connect( handle_printable );
 
+  }
+
+  /* Called whenever the selection mode changed of the current node */
+  private void select_mode_changed( bool name, bool mode ) {
+    _show_format = mode;
   }
 
   /* Make sure that the given node is fully in view */
@@ -200,21 +208,21 @@ public class OutlineTable : DrawingArea {
         return( false );
       } else if( clicked.is_within_name( x, y ) ) {
         bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
+        selected = clicked;
         switch( e.type ) {
           case EventType.BUTTON_PRESS        :  clicked.name.set_cursor_at_char( e.x, e.y, shift );  break;
           case EventType.DOUBLE_BUTTON_PRESS :  clicked.name.set_cursor_at_word( e.x, e.y, shift );  break;
           case EventType.TRIPLE_BUTTON_PRESS :  clicked.name.set_cursor_all( false );                break;
         }
-        selected = clicked;
         clicked.mode = NodeMode.EDITABLE;
       } else if( clicked.is_within_note( x, y ) ) {
         bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
+        selected = clicked;
         switch( e.type ) {
           case EventType.BUTTON_PRESS        :  clicked.note.set_cursor_at_char( e.x, e.y, shift );  break;
           case EventType.DOUBLE_BUTTON_PRESS :  clicked.note.set_cursor_at_word( e.x, e.y, shift );  break;
           case EventType.TRIPLE_BUTTON_PRESS :  clicked.note.set_cursor_all( false );                break;
         }
-        selected = clicked;
         clicked.mode = NodeMode.NOTEEDIT;
       } else {
         _active = clicked;
@@ -237,6 +245,9 @@ public class OutlineTable : DrawingArea {
   /* Handle button press event */
   private bool on_press( EventButton e ) {
 
+    /* Update the format bar display */
+    show_format_bar();
+
     switch( e.button ) {
       case Gdk.BUTTON_PRIMARY :
         grab_focus();
@@ -251,9 +262,6 @@ public class OutlineTable : DrawingArea {
         // TBD - show_contextual_menu( e );
         break;
     }
-
-    /* Hide the format bar, if displayed */
-    show_format_bar( false );
 
     return( false );
 
@@ -372,10 +380,8 @@ public class OutlineTable : DrawingArea {
 
     }
 
-    /* Display the format bar, if necessary */
-    if( is_name_selected() || is_note_selected() ) {
-      show_format_bar( true );
-    }
+    /* Update the format bar state */
+    show_format_bar();
 
     _pressed = false;
 
@@ -432,6 +438,9 @@ public class OutlineTable : DrawingArea {
       }
     }
 
+    /* Update the format bar state, if necessary */
+    show_format_bar();
+
     return( true );
 
   }
@@ -478,7 +487,6 @@ public class OutlineTable : DrawingArea {
       selected.mode = NodeMode.SELECTED;
       queue_draw();
       changed();
-      show_format_bar( false );
     }
   }
 
@@ -904,9 +912,11 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Shows/Hides the formatting toolbar */
-  private void show_format_bar( bool show ) {
+  private void show_format_bar() {
 
-    if( show && (selected != null ) ) {
+    if( _show_format == null ) return;
+
+    if( _show_format ) {
 
       _format_bar = new FormatBar( this );
 
@@ -917,7 +927,7 @@ public class OutlineTable : DrawingArea {
 
       /* Position the popover */
       double left, top;
-      text.get_char_pos( selstart, out left, out top );
+      text.get_char_pos( cursor, out left, out top );
       Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
       _format_bar.pointing_to = rect;
 
@@ -938,6 +948,9 @@ public class OutlineTable : DrawingArea {
       _format_bar = null;
 
     }
+
+    /* Clear the show format indicator */
+    _show_format = null;
 
   }
 

@@ -184,6 +184,11 @@ public class FormattedText {
       }
     }
 
+    /* Removes all ranges for this tag */
+    public void remove_tag_all() {
+      _info.remove_range( 0, _info.length );
+    }
+
     /* Returns true if the given index contains this tag */
     public bool is_applied_at_index( int index ) {
       for( int i=0; i<_info.length; i++ ) {
@@ -452,6 +457,12 @@ public class FormattedText {
   /* Removes the given tag */
   public void remove_tag( FormatTag tag, int start, int end ) {
     _formats[tag].remove_tag( start, end );
+    changed();
+  }
+
+  /* Removes all ranges for the given tag */
+  public void remove_tag_all( FormatTag tag ) {
+    _formats[tag].remove_tag_all();
     changed();
   }
 

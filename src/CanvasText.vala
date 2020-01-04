@@ -43,6 +43,7 @@ public class CanvasText : Object {
 
   /* Signals */
   public signal void resized();
+  public signal void select_mode( bool mode );
 
   /* Properties */
   public FormattedText text {
@@ -268,24 +269,14 @@ public class CanvasText : Object {
     var cindex = text.text.char_count( cursor + trailing );
     if( motion ) {
       if( cindex > _selanchor ) {
-        _selend = cindex;
-         _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+        change_selection( null, cindex );
       } else if( cindex < _selanchor ) {
-        _selstart = cindex;
-         _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+        change_selection( cindex, null );
       } else {
-        if( _selstart != _selend ) {
-          _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-        }
-        _selstart = cindex;
-        _selend   = cindex;
+        change_selection( cindex, cindex );
       }
     } else {
-      if( _selstart != _selend ) {
-        _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-      }
-      _selstart  = cindex;
-      _selend    = cindex;
+      change_selection( cindex, cindex );
       _selanchor = cindex;
     }
     _cursor = _selend;
@@ -301,34 +292,33 @@ public class CanvasText : Object {
       cursor += trailing;
       var word_start = text.text.substring( 0, cursor ).last_index_of( " " );
       var word_end   = text.text.index_of( " ", cursor );
+      int? sstart    = null;
+      int? send      = null;
       if( word_start == -1 ) {
-        _selstart = 0;
+        sstart = 0;
       } else {
         var windex = text.text.char_count( word_start );
         if( !motion || (windex < _selanchor) ) {
-          _selstart = windex + 1;
+          sstart = windex + 1;
         }
       }
       if( word_end == -1 ) {
-        _selend = text.text.char_count();
+        send = text.text.char_count();
       } else {
         var windex = text.text.char_count( word_end );
         if( !motion || (windex > _selanchor) ) {
-          _selend = windex;
+          send = windex;
         }
       }
+      change_selection( sstart, send );
       _cursor = _selend;
-      _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
       update_column();
     }
   }
 
   /* Called after the cursor has been moved, clears the selection */
   public void clear_selection() {
-    if( _selstart != _selend ) {
-      _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-    }
-    _selstart = _selend = _cursor;
+    change_selection( _cursor, _cursor );
   }
 
   /*
@@ -338,18 +328,17 @@ public class CanvasText : Object {
   private void adjust_selection( int last_cursor ) {
     if( last_cursor == _selstart ) {
       if( _cursor <= _selend ) {
-        _selstart = _cursor;
+        change_selection( _cursor, null );
       } else {
-        _selend = _cursor;
+        change_selection( null, _cursor );
       }
     } else {
       if( _cursor >= _selstart ) {
-        _selend = _cursor;
+        change_selection( null, _cursor );
       } else {
-        _selstart = _cursor;
+        change_selection( _cursor, null );
       }
     }
-    _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
   }
 
   /* Deselects all of the text */
@@ -360,15 +349,9 @@ public class CanvasText : Object {
   /* Selects all of the text and places the cursor at the end of the name string */
   public void set_cursor_all( bool motion ) {
     if( !motion ) {
-      _selstart  = 0;
-      _selend    = text.text.char_count();
+      change_selection( 0, text.text.char_count() );
       _selanchor = _selend;
       _cursor    = _selend;
-      if( _selstart == _selend ) {
-        _text.remove_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-      } else {
-        _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
-      }
     }
   }
 
@@ -446,23 +429,21 @@ public class CanvasText : Object {
   /* Causes the selection to continue from the start of the text */
   public void selection_to_start() {
     if( _selstart == _selend ) {
-      _selstart = 0;
-      _selend   = _cursor;
-      _cursor   = 0;
+      change_selection( 0, _cursor );
+      _cursor = 0;
     } else {
-      _selstart = 0;
-      _cursor   = 0;
+      change_selection( _cursor, null );
+      _cursor = 0;
     }
   }
 
   /* Causes the selection to continue to the end of the text */
   public void selection_to_end() {
     if( _selstart == _selend ) {
-      _selstart = _cursor;
-      _selend   = text.text.char_count();
-      _cursor   = text.text.char_count();
+      change_selection( _cursor, text.text.char_count() );
+      _cursor = text.text.char_count();
     } else {
-      _selend = text.text.char_count();
+      change_selection( null, text.text.char_count() );
       _cursor = text.text.char_count();
     }
   }
@@ -496,7 +477,7 @@ public class CanvasText : Object {
   /* Moves the cursor to the next or previous word beginning */
   public void move_cursor_by_word( int dir ) {
     _cursor = find_word( _cursor, dir );
-    _selend = _selstart;
+    change_selection( null, _selstart );
   }
 
   /* Change the selection by a word in the given direction */
@@ -504,18 +485,16 @@ public class CanvasText : Object {
     if( _cursor == _selstart ) {
       _cursor = find_word( _cursor, dir );
       if( _cursor <= _selend ) {
-        _selstart = _cursor;
+        change_selection( _cursor, null );
       } else {
-        _selstart = _selend;
-        _selend   = _cursor;
+        change_selection( _selend, _cursor );
       }
     } else {
       _cursor = find_word( _cursor, dir );
       if( _cursor >= _selstart ) {
-        _selend = _cursor;
+        change_selection( null, _cursor );
       } else {
-        _selend   = _selstart;
-        _selstart = _cursor;
+        change_selection( _cursor, _selstart );
       }
     }
   }
@@ -528,7 +507,7 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _selend );
         text.remove_text( spos, ((epos - spos) + 1) );
         _cursor  = _selstart;
-        _selend  = _selstart;
+        change_selection( null, _selstart );
       } else {
         var spos = text.text.index_of_nth_char( _cursor - 1 );
         text.remove_text( spos, 1 );
@@ -545,7 +524,7 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _selend );
         text.remove_text( spos, ((epos - spos) + 1) );
         _cursor = _selstart;
-        _selend = _selstart;
+        change_selection( null, _selstart );
       } else {
         var spos = text.text.index_of_nth_char( _cursor );
         text.remove_text( spos, 1 );
@@ -561,7 +540,7 @@ public class CanvasText : Object {
       var epos = text.text.index_of_nth_char( _selend );
       text.replace_text( spos, ((epos - epos) + 1), s );
       _cursor = _selstart + slen;
-      _selend = _selstart;
+      change_selection( null, _selstart );
     } else {
       var cpos = text.text.index_of_nth_char( _cursor );
       text.insert_text( cpos, s );
@@ -625,6 +604,38 @@ public class CanvasText : Object {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
     text.remove_all_tags( spos, epos );
+  }
+
+  /*
+   Call this method to change the current selection.  If a parameter
+   is specified as null, this selection index will not change value.
+  */
+  private void change_selection( int? selstart, int? selend ) {
+
+    /* Get the selection state prior to changing it */
+    var old_selected = (_selstart != _selend);
+
+    /* Update the selection range */
+    _selstart = selstart ?? _selstart;
+    _selend   = selend   ?? _selend;
+
+    /* Get the selection state after the change */
+    var new_selected = (_selstart != _selend);
+
+    /* Update the selection tag */
+    if( new_selected ) {
+      _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
+    } else if( old_selected ) {
+      _text.remove_tag_all( FormatTag.SELECT );
+    }
+
+    /* Alert anyone listening if the selection mode changed */
+    if( old_selected && !new_selected ) {
+      select_mode( false );
+    } else if( !old_selected && new_selected ) {
+      select_mode( true );
+    }
+
   }
 
   /* Draws the node font to the screen */
