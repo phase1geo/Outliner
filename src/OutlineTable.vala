@@ -168,16 +168,6 @@ public class OutlineTable : DrawingArea {
     return( (selected != null) && (selected.mode == NodeMode.EDITABLE) );
   }
 
-  /* Returns true if the name has selected text */
-  private bool is_name_selected() {
-    return( is_node_editable() && selected.name.is_selected() );
-  }
-
-  /* Returns true if the note has selected text */
-  private bool is_note_selected() {
-    return( is_note_editable() && selected.note.is_selected() );
-  }
-
   /* Returns true if the currently selected note is editable */
   private bool is_note_editable() {
     return( (selected != null) && (selected.mode == NodeMode.NOTEEDIT) );

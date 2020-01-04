@@ -20,6 +20,7 @@
 */
 
 using Gtk;
+using Gee;
 
 public enum TabAddReason {
   NEW,
@@ -54,6 +55,7 @@ public class MainWindow : ApplicationWindow {
   private SpinButton      _zoom;
   private bool            _debug          = false;
   private bool            _prefer_dark    = false;
+  private HashMap<string,RadioButton> _theme_buttons;
 
   public static Themes themes = new Themes();
 
@@ -80,6 +82,9 @@ public class MainWindow : ApplicationWindow {
     Object( application: app );
 
     _settings = settings;
+
+    /* Initialize variables */
+    _theme_buttons = new HashMap<string,RadioButton>();
 
     /* Handle any changes to the dark mode preference setting */
     handle_prefer_dark_changes();
@@ -575,6 +580,7 @@ public class MainWindow : ApplicationWindow {
         table.set_theme( theme );
         theme_changed( table );
       });
+      _theme_buttons.set( theme.name, button );
       theme_box.pack_start( button, false, false, 10 );
       if( rb == null ) {
         rb = button;
@@ -959,7 +965,8 @@ public class MainWindow : ApplicationWindow {
   }
 
   private void properties_clicked() {
-
+    string theme_name = get_current_table( "properties_clicked" ).get_theme().name;
+    _theme_buttons.get( theme_name ).active = true;
   }
 
 }
