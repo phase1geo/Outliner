@@ -48,17 +48,19 @@ public class OutlineTable : DrawingArea {
       return( _selected );
     }
     set {
-      if( _selected != null ) {
-        _selected.mode = NodeMode.NONE;
-        _selected.select_mode.disconnect( select_mode_changed );
-      }
-      if( (value != null) && (_selected != value) ) {
-        see( value );
-      }
-      _selected = value;
-      if( _selected != null ) {
-        _selected.mode = NodeMode.SELECTED;
-        _selected.select_mode.connect( select_mode_changed );
+      if( _selected != value ) {
+        if( _selected != null ) {
+          _selected.mode = NodeMode.NONE;
+          _selected.select_mode.disconnect( select_mode_changed );
+        }
+        if( value != null ) {
+          see( value );
+        }
+        _selected = value;
+        if( _selected != null ) {
+          _selected.mode = NodeMode.SELECTED;
+          _selected.select_mode.connect( select_mode_changed );
+        }
       }
     }
   }
@@ -245,9 +247,6 @@ public class OutlineTable : DrawingArea {
   /* Handle button press event */
   private bool on_press( EventButton e ) {
 
-    /* Update the format bar display */
-    show_format_bar();
-
     switch( e.button ) {
       case Gdk.BUTTON_PRIMARY :
         grab_focus();
@@ -262,6 +261,9 @@ public class OutlineTable : DrawingArea {
         // TBD - show_contextual_menu( e );
         break;
     }
+
+    /* Update the format bar display */
+    update_format_bar();
 
     return( false );
 
@@ -381,7 +383,7 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Update the format bar state */
-    show_format_bar();
+    update_format_bar();
 
     _pressed = false;
 
@@ -439,7 +441,7 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Update the format bar state, if necessary */
-    show_format_bar();
+    update_format_bar();
 
     return( true );
 
@@ -911,33 +913,40 @@ public class OutlineTable : DrawingArea {
 
   }
 
-  /* Shows/Hides the formatting toolbar */
+  /*
+   If the format bar needs to be created, create it.  Place it at the current
+   cursor position and make sure that it is visible.
+  */
   private void show_format_bar() {
 
-    if( _show_format == null ) return;
-
-    if( _show_format ) {
-
+    /* If the format bar is currently displayed, just reposition it */
+    if( _format_bar == null ) {
       _format_bar = new FormatBar( this );
+    }
 
-      int selstart, selend, cursor;
-      var text = (selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note;
+    int selstart, selend, cursor;
+    var text = (selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note;
 
-      text.get_cursor_info( out cursor, out selstart, out selend );
+    text.get_cursor_info( out cursor, out selstart, out selend );
 
-      /* Position the popover */
-      double left, top;
-      text.get_char_pos( cursor, out left, out top );
-      Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
-      _format_bar.pointing_to = rect;
+    /* Position the popover */
+    double left, top;
+    text.get_char_pos( cursor, out left, out top );
+    Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
+    _format_bar.pointing_to = rect;
 
 #if GTK322
-      _format_bar.popup();
+    _format_bar.popup();
 #else
-      _format_bar.show();
+    _format_bar.show();
 #endif
 
-    } else if( _format_bar != null ) {
+  }
+
+  /* Hides the format bar if it is currently visible and destroys it */
+  private void hide_format_bar() {
+
+    if( _format_bar != null ) {
 
 #if GTK322
       _format_bar.popdown();
@@ -947,6 +956,21 @@ public class OutlineTable : DrawingArea {
 
       _format_bar = null;
 
+    }
+
+  }
+
+  /* Shows/Hides the formatting toolbar */
+  private void update_format_bar() {
+
+    /* If we have nothing to do, just return */
+    if( _show_format == null ) return;
+
+    /* Update the format bar */
+    if( _show_format ) {
+      show_format_bar();
+    } else {
+      hide_format_bar();
     }
 
     /* Clear the show format indicator */

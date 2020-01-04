@@ -64,14 +64,16 @@ public class Node {
       return( _mode );
     }
     set {
-      var note_was_edited = _mode == NodeMode.NOTEEDIT;
-      _mode = value;
-      name.edit = (_mode == NodeMode.EDITABLE);
-      note.edit = (_mode == NodeMode.NOTEEDIT);
-      if( !note.edit && note_was_edited && (note.text.text == "") ) {
-        hide_note = true;
+      if( _mode != value ) {
+        var note_was_edited = _mode == NodeMode.NOTEEDIT;
+        _mode = value;
+        name.edit = (_mode == NodeMode.EDITABLE);
+        note.edit = (_mode == NodeMode.NOTEEDIT);
+        if( !note.edit && note_was_edited && (note.text.text == "") ) {
+          hide_note = true;
+        }
+        update_height();
       }
-      update_height();
     }
   }
   public CanvasText name {

@@ -40,6 +40,7 @@ public class CanvasText : Object {
   private double         _max_width    = 200;
   private double         _width        = 0;
   private double         _height       = 0;
+  private bool           _debug        = false;
 
   /* Signals */
   public signal void resized();
@@ -82,7 +83,7 @@ public class CanvasText : Object {
       if( _edit != value ) {
         _edit = value;
         if( !_edit ) {
-          clear_selection();
+          clear_selection( "edit" );
         }
         update_size( true );
       }
@@ -269,14 +270,14 @@ public class CanvasText : Object {
     var cindex = text.text.char_count( cursor + trailing );
     if( motion ) {
       if( cindex > _selanchor ) {
-        change_selection( null, cindex );
+        change_selection( null, cindex, "set_cursor_at_char A" );
       } else if( cindex < _selanchor ) {
-        change_selection( cindex, null );
+        change_selection( cindex, null, "set_cursor_at_char B" );
       } else {
-        change_selection( cindex, cindex );
+        change_selection( cindex, cindex, "set_cursor_at_char C" );
       }
     } else {
-      change_selection( cindex, cindex );
+      change_selection( cindex, cindex, "set_cursor_at_char D" );
       _selanchor = cindex;
     }
     _cursor = _selend;
@@ -310,15 +311,18 @@ public class CanvasText : Object {
           send = windex;
         }
       }
-      change_selection( sstart, send );
+      change_selection( sstart, send, "set_cursor_at_word" );
       _cursor = _selend;
       update_column();
     }
   }
 
   /* Called after the cursor has been moved, clears the selection */
-  public void clear_selection() {
-    change_selection( _cursor, _cursor );
+  public void clear_selection( string? msg = null ) {
+    if( _debug && (msg != null) ) {
+      stdout.printf( "In clear_selection, msg: %s\n", msg );
+    }
+    change_selection( _cursor, _cursor, "clear_selection" );
   }
 
   /*
@@ -328,28 +332,28 @@ public class CanvasText : Object {
   private void adjust_selection( int last_cursor ) {
     if( last_cursor == _selstart ) {
       if( _cursor <= _selend ) {
-        change_selection( _cursor, null );
+        change_selection( _cursor, null, "adjust_selection A" );
       } else {
-        change_selection( null, _cursor );
+        change_selection( null, _cursor, "adjust_selection B" );
       }
     } else {
       if( _cursor >= _selstart ) {
-        change_selection( null, _cursor );
+        change_selection( null, _cursor, "adjust_selection C" );
       } else {
-        change_selection( _cursor, null );
+        change_selection( _cursor, null, "adjust_selection D" );
       }
     }
   }
 
   /* Deselects all of the text */
   public void set_cursor_none() {
-    clear_selection();
+    clear_selection( "set_cursor_none" );
   }
 
   /* Selects all of the text and places the cursor at the end of the name string */
   public void set_cursor_all( bool motion ) {
     if( !motion ) {
-      change_selection( 0, text.text.char_count() );
+      change_selection( 0, text.text.char_count(), "set_cursor_all" );
       _selanchor = _selend;
       _cursor    = _selend;
     }
@@ -370,7 +374,7 @@ public class CanvasText : Object {
   /* Move the cursor in the given direction */
   public void move_cursor( int dir ) {
     cursor_by_char( dir );
-    clear_selection();
+    clear_selection( "move_cursor" );
   }
 
   /* Adjusts the selection by the given cursor */
@@ -404,7 +408,7 @@ public class CanvasText : Object {
   */
   public void move_cursor_vertically( int dir ) {
     cursor_by_line( dir );
-    clear_selection();
+    clear_selection( "move_cursor_vertically" );
   }
 
   /* Adjusts the selection in the vertical direction */
@@ -417,22 +421,22 @@ public class CanvasText : Object {
   /* Moves the cursor to the beginning of the name */
   public void move_cursor_to_start() {
     _cursor = 0;
-    clear_selection();
+    clear_selection( "move_cursor_to_start" );
   }
 
   /* Moves the cursor to the end of the name */
   public void move_cursor_to_end() {
     _cursor = text.text.char_count();
-    clear_selection();
+    clear_selection( "move_cursor_to_end" );
   }
 
   /* Causes the selection to continue from the start of the text */
   public void selection_to_start() {
     if( _selstart == _selend ) {
-      change_selection( 0, _cursor );
+      change_selection( 0, _cursor, "selection_to_start A" );
       _cursor = 0;
     } else {
-      change_selection( _cursor, null );
+      change_selection( _cursor, null, "selection_to_start B" );
       _cursor = 0;
     }
   }
@@ -440,10 +444,10 @@ public class CanvasText : Object {
   /* Causes the selection to continue to the end of the text */
   public void selection_to_end() {
     if( _selstart == _selend ) {
-      change_selection( _cursor, text.text.char_count() );
+      change_selection( _cursor, text.text.char_count(), "selection_to_end A" );
       _cursor = text.text.char_count();
     } else {
-      change_selection( null, text.text.char_count() );
+      change_selection( null, text.text.char_count(), "selection_to_end B" );
       _cursor = text.text.char_count();
     }
   }
@@ -477,7 +481,7 @@ public class CanvasText : Object {
   /* Moves the cursor to the next or previous word beginning */
   public void move_cursor_by_word( int dir ) {
     _cursor = find_word( _cursor, dir );
-    change_selection( null, _selstart );
+    change_selection( null, _selstart, "move_cursor_by_word" );
   }
 
   /* Change the selection by a word in the given direction */
@@ -485,16 +489,16 @@ public class CanvasText : Object {
     if( _cursor == _selstart ) {
       _cursor = find_word( _cursor, dir );
       if( _cursor <= _selend ) {
-        change_selection( _cursor, null );
+        change_selection( _cursor, null, "selection_by_word A" );
       } else {
-        change_selection( _selend, _cursor );
+        change_selection( _selend, _cursor, "selection_by_word B" );
       }
     } else {
       _cursor = find_word( _cursor, dir );
       if( _cursor >= _selstart ) {
-        change_selection( null, _cursor );
+        change_selection( null, _cursor, "selection_by_word C" );
       } else {
-        change_selection( _cursor, _selstart );
+        change_selection( _cursor, _selstart, "selection_by_word D" );
       }
     }
   }
@@ -507,7 +511,7 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _selend );
         text.remove_text( spos, ((epos - spos) + 1) );
         _cursor  = _selstart;
-        change_selection( null, _selstart );
+        change_selection( null, _selstart, "backspace" );
       } else {
         var spos = text.text.index_of_nth_char( _cursor - 1 );
         text.remove_text( spos, 1 );
@@ -524,7 +528,7 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _selend );
         text.remove_text( spos, ((epos - spos) + 1) );
         _cursor = _selstart;
-        change_selection( null, _selstart );
+        change_selection( null, _selstart, "delete" );
       } else {
         var spos = text.text.index_of_nth_char( _cursor );
         text.remove_text( spos, 1 );
@@ -540,7 +544,7 @@ public class CanvasText : Object {
       var epos = text.text.index_of_nth_char( _selend );
       text.replace_text( spos, ((epos - epos) + 1), s );
       _cursor = _selstart + slen;
-      change_selection( null, _selstart );
+      change_selection( null, _selstart, "insert" );
     } else {
       var cpos = text.text.index_of_nth_char( _cursor );
       text.insert_text( cpos, s );
@@ -610,7 +614,11 @@ public class CanvasText : Object {
    Call this method to change the current selection.  If a parameter
    is specified as null, this selection index will not change value.
   */
-  private void change_selection( int? selstart, int? selend ) {
+  private void change_selection( int? selstart, int? selend, string? msg = null ) {
+
+    if( _debug && (msg != null) ) {
+      stdout.printf( "In change_selection, msg: %s\n", msg );
+    }
 
     /* Get the selection state prior to changing it */
     var old_selected = (_selstart != _selend);
