@@ -83,6 +83,7 @@ public class OutlineTable : DrawingArea {
       update_css();
     }
   }
+  public Clipboard node_clipboard { set; get; default = Clipboard.get_for_display( Display.get_default(), Atom.intern( "org.github.phase1geo.outliner", false ) );}
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -393,9 +394,9 @@ public class OutlineTable : DrawingArea {
     if( selected != null ) {
       if( control ) {
         switch( e.keyval ) {
-          case 99    :  /* do_copy(); */                     break;
-          case 120   :  /* do_cut(); */                      break;
-          case 118   :  /* do_paste(); */                    break;
+          case 99    :  do_copy();                      break;
+          case 120   :  do_cut();                       break;
+          case 118   :  do_paste();                     break;
           case 65293 :  handle_control_return();        break;
           case 65289 :  handle_control_tab();           break;
           case 65363 :  handle_control_right( shift );  break;
@@ -435,6 +436,103 @@ public class OutlineTable : DrawingArea {
 
     return( true );
 
+  }
+
+  /* Creates a serialized version of the node for copy */
+  private string serialize_for_copy( Node node ) {
+    string    str;
+    Xml.Doc*  doc  = new Xml.Doc( "1.0" );
+    Xml.Node* root = new Xml.Node( null, "outliner" );
+    doc->set_root_element( root );
+    Xml.Node* n = new Xml.Node( null, "node" );
+    root->add_child( node.save() );
+    doc->dump_memory( out str );
+    delete doc;
+    return( str );
+  }
+
+  /* Takes an XML string as input and populates the passed node with its contents */
+  private void deserialize_for_paste( string str, Node node ) {
+    Xml.Doc* doc = Xml.Parser.parse_doc( str );
+    if( doc == null ) return;
+    for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
+        node.load( this, it );
+      }
+    }
+    delete doc;
+  }
+
+  /* Copies the given node to the designated node clipboard */
+  private void copy_node_to_clipboard( Node node ) {
+    var text = serialize_for_copy( node );
+    node_clipboard.set_text( text, -1 );
+    node_clipboard.store();
+  }
+
+  /*
+   Copies the selected text to the clipboard.  TBD - This will not include
+   text formatting at this point.
+  */
+  private void copy_selected_text( CanvasText ct ) {
+    var text = ct.get_selected_text();
+    if( text != null ) {
+      var clipboard = Clipboard.get_default( get_display() );
+      clipboard.set_text( text, -1 );
+    }
+  }
+
+  /* Handles a copy operation on a node or selected text */
+  public void do_copy() {
+    if( selected == null ) return;
+    switch( selected.mode ) {
+      case NodeMode.SELECTED :  copy_node_to_clipboard( selected );   break;
+      case NodeMode.EDITABLE :  copy_selected_text( selected.name );  break;
+      case NodeMode.NOTEEDIT :  copy_selected_text( selected.note );  break;
+    }
+  }
+
+  private void cut_node_to_clipboard( Node node ) {
+    // TBD
+  }
+
+  private void cut_selected_text( CanvasText ct ) {
+    // TBD
+  }
+
+  /* Handles a cut operation on a node or selected text */
+  public void do_cut() {
+    if( selected == null ) return;
+    switch( selected.mode ) {
+      case NodeMode.SELECTED :  cut_node_to_clipboard( selected );   break;
+      case NodeMode.EDITABLE :  cut_selected_text( selected.name );  break;
+      case NodeMode.NOTEEDIT :  cut_selected_text( selected.note );  break;
+    }
+  }
+
+  private void paste_node( Node node ) {
+    // TBD
+  }
+
+  /* Pastes the text into the provided CanvasText */
+  private void paste_text( CanvasText ct ) {
+    var clipboard = Clipboard.get_default( get_display() );
+    var text      = clipboard.wait_for_text();
+    if( text != null ) {
+      ct.insert( text );
+      queue_draw();
+      changed();
+    }
+  }
+
+  /* Handles a paste operation of a node or text to the table */
+  public void do_paste() {
+    if( selected == null ) return;
+    switch( selected.mode ) {
+      case NodeMode.SELECTED :  paste_node( selected );       break;
+      case NodeMode.EDITABLE :  paste_text( selected.name );  break;
+      case NodeMode.NOTEEDIT :  paste_text( selected.note );  break;
+    }
   }
 
   /* Handles a backspace keypress */

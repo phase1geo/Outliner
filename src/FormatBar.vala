@@ -204,18 +204,25 @@ public class FormatBar : Gtk.Popover {
     _table.changed();
   }
 
+  /* Copies the selected text to the clipboard */
   private void handle_copy() {
+    _table.do_copy();
     close();
   }
 
+  /* Cuts the selected text to the clipboard */
   private void handle_cut() {
+    _table.do_cut();
     close();
   }
 
+  /* Pastes the clipboard text into the entry */
   private void handle_paste() {
+    _table.do_paste();
     close();
   }
 
+  /* Toggles the bold status of the currently selected text */
   private void handle_bold() {
     if( !_ignore_active ) {
       if( _bold.active ) {
@@ -226,6 +233,7 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Toggles the italics status of the currently selected text */
   private void handle_italics() {
     if( !_ignore_active ) {
       if( _italics.active ) {
@@ -236,6 +244,7 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Toggles the underline status of the currently selected text */
   private void handle_underline() {
     if( !_ignore_active ) {
       if( _underline.active ) {
@@ -246,6 +255,7 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Toggles the strikethru status of the currently selected text */
   private void handle_strikethru() {
     if( !_ignore_active ) {
       if( _strike.active ) {
@@ -256,6 +266,7 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Toggles the highlight status of the currently selected text */
   private void handle_highlight() {
     if( !_ignore_active ) {
       if( _hilite.active ) {
@@ -266,11 +277,13 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Picks a new color to set the selected text highlighter to */
   private void handle_highlight_chooser() {
     _table.hilite_color = Utils.color_from_rgba( _hilite_chooser.rgba );
     format_text( FormatTag.HILITE, _table.hilite_color );
   }
 
+  /* Toggles the foreground color of the currently selected text */
   private void handle_color() {
     if( !_ignore_active ) {
       if( _color.active ) {
@@ -281,11 +294,13 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Picks a new color to set the selected foreground color to */
   private void handle_color_chooser() {
     _table.font_color = Utils.color_from_rgba( _color_chooser.rgba );
     format_text( FormatTag.COLOR, _table.font_color );
   }
 
+  /* Creates a link out of the currently selected text */
   private void handle_link() {
     if( !_ignore_active ) {
       if( _link.active ) {
