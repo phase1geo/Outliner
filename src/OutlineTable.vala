@@ -444,9 +444,9 @@ public class OutlineTable : DrawingArea {
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* root = new Xml.Node( null, "outliner" );
     doc->set_root_element( root );
-    Xml.Node* n = new Xml.Node( null, "node" );
     root->add_child( node.save() );
     doc->dump_memory( out str );
+    stdout.printf( "Copy string: %s\n", str );
     delete doc;
     return( str );
   }
@@ -492,12 +492,20 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Copies the given node to the clipboard and then removes it from the document */
   private void cut_node_to_clipboard( Node node ) {
-    // TBD
+    copy_node_to_clipboard( node );
+    delete_node( node );
   }
 
+  /*
+   Copies the currently selected text to the clipboard and then removes
+   it from the given CanvasText object.
+  */
   private void cut_selected_text( CanvasText ct ) {
-    // TBD
+    copy_selected_text( ct );
+    ct.backspace();
+    queue_draw();
   }
 
   /* Handles a cut operation on a node or selected text */
@@ -510,8 +518,39 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  private void paste_node( Node node ) {
-    // TBD
+  /*
+   Pastes the given node into the table after the currently selected node as
+   a sibling node.
+  */
+  private void paste_node() {
+
+    /* Create the new node from the clipboard */
+    var node = new Node( this );
+    var text = node_clipboard.wait_for_text();
+    stdout.printf( "text: %s\n", text );
+    deserialize_for_paste( text, node );
+
+    /* Insert the node into the appropriate position in the table */
+    if( selected.is_root() ) {
+      var index  = root_index( selected ) + 1;
+      var last_y = selected.get_root_node().get_last_node().last_y;
+      nodes.insert_val( index, node );
+      for( uint i=index; i<nodes.length; i++ ) {
+        nodes.index( i ).y = last_y;
+        last_y = nodes.index( i ).adjust_nodes( nodes.index( i ).last_y, false );
+      }
+    } else {
+      var index = selected.index() + 1;
+      selected.parent.add_child( node, index );
+    }
+
+    /* Make sure the new node becomes the currently selected node */
+    selected = node;
+
+    queue_draw();
+    changed();
+    see( node );
+
   }
 
   /* Pastes the text into the provided CanvasText */
@@ -529,7 +568,7 @@ public class OutlineTable : DrawingArea {
   public void do_paste() {
     if( selected == null ) return;
     switch( selected.mode ) {
-      case NodeMode.SELECTED :  paste_node( selected );       break;
+      case NodeMode.SELECTED :  paste_node();                 break;
       case NodeMode.EDITABLE :  paste_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  paste_text( selected.note );  break;
     }
@@ -541,7 +580,7 @@ public class OutlineTable : DrawingArea {
       if( selected.name.text.text == "" ) {
         var prev = selected.get_previous_node();
         if( prev != null ) {
-          delete_node();
+          delete_current_node();
           selected      = prev;
           selected.mode = NodeMode.EDITABLE;
           selected.name.move_cursor_to_end();
@@ -554,7 +593,7 @@ public class OutlineTable : DrawingArea {
       selected.note.backspace();
       queue_draw();
     } else if( selected != null ) {
-      delete_node();
+      delete_current_node();
     }
   }
 
@@ -567,7 +606,7 @@ public class OutlineTable : DrawingArea {
       selected.note.delete();
       queue_draw();
     } else if( selected != null ) {
-      delete_node();
+      delete_current_node();
     }
   }
 
@@ -1271,23 +1310,35 @@ public class OutlineTable : DrawingArea {
 
   }
 
-  /* Removes the selected node from the table */
-  public void delete_node() {
-    if( selected == null ) return;
-    if( selected.is_root() ) {
-      var index = root_index( selected );
+  /* Removes the specified node from the table */
+  public void delete_node( Node node ) {
+    var was_selected = (node == selected);
+    if( node.is_root() ) {
+      var index = root_index( node );
       nodes.remove_index( index );
       nodes.index( index ).y = (index == 0) ? 0 : nodes.index( index - 1 ).get_last_node().last_y;
       nodes.index( index ).adjust_nodes_all( nodes.index( index ).last_y, true );
-      selected = (index == nodes.length) ? nodes.index( index - 1 ).get_last_node() : nodes.index( index );
+      if( was_selected ) {
+        selected = (index == nodes.length) ? nodes.index( index - 1 ).get_last_node() : nodes.index( index );
+      }
     } else {
-      var next = selected.get_next_node() ?? selected.get_previous_node();
-      selected.parent.remove_child( selected );
-      selected = next;
+      var next = node.get_next_node() ?? node.get_previous_node();
+      node.parent.remove_child( node );
+      if( was_selected ) {
+        selected = next;
+      }
     }
     queue_draw();
     changed();
 
+  }
+
+  /* Removes the selected node from the table */
+  public void delete_current_node() {
+    if( selected == null ) return;
+    delete_node( selected );
+    queue_draw();
+    changed();
   }
 
   /* Indents the currently selected row such that it becomes the child of the sibling row above it */

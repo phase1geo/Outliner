@@ -191,6 +191,39 @@ public class Node {
 
   }
 
+  /* Copy constructor */
+  public Node.from_node( OutlineTable ot, Node node ) {
+
+    _ot = ot;
+
+    var name_fd = new Pango.FontDescription();
+    name_fd.set_size( 12 * Pango.SCALE );
+
+    var note_fd = new Pango.FontDescription();
+    note_fd.set_size( 10 * Pango.SCALE );
+
+    _name = new CanvasText( ot, ot.get_allocated_width() );
+    _name.resized.connect( update_height );
+    _name.select_mode.connect( name_select_mode );
+    _name.set_font( name_fd );
+    _name.copy( node.name );
+
+    _note = new CanvasText( ot, ot.get_allocated_width() );
+    _note.resized.connect( update_height );
+    _note.select_mode.connect( note_select_mode );
+    _note.set_font( note_fd );
+    _note.copy( node.note );
+
+    position_name();
+    update_width( ot.get_allocated_width() );
+
+    /* Detect any size changes by the drawing area */
+    ot.size_allocate.connect( table_size_changed );
+    ot.zoom_changed.connect( table_zoom_changed );
+    ot.theme_changed.connect( table_theme_changed );
+
+  }
+
   /* Destructor */
   ~Node() {
     _ot.size_allocate.disconnect( table_size_changed );
