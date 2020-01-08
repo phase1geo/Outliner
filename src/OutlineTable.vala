@@ -358,6 +358,7 @@ public class OutlineTable : DrawingArea {
       if( !_motion ) {
         if( _active.is_within_expander( e.x, e.y ) ) {
           _active.expanded = !_active.expanded;
+          undo_buffer.add_item( new UndoNodeExpander( _active ) );
           queue_draw();
           changed();
         } else if( _active.is_within_note_icon( e.x, e.y ) ) {
@@ -439,20 +440,19 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Creates a serialized version of the node for copy */
-  private string serialize_for_copy( Node node ) {
+  public string serialize_for_copy( Node node ) {
     string    str;
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* root = new Xml.Node( null, "outliner" );
     doc->set_root_element( root );
     root->add_child( node.save() );
     doc->dump_memory( out str );
-    stdout.printf( "Copy string: %s\n", str );
     delete doc;
     return( str );
   }
 
   /* Takes an XML string as input and populates the passed node with its contents */
-  private void deserialize_for_paste( string str, Node node ) {
+  public void deserialize_for_paste( string str, Node node ) {
     Xml.Doc* doc = Xml.Parser.parse_doc( str );
     if( doc == null ) return;
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
@@ -494,7 +494,11 @@ public class OutlineTable : DrawingArea {
 
   /* Copies the given node to the clipboard and then removes it from the document */
   private void cut_node_to_clipboard( Node node ) {
-    copy_node_to_clipboard( node );
+    var text = serialize_for_copy( node );
+    node_clipboard.set_text( text, -1 );
+    node_clipboard.store();
+    var index = node.is_root() ? root_index( node ) : node.index();
+    undo_buffer.add_item( new UndoNodeCut( node, index ) );
     delete_node( node );
   }
 
@@ -527,22 +531,14 @@ public class OutlineTable : DrawingArea {
     /* Create the new node from the clipboard */
     var node = new Node( this );
     var text = node_clipboard.wait_for_text();
-    stdout.printf( "text: %s\n", text );
     deserialize_for_paste( text, node );
 
     /* Insert the node into the appropriate position in the table */
-    if( selected.is_root() ) {
-      var index  = root_index( selected ) + 1;
-      var last_y = selected.get_root_node().get_last_node().last_y;
-      nodes.insert_val( index, node );
-      for( uint i=index; i<nodes.length; i++ ) {
-        nodes.index( i ).y = last_y;
-        last_y = nodes.index( i ).adjust_nodes( nodes.index( i ).last_y, false );
-      }
-    } else {
-      var index = selected.index() + 1;
-      selected.parent.add_child( node, index );
-    }
+    var index = (selected.is_root() ? root_index( selected ) : selected.index()) + 1;
+    insert_node( selected.is_root() ? null : selected.parent, node, index );
+
+    /* Add an undo item for this operation */
+    undo_buffer.add_item( new UndoNodePaste( node, index ) );
 
     /* Make sure the new node becomes the currently selected node */
     selected = node;
@@ -698,7 +694,9 @@ public class OutlineTable : DrawingArea {
     } else if( selected != null ) {
       if( !selected.is_leaf() && !selected.expanded ) {
         selected.expanded = true;
+        undo_buffer.add_item( new UndoNodeExpander( selected ) );
         queue_draw();
+        changed();
       }
     }
   }
@@ -741,7 +739,9 @@ public class OutlineTable : DrawingArea {
     } else if( selected != null ) {
       if( !selected.is_leaf() && selected.expanded ) {
         selected.expanded = false;
+        undo_buffer.add_item( new UndoNodeExpander( selected ) );
         queue_draw();
+        changed();
       }
     }
   }
@@ -1251,63 +1251,60 @@ public class OutlineTable : DrawingArea {
     set_size_request( get_allocated_width(), (int)last_y );
   }
 
-  /* Adds a new root node */
-  public void add_root_node( bool below ) {
+  /* Inserts the given node into the given parent at the specified index */
+  public void insert_node( Node? parent, Node node, int index ) {
 
-    var insert_index = (selected != null) ? (root_index( selected ) + (below ? 1 : 0)) : (int)nodes.length;
-    var last_y       = (selected != null) ? selected.get_root_node().get_last_node().last_y : 0;
-    var node         = create_node();
+    /* Insert the root node */
+    if( parent == null ) {
 
-    /* Create the new node and add it to the nodes array */
-    nodes.insert_val( insert_index, node );
+      var last_y = (index == 0) ? 0 : _nodes.index( index-1 ).get_last_node().last_y;
 
-    /* Adjust all of the nodes down */
-    for( uint i=insert_index; i<nodes.length; i++ ) {
-      nodes.index( i ).y = last_y;
-      last_y = nodes.index( i ).adjust_nodes( nodes.index( i ).last_y, false );
+      nodes.insert_val( index, node );
+
+      for( uint i=index; i<nodes.length; i++ ) {
+        nodes.index( i ).y = last_y;
+        last_y = nodes.index( i ).adjust_nodes( nodes.index( i ).last_y, false );
+      }
+
+    /* Otherwise, insert the node into the parent at the given index */
+    } else {
+
+      parent.add_child( node, index );
+
     }
 
     queue_draw();
     changed();
     see( node );
 
+  }
+
+  /* Adds a new root node */
+  public void add_root_node( bool below ) {
+    var index = (selected != null) ? (root_index( selected ) + (below ? 1 : 0)) : (int)nodes.length;
+    var node  = create_node();
+    insert_node( null, node, index );
+    undo_buffer.add_item( new UndoNodeInsert( node, index ) );
   }
 
   /* Adds a sibling node of the currently selected node */
   public void add_sibling_node( bool below, string? title = null ) {
-
     if( (selected == null) || selected.is_root() ) return;
-
-    var index = selected.index();
+    var index = selected.index() + (below ? 1 : 0);
     var sel   = selected;
     var node  = create_node( title );
-
-    if( below ) {
-      sel.parent.add_child( node, (index + 1) );
-    } else {
-      sel.parent.add_child( node, index );
-    }
-
-    queue_draw();
-    changed();
-    see( node );
-
+    insert_node( sel.parent, node, index );
+    undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
 
   /* Adds a child node of the currently selected node */
   public void add_child_node() {
-
     if( selected == null ) return;
-
-    var sel  = selected;
-    var node = create_node();
-
-    sel.add_child( node );
-
-    queue_draw();
-    changed();
-    see( node );
-
+    var index = selected.children.length;
+    var sel   = selected;
+    var node  = create_node();
+    insert_node( sel, node, (int)index );
+    undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
 
   /* Removes the specified node from the table */
@@ -1336,28 +1333,42 @@ public class OutlineTable : DrawingArea {
   /* Removes the selected node from the table */
   public void delete_current_node() {
     if( selected == null ) return;
+    var index = selected.is_root() ? root_index( selected ) : selected.index();
+    undo_buffer.add_item( new UndoNodeDelete( selected, index ) );
     delete_node( selected );
     queue_draw();
     changed();
   }
 
-  /* Indents the currently selected row such that it becomes the child of the sibling row above it */
-  public void indent() {
-    if( selected == null ) return;
-    if( !selected.is_root() ) {
-      var index = selected.index();
+  /*
+   Indents the specified node such that it becomes the child of the sibling
+   node above it.
+  */
+  public void indent_node( Node node ) {
+    if( !node.is_root() ) {
+      var index = node.index();
       if( index == 0 ) return;
-      var parent = selected.parent;
-      parent.remove_child( selected );
-      parent.children.index( index - 1 ).add_child( selected );
+      var parent = node.parent;
+      parent.remove_child( node );
+      parent.children.index( index - 1 ).add_child( node );
     } else {
-      var index = root_index( selected );
+      var index = root_index( node );
       if( index == 0 ) return;
       nodes.remove_index( index );
-      nodes.index( index - 1 ).add_child( selected );
+      nodes.index( index - 1 ).add_child( node );
     }
     queue_draw();
     changed();
+  }
+
+  /*
+   Indents the currently selected row such that it becomes the child of the
+   sibling row above it
+  */
+  public void indent() {
+    if( selected == null ) return;
+    undo_buffer.add_item( new UndoNodeIndent( selected ) );
+    indent_node( selected );
   }
 
   /* Handles inserting the given node into the list of root nodes at the given index */
@@ -1368,8 +1379,11 @@ public class OutlineTable : DrawingArea {
     node.adjust_nodes_all( node.last_y, true );
   }
 
-  /* Removes the currently selected row from its parent and places itself just below its parent */
-  public void unindent() {
+  /*
+   Removes the specified node from its parent and places itself just below its
+   parent.
+  */
+  public void unindent_node( Node node ) {
     if( (selected == null) || selected.is_root() ) return;
     var parent = selected.parent;
     if( !parent.is_root() ) {
@@ -1389,6 +1403,16 @@ public class OutlineTable : DrawingArea {
     see( selected );
     queue_draw();
     changed();
+  }
+
+  /*
+   Removes the currently selected row from its parent and places itself just
+   below its parent.
+  */
+  public void unindent() {
+    if( (selected == null) || selected.is_root() ) return;
+    undo_buffer.add_item( new UndoNodeUnindent( selected ) );
+    unindent_node( selected );
   }
 
   /*******************/

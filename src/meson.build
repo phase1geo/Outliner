@@ -11,6 +11,14 @@ sources += files(
   'themes/ThemeSolarizedDark.vala',
   'themes/ThemeSolarizedLight.vala',
 
+  'undo_actions/UndoNodeCut.vala',
+  'undo_actions/UndoNodeDelete.vala',
+  'undo_actions/UndoNodeExpander.vala',
+  'undo_actions/UndoNodeIndent.vala',
+  'undo_actions/UndoNodeInsert.vala',
+  'undo_actions/UndoNodePaste.vala',
+  'undo_actions/UndoNodeUnindent.vala',
+
   'Application.vala',
   'CanvasText.vala',
   'Document.vala',
