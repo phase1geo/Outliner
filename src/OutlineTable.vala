@@ -325,10 +325,15 @@ public class OutlineTable : DrawingArea {
     if( _pressed ) {
 
       if( _active != null ) {
+
+        /* Handle a node move */
         if( _motion ) {
+          var orig_parent = selected.parent;
+          var orig_index  = selected.is_root() ? root_index( selected ) : selected.index();
           switch( _active.mode ) {
             case NodeMode.ATTACHTO :
               _active.add_child( selected );
+              undo_buffer.add_item( new UndoNodeMove( selected, orig_parent, orig_index ) );
               break;
             case NodeMode.ATTACHBELOW :
               if( !_active.is_leaf() ) {
@@ -336,6 +341,7 @@ public class OutlineTable : DrawingArea {
               } else {
                 _active.parent.add_child( selected, (_active.index() + 1) );
               }
+              undo_buffer.add_item( new UndoNodeMove( selected, orig_parent, orig_index ) );
               break;
           }
           if( selected == null ) {

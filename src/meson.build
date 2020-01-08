@@ -16,6 +16,7 @@ sources += files(
   'undo_actions/UndoNodeExpander.vala',
   'undo_actions/UndoNodeIndent.vala',
   'undo_actions/UndoNodeInsert.vala',
+  'undo_actions/UndoNodeMove.vala',
   'undo_actions/UndoNodePaste.vala',
   'undo_actions/UndoNodeUnindent.vala',
 
