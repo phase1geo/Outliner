@@ -27,7 +27,7 @@ public class UndoBuffer : Object {
   private Array<UndoItem> _undo_buffer;
   private Array<UndoItem> _redo_buffer;
 
-  public signal void buffer_changed( OutlineTable ot );
+  public signal void buffer_changed( UndoBuffer buf );
 
   /* Default constructor */
   public UndoBuffer( OutlineTable table ) {
@@ -40,7 +40,7 @@ public class UndoBuffer : Object {
   public void clear() {
     _undo_buffer.remove_range( 0, _undo_buffer.length );
     _redo_buffer.remove_range( 0, _redo_buffer.length );
-    buffer_changed( _table );
+    buffer_changed( this );
   }
 
   /* Returns true if we can perform an undo action */
@@ -60,7 +60,7 @@ public class UndoBuffer : Object {
       item.undo( _table );
       _undo_buffer.remove_index( _undo_buffer.length - 1 );
       _redo_buffer.append_val( item );
-      buffer_changed( _table );
+      buffer_changed( this );
     }
   }
 
@@ -71,7 +71,7 @@ public class UndoBuffer : Object {
       item.redo( _table );
       _redo_buffer.remove_index( _redo_buffer.length - 1 );
       _undo_buffer.append_val( item );
-      buffer_changed( _table );
+      buffer_changed( this );
     }
   }
 
@@ -91,7 +91,7 @@ public class UndoBuffer : Object {
   public void add_item( UndoItem item ) {
     _undo_buffer.append_val( item );
     _redo_buffer.remove_range( 0, _redo_buffer.length );
-    buffer_changed( _table );
+    buffer_changed( this );
   }
 
 }

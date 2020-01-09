@@ -40,9 +40,11 @@ public class OutlineTable : DrawingArea {
   private string?         _font_color    = null;
   private FormatBar?      _format_bar    = null;
   private bool?           _show_format   = null;
+  private CanvasText      _orig_text;
 
   public Document   document    { get { return( _doc ); } }
   public UndoBuffer undo_buffer { get; set; }
+  public UndoBuffer undo_text   { get; set; }
   public Node?      selected {
     get {
       return( _selected );
@@ -50,7 +52,7 @@ public class OutlineTable : DrawingArea {
     set {
       if( _selected != value ) {
         if( _selected != null ) {
-          _selected.mode = NodeMode.NONE;
+          set_selected_mode( NodeMode.NONE );
           _selected.select_mode.disconnect( select_mode_changed );
         }
         if( value != null ) {
@@ -58,7 +60,7 @@ public class OutlineTable : DrawingArea {
         }
         _selected = value;
         if( _selected != null ) {
-          _selected.mode = NodeMode.SELECTED;
+          set_selected_mode( NodeMode.SELECTED );
           _selected.select_mode.connect( select_mode_changed );
         }
       }
@@ -96,8 +98,12 @@ public class OutlineTable : DrawingArea {
     /* Create the document for this table */
     _doc = new Document( this, settings );
 
+    /* Allocate memory for the canvas text prior to editing for undo purposes */
+    _orig_text = new CanvasText( this, 0 );
+
     /* Allocate memory for the undo buffer */
     undo_buffer = new UndoBuffer( this );
+    undo_text   = new UndoBuffer( this );
 
     /* Set the style context */
     get_style_context().add_class( "canvas" );
@@ -138,6 +144,26 @@ public class OutlineTable : DrawingArea {
     _show_format = mode;
   }
 
+  /* Called whenever we want to change the current selected node's mode */
+  private void set_selected_mode( NodeMode mode ) {
+    if( selected == null ) return;
+    if( selected.mode != mode ) {
+      if( (selected.mode == NodeMode.EDITABLE) && undo_text.undoable() ) {
+        undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
+        undo_text.clear();
+      } else if( (selected.mode == NodeMode.NOTEEDIT) && undo_text.undoable() ) {
+        undo_buffer.add_item( new UndoNodeNote( this, selected, _orig_text ) );
+        undo_text.clear();
+      }
+      if( mode == NodeMode.EDITABLE ) {
+        _orig_text.copy( selected.name );
+      } else if( mode == NodeMode.NOTEEDIT ) {
+        _orig_text.copy( selected.note );
+      }
+      selected.mode = mode;
+    }
+  }
+
   /* Make sure that the given node is fully in view */
   public void see( Node node ) {
     if( (nodes.length == 0) || (root_index( node ) == -1) ) return;
@@ -172,6 +198,16 @@ public class OutlineTable : DrawingArea {
   /* Returns true if the currently selected note is editable */
   private bool is_note_editable() {
     return( (selected != null) && (selected.mode == NodeMode.NOTEEDIT) );
+  }
+
+  /* Returns true if the currently selected node is editable and has text selected */
+  private bool is_node_text_selected() {
+    return( is_node_editable() && selected.name.is_selected() );
+  }
+
+  /* Returns true if the currently selected note is editable and has text selected */
+  private bool is_note_text_selected() {
+    return( is_note_editable() && selected.note.is_selected() );
   }
 
   /* Returns the node at the given coordinates */
@@ -347,7 +383,7 @@ public class OutlineTable : DrawingArea {
           if( selected == null ) {
             selected = _active;
           }
-          selected.mode = NodeMode.SELECTED;
+          set_selected_mode( NodeMode.SELECTED );
           _active.mode  = NodeMode.NONE;
           _active       = null;
           queue_draw();
@@ -370,8 +406,8 @@ public class OutlineTable : DrawingArea {
         } else if( _active.is_within_note_icon( e.x, e.y ) ) {
           _active.hide_note = !_active.hide_note;
           if( !_active.hide_note && (_active.note.text.text == "") ) {
-            selected      = _active;
-            selected.mode = NodeMode.NOTEEDIT;
+            selected = _active;
+            set_selected_mode( NodeMode.NOTEEDIT );
           }
           queue_draw();
           changed();
@@ -413,6 +449,10 @@ public class OutlineTable : DrawingArea {
           case 47    :  handle_control_slash();         break;
           case 92    :  handle_control_backslash();     break;
           case 46    :  handle_control_period();        break;
+          case 98    :  handle_control_b();             break;
+          case 117   :  handle_control_u();             break;
+          case 105   :  handle_control_i();             break;
+          case 116   :  handle_control_t();             break;
         }
       } else if( nomod || shift ) {
         if( _im_context.filter_keypress( e ) ) {
@@ -583,8 +623,8 @@ public class OutlineTable : DrawingArea {
         var prev = selected.get_previous_node();
         if( prev != null ) {
           delete_current_node();
-          selected      = prev;
-          selected.mode = NodeMode.EDITABLE;
+          selected = prev;
+          set_selected_mode( NodeMode.EDITABLE );
           selected.name.move_cursor_to_end();
         }
       } else {
@@ -615,7 +655,7 @@ public class OutlineTable : DrawingArea {
   /* Handles an escape keypress */
   private void handle_escape() {
     if( is_node_editable() || is_note_editable() ) {
-      selected.mode = NodeMode.SELECTED;
+      set_selected_mode( NodeMode.SELECTED );
       queue_draw();
       changed();
     }
@@ -890,6 +930,50 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Causes selected text to be bolded */
+  private void handle_control_b() {
+    if( is_node_text_selected() ) {
+      selected.name.add_tag( FormatTag.BOLD, null );
+      queue_draw();
+    } else if( is_note_text_selected() ) {
+      selected.note.add_tag( FormatTag.BOLD, null );
+      queue_draw();
+    }
+  }
+
+  /* Causes selected text to be italicized */
+  private void handle_control_i() {
+    if( is_node_text_selected() ) {
+      selected.name.add_tag( FormatTag.ITALICS, null );
+      queue_draw();
+    } else if( is_note_text_selected() ) {
+      selected.note.add_tag( FormatTag.ITALICS, null );
+      queue_draw();
+    }
+  }
+
+  /* Causes selected text to be underlined */
+  private void handle_control_u() {
+    if( is_node_text_selected() ) {
+      selected.name.add_tag( FormatTag.UNDERLINE, null );
+      queue_draw();
+    } else if( is_note_text_selected() ) {
+      selected.note.add_tag( FormatTag.UNDERLINE, null );
+      queue_draw();
+    }
+  }
+
+  /* Causes selected text to be striken */
+  private void handle_control_t() {
+    if( is_node_text_selected() ) {
+      selected.name.add_tag( FormatTag.STRIKETHRU, null );
+      queue_draw();
+    } else if( is_note_text_selected() ) {
+      selected.note.add_tag( FormatTag.STRIKETHRU, null );
+      queue_draw();
+    }
+  }
+
   /* Handles a Home keypress */
   private void handle_home() {
     if( is_node_editable() ) {
@@ -951,9 +1035,9 @@ public class OutlineTable : DrawingArea {
   private void edit_selected( bool title ) {
     if( selected == null ) return;
     if( title ) {
-      selected.mode = NodeMode.EDITABLE;
+      set_selected_mode( NodeMode.EDITABLE );
     } else {
-      selected.mode = NodeMode.NOTEEDIT;
+      set_selected_mode( NodeMode.NOTEEDIT );
       selected.hide_note = false;
     }
     queue_draw();
@@ -983,6 +1067,7 @@ public class OutlineTable : DrawingArea {
       text.insert( entry.text );
       entry.unparent();
       grab_focus();
+      queue_draw();
     });
     overlay.add_overlay( entry );
     entry.insert_emoji();
@@ -1036,7 +1121,7 @@ public class OutlineTable : DrawingArea {
 
     /* Create the main idea node */
     selected = new Node( this );
-    selected.mode = NodeMode.EDITABLE;
+    set_selected_mode( NodeMode.EDITABLE );
     nodes.append_val( selected );
 
     /* Set the default theme */

@@ -211,7 +211,7 @@ public class MainWindow : ApplicationWindow {
   /* This needs to be called whenever the tab is changed */
   private void tab_changed( Tab tab ) {
     var ot = get_table( tab );
-    do_buffer_changed( ot );
+    do_buffer_changed( ot.undo_buffer );
     update_title( ot );
     canvas_changed( ot );
     save_tab_state( tab );
@@ -246,6 +246,7 @@ public class MainWindow : ApplicationWindow {
     var ot = new OutlineTable( _settings );
     ot.map_event.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
+    ot.undo_text.buffer_changed.connect( do_buffer_changed );
 
     if( fname != null ) {
       ot.document.filename = fname;
@@ -762,11 +763,11 @@ public class MainWindow : ApplicationWindow {
    Called whenever the undo buffer changes state.  Updates the state of
    the undo and redo buffer buttons.
   */
-  public void do_buffer_changed( OutlineTable ot ) {
-    _undo_btn.set_sensitive( ot.undo_buffer.undoable() );
-    _undo_btn.set_tooltip_text( ot.undo_buffer.undo_tooltip() );
-    _redo_btn.set_sensitive( ot.undo_buffer.redoable() );
-    _redo_btn.set_tooltip_text( ot.undo_buffer.redo_tooltip() );
+  public void do_buffer_changed( UndoBuffer buf ) {
+    _undo_btn.set_sensitive( buf.undoable() );
+    _undo_btn.set_tooltip_text( buf.undo_tooltip() );
+    _redo_btn.set_sensitive( buf.redoable() );
+    _redo_btn.set_tooltip_text( buf.redo_tooltip() );
   }
 
   /* Allow the user to select a filename to save the document as */
