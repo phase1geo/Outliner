@@ -98,6 +98,11 @@ public class OutlineTable : DrawingArea {
     /* Create the document for this table */
     _doc = new Document( this, settings );
 
+    /* Set the default theme */
+    var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
+    _hilite_color = Utils.color_from_rgba( init_theme.hilite );
+    set_theme( init_theme );
+
     /* Allocate memory for the canvas text prior to editing for undo purposes */
     _orig_text = new CanvasText( this, 0 );
 
@@ -1123,9 +1128,6 @@ public class OutlineTable : DrawingArea {
     selected = new Node( this );
     set_selected_mode( NodeMode.EDITABLE );
     nodes.append_val( selected );
-
-    /* Set the default theme */
-    set_theme( MainWindow.themes.get_theme( "solarized_dark" ) );
 
     queue_draw();
 

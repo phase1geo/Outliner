@@ -21,6 +21,9 @@ sources += files(
   'undo_actions/UndoNodeNote.vala',
   'undo_actions/UndoNodePaste.vala',
   'undo_actions/UndoNodeUnindent.vala',
+  'undo_actions/UndoTextDelete.vala',
+  'undo_actions/UndoTextInsert.vala',
+  'undo_actions/UndoTextReplace.vala',
 
   'Application.vala',
   'CanvasText.vala',
@@ -36,5 +39,7 @@ sources += files(
   'Themes.vala',
   'UndoBuffer.vala',
   'UndoItem.vala',
+  'UndoTextBuffer.vala',
+  'UndoTextItem.vala',
   'Utils.vala'
 )

@@ -23,9 +23,9 @@ using GLib;
 
 public class UndoBuffer : Object {
 
-  private OutlineTable    _table;
-  private Array<UndoItem> _undo_buffer;
-  private Array<UndoItem> _redo_buffer;
+  private   OutlineTable    _table;
+  protected Array<UndoItem> _undo_buffer;
+  protected Array<UndoItem> _redo_buffer;
 
   public signal void buffer_changed( UndoBuffer buf );
 
@@ -37,7 +37,7 @@ public class UndoBuffer : Object {
   }
 
   /* Clear the undo/redo buffers */
-  public void clear() {
+  public virtual void clear() {
     _undo_buffer.remove_range( 0, _undo_buffer.length );
     _redo_buffer.remove_range( 0, _redo_buffer.length );
     buffer_changed( this );
@@ -88,7 +88,7 @@ public class UndoBuffer : Object {
   }
 
   /* Adds a new undo item to the undo buffer.  Clears the redo buffer. */
-  public void add_item( UndoItem item ) {
+  public virtual void add_item( UndoItem item ) {
     _undo_buffer.append_val( item );
     _redo_buffer.remove_range( 0, _redo_buffer.length );
     buffer_changed( this );
