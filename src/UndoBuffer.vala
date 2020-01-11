@@ -23,7 +23,7 @@ using GLib;
 
 public class UndoBuffer : Object {
 
-  private   OutlineTable    _table;
+  protected OutlineTable    _table;
   protected Array<UndoItem> _undo_buffer;
   protected Array<UndoItem> _redo_buffer;
 
@@ -54,7 +54,7 @@ public class UndoBuffer : Object {
   }
 
   /* Performs the next undo action in the buffer */
-  public void undo() {
+  public virtual void undo() {
     if( undoable() ) {
       UndoItem item = _undo_buffer.index( _undo_buffer.length - 1 );
       item.undo( _table );
@@ -65,7 +65,7 @@ public class UndoBuffer : Object {
   }
 
   /* Performs the next redo action in the buffer */
-  public void redo() {
+  public virtual void redo() {
     if( redoable() ) {
       UndoItem item = _redo_buffer.index( _redo_buffer.length - 1 );
       item.redo( _table );

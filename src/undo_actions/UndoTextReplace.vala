@@ -27,8 +27,8 @@ public class UndoTextReplace : UndoTextItem {
   public int    orig_cursor { private set; get; }
 
   /* Default constructor */
-  public UndoTextReplace( CanvasText ct, string orig_text, string new_text, int start, int orig_cursor ) {
-    base( _( "text replacement", ct, UndoTextOp.REPLACE ) );
+  public UndoTextReplace( string orig_text, string new_text, int start, int orig_cursor, int cursor ) {
+    base( _( "text replacement" ), UndoTextOp.REPLACE, cursor );
     this.orig_text   = orig_text;
     this.new_text    = new_text;
     this.start       = start;
@@ -36,24 +36,26 @@ public class UndoTextReplace : UndoTextItem {
   }
 
   /* Causes the stored item to be put into the before state */
-  public override void undo( OutlineTable table ) {
+  public override void undo_text( OutlineTable table, CanvasText ct ) {
     ct.text.replace_text( _start, _new_text.length, _orig_text );
-    ct.cursor = _orig_cursor;
+    ct.set_cursor_only( _orig_cursor );
     table.queue_draw();
   }
 
   /* Causes the stored item to be put into the after state */
-  public override void redo( OutlineTable table ) {
+  public override void redo_text( OutlineTable table, CanvasText ct ) {
     ct.text.replace_text( _start, _orig_text.length, _new_text );
-    ct.cursor = cursor;
+    ct.set_cursor_only( cursor );
     table.queue_draw();
   }
 
-  public override bool merge( UndoTextItem item ) {
+  /* Merges the given item with this item, if possible */
+  public override bool merge( CanvasText ct, UndoTextItem item ) {
     if( item.op == UndoTextOp.INSERT ) {
       var insert_item = item as UndoTextInsert;
       // TBD
     }
+    return( false );
   }
 
 }

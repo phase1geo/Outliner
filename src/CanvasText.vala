@@ -106,24 +106,24 @@ public class CanvasText : Object {
   }
 
   /* Default constructor */
-  public CanvasText( OutlineTable da, double max_width ) {
-    _text         = new FormattedText( da.get_theme() );
+  public CanvasText( OutlineTable table, double max_width ) {
+    _text         = new FormattedText( table.get_theme() );
     _text.changed.connect( text_changed );
     _max_width    = max_width;
-    _line_layout  = da.create_pango_layout( "M" );
-    _pango_layout = da.create_pango_layout( null );
+    _line_layout  = table.create_pango_layout( "M" );
+    _pango_layout = table.create_pango_layout( null );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
     update_size( false );
   }
 
   /* Constructor initializing string */
-  public CanvasText.with_text( OutlineTable da, double max_width, string txt ) {
-    _text         = new FormattedText.with_text( da.get_theme(), txt );
+  public CanvasText.with_text( OutlineTable table, double max_width, string txt ) {
+    _text         = new FormattedText.with_text( table.get_theme(), txt );
     _text.changed.connect( text_changed );
     _max_width    = max_width;
-    _line_layout  = da.create_pango_layout( "M" );
-    _pango_layout = da.create_pango_layout( txt );
+    _line_layout  = table.create_pango_layout( "M" );
+    _pango_layout = table.create_pango_layout( txt );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
     update_size( false );
@@ -258,6 +258,12 @@ public class CanvasText : Object {
     _pango_layout.index_to_line_x( cpos, false, out line, out _column );
   }
 
+  /* Only sets the cursor location to the given value */
+  public void set_cursor_only( int cursor ) {
+    _cursor = cursor;
+    update_column();
+  }
+
   /* Sets the cursor from the given mouse coordinates */
   public void set_cursor_at_char( double x, double y, bool motion ) {
     int cursor, trailing;
@@ -280,8 +286,7 @@ public class CanvasText : Object {
       change_selection( cindex, cindex, "set_cursor_at_char D" );
       _selanchor = cindex;
     }
-    _cursor = _selend;
-    update_column();
+    set_cursor_only( _selend );
   }
 
   /* Selects the word at the current x/y position in the text */
@@ -312,8 +317,7 @@ public class CanvasText : Object {
         }
       }
       change_selection( sstart, send, "set_cursor_at_word" );
-      _cursor = _selend;
-      update_column();
+      set_cursor_only( _selend );
     }
   }
 
@@ -355,20 +359,20 @@ public class CanvasText : Object {
     if( !motion ) {
       change_selection( 0, text.text.char_count(), "set_cursor_all" );
       _selanchor = _selend;
-      _cursor    = _selend;
+      set_cursor_only( _selend );
     }
   }
 
   /* Adjusts the cursor by the given amount of characters */
   private void cursor_by_char( int dir ) {
     var last = text.text.char_count();
-    _cursor += dir;
-    if( _cursor < 0 ) {
-      _cursor = 0;
-    } else if( _cursor > last ) {
-      _cursor = last;
+    var cpos = _cursor + dir;
+    if( cpos < 0 ) {
+      cpos = 0;
+    } else if( cpos > last ) {
+      cpos = last;
     }
-    update_column();
+    set_cursor_only( cpos );
   }
 
   /* Move the cursor in the given direction */
@@ -391,14 +395,14 @@ public class CanvasText : Object {
     _pango_layout.index_to_line_x( cpos, false, out line, out x );
     line += dir;
     if( line < 0 ) {
-      _cursor = 0;
+      set_cursor_only( 0 );
     } else if( line >= _pango_layout.get_line_count() ) {
-      _cursor = text.text.char_count();
+      set_cursor_only( text.text.char_count() );
     } else {
       int index, trailing;
       var line_layout = _pango_layout.get_line( line );
       line_layout.x_to_index( _column, out index, out trailing );
-      _cursor = text.text.char_count( index + trailing );
+      set_cursor_only( text.text.char_count( index + trailing ) );
     }
   }
 
@@ -420,13 +424,13 @@ public class CanvasText : Object {
 
   /* Moves the cursor to the beginning of the name */
   public void move_cursor_to_start() {
-    _cursor = 0;
+    set_cursor_only( 0 );
     clear_selection( "move_cursor_to_start" );
   }
 
   /* Moves the cursor to the end of the name */
   public void move_cursor_to_end() {
-    _cursor = text.text.char_count();
+    set_cursor_only( text.text.char_count() );
     clear_selection( "move_cursor_to_end" );
   }
 
@@ -434,10 +438,10 @@ public class CanvasText : Object {
   public void selection_to_start() {
     if( _selstart == _selend ) {
       change_selection( 0, _cursor, "selection_to_start A" );
-      _cursor = 0;
+      set_cursor_only( 0 );
     } else {
       change_selection( _cursor, null, "selection_to_start B" );
-      _cursor = 0;
+      set_cursor_only( 0 );
     }
   }
 
@@ -445,10 +449,10 @@ public class CanvasText : Object {
   public void selection_to_end() {
     if( _selstart == _selend ) {
       change_selection( _cursor, text.text.char_count(), "selection_to_end A" );
-      _cursor = text.text.char_count();
+      set_cursor_only( text.text.char_count() );
     } else {
       change_selection( null, text.text.char_count(), "selection_to_end B" );
-      _cursor = text.text.char_count();
+      set_cursor_only( text.text.char_count() );
     }
   }
 
@@ -480,21 +484,21 @@ public class CanvasText : Object {
 
   /* Moves the cursor to the next or previous word beginning */
   public void move_cursor_by_word( int dir ) {
-    _cursor = find_word( _cursor, dir );
+    set_cursor_only( find_word( _cursor, dir ) );
     change_selection( null, _selstart, "move_cursor_by_word" );
   }
 
   /* Change the selection by a word in the given direction */
   public void selection_by_word( int dir ) {
     if( _cursor == _selstart ) {
-      _cursor = find_word( _cursor, dir );
+      set_cursor_only( find_word( _cursor, dir ) );
       if( _cursor <= _selend ) {
         change_selection( _cursor, null, "selection_by_word A" );
       } else {
         change_selection( _selend, _cursor, "selection_by_word B" );
       }
     } else {
-      _cursor = find_word( _cursor, dir );
+      set_cursor_only( find_word( _cursor, dir ) );
       if( _cursor >= _selstart ) {
         change_selection( null, _cursor, "selection_by_word C" );
       } else {
@@ -504,51 +508,67 @@ public class CanvasText : Object {
   }
 
   /* Handles a backspace key event */
-  public void backspace() {
+  public void backspace( UndoTextBuffer undo_buffer ) {
     if( _cursor > 0 ) {
+      var cur = _cursor;
       if( _selstart != _selend ) {
         var spos = text.text.index_of_nth_char( _selstart );
         var epos = text.text.index_of_nth_char( _selend );
+        var str  = text.text.slice( spos, epos );
         text.remove_text( spos, ((epos - spos) + 1) );
-        _cursor  = _selstart;
+        set_cursor_only( _selstart );
         change_selection( null, _selstart, "backspace" );
+        undo_buffer.add_delete( spos, str, cur );
       } else {
         var spos = text.text.index_of_nth_char( _cursor - 1 );
+        var epos = text.text.index_of_nth_char( _cursor );
+        var str  = text.text.slice( spos, epos );
         text.remove_text( spos, 1 );
-        _cursor--;
+        set_cursor_only( _cursor - 1 );
+        undo_buffer.add_delete( spos, str, cur );
       }
     }
   }
 
   /* Handles a delete key event */
-  public void delete() {
+  public void delete( UndoTextBuffer undo_buffer ) {
     if( _cursor < text.text.length ) {
+      var cur = _cursor;
       if( _selstart != _selend ) {
         var spos = text.text.index_of_nth_char( _selstart );
         var epos = text.text.index_of_nth_char( _selend );
+        var str  = text.text.slice( spos, epos );
         text.remove_text( spos, ((epos - spos) + 1) );
-        _cursor = _selstart;
+        set_cursor_only( _selstart );
         change_selection( null, _selstart, "delete" );
+        undo_buffer.add_delete( spos, str, cur );
       } else {
         var spos = text.text.index_of_nth_char( _cursor );
+        var epos = text.text.index_of_nth_char( _cursor + 1 );
+        var str  = text.text.slice( spos, epos );
         text.remove_text( spos, 1 );
+        undo_buffer.add_delete( spos, str, cur );
       }
     }
   }
 
   /* Inserts the given string at the current cursor position and adjusts cursor */
-  public void insert( string s ) {
+  public void insert( string s, UndoTextBuffer undo_buffer ) {
     var slen = s.char_count();
+    var cur  = _cursor;
     if( _selstart != _selend ) {
       var spos = text.text.index_of_nth_char( _selstart );
       var epos = text.text.index_of_nth_char( _selend );
+      var str  = text.text.slice( spos, epos );
       text.replace_text( spos, ((epos - epos) + 1), s );
-      _cursor = _selstart + slen;
+      set_cursor_only( _selstart + slen );
       change_selection( null, _selstart, "insert" );
+      undo_buffer.add_replace( spos, str, s, cur );
     } else {
       var cpos = text.text.index_of_nth_char( _cursor );
       text.insert_text( cpos, s );
-      _cursor += slen;
+      set_cursor_only( _cursor + slen );
+      undo_buffer.add_insert( cpos, s, cur );
     }
   }
 

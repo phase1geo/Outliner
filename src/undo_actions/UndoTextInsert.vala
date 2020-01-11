@@ -19,36 +19,37 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public class UndoTextInsert : UndoItem {
+public class UndoTextInsert : UndoTextItem {
 
-  private CanvasText _ct;
-  private string     _text;
-  private int        _start;
-  private int        _orig_cursor;
-  private int        _new_cursor;
+  private string _text;
+  private int    _start;
+  private int    _orig_cursor;
 
   /* Default constructor */
-  public UndoTextInsert( CanvasText ct, string text, int start, int orig_cursor ) {
-    base( _( "text insertion" ) );
-    _ct          = ct;
+  public UndoTextInsert( string text, int start, int orig_cursor, int cursor ) {
+    base( _( "text insertion" ), UndoTextOp.INSERT, cursor );
     _text        = text;
     _start       = start;
     _orig_cursor = orig_cursor;
-    _new_cursor  = _ct.cursor;
   }
 
   /* Causes the stored item to be put into the before state */
-  public override void undo( OutlineTable table ) {
-    _ct.text.remove_text( _start, _text.length );
-    _ct.cursor = _orig_cursor;
+  public override void undo_text( OutlineTable table, CanvasText ct ) {
+    ct.text.remove_text( _start, _text.length );
+    ct.set_cursor_only( _orig_cursor );
     table.queue_draw();
   }
 
   /* Causes the stored item to be put into the after state */
-  public override void redo( OutlineTable table ) {
-    _ct.text.insert_text( _start, _text );
-    _ct.cursor = _new_cursor;
+  public override void redo_text( OutlineTable table, CanvasText ct ) {
+    ct.text.insert_text( _start, _text );
+    ct.set_cursor_only( cursor );
     table.queue_draw();
+  }
+
+  /* Merges the given item with the current one */
+  public override bool merge( CanvasText ct, UndoTextItem item ) {
+    return( false );
   }
 
 }

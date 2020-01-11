@@ -30,24 +30,28 @@ public enum UndoTextOp {
 */
 public class UndoTextItem : UndoItem {
 
-  protected CanvasText ct     { private set; get; }
   protected UndoTextOp op     { private set; get; }
   protected int        cursor { private set; get; }
 
   /* Default constructor */
-  public UndoTextItem( string name, CanvasText ct, UndoTextOp op ) {
+  public UndoTextItem( string name, UndoTextOp op, int cursor ) {
     base( name );
-    this.ct     = ct;
     this.op     = op;
-    this.cursor = ct.cursor;
+    this.cursor = cursor;
   }
 
   /*
    Merges the given item into this item, if possible and returns true to indicate
    that the merge occurred.
   */
-  public virtual bool merge( UndoTextItem item ) {
+  public virtual bool merge( CanvasText ct, UndoTextItem item ) {
     return( false );
   }
+
+  /* Performs an undo of the text item */
+  public virtual void undo_text( OutlineTable table, CanvasText ct ) {}
+
+  /* Performs a redo of the text item */
+  public virtual void redo_text( OutlineTable table, CanvasText ct ) {}
 
 }

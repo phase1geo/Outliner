@@ -42,10 +42,10 @@ public class OutlineTable : DrawingArea {
   private bool?           _show_format   = null;
   private CanvasText      _orig_text;
 
-  public Document   document    { get { return( _doc ); } }
-  public UndoBuffer undo_buffer { get; set; }
-  public UndoBuffer undo_text   { get; set; }
-  public Node?      selected {
+  public Document       document    { get { return( _doc ); } }
+  public UndoBuffer     undo_buffer { get; set; }
+  public UndoTextBuffer undo_text   { get; set; }
+  public Node?          selected {
     get {
       return( _selected );
     }
@@ -108,7 +108,7 @@ public class OutlineTable : DrawingArea {
 
     /* Allocate memory for the undo buffer */
     undo_buffer = new UndoBuffer( this );
-    undo_text   = new UndoBuffer( this );
+    undo_text   = new UndoTextBuffer( this );
 
     /* Set the style context */
     get_style_context().add_class( "canvas" );
@@ -156,14 +156,18 @@ public class OutlineTable : DrawingArea {
       if( (selected.mode == NodeMode.EDITABLE) && undo_text.undoable() ) {
         undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
         undo_text.clear();
+        undo_text.ct = null;
       } else if( (selected.mode == NodeMode.NOTEEDIT) && undo_text.undoable() ) {
         undo_buffer.add_item( new UndoNodeNote( this, selected, _orig_text ) );
         undo_text.clear();
+        undo_text.ct = null;
       }
       if( mode == NodeMode.EDITABLE ) {
         _orig_text.copy( selected.name );
+        undo_text.ct = selected.name;
       } else if( mode == NodeMode.NOTEEDIT ) {
         _orig_text.copy( selected.note );
+        undo_text.ct = selected.note;
       }
       selected.mode = mode;
     }
@@ -248,7 +252,7 @@ public class OutlineTable : DrawingArea {
           case EventType.DOUBLE_BUTTON_PRESS :  clicked.name.set_cursor_at_word( e.x, e.y, shift );  break;
           case EventType.TRIPLE_BUTTON_PRESS :  clicked.name.set_cursor_all( false );                break;
         }
-        clicked.mode = NodeMode.EDITABLE;
+        set_selected_mode( NodeMode.EDITABLE );
       } else if( clicked.is_within_note( x, y ) ) {
         bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
         selected = clicked;
@@ -257,7 +261,7 @@ public class OutlineTable : DrawingArea {
           case EventType.DOUBLE_BUTTON_PRESS :  clicked.note.set_cursor_at_word( e.x, e.y, shift );  break;
           case EventType.TRIPLE_BUTTON_PRESS :  clicked.note.set_cursor_all( false );                break;
         }
-        clicked.mode = NodeMode.NOTEEDIT;
+        set_selected_mode( NodeMode.NOTEEDIT );
       } else {
         _active = clicked;
       }
@@ -559,7 +563,7 @@ public class OutlineTable : DrawingArea {
   */
   private void cut_selected_text( CanvasText ct ) {
     copy_selected_text( ct );
-    ct.backspace();
+    ct.backspace( undo_text );
     queue_draw();
   }
 
@@ -605,7 +609,7 @@ public class OutlineTable : DrawingArea {
     var clipboard = Clipboard.get_default( get_display() );
     var text      = clipboard.wait_for_text();
     if( text != null ) {
-      ct.insert( text );
+      ct.insert( text, undo_text );
       queue_draw();
       changed();
     }
@@ -633,11 +637,11 @@ public class OutlineTable : DrawingArea {
           selected.name.move_cursor_to_end();
         }
       } else {
-        selected.name.backspace();
+        selected.name.backspace( undo_text );
         queue_draw();
       }
     } else if( is_note_editable() ) {
-      selected.note.backspace();
+      selected.note.backspace( undo_text );
       queue_draw();
     } else if( selected != null ) {
       delete_current_node();
@@ -647,10 +651,10 @@ public class OutlineTable : DrawingArea {
   /* Handles a delete keypress */
   private void handle_delete() {
     if( is_node_editable() ) {
-      selected.name.delete();
+      selected.name.delete( undo_text );
       queue_draw();
     } else if( is_note_editable() ) {
-      selected.note.delete();
+      selected.note.delete( undo_text );
       queue_draw();
     } else if( selected != null ) {
       delete_current_node();
@@ -669,11 +673,11 @@ public class OutlineTable : DrawingArea {
   /* Handles a return keypress */
   private void handle_return( bool shift ) {
     if( is_note_editable() ) {
-      selected.note.insert( "\n" );
+      selected.note.insert( "\n", undo_text );
       queue_draw();
       see( selected );
     } else if( is_node_editable() && shift ) {
-      selected.name.insert( "\n" );
+      selected.name.insert( "\n", undo_text );
       queue_draw();
       see( selected );
     } else if( selected != null ) {
@@ -693,7 +697,7 @@ public class OutlineTable : DrawingArea {
       selected.name.text.remove_text( curpos, (selected.name.text.text.length - curpos ) );
       add_sibling_node( true, name.substring( curpos ) );
     } else if( is_note_editable() ) {
-      selected.note.insert( "\n" );
+      selected.note.insert( "\n", undo_text );
       queue_draw();
     }
   }
@@ -708,7 +712,7 @@ public class OutlineTable : DrawingArea {
   /* Handles a shift tab keypress when a node is selected */
   private void handle_shift_tab() {
     if( is_note_editable() ) {
-      selected.note.insert( "\t" );
+      selected.note.insert( "\t", undo_text );
       queue_draw();
     } else if( selected != null ) {
       unindent();
@@ -718,10 +722,10 @@ public class OutlineTable : DrawingArea {
   /* Handles a Control-Tab keypress */
   private void handle_control_tab() {
     if( is_node_editable() ) {
-      selected.name.insert( "\t" );
+      selected.name.insert( "\t", undo_text );
       queue_draw();
     } else if( is_note_editable() ) {
-      selected.note.insert( "\t" );
+      selected.note.insert( "\t", undo_text );
       queue_draw();
     }
   }
@@ -1017,10 +1021,10 @@ public class OutlineTable : DrawingArea {
   private void handle_printable( string str ) {
     if( !str.get_char( 0 ).isprint() ) return;
     if( is_node_editable() ) {
-      selected.name.insert( str );
+      selected.name.insert( str, undo_text );
       queue_draw();
     } else if( is_note_editable() ) {
-      selected.note.insert( str );
+      selected.note.insert( str, undo_text );
       queue_draw();
     } else if( selected != null ) {
       switch( str ) {
@@ -1069,7 +1073,7 @@ public class OutlineTable : DrawingArea {
     entry.margin_start = x;
     entry.margin_top   = ytop + ((ybot - ytop) / 2);
     entry.changed.connect(() => {
-      text.insert( entry.text );
+      text.insert( entry.text, undo_text );
       entry.unparent();
       grab_focus();
       queue_draw();
@@ -1312,7 +1316,7 @@ public class OutlineTable : DrawingArea {
     }
 
     selected = node;
-    node.mode = NodeMode.EDITABLE;
+    set_selected_mode( NodeMode.EDITABLE );
 
     return( node );
 
