@@ -735,17 +735,26 @@ public class MainWindow : ApplicationWindow {
   /* Perform an undo action */
   public void do_undo() {
     var table = get_current_table( "do_undo" );
-    table.undo_buffer.undo();
+    if( table.is_node_editable() || table.is_note_editable() ) {
+      table.undo_text.undo();
+    } else {
+      table.undo_buffer.undo();
+    }
     table.grab_focus();
   }
 
   /* Perform a redo action */
   public void do_redo() {
     var table = get_current_table( "do_redo" );
-    table.undo_buffer.redo();
+    if( table.is_node_editable() || table.is_note_editable() ) {
+      table.undo_text.redo();
+    } else {
+      table.undo_buffer.redo();
+    }
     table.grab_focus();
   }
 
+  /* Called when the outline table is initially mapped */
   private bool on_table_mapped( Gdk.EventAny e ) {
     get_current_table().queue_draw();
     return( false );

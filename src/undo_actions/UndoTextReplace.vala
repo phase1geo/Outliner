@@ -24,36 +24,36 @@ public class UndoTextReplace : UndoTextItem {
   public string orig_text   { private set; get; }
   public string new_text    { private set; get; }
   public int    start       { private set; get; }
-  public int    orig_cursor { private set; get; }
 
   /* Default constructor */
-  public UndoTextReplace( string orig_text, string new_text, int start, int orig_cursor, int cursor ) {
-    base( _( "text replacement" ), UndoTextOp.REPLACE, cursor );
-    this.orig_text   = orig_text;
-    this.new_text    = new_text;
-    this.start       = start;
-    this.orig_cursor = orig_cursor;
+  public UndoTextReplace( string orig_text, string new_text, int start, int start_cursor, int end_cursor ) {
+    base( _( "text replacement" ), UndoTextOp.REPLACE, start_cursor, end_cursor );
+    this.orig_text = orig_text;
+    this.new_text  = new_text;
+    this.start     = start;
   }
 
   /* Causes the stored item to be put into the before state */
   public override void undo_text( OutlineTable table, CanvasText ct ) {
-    ct.text.replace_text( _start, _new_text.length, _orig_text );
-    ct.set_cursor_only( _orig_cursor );
+    ct.text.replace_text( start, new_text.length, orig_text );
+    ct.set_cursor_only( start_cursor );
     table.queue_draw();
   }
 
   /* Causes the stored item to be put into the after state */
   public override void redo_text( OutlineTable table, CanvasText ct ) {
-    ct.text.replace_text( _start, _orig_text.length, _new_text );
-    ct.set_cursor_only( cursor );
+    ct.text.replace_text( start, orig_text.length, new_text );
+    ct.set_cursor_only( end_cursor );
     table.queue_draw();
   }
 
   /* Merges the given item with this item, if possible */
   public override bool merge( CanvasText ct, UndoTextItem item ) {
-    if( item.op == UndoTextOp.INSERT ) {
-      var insert_item = item as UndoTextInsert;
-      // TBD
+    if( (end_cursor == item.start_cursor) && (item.op == UndoTextOp.INSERT) ) {
+      var insert = item as UndoTextInsert;
+      new_text  += insert.text;
+      end_cursor = insert.end_cursor;
+      return( true );
     }
     return( false );
   }

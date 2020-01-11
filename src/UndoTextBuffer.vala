@@ -23,7 +23,8 @@ using GLib;
 
 public class UndoTextBuffer : UndoBuffer {
 
-  public CanvasText? ct { set; get; default = null; }
+  public CanvasText? ct        { set; get; default = null; }
+  public bool        mergeable { set; get; default = true; }
 
   /* Default constructor */
   public UndoTextBuffer( OutlineTable table ) {
@@ -35,31 +36,32 @@ public class UndoTextBuffer : UndoBuffer {
    If it is mergeable, merge it and return true; otherwise, return false.
   */
   private bool merge_with_last( UndoTextItem item ) {
-    if( (_undo_buffer.length > 0) && (_redo_buffer.length == 0) ) {
+    if( (_undo_buffer.length > 0) && (_redo_buffer.length == 0) && mergeable ) {
       return( (_undo_buffer.index( _undo_buffer.length - 1 ) as UndoTextItem).merge( ct, item ) );
     }
+    mergeable = true;
     return( false );
   }
 
   /* Call after text has been inserted */
-  public void add_insert( int start, string text, int orig_cursor ) {
-    var item = new UndoTextInsert( text, start, orig_cursor, ct.cursor );
+  public void add_insert( int start, string text, int start_cursor ) {
+    var item = new UndoTextInsert( text, start, start_cursor, ct.cursor );
     if( !merge_with_last( item ) ) {
       add_item( item );
     }
   }
 
   /* Call after text has been deleted */
-  public void add_delete( int start, string orig_text, int orig_cursor ) {
-    var item = new UndoTextDelete( orig_text, start, orig_cursor, ct.cursor );
+  public void add_delete( int start, string orig_text, int start_cursor ) {
+    var item = new UndoTextDelete( orig_text, start, start_cursor, ct.cursor );
     if( !merge_with_last( item ) ) {
       add_item( item );
     }
   }
 
   /* Call after text has been replaced */
-  public void add_replace( int start, string orig_text, string text, int orig_cursor ) {
-    var item = new UndoTextReplace( orig_text, text, start, orig_cursor, ct.cursor );
+  public void add_replace( int start, string orig_text, string text, int start_cursor ) {
+    var item = new UndoTextReplace( orig_text, text, start, start_cursor, ct.cursor );
     if( !merge_with_last( item ) ) {
       add_item( item );
     }
@@ -72,6 +74,7 @@ public class UndoTextBuffer : UndoBuffer {
       (item as UndoTextItem).undo_text( _table, ct );
       _undo_buffer.remove_index( _undo_buffer.length - 1 );
       _redo_buffer.append_val( item );
+      mergeable = false;
       buffer_changed( this );
     }
   }
@@ -83,6 +86,7 @@ public class UndoTextBuffer : UndoBuffer {
       (item as UndoTextItem).redo_text( _table, ct );
       _redo_buffer.remove_index( _redo_buffer.length - 1 );
       _undo_buffer.append_val( item );
+      mergeable = false;
       buffer_changed( this );
     }
   }

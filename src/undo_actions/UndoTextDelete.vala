@@ -21,34 +21,39 @@
 
 public class UndoTextDelete : UndoTextItem {
 
-  private string _text;
-  private int    _start;
-  private int    _orig_cursor;
+  public string text  { private set; get; }
+  public int    start { private set; get; }
 
   /* Default constructor */
-  public UndoTextDelete( string text, int start, int orig_cursor, int cursor ) {
-    base( _( "text deletion" ), UndoTextOp.DELETE, cursor );
-    _text        = text;
-    _start       = start;
-    _orig_cursor = orig_cursor;
+  public UndoTextDelete( string text, int start, int start_cursor, int end_cursor ) {
+    base( _( "text deletion" ), UndoTextOp.DELETE, start_cursor, end_cursor );
+    this.text  = text;
+    this.start = start;
   }
 
   /* Causes the stored item to be put into the before state */
   public override void undo_text( OutlineTable table, CanvasText ct ) {
-    ct.text.insert_text( _start, _text );
-    ct.set_cursor_only( _orig_cursor );
+    ct.text.insert_text( start, text );
+    ct.set_cursor_only( start_cursor );
     table.queue_draw();
   }
 
   /* Causes the stored item to be put into the after state */
   public override void redo_text( OutlineTable table, CanvasText ct ) {
-    ct.text.remove_text( _start, _text.length );
-    ct.set_cursor_only( cursor );
+    ct.text.remove_text( start, text.length );
+    ct.set_cursor_only( end_cursor );
     table.queue_draw();
   }
 
   /* Merges the given text item with the current only */
   public override bool merge( CanvasText ct, UndoTextItem item ) {
+    if( (end_cursor == item.start_cursor) && (item.op == UndoTextOp.DELETE) ) {
+      var delete = item as UndoTextDelete;
+      end_cursor = delete.end_cursor;
+      text       = delete.text + text;
+      start      = delete.start;
+      return( true );
+    }
     return( false );
   }
 

@@ -30,14 +30,16 @@ public enum UndoTextOp {
 */
 public class UndoTextItem : UndoItem {
 
-  protected UndoTextOp op     { private set; get; }
-  protected int        cursor { private set; get; }
+  protected UndoTextOp op           { set; get; }
+  protected int        start_cursor { set; get; }
+  protected int        end_cursor   { set; get; }
 
   /* Default constructor */
-  public UndoTextItem( string name, UndoTextOp op, int cursor ) {
+  public UndoTextItem( string name, UndoTextOp op, int start_cursor, int end_cursor ) {
     base( name );
-    this.op     = op;
-    this.cursor = cursor;
+    this.op           = op;
+    this.start_cursor = start_cursor;
+    this.end_cursor   = end_cursor;
   }
 
   /*

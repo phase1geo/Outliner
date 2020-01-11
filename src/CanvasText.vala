@@ -515,7 +515,7 @@ public class CanvasText : Object {
         var spos = text.text.index_of_nth_char( _selstart );
         var epos = text.text.index_of_nth_char( _selend );
         var str  = text.text.slice( spos, epos );
-        text.remove_text( spos, ((epos - spos) + 1) );
+        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _selstart );
         change_selection( null, _selstart, "backspace" );
         undo_buffer.add_delete( spos, str, cur );
@@ -538,7 +538,7 @@ public class CanvasText : Object {
         var spos = text.text.index_of_nth_char( _selstart );
         var epos = text.text.index_of_nth_char( _selend );
         var str  = text.text.slice( spos, epos );
-        text.remove_text( spos, ((epos - spos) + 1) );
+        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _selstart );
         change_selection( null, _selstart, "delete" );
         undo_buffer.add_delete( spos, str, cur );
@@ -560,7 +560,7 @@ public class CanvasText : Object {
       var spos = text.text.index_of_nth_char( _selstart );
       var epos = text.text.index_of_nth_char( _selend );
       var str  = text.text.slice( spos, epos );
-      text.replace_text( spos, ((epos - epos) + 1), s );
+      text.replace_text( spos, (epos - spos), s );
       set_cursor_only( _selstart + slen );
       change_selection( null, _selstart, "insert" );
       undo_buffer.add_replace( spos, str, s, cur );
