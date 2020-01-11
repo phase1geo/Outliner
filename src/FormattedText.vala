@@ -507,11 +507,11 @@ public class FormattedText {
   }
 
   /*
-   Returns the URL stored at the given index location, if one exists.  If nothing
-   is found, returns null.
+   Returns the extra data stored at the given index location, if one exists.
+   If nothing is found, returns null.
   */
-  public string? get_url( int index ) {
-    return( _formats[FormatTag.URL].get_extra( index ) );
+  public string? get_extra( FormatTag tag, int index ) {
+    return( _formats[tag].get_extra( index ) );
   }
 
   /* Saves the text as the given XML node */

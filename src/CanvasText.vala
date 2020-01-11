@@ -610,17 +610,20 @@ public class CanvasText : Object {
   }
 
   /* Add tag to selected area */
-  public void add_tag( FormatTag tag, string? extra ) {
+  public void add_tag( FormatTag tag, string? extra, UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
     text.add_tag( tag, spos, epos, extra );
+    undo_buffer.add_tag_add( spos, epos, tag, extra, _cursor );
   }
 
   /* Removes the specified tag for the selected range */
-  public void remove_tag( FormatTag tag ) {
-    var spos = text.text.index_of_nth_char( _selstart );
-    var epos = text.text.index_of_nth_char( _selend );
+  public void remove_tag( FormatTag tag, UndoTextBuffer undo_buffer ) {
+    var spos  = text.text.index_of_nth_char( _selstart );
+    var epos  = text.text.index_of_nth_char( _selend );
+    var extra = text.get_extra( tag, spos );
     text.remove_tag( tag, spos, epos );
+    undo_buffer.add_tag_remove( spos, epos, tag, extra, _cursor );
   }
 
   /* Removes the specified tag for the selected range */

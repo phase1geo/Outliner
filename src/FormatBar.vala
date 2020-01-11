@@ -183,10 +183,10 @@ public class FormatBar : Gtk.Popover {
 
   private void format_text( FormatTag tag, string? extra=null ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
-      _table.selected.name.add_tag( tag, extra );
+      _table.selected.name.add_tag( tag, extra, _table.undo_text );
       _table.selected.name.clear_selection();
     } else {
-      _table.selected.note.add_tag( tag, extra );
+      _table.selected.note.add_tag( tag, extra, _table.undo_text );
       _table.selected.note.clear_selection();
     }
     _table.queue_draw();
@@ -196,9 +196,9 @@ public class FormatBar : Gtk.Popover {
 
   private void unformat_text( FormatTag tag ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
-      _table.selected.name.remove_tag( tag );
+      _table.selected.name.remove_tag( tag, _table.undo_text );
     } else {
-      _table.selected.note.remove_tag( tag );
+      _table.selected.note.remove_tag( tag, _table.undo_text );
     }
     _table.queue_draw();
     _table.changed();

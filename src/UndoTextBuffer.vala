@@ -67,6 +67,18 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
+  /* Call after tag has been applied to text */
+  public void add_tag_add( int start, int end, FormatTag tag, string? extra, int cursor ) {
+    var item = new UndoTextTagAdd( start, end, tag, extra, cursor );
+    add_item( item );
+  }
+
+  /* Call after tag has been removed from text */
+  public void add_tag_remove( int start, int end, FormatTag tag, string? extra, int cursor ) {
+    var item = new UndoTextTagRemove( start, end, tag, extra, cursor );
+    add_item( item );
+  }
+
   /* Performs the next undo action in the buffer */
   public override void undo() {
     if( undoable() ) {

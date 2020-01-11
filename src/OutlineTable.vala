@@ -962,10 +962,10 @@ public class OutlineTable : DrawingArea {
   /* Causes selected text to be bolded */
   private void handle_control_b() {
     if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.BOLD, null );
+      selected.name.add_tag( FormatTag.BOLD, null, undo_text );
       queue_draw();
     } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.BOLD, null );
+      selected.note.add_tag( FormatTag.BOLD, null, undo_text );
       queue_draw();
     }
   }
@@ -973,10 +973,10 @@ public class OutlineTable : DrawingArea {
   /* Causes selected text to be italicized */
   private void handle_control_i() {
     if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.ITALICS, null );
+      selected.name.add_tag( FormatTag.ITALICS, null, undo_text );
       queue_draw();
     } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.ITALICS, null );
+      selected.note.add_tag( FormatTag.ITALICS, null, undo_text );
       queue_draw();
     }
   }
@@ -984,10 +984,10 @@ public class OutlineTable : DrawingArea {
   /* Causes selected text to be underlined */
   private void handle_control_u() {
     if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.UNDERLINE, null );
+      selected.name.add_tag( FormatTag.UNDERLINE, null, undo_text );
       queue_draw();
     } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.UNDERLINE, null );
+      selected.note.add_tag( FormatTag.UNDERLINE, null, undo_text );
       queue_draw();
     }
   }
@@ -995,10 +995,10 @@ public class OutlineTable : DrawingArea {
   /* Causes selected text to be striken */
   private void handle_control_t() {
     if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.STRIKETHRU, null );
+      selected.name.add_tag( FormatTag.STRIKETHRU, null, undo_text );
       queue_draw();
     } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.STRIKETHRU, null );
+      selected.note.add_tag( FormatTag.STRIKETHRU, null, undo_text );
       queue_draw();
     }
   }
