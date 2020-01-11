@@ -21,19 +21,23 @@
 
 public class UndoTextDelete : UndoTextItem {
 
-  public string text  { private set; get; }
-  public int    start { private set; get; }
+  public string             text  { private set; get; }
+  public int                start { private set; get; }
+  public Array<UndoTagInfo> tags  { private set; get; }
 
   /* Default constructor */
-  public UndoTextDelete( string text, int start, int start_cursor, int end_cursor ) {
+  public UndoTextDelete( string text, int start, Array<UndoTagInfo> tags, int start_cursor, int end_cursor ) {
     base( _( "text deletion" ), UndoTextOp.DELETE, start_cursor, end_cursor );
     this.text  = text;
     this.start = start;
+    this.tags  = tags;
   }
 
   /* Causes the stored item to be put into the before state */
   public override void undo_text( OutlineTable table, CanvasText ct ) {
     ct.text.insert_text( start, text );
+    stdout.printf( "start: %d, end: %d, tags: %u\n", start, (start + text.length), tags.length );
+    ct.text.apply_tags_in_range( start, (start + text.length), tags );
     ct.set_cursor_only( start_cursor );
     table.queue_draw();
   }

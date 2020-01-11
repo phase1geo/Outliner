@@ -61,6 +61,16 @@ public enum FormatTag {
 
 }
 
+/* Stores information for undo/redo operation on tags */
+public class UndoTagInfo {
+  public int     tag   { private set; get; }
+  public string? extra { private set; get; }
+  public UndoTagInfo( int tag, string? extra ) {
+    this.tag   = tag;
+    this.extra = extra;
+  }
+}
+
 public class FormattedText {
 
   private class TagInfo {
@@ -142,7 +152,7 @@ public class FormattedText {
             _info.remove_index( i );
           }
         } else if( index < info.end ) {
-          info.end   += length;
+          info.end += length;
         }
       }
     }
@@ -187,6 +197,16 @@ public class FormattedText {
     /* Removes all ranges for this tag */
     public void remove_tag_all() {
       _info.remove_range( 0, _info.length );
+    }
+
+    /* Returns all tags found within the given range */
+    public void get_tags_in_range( int tag, int start, int end, ref Array<UndoTagInfo> tags ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (start < info.end) && (end > info.start) ) {
+          tags.append_val( new UndoTagInfo( tag, info.extra ) );
+        }
+      }
     }
 
     /* Returns true if the given index contains this tag */
@@ -425,7 +445,7 @@ public class FormattedText {
   public void replace_text( int index, int chars, string str ) {
     _text = _text.splice( index, (index + chars), str );
     foreach( TagInfo f in _formats ) {
-      f.adjust( index, (0 - chars) );
+      f.adjust( (index + chars), (0 - chars) );
       f.remove_tag( index, (index + chars) );
       f.adjust( index, str.length );
     }
@@ -436,7 +456,8 @@ public class FormattedText {
   public void remove_text( int index, int chars ) {
     _text = _text.splice( index, (index + chars) );
     foreach( TagInfo f in _formats ) {
-      f.adjust( index, (0 - chars) );
+      stdout.printf( "In remove_text, index: %d, chars: %d\n", index, chars );
+      f.adjust( (index + chars), (0 - chars) );
       f.remove_tag( index, (index + chars) );
     }
     changed();
@@ -492,6 +513,23 @@ public class FormattedText {
       }
     }
     return( false );
+  }
+
+  /* Returns an array containing all tags that are within the specified range */
+  public Array<UndoTagInfo> get_tags_in_range( int start, int end ) {
+    var tags = new Array<UndoTagInfo>();
+    for( int i=0; i<FormatTag.SELECT; i++ ) {
+      _formats[i].get_tags_in_range( i, start, end, ref tags );
+    }
+    return( tags );
+  }
+
+  /* Reapplies tags that were previously removed */
+  public void apply_tags_in_range( int start, int end, Array<UndoTagInfo> tags ) {
+    for( int i=0; i<tags.length; i++ ) {
+      var info = tags.index( i );
+      _formats[info.tag].add_tag( start, end, info.extra );
+    }
   }
 
   /*
