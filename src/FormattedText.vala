@@ -445,9 +445,8 @@ public class FormattedText {
   public void replace_text( int index, int chars, string str ) {
     _text = _text.splice( index, (index + chars), str );
     foreach( TagInfo f in _formats ) {
-      f.adjust( (index + chars), (0 - chars) );
       f.remove_tag( index, (index + chars) );
-      f.adjust( index, str.length );
+      f.adjust( index, ((0 - chars) + str.length) );
     }
     changed();
   }
@@ -456,9 +455,8 @@ public class FormattedText {
   public void remove_text( int index, int chars ) {
     _text = _text.splice( index, (index + chars) );
     foreach( TagInfo f in _formats ) {
-      stdout.printf( "In remove_text, index: %d, chars: %d\n", index, chars );
-      f.adjust( (index + chars), (0 - chars) );
       f.remove_tag( index, (index + chars) );
+      f.adjust( index, (0 - chars) );
     }
     changed();
   }
@@ -528,6 +526,7 @@ public class FormattedText {
   public void apply_tags_in_range( int start, int end, Array<UndoTagInfo> tags ) {
     for( int i=0; i<tags.length; i++ ) {
       var info = tags.index( i );
+      stdout.printf( "Adding tagS: %d to start: %d, end: %d\n", info.tag, start, end );
       _formats[info.tag].add_tag( start, end, info.extra );
     }
   }

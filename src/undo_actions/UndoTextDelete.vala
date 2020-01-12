@@ -36,7 +36,6 @@ public class UndoTextDelete : UndoTextItem {
   /* Causes the stored item to be put into the before state */
   public override void undo_text( OutlineTable table, CanvasText ct ) {
     ct.text.insert_text( start, text );
-    stdout.printf( "start: %d, end: %d, tags: %u\n", start, (start + text.length), tags.length );
     ct.text.apply_tags_in_range( start, (start + text.length), tags );
     ct.set_cursor_only( start_cursor );
     table.queue_draw();
