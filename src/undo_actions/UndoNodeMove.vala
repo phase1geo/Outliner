@@ -38,7 +38,8 @@ public class UndoNodeMove : UndoItem {
   }
 
   private void move( OutlineTable table, Node? parent, int index ) {
-    parent.add_child( _node, index );
+    table.delete_node( _node );
+    table.insert_node( parent, _node, index );
     table.selected = _node;
     table.queue_draw();
     table.changed();
