@@ -121,6 +121,10 @@ public class MainWindow : ApplicationWindow {
     /* Add keyboard shortcuts */
     add_keyboard_shortcuts( app );
 
+    /* TEMPORARY */
+    var box = new Box( Orientation.VERTICAL, 0 );
+    var search = new SearchBar();
+
     _nb = new DynamicNotebook();
     _nb.add_button_visible = false;
     _nb.tab_bar_behavior   = DynamicNotebook.TabBarBehavior.SINGLE;
@@ -162,8 +166,13 @@ public class MainWindow : ApplicationWindow {
     add_export_button();
     add_search_button();
 
+    /* TEMPORARY */
+    box.pack_start( search, false, true, 0 );
+    box.pack_start( _nb,    true, true, 0 );
+
     /* Display the UI */
-    add( _nb );
+    // add( _nb );
+    add( box );
     show_all();
 
   }

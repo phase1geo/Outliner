@@ -37,6 +37,7 @@ sources += files(
   'MainWindow.vala',
   'Node.vala',
   'OutlineTable.vala',
+  'SearchBar.vala',
   'Theme.vala',
   'Themes.vala',
   'UndoBuffer.vala',
