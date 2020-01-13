@@ -38,7 +38,7 @@ public class UndoTextReplace : UndoTextItem {
   /* Causes the stored item to be put into the before state */
   public override void undo_text( OutlineTable table, CanvasText ct ) {
     ct.text.replace_text( start, new_text.length, orig_text );
-    ct.text.apply_tags_in_range( start, (start + new_text.length), tags );
+    ct.text.apply_tags( tags );
     ct.set_cursor_only( start_cursor );
     table.queue_draw();
   }

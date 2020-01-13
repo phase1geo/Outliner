@@ -63,10 +63,14 @@ public enum FormatTag {
 
 /* Stores information for undo/redo operation on tags */
 public class UndoTagInfo {
+  public int     start { private set; get; }
+  public int     end   { private set; get; }
   public int     tag   { private set; get; }
   public string? extra { private set; get; }
-  public UndoTagInfo( int tag, string? extra ) {
+  public UndoTagInfo( int tag, int start, int end, string? extra ) {
     this.tag   = tag;
+    this.start = start;
+    this.end   = end;
     this.extra = extra;
   }
 }
@@ -204,7 +208,7 @@ public class FormattedText {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
         if( (start < info.end) && (end > info.start) ) {
-          tags.append_val( new UndoTagInfo( tag, info.extra ) );
+          tags.append_val( new UndoTagInfo( tag, info.start, info.end, info.extra ) );
         }
       }
     }
@@ -523,12 +527,12 @@ public class FormattedText {
   }
 
   /* Reapplies tags that were previously removed */
-  public void apply_tags_in_range( int start, int end, Array<UndoTagInfo> tags ) {
-    for( int i=0; i<tags.length; i++ ) {
+  public void apply_tags( Array<UndoTagInfo> tags ) {
+    for( int i=((int)tags.length - 1); i>=0; i-- ) {
       var info = tags.index( i );
-      stdout.printf( "Adding tagS: %d to start: %d, end: %d\n", info.tag, start, end );
-      _formats[info.tag].add_tag( start, end, info.extra );
+      _formats[info.tag].add_tag( info.start, info.end, info.extra );
     }
+    changed();
   }
 
   /*
