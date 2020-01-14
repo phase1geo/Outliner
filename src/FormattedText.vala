@@ -30,6 +30,7 @@ public enum FormatTag {
   COLOR,
   HILITE,
   URL,
+  MATCH,
   SELECT,
   LENGTH;
 
@@ -42,6 +43,7 @@ public enum FormatTag {
       case COLOR      :  return( "color" );
       case HILITE     :  return( "hilite" );
       case URL        :  return( "url" );
+      case MATCH      :  return( "match" );
     }
     return( "bold" );
   }
@@ -55,6 +57,7 @@ public enum FormatTag {
       case "color"      :  return( COLOR );
       case "hilite"     :  return( HILITE );
       case "url"        :  return( URL );
+      case "match"      :  return( MATCH );
     }
     return( LENGTH );
   }
@@ -363,6 +366,20 @@ public class FormattedText {
 
   }
 
+  private class MatchInfo : TagAttrs {
+    public MatchInfo( RGBA f, RGBA b ) {
+      set_color( f, b );
+    }
+    private void set_color( RGBA f, RGBA b ) {
+      attrs.append_val( attr_foreground_new( (uint16)(f.red * 65535), (uint16)(f.green * 65535), (uint16)(f.blue * 65535) ) );
+      attrs.append_val( attr_background_new( (uint16)(b.red * 65535), (uint16)(b.green * 65535), (uint16)(b.blue * 65535) ) );
+    }
+    public void update_color( RGBA f, RGBA b ) {
+      attrs.remove_range( 0, 2 );
+      set_color( f, b );
+    }
+  }
+
   private class SelectInfo : TagAttrs {
     public SelectInfo( RGBA f, RGBA b ) {
       set_color( f, b );
@@ -409,6 +426,7 @@ public class FormattedText {
       _attr_tags[FormatTag.COLOR]      = new ColorInfo();
       _attr_tags[FormatTag.HILITE]     = new HighlightInfo();
       _attr_tags[FormatTag.URL]        = new UrlInfo( theme.url );
+      _attr_tags[FormatTag.MATCH]      = new MatchInfo( theme.match_foreground, theme.match_background );
       _attr_tags[FormatTag.SELECT]     = new SelectInfo( theme.textsel_foreground, theme.textsel_background );
     }
     for( int i=0; i<FormatTag.LENGTH; i++ ) {
@@ -419,6 +437,7 @@ public class FormattedText {
   public static void set_theme( Theme theme ) {
     if( _attr_tags == null ) return;
     (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
+    (_attr_tags[FormatTag.MATCH] as MatchInfo).update_color( theme.match_foreground, theme.match_background );
     (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
   }
 
@@ -520,7 +539,7 @@ public class FormattedText {
   /* Returns an array containing all tags that are within the specified range */
   public Array<UndoTagInfo> get_tags_in_range( int start, int end ) {
     var tags = new Array<UndoTagInfo>();
-    for( int i=0; i<FormatTag.SELECT; i++ ) {
+    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
       _formats[i].get_tags_in_range( i, start, end, ref tags );
     }
     return( tags );
@@ -555,11 +574,32 @@ public class FormattedText {
     return( _formats[tag].get_extra( index ) );
   }
 
+  /*
+   Performs search of the given string within the text.  If any occurrences
+   are found, highlight them with the match color.
+  */
+  public bool do_search( string pattern, ref Array<int> starts ) {
+    remove_tag_all( FormatTag.MATCH );
+    if( (pattern != "") && text.contains( pattern ) ) {
+      var tags = new Array<UndoTagInfo>();
+      var index = 0;
+      while( (index = text.index_of( pattern, index )) != -1 ) {
+        var end = index + pattern.index_of_nth_char( pattern.length );
+        tags.append_val( new UndoTagInfo( FormatTag.MATCH, index, end, null ) );
+        starts.append_val( index );
+        index++;
+      }
+      apply_tags( tags );
+      return( true );
+    }
+    return( false );
+  }
+
   /* Saves the text as the given XML node */
   public Xml.Node* save() {
     Xml.Node* n = new Xml.Node( null, "text" );
     n->new_prop( "data", text );
-    for( int i=0; i<(FormatTag.LENGTH - 1); i++ ) {
+    for( int i=0; i<(FormatTag.LENGTH - 2); i++ ) {
       if( !_formats[i].is_empty() ) {
         var tag = (FormatTag)i;
         n->add_child( _formats[i].save( tag.to_string() ) );

@@ -37,18 +37,7 @@ public class MainWindow : ApplicationWindow {
   private GLib.Settings   _settings;
   private HeaderBar?      _header         = null;
   private DynamicNotebook _nb;
-  private Popover?        _search         = null;
-  private MenuButton?     _search_btn     = null;
-  private SearchEntry?    _search_entry   = null;
-  private TreeView        _search_list;
-  private Gtk.ListStore   _search_items;
-  private ScrolledWindow  _search_scroll;
-  private CheckButton     _search_titles;
-  private CheckButton     _search_notes;
-  private CheckButton     _search_folded;
-  private CheckButton     _search_unfolded;
-  private CheckButton     _search_tasks;
-  private CheckButton     _search_nontasks;
+  private Button          _search_btn;
   private Popover?        _export         = null;
   private Button?         _undo_btn       = null;
   private Button?         _redo_btn       = null;
@@ -121,10 +110,6 @@ public class MainWindow : ApplicationWindow {
     /* Add keyboard shortcuts */
     add_keyboard_shortcuts( app );
 
-    /* TEMPORARY */
-    var box = new Box( Orientation.VERTICAL, 0 );
-    var search = new SearchBar();
-
     _nb = new DynamicNotebook();
     _nb.add_button_visible = false;
     _nb.tab_bar_behavior   = DynamicNotebook.TabBarBehavior.SINGLE;
@@ -166,20 +151,16 @@ public class MainWindow : ApplicationWindow {
     add_export_button();
     add_search_button();
 
-    /* TEMPORARY */
-    box.pack_start( search, false, true, 0 );
-    box.pack_start( _nb,    true, true, 0 );
-
     /* Display the UI */
-    // add( _nb );
-    add( box );
+    add( _nb );
     show_all();
 
   }
 
   /* Returns the OutlineTable from the given tab */
   private OutlineTable? get_table( Tab tab ) {
-    var bin1  = tab.page as Gtk.ScrolledWindow;
+    var box  = tab.page as Gtk.Box;
+    var bin1 = box.get_children().nth_data( 1 ) as Gtk.ScrolledWindow;
     var bin2 = bin1.get_child() as Gtk.Bin;  // Viewport
     var bin3 = bin2.get_child() as Gtk.Bin;  // Overlay
     return( bin3.get_child() as OutlineTable );
@@ -192,6 +173,20 @@ public class MainWindow : ApplicationWindow {
     }
     if( _nb.current == null ) { return( null ); }
     return( get_table( _nb.current ) );
+  }
+
+  /* Shows or hides the search bar for the current tab */
+  private void toggle_search_bar() {
+    if( _nb.current != null ) {
+      var box = _nb.current.page as Gtk.Box;
+      var revealer = box.get_children().nth_data( 0 ) as Gtk.Revealer;
+      if( revealer != null ) {
+        var bar    = revealer.get_child() as SearchBar;
+        var reveal = !revealer.reveal_child;
+        revealer.reveal_child = reveal;
+        bar.change_display( reveal );
+      }
+    }
   }
 
   /* Handles any changes to the dark mode preference gsettings for the desktop */
@@ -251,6 +246,8 @@ public class MainWindow : ApplicationWindow {
    /* Adds a new tab to the notebook */
   public OutlineTable add_tab( string? fname, TabAddReason reason ) {
 
+    var box = new Box( Orientation.VERTICAL, 0 );
+
     /* Create and pack the canvas */
     var ot = new OutlineTable( _settings );
     ot.map_event.connect( on_table_mapped );
@@ -271,8 +268,18 @@ public class MainWindow : ApplicationWindow {
     scroll.hscrollbar_policy = PolicyType.EXTERNAL;
     scroll.add( overlay );
 
+    /* Create the search bar */
+    var search = new SearchBar( ot );
+
+    /* Create the search revealer */
+    var search_reveal = new Revealer();
+    search_reveal.add( search );
+
+    box.pack_start( search_reveal, false, true );
+    box.pack_start( scroll,        true,  true );
+
     /* Create the tab in the notebook */
-    var tab = new Tab( ot.document.label, null, scroll );
+    var tab = new Tab( ot.document.label, null, box );
     tab.pinnable = false;
     tab.tooltip  = fname;
 
@@ -392,126 +399,10 @@ public class MainWindow : ApplicationWindow {
   private void add_search_button() {
 
     /* Create the menu button */
-    _search_btn = new MenuButton();
-    _search_btn.set_image( new Image.from_icon_name( "edit-find", IconSize.LARGE_TOOLBAR ) );
+    _search_btn = new Button.from_icon_name( "edit-find", IconSize.LARGE_TOOLBAR );
     _search_btn.set_tooltip_markup( _( "Search   <i>(Control-F)</i>" ) );
-    _search_btn.clicked.connect( on_search_change );
+    _search_btn.clicked.connect( toggle_search_bar );
     _header.pack_end( _search_btn );
-
-    /* Create search popover */
-    var box = new Box( Orientation.VERTICAL, 5 );
-
-    /* Create the search entry field */
-    _search_entry = new SearchEntry();
-    _search_entry.placeholder_text = _( "Search Nodes" );
-    _search_entry.width_chars = 40;
-    _search_entry.search_changed.connect( on_search_change );
-
-    _search_items = new Gtk.ListStore( 3, typeof(string), typeof(string), typeof(Node) );
-
-    /* Create the treeview */
-    _search_list  = new TreeView.with_model( _search_items );
-    var type_cell = new CellRendererText();
-    type_cell.xalign = 1;
-    _search_list.insert_column_with_attributes( -1, null, type_cell,              "markup", 0, null );
-    _search_list.insert_column_with_attributes( -1, null, new CellRendererText(), "markup", 1, null );
-    _search_list.headers_visible = false;
-    _search_list.activate_on_single_click = true;
-    _search_list.enable_search = false;
-    _search_list.row_activated.connect( on_search_clicked );
-
-    /* Create the scrolled window for the treeview */
-    _search_scroll = new ScrolledWindow( null, null );
-    _search_scroll.height_request = 200;
-    _search_scroll.hscrollbar_policy = PolicyType.EXTERNAL;
-    _search_scroll.add( _search_list );
-
-    var search_opts = new Expander( _( "Search Criteria" ) );
-    search_opts.add( create_search_options_box() );
-
-    box.margin = 5;
-    box.pack_start( _search_entry,  false, true );
-    box.pack_start( _search_scroll, true,  true );
-    box.pack_start( new Separator( Orientation.HORIZONTAL ) );
-    box.pack_start( search_opts,    false, true, 5 );
-    box.show_all();
-
-    /* Create the popover and associate it with the menu button */
-    _search = new Popover( null );
-    _search.add( box );
-    _search_btn.popover = _search;
-
-  }
-
-  /* Creates the UI for the search criteria box */
-  private Grid create_search_options_box() {
-
-    var grid = new Grid();
-
-    _search_titles   = new CheckButton.with_label( _( "Titles" ) );
-    _search_notes    = new CheckButton.with_label( _( "Notes" ) );
-    _search_folded   = new CheckButton.with_label( _( "Folded" ) );
-    _search_unfolded = new CheckButton.with_label( _( "Unfolded" ) );
-    _search_tasks    = new CheckButton.with_label( _( "Tasks" ) );
-    _search_nontasks = new CheckButton.with_label( _( "Non-tasks" ) );
-
-    /* Set the active values from the settings */
-    _search_titles.active   = _settings.get_boolean( "search-opt-titles" );
-    _search_notes.active    = _settings.get_boolean( "search-opt-notes" );
-    _search_folded.active   = _settings.get_boolean( "search-opt-folded" );
-    _search_unfolded.active = _settings.get_boolean( "search-opt-unfolded" );
-    _search_tasks.active    = _settings.get_boolean( "search-opt-tasks" );
-    _search_nontasks.active = _settings.get_boolean( "search-opt-nontasks" );
-
-    /* Set the checkbutton sensitivity */
-    _search_titles.set_sensitive( _search_notes.active );
-    _search_notes.set_sensitive( _search_titles.active );
-    _search_folded.set_sensitive( _search_unfolded.active );
-    _search_unfolded.set_sensitive( _search_folded.active );
-    _search_tasks.set_sensitive( _search_nontasks.active );
-    _search_nontasks.set_sensitive( _search_tasks.active );
-
-    _search_titles.toggled.connect(() => {
-      _settings.set_boolean( "search-opt-titles", _search_titles.active );
-      _search_notes.set_sensitive( _search_titles.active );
-      on_search_change();
-    });
-    _search_notes.toggled.connect(() => {
-      _settings.set_boolean( "search-opt-notes", _search_notes.active );
-      _search_titles.set_sensitive( _search_notes.active );
-      on_search_change();
-    });
-    _search_folded.toggled.connect(() => {
-      _settings.set_boolean( "search-opt-folded", _search_folded.active );
-      _search_unfolded.set_sensitive( _search_folded.active );
-      on_search_change();
-    });
-    _search_unfolded.toggled.connect(() => {
-      _settings.set_boolean( "search-opt-unfolded", _search_unfolded.active );
-      _search_folded.set_sensitive( _search_unfolded.active );
-      on_search_change();
-    });
-    _search_tasks.toggled.connect(() => {
-      _settings.set_boolean( "search-opt-tasks", _search_tasks.active );
-      _search_nontasks.set_sensitive( _search_tasks.active );
-      on_search_change();
-    });
-    _search_nontasks.clicked.connect(() => {
-      _settings.set_boolean( "search-opt-nontasks", _search_nontasks.active );
-      _search_tasks.set_sensitive( _search_nontasks.active );
-      on_search_change();
-    });
-
-    grid.margin_top         = 10;
-    grid.column_homogeneous = true;
-    grid.attach( _search_titles,   0, 0, 1, 1 );
-    grid.attach( _search_notes,    0, 1, 1, 1 );
-    grid.attach( _search_folded,   1, 0, 1, 1 );
-    grid.attach( _search_unfolded, 1, 1, 1, 1 );
-    grid.attach( _search_tasks,    2, 0, 1, 1 );
-    grid.attach( _search_nontasks, 2, 1, 1, 1 );
-
-    return( grid );
 
   }
 
@@ -860,44 +751,6 @@ public class MainWindow : ApplicationWindow {
   /* Called when the user uses the Control-q keyboard shortcut */
   private void action_quit() {
     destroy();
-  }
-
-  /* Display matched items to the search within the search popover */
-  private void on_search_change() {
-    bool[] search_opts = {
-      _search_titles.active,    // 0
-      _search_notes.active,     // 1
-      _search_folded.active,    // 2
-      _search_unfolded.active,  // 3
-      _search_tasks.active,     // 4
-      _search_nontasks.active   // 5
-    };
-    _search_items.clear();
-    if( _search_entry.get_text() != "" ) {
-      get_current_table( "on_search_change" ).get_match_items(
-        _search_entry.get_text().casefold(),
-        search_opts,
-        ref _search_items
-      );
-    }
-  }
-
-  /*
-   Called when the user selects an item in the search list.  The current node
-   will be set to the node associated with the selection.
-  */
-  private void on_search_clicked( TreePath path, TreeViewColumn col ) {
-    TreeIter it;
-    Node?    node = null;
-    var      table = get_current_table( "on_search_clicked" );
-    _search_items.get_iter( out it, path );
-    _search_items.get( it, 2, &node, -1 );
-    if( node != null ) {
-      table.selected = node;
-      table.see( node );
-    }
-    _search.closed();
-    table.grab_focus();
   }
 
   /* Exports the model to various formats */

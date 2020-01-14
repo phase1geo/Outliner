@@ -47,6 +47,8 @@ public class ThemeDark : Theme {
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
     hilite             = get_color( "yellow" );
+    match_foreground   = get_color( "Black" );
+    match_background   = get_color( "Gold" );
     prefer_dark        = true;
 
   }

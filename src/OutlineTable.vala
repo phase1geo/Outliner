@@ -1067,7 +1067,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Edit the selected node */
-  private void edit_selected( bool title ) {
+  public void edit_selected( bool title ) {
     if( selected == null ) return;
     if( title ) {
       set_selected_mode( NodeMode.EDITABLE );
@@ -1311,9 +1311,12 @@ public class OutlineTable : DrawingArea {
   /* SEARCH-RELATED METHODS */
   /**************************/
 
-  /* Finds the rows that match the given search criteria */
-  public void get_match_items( string pattern, bool[] opts, ref Gtk.ListStore items ) {
-    // TBD
+  /* Perform a depth-first search for the given search pattern */
+  public void do_search( string pattern, ref Array<SearchMatch> matches ) {
+    for( int i=0; i<nodes.length; i++ ) {
+      nodes.index( i ).do_search( pattern, ref matches );
+    }
+    queue_draw();
   }
 
   /************************/

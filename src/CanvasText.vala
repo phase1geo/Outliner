@@ -642,7 +642,7 @@ public class CanvasText : Object {
    Call this method to change the current selection.  If a parameter
    is specified as null, this selection index will not change value.
   */
-  private void change_selection( int? selstart, int? selend, string? msg = null ) {
+  public void change_selection( int? selstart, int? selend, string? msg = null ) {
 
     if( _debug && (msg != null) ) {
       stdout.printf( "In change_selection, msg: %s\n", msg );

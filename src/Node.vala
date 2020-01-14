@@ -599,6 +599,29 @@ public class Node {
 
   }
 
+  /* Performs depth first search */
+  public void do_search( string pattern, ref Array<SearchMatch> matches ) {
+
+    var starts = new Array<int>();
+
+    do_search_text( name, pattern, ref starts, ref matches );
+    do_search_text( note, pattern, ref starts, ref matches );
+
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).do_search( pattern, ref matches );
+    }
+
+  }
+
+  private void do_search_text( CanvasText ct, string pattern, ref Array<int> starts, ref Array<SearchMatch> matches ) {
+    starts.remove_range( 0, starts.length );
+    if( ct.text.do_search( pattern, ref starts ) ) {
+      for( int i=0; i<starts.length; i++ ) {
+        matches.append_val( new SearchMatch( this, (ct == name), starts.index( i ) ) );
+      }
+    }
+  }
+
   /*******************/
   /* DRAWING METHODS */
   /*******************/
