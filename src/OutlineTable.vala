@@ -411,6 +411,7 @@ public class OutlineTable : DrawingArea {
       if( !_motion ) {
         if( _active.is_within_expander( e.x, e.y ) ) {
           _active.expanded = !_active.expanded;
+          selected = null;
           undo_buffer.add_item( new UndoNodeExpander( _active ) );
           queue_draw();
           changed();
@@ -1565,7 +1566,7 @@ public class OutlineTable : DrawingArea {
     for( int i=0; i<nodes.length; i++ ) {
       nodes.index( i ).draw_tree( ctx, _theme );
     }
-    if( selected != null ) {
+    if( (selected != null) && ((selected.parent == null) || selected.parent.expanded) ) {
       selected.draw( ctx, _theme );
     }
   }

@@ -313,10 +313,12 @@ public class Node {
 
   /* Adjusts the posy value of all nodes that are descendants of the give node */
   private double adjust_descendants( double last_y, int child_start ) {
-    for( int i=child_start; i<children.length; i++ ) {
-      var child = children.index( i );
-      child.y = last_y;
-      last_y  = child.adjust_descendants( child.last_y, 0 );
+    if( expanded ) {
+      for( int i=child_start; i<children.length; i++ ) {
+        var child = children.index( i );
+        child.y = last_y;
+        last_y  = child.adjust_descendants( child.last_y, 0 );
+      }
     }
     return( last_y );
   }
