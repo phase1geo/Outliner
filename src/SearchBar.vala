@@ -23,37 +23,34 @@ using Gtk;
 
 public class SearchMatch {
 
-  public Node node  { private set; get; }
-  public bool name  { private set; get; }
-  public int  start { private set; get; }
+  public Node? node  { set; get; default = null; }
+  public bool  name  { set; get; default = true; }
+  public int   start { set; get; default = -1; }
+  public int   end   { set; get; default = -1; }
 
-  public SearchMatch( Node node, bool name, int start ) {
-    this.node  = node;
-    this.name  = name;
-    this.start = start;
-  }
+  public SearchMatch() {}
 
 }
 
 public class SearchBar : Box {
 
-  private OutlineTable       _ot;
-  private SearchEntry        _search_entry;
-  private Button             _search_next;
-  private Button             _search_prev;
-  private SearchEntry        _replace_entry;
-  private Button             _replace_current;
-  private Button             _replace_all;
-  private Array<SearchMatch> _matches;
-  private int                _match_ptr;
+  private OutlineTable _ot;
+  private SearchEntry  _search_entry;
+  private Button       _search_next;
+  private Button       _search_prev;
+  private SearchEntry  _replace_entry;
+  private Button       _replace_current;
+  private Button       _replace_all;
+  private SearchMatch  _next;
+  private SearchMatch  _prev;
 
   /* Default constructor */
   public SearchBar( OutlineTable ot ) {
 
     _ot = ot;
 
-    /* Initialize variables */
-    _matches = new Array<SearchMatch>();
+    _next = new SearchMatch();
+    _prev = new SearchMatch();
 
     add_search_entry();
     add_search_next();
@@ -64,6 +61,9 @@ public class SearchBar : Box {
 
     show_all();
 
+    _ot.selected_changed.connect( update_next_previous );
+    _ot.cursor_changed.connect( update_next_previous );
+
   }
 
   /* Called whenever the search bar is displayed or hidden */
@@ -73,6 +73,7 @@ public class SearchBar : Box {
       search();
     } else {
       _search_entry.grab_focus();
+      update_state();
     }
   }
 
@@ -91,14 +92,20 @@ public class SearchBar : Box {
   /* Performs the text search */
   private void search() {
 
-    /* Clear the current matches */
-    _matches.remove_range( 0, _matches.length );
-
     /* Perform search */
-    _ot.do_search( _search_entry.text, ref _matches );
+    _ot.do_search( _search_entry.text );
 
-    /* Get the closest match to the current cursor position */
+    /* Update the UI state */
+    update_next_previous();
+
+  }
+
+  /* Called whenever the cursor changes position or the selected node changes */
+  private void update_next_previous() {
+
+    /* Get the next and previous matches */
     find_next_match();
+    find_prev_match();
 
     /* Update the UI state */
     update_state();
@@ -108,11 +115,14 @@ public class SearchBar : Box {
   /* Updates the UI state */
   private void update_state() {
 
-    _search_next.set_sensitive( _match_ptr < _matches.length );
-    _search_prev.set_sensitive( (_matches.length > 0) && (_match_ptr !=  0) );
-    _replace_entry.set_sensitive( _matches.length > 0 );
-    _replace_current.set_sensitive( (_replace_entry.text != "") && (_matches.length > 0) );
-    _replace_all.set_sensitive( (_replace_entry.text != "") && (_matches.length > 0) );
+    var found = (_next.node != null) || (_prev.node != null);
+
+    stdout.printf( "Update_state!!!\n" );
+    _search_next.set_sensitive( _next.node != null );
+    _search_prev.set_sensitive( _prev.node != null );
+    _replace_entry.set_sensitive( found );
+    _replace_current.set_sensitive( (_replace_entry.text != "") && is_match_selected() );
+    _replace_all.set_sensitive( (_replace_entry.text != "") && found );
 
   }
 
@@ -129,25 +139,87 @@ public class SearchBar : Box {
   /* Finds the match after the currently selected node */
   private void find_next_match() {
 
-    var selected = _ot.selected;
+    _next.node  = _ot.selected;
+    _next.name  = true;
+    _next.start = -1;
 
-    if( (_matches.length == 0) || (selected == null) ) {
-      _match_ptr = 0;
+    var start = 0;
+
+    if( _next.node != null ) {
+      switch( _next.node.mode ) {
+        case NodeMode.EDITABLE :  _next.name = true;   start = _next.node.name.cursor + 1;  break;
+        case NodeMode.NOTEEDIT :  _next.name = false;  start = _next.node.note.cursor + 1;  break;
+        default                :  _next.name = true;   start = 0;                         break;
+      }
+    } else if( _ot.nodes.length > 0 ) {
+      _next.node = _ot.nodes.index( 0 );
+    } else {
       return;
     }
 
-    var y      = selected.y;
-    var cursor = (selected.mode == NodeMode.EDITABLE) ? selected.name.cursor :
-                 (selected.mode == NodeMode.NOTEEDIT) ? selected.note.cursor : -1;
+    if( _next.name ) {
+      _next.node.name.text.get_search_match( start, true, ref _next );
+    } else {
+      _next.node.note.text.get_search_match( start, true, ref _next );
+    }
 
-    _match_ptr = -1;
+    while( (_next.node != null) && (_next.start == -1) ) {
+      _next.name = !_next.name;
+      if( _next.name ) {
+        _next.node = _next.node.get_next_node();
+      }
+      if( _next.node != null ) {
+        if( _next.name ) {
+          _next.node.name.text.get_search_match( 0, true, ref _next );
+        } else {
+          _next.node.note.text.get_search_match( 0, true, ref _next );
+        }
+      }
+    }
 
-    for( int i=0; i<_matches.length; i++ ) {
-      var match = _matches.index( i );
-      stdout.printf( "  i: %d, matches: %u, match.node.y: %g, y: %g, match.start: %d, cursor: %d\n", i, _matches.length, match.node.y, y, match.start, cursor );
-      if( (match.node.y >= y) && ((match.node != selected) || (match.start > cursor)) ) {
-        _match_ptr = i;
-        return;
+  }
+
+  /* Finds the match after the currently selected node */
+  private void find_prev_match() {
+
+    _prev.node  = _ot.selected;
+    _prev.name  = false;
+    _prev.start = -1;
+
+    var start = 0;
+
+    if( _prev.node != null ) {
+      switch( _prev.node.mode ) {
+        case NodeMode.EDITABLE :
+          _prev.name = true;
+          start = _prev.node.name.is_selected() ? _prev.node.name.selstart : _prev.node.name.cursor;
+          break;
+        case NodeMode.NOTEEDIT :
+          _prev.name = false;
+          start = _prev.node.note.is_selected() ? _prev.node.name.selstart : _prev.node.note.cursor;
+          break;
+      }
+    } else {
+      return;
+    }
+
+    if( _prev.name ) {
+      _prev.node.name.text.get_search_match( start, false, ref _prev );
+    } else {
+      _prev.node.note.text.get_search_match( start, false, ref _prev );
+    }
+
+    while( (_prev.node != null) && (_prev.start == -1) ) {
+      _prev.name = !_prev.name;
+      if( !_prev.name ) {
+        _prev.node = _prev.node.get_previous_node();
+      }
+      if( _prev.node != null ) {
+        if( _prev.name ) {
+          _prev.node.name.text.get_search_match( _prev.node.name.text.text.length, false, ref _prev );
+        } else {
+          _prev.node.note.text.get_search_match( _prev.node.name.text.text.length, false, ref _prev );
+        }
       }
     }
 
@@ -156,33 +228,25 @@ public class SearchBar : Box {
   /* Perform the search for the next text match */
   private void search_next() {
 
-    /* Get the next match */
-    find_next_match();
-
     /* Select the matched text */
-    select_matched_text();
-
-    /* Update the UI state */
-    update_state();
+    select_matched_text( _next );
 
   }
 
   /* Selects the matched text */
-  private void select_matched_text() {
+  private void select_matched_text( SearchMatch match ) {
 
-    var current = _matches.index( _match_ptr );
-    var pattern = _search_entry.text;
-    var end     = current.start + pattern.length;
+    if( match.node == null ) return;
 
     /* Set the matched node to edit mode and select the matched text */
-    _ot.selected = current.node;
-    _ot.edit_selected( current.name );
-    if( current.name ) {
-      _ot.selected.name.change_selection( current.start, end );
-      _ot.selected.name.set_cursor_only( end );
+    _ot.selected = match.node;
+    _ot.edit_selected( match.name );
+    if( match.name ) {
+      _ot.selected.name.change_selection( match.start, match.end );
+      _ot.selected.name.set_cursor_only( match.end );
     } else {
-      _ot.selected.note.change_selection( current.start, end );
-      _ot.selected.note.set_cursor_only( end );
+      _ot.selected.note.change_selection( match.start, match.end );
+      _ot.selected.note.set_cursor_only( match.end );
     }
 
   }
@@ -200,15 +264,26 @@ public class SearchBar : Box {
   /* Perform the search for the previous text match */
   private void search_previous() {
 
-    /* Get the previous match */
-    find_next_match();
-    _match_ptr--;
-
     /* Select the matched text */
-    select_matched_text();
+    select_matched_text( _prev );
 
-    /* Update the UI state */
-    update_state();
+  }
+
+  /* Returns true if the selected text is a matched pattern */
+  private bool is_match_selected() {
+
+    var pattern = _search_entry.text;
+
+    if( (_ot.selected != null) && (pattern != "") ) {
+      string? seltext = null;
+      switch( _ot.selected.mode ) {
+        case NodeMode.EDITABLE :  seltext = _ot.selected.name.get_selected_text();  break;
+        case NodeMode.NOTEEDIT :  seltext = _ot.selected.note.get_selected_text();  break;
+      }
+      return( (seltext != null) && (seltext == pattern) );
+    }
+
+    return( false );
 
   }
 
@@ -217,9 +292,15 @@ public class SearchBar : Box {
 
     _replace_entry = new Gtk.SearchEntry();
     _replace_entry.placeholder_text = _( "Replace with…");
+    _replace_entry.search_changed.connect( replace_text_changed );
 
     pack_start( _replace_entry, true, true, 5 );
 
+  }
+
+  /* Called whenever the replacement text is changed */
+  private void replace_text_changed() {
+    update_state();
   }
 
   /* Adds the replace current button and adds it to this box */
@@ -234,6 +315,10 @@ public class SearchBar : Box {
 
   /* Performs the replacement for the currently matched text */
   private void replace_current() {
+
+    var replace = _replace_entry.text;
+
+    stdout.printf( "Replacing current with %s\n", replace );
 
     // TBD
 
@@ -254,12 +339,9 @@ public class SearchBar : Box {
 
     var replace = _replace_entry.text;
 
-    for( int i=0; i<_matches.length; i++ ) {
-      var match = _matches.index( i );
-      if( match.name ) {
-        /* TBD */
-      }
-    }
+    stdout.printf( "Replacing all with %s\n", replace );
+
+    /* TBD */
 
   }
 

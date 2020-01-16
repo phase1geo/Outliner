@@ -45,6 +45,7 @@ public class CanvasText : Object {
   /* Signals */
   public signal void resized();
   public signal void select_mode( bool mode );
+  public signal void cursor_changed();
 
   /* Properties */
   public FormattedText text {
@@ -260,8 +261,17 @@ public class CanvasText : Object {
 
   /* Only sets the cursor location to the given value */
   public void set_cursor_only( int cursor ) {
+
+    var orig_cursor = _cursor;
+
     _cursor = cursor;
     update_column();
+
+    /* Alert anyone listening that the cursor changed */
+    if( orig_cursor != _cursor ) {
+      cursor_changed();
+    }
+
   }
 
   /* Sets the cursor from the given mouse coordinates */

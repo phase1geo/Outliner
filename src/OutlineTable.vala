@@ -56,6 +56,7 @@ public class OutlineTable : DrawingArea {
         if( _selected != null ) {
           set_selected_mode( NodeMode.NONE );
           _selected.select_mode.disconnect( select_mode_changed );
+          _selected.cursor_changed.disconnect( selected_cursor_changed );
         }
         if( value != null ) {
           see( value );
@@ -64,7 +65,9 @@ public class OutlineTable : DrawingArea {
         if( _selected != null ) {
           set_selected_mode( NodeMode.SELECTED );
           _selected.select_mode.connect( select_mode_changed );
+          _selected.cursor_changed.connect( selected_cursor_changed );
         }
+        selected_changed();
       }
     }
   }
@@ -93,6 +96,8 @@ public class OutlineTable : DrawingArea {
   public signal void changed();
   public signal void zoom_changed( int name_size, int note_size, int pady );
   public signal void theme_changed( Theme theme );
+  public signal void selected_changed();
+  public signal void cursor_changed();
 
   /* Default constructor */
   public OutlineTable( GLib.Settings settings ) {
@@ -149,6 +154,11 @@ public class OutlineTable : DrawingArea {
   /* Called whenever the selection mode changed of the current node */
   private void select_mode_changed( bool name, bool mode ) {
     _show_format = mode;
+  }
+
+  /* Called whenever the cursor changes position in the current node */
+  private void selected_cursor_changed( bool name ) {
+    cursor_changed();
   }
 
   /* Called whenever we want to change the current selected node's mode */
@@ -1313,9 +1323,9 @@ public class OutlineTable : DrawingArea {
   /**************************/
 
   /* Perform a depth-first search for the given search pattern */
-  public void do_search( string pattern, ref Array<SearchMatch> matches ) {
+  public void do_search( string pattern ) {
     for( int i=0; i<nodes.length; i++ ) {
-      nodes.index( i ).do_search( pattern, ref matches );
+      nodes.index( i ).do_search( pattern );
     }
     queue_draw();
   }

@@ -578,21 +578,37 @@ public class FormattedText {
    Performs search of the given string within the text.  If any occurrences
    are found, highlight them with the match color.
   */
-  public bool do_search( string pattern, ref Array<int> starts ) {
+  public bool do_search( string pattern ) {
     remove_tag_all( FormatTag.MATCH );
     if( (pattern != "") && text.contains( pattern ) ) {
-      var tags = new Array<UndoTagInfo>();
-      var index = 0;
-      while( (index = text.index_of( pattern, index )) != -1 ) {
-        var end = index + pattern.index_of_nth_char( pattern.length );
-        tags.append_val( new UndoTagInfo( FormatTag.MATCH, index, end, null ) );
-        starts.append_val( index );
-        index++;
+      var tags  = new Array<UndoTagInfo>();
+      var start = 0;
+      while( (start = text.index_of( pattern, start )) != -1 ) {
+        var end = start + pattern.index_of_nth_char( pattern.length );
+        tags.append_val( new UndoTagInfo( FormatTag.MATCH, start++, end, null ) );
       }
       apply_tags( tags );
       return( true );
     }
     return( false );
+  }
+
+  /*
+   Sets the start value of match to the next/previous match if a search match
+   exists in the text.
+  */
+  public void get_search_match( int start, bool get_next, ref SearchMatch match ) {
+    var tags = new Array<UndoTagInfo>();
+    var spos = get_next ? start : 0;
+    var epos = get_next ? text.length : start;
+    stdout.printf( "In get_search_match, spos: %d, epos: %d, text: %s\n", spos, epos, text );
+    _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, spos, epos, ref tags );
+    var index = get_next ? (tags.length - 1) : 0;
+    if( tags.length > 0 ) {
+      match.start = tags.index( index ).start;
+      match.end   = tags.index( index ).end;
+    }
+    stdout.printf( "  match.start: %d, end: %d\n", match.start, match.end );
   }
 
   /* Saves the text as the given XML node */

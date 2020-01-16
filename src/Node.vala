@@ -52,6 +52,7 @@ public class Node {
 
   /* Signals */
   public signal void select_mode( bool name, bool mode );
+  public signal void cursor_changed( bool name );
 
   /* Properties */
   public int id {
@@ -174,11 +175,13 @@ public class Node {
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height );
     _name.select_mode.connect( name_select_mode );
+    _name.cursor_changed.connect( name_cursor_changed );
     _name.set_font( name_fd );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
     _note.resized.connect( update_height );
     _note.select_mode.connect( note_select_mode );
+    _note.cursor_changed.connect( note_cursor_changed );
     _note.set_font( note_fd );
 
     position_name();
@@ -205,12 +208,14 @@ public class Node {
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height );
     _name.select_mode.connect( name_select_mode );
+    _name.cursor_changed.connect( name_cursor_changed );
     _name.set_font( name_fd );
     _name.copy( node.name );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
     _note.resized.connect( update_height );
     _note.select_mode.connect( note_select_mode );
+    _note.cursor_changed.connect( note_cursor_changed );
     _note.set_font( note_fd );
     _note.copy( node.note );
 
@@ -259,6 +264,14 @@ public class Node {
   /* Generates the select mode signal for the note field */
   private void note_select_mode( bool mode ) {
     select_mode( false, mode );
+  }
+
+  private void name_cursor_changed() {
+    cursor_changed( true );
+  }
+
+  private void note_cursor_changed() {
+    cursor_changed( false );
   }
 
   /* Called whenever the canvas width changes */
@@ -602,26 +615,15 @@ public class Node {
   }
 
   /* Performs depth first search */
-  public void do_search( string pattern, ref Array<SearchMatch> matches ) {
+  public void do_search( string pattern ) {
 
-    var starts = new Array<int>();
-
-    do_search_text( name, pattern, ref starts, ref matches );
-    do_search_text( note, pattern, ref starts, ref matches );
+    name.text.do_search( pattern );
+    note.text.do_search( pattern );
 
     for( int i=0; i<children.length; i++ ) {
-      children.index( i ).do_search( pattern, ref matches );
+      children.index( i ).do_search( pattern );
     }
 
-  }
-
-  private void do_search_text( CanvasText ct, string pattern, ref Array<int> starts, ref Array<SearchMatch> matches ) {
-    starts.remove_range( 0, starts.length );
-    if( ct.text.do_search( pattern, ref starts ) ) {
-      for( int i=0; i<starts.length; i++ ) {
-        matches.append_val( new SearchMatch( this, (ct == name), starts.index( i ) ) );
-      }
-    }
   }
 
   /*******************/
