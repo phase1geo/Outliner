@@ -626,6 +626,27 @@ public class Node {
 
   }
 
+  /* Replaces all matched text with the given string in the specified CanvasText */
+  private void replace_all_text( string str, CanvasText ct, ref UndoReplaceAll undo ) {
+    var undo_text = new UndoTextReplaceAll( ct );
+    ct.text.replace_all( str, ref undo_text );
+    if( undo_text.tags.length > 0 ) {
+      undo.add_text( undo_text );
+    }
+  }
+
+  /*
+   Replaces all matched text within this node and its descendants with the
+   given string.
+  */
+  public void replace_all( string str, ref UndoReplaceAll undo ) {
+    replace_all_text( str, name, ref undo );
+    replace_all_text( str, note, ref undo );
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).replace_all( str, ref undo );
+    }
+  }
+
   /*******************/
   /* DRAWING METHODS */
   /*******************/

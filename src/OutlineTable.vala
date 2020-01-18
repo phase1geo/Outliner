@@ -1330,6 +1330,14 @@ public class OutlineTable : DrawingArea {
     queue_draw();
   }
 
+  /* Replaces all matched text within the document with the given string */
+  public void replace_all( string str, ref UndoReplaceAll undo ) {
+    for( int i=0; i<nodes.length; i++ ) {
+      nodes.index( i ).replace_all( str, ref undo );
+    }
+    queue_draw();
+  }
+
   /************************/
   /* TREE-RELATED METHODS */
   /************************/

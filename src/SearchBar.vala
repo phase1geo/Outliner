@@ -338,10 +338,9 @@ public class SearchBar : Box {
   private void replace_all() {
 
     var replace = _replace_entry.text;
+    var undo    = new UndoReplaceAll( _search_entry.text, _replace_entry.text );
 
-    stdout.printf( "Replacing all with %s\n", replace );
-
-    /* TBD */
+    _ot.replace_all( replace, ref undo );
 
   }
 
