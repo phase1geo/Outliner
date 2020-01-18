@@ -277,6 +277,8 @@ public class OutlineTable : DrawingArea {
       } else {
         _active = clicked;
       }
+    } else {
+      selected = null;
     }
 
     return( true );
