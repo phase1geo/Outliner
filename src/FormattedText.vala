@@ -611,19 +611,18 @@ public class FormattedText {
 
   /* Replaces all matched search text with the given string */
   public void replace_all( string str, ref UndoTextReplaceAll undo ) {
-    stdout.printf( "In replace_all, str: %s\n", str );
     var matches = new Array<UndoTagInfo>();
     _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, 0, _text.char_count( _text.length - 1 ), ref matches );
     for( int i=0; i<matches.length; i++ ) {
       var match = matches.index( i );
-      undo.add_tags( get_tags_in_range( match.start, match.end ) );
+      undo.add_tags( match.start, get_tags_in_range( match.start, match.end ) );
       _text = _text.splice( match.start, match.end, str );
-      stdout.printf( "  text: %s\n", _text );
       foreach( TagInfo f in _formats ) {
         f.remove_tag( match.start, match.end );
         f.adjust( match.start, ((0 - (match.end - match.start)) + str.length) );
       }
     }
+    changed();
   }
 
   /* Saves the text as the given XML node */

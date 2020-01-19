@@ -21,12 +21,15 @@
 
 public class UndoTextReplaceAll {
   public CanvasText         text;
+  public Array<int>         starts;
   public Array<UndoTagInfo> tags;
   public UndoTextReplaceAll( CanvasText text ) {
-    this.text = text;
-    this.tags = new Array<UndoTagInfo>();
+    this.text   = text;
+    this.starts = new Array<int>();
+    this.tags   = new Array<UndoTagInfo>();
   }
-  public void add_tags( Array<UndoTagInfo> tags ) {
+  public void add_tags( int start, Array<UndoTagInfo> tags ) {
+    this.starts.append_val( start );
     this.tags.append_vals( tags, tags.length );
   }
 }
@@ -50,14 +53,13 @@ public class UndoReplaceAll : UndoItem {
     texts.append_val( text );
   }
 
-  private void replace( CanvasText ct, string remove_text, string add_text, Array<UndoTagInfo> tags ) {
+  private void replace( UndoTextReplaceAll utra, string remove_text, string add_text ) {
     var remove_chars = remove_text.char_count();
-    for( int i=0; i<tags.length; i++ ) {
-      var tag = tags.index( i );
-      ct.text.replace_text( tag.start, remove_chars, add_text );
+    for( int i=0; i<utra.starts.length; i++ ) {
+      utra.text.text.replace_text( utra.starts.index( i ), remove_chars, add_text );
     }
     if( add_text == search_text ) {
-      ct.text.apply_tags( tags );
+      utra.text.text.apply_tags( utra.tags );
     }
   }
 
@@ -65,18 +67,20 @@ public class UndoReplaceAll : UndoItem {
   public override void undo( OutlineTable table ) {
     for( int i=0; i<texts.length; i++ ) {
       var ti = texts.index( i );
-      replace( ti.text, replace_text, search_text, ti.tags );
+      replace( ti, replace_text, search_text );
     }
     table.queue_draw();
+    table.changed();
   }
 
   /* Causes the stored item to be put into the after state */
   public override void redo( OutlineTable table ) {
     for( int i=0; i<texts.length; i++ ) {
       var ti = texts.index( i );
-      replace( ti.text, search_text, replace_text, ti.tags );
+      replace( ti, search_text, replace_text );
     }
     table.queue_draw();
+    table.changed();
   }
 
 }

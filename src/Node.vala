@@ -630,7 +630,7 @@ public class Node {
   private void replace_all_text( string str, CanvasText ct, ref UndoReplaceAll undo ) {
     var undo_text = new UndoTextReplaceAll( ct );
     ct.text.replace_all( str, ref undo_text );
-    if( undo_text.tags.length > 0 ) {
+    if( undo_text.starts.length > 0 ) {
       undo.add_text( undo_text );
     }
   }

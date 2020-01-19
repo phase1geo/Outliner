@@ -117,7 +117,6 @@ public class SearchBar : Box {
 
     var found = (_next.node != null) || (_prev.node != null);
 
-    stdout.printf( "Update_state!!!\n" );
     _search_next.set_sensitive( _next.node != null );
     _search_prev.set_sensitive( _prev.node != null );
     _replace_entry.set_sensitive( found );
@@ -318,8 +317,6 @@ public class SearchBar : Box {
 
     var replace = _replace_entry.text;
 
-    stdout.printf( "Replacing current with %s\n", replace );
-
     // TBD
 
   }
@@ -341,6 +338,7 @@ public class SearchBar : Box {
     var undo    = new UndoReplaceAll( _search_entry.text, _replace_entry.text );
 
     _ot.replace_all( replace, ref undo );
+    _ot.undo_buffer.add_item( undo );
 
   }
 

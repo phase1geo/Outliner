@@ -1338,6 +1338,7 @@ public class OutlineTable : DrawingArea {
       nodes.index( i ).replace_all( str, ref undo );
     }
     queue_draw();
+    changed();
   }
 
   /************************/
