@@ -1332,11 +1332,26 @@ public class OutlineTable : DrawingArea {
     queue_draw();
   }
 
-  /* Replaces all matched text within the document with the given string */
-  public void replace_all( string str, ref UndoReplaceAll undo ) {
-    for( int i=0; i<nodes.length; i++ ) {
-      nodes.index( i ).replace_all( str, ref undo );
+  /* Replaces the current match */
+  public void replace_current( string replace ) {
+    if( is_node_editable() ) {
+      selected.name.insert( replace, undo_text );
+      queue_draw();
+      changed();
+    } else if( is_note_editable() ) {
+      selected.note.insert( replace, undo_text );
+      queue_draw();
+      changed();
     }
+  }
+
+  /* Replaces all matched text within the document with the given string */
+  public void replace_all( string search, string replace ) {
+    var undo = new UndoReplaceAll( search, replace );
+    for( int i=0; i<nodes.length; i++ ) {
+      nodes.index( i ).replace_all( replace, ref undo );
+    }
+    undo_buffer.add_item( undo );
     queue_draw();
     changed();
   }

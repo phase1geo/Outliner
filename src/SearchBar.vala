@@ -322,9 +322,7 @@ public class SearchBar : Box {
   /* Performs the replacement for the currently matched text */
   private void replace_current() {
 
-    var replace = _replace_entry.text;
-
-    // TBD
+    _ot.replace_current( _replace_entry.text );
 
   }
 
@@ -341,11 +339,7 @@ public class SearchBar : Box {
   /* Performs the replacement for all text that matches the search text */
   private void replace_all() {
 
-    var replace = _replace_entry.text;
-    var undo    = new UndoReplaceAll( _search_entry.text, _replace_entry.text );
-
-    _ot.replace_all( replace, ref undo );
-    _ot.undo_buffer.add_item( undo );
+    _ot.replace_all( _search_entry.text, _replace_entry.text );
 
   }
 
