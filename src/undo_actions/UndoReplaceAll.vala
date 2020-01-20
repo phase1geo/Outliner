@@ -30,8 +30,9 @@ public class UndoTextReplaceAll {
   }
   public void add_tags( int start, Array<UndoTagInfo> tags ) {
     this.starts.append_val( start );
-    this.tags.append_vals( tags, tags.length );
-    stdout.printf( "In add_tags, tags: %u\n", this.tags.length );
+    for( int i=0; i<tags.length; i++ ) {
+      this.tags.append_val( tags.index( i ) );
+    }
   }
 }
 
@@ -54,14 +55,13 @@ public class UndoReplaceAll : UndoItem {
     texts.append_val( text );
   }
 
+  /* Performs replacement */
   private void replace( UndoTextReplaceAll utra, string remove_text, string add_text ) {
     var remove_chars = remove_text.char_count();
-    stdout.printf( "Replace, remove_chars: %d, add_text: %s\n", remove_chars, add_text );
     for( int i=0; i<utra.starts.length; i++ ) {
       utra.text.text.replace_text( utra.starts.index( i ), remove_chars, add_text );
     }
     if( add_text == search_text ) {
-      stdout.printf( "Applying tags: %u\n", utra.tags.length );
       utra.text.text.apply_tags( utra.tags );
     }
   }

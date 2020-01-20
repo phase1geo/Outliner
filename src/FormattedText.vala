@@ -549,7 +549,6 @@ public class FormattedText {
   public void apply_tags( Array<UndoTagInfo> tags ) {
     for( int i=((int)tags.length - 1); i>=0; i-- ) {
       var info = tags.index( i );
-      stdout.printf( "In apply_tags, tag: %d, start: %d, end: %d, extra: %s\n", info.tag, info.start, info.end, info.extra );
       _formats[info.tag].add_tag( info.start, info.end, info.extra );
     }
     changed();
@@ -613,7 +612,7 @@ public class FormattedText {
   /* Replaces all matched search text with the given string */
   public void replace_all( string str, ref UndoTextReplaceAll undo ) {
     var matches = new Array<UndoTagInfo>();
-    _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, 0, _text.char_count( _text.length - 1 ), ref matches );
+    _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, 0, _text.char_count(), ref matches );
     for( int i=0; i<matches.length; i++ ) {
       var match = matches.index( i );
       undo.add_tags( match.start, get_tags_in_range( match.start, match.end ) );
