@@ -19,6 +19,7 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
+using Gdk;
 using Gtk;
 
 public class SearchMatch {
@@ -85,6 +86,7 @@ public class SearchBar : Box {
     _search_entry.placeholder_text = _( "Find text…");
     _search_entry.search_changed.connect( search );
     _search_entry.activate.connect( search_next );
+    _search_entry.focus_out_event.connect( search_focus_out );
 
     pack_start( _search_entry, true, true );
 
@@ -116,7 +118,7 @@ public class SearchBar : Box {
   /* Updates the UI state */
   private void update_state() {
 
-    var found = (_next.node != null) || (_prev.node != null);
+    var found = (_next.node != null) || (_prev.node != null) || is_match_selected();
 
     _search_next.set_sensitive( _next.node != null );
     _search_prev.set_sensitive( _prev.node != null );
@@ -227,10 +229,13 @@ public class SearchBar : Box {
 
   /* Perform the search for the next text match */
   private void search_next() {
-
-    /* Select the matched text */
     select_matched_text( _next );
+  }
 
+  /* Called when the search box loses focus */
+  private bool search_focus_out( EventFocus e ) {
+    select_matched_text( _next );
+    return( false );
   }
 
   /* Selects the matched text */
@@ -322,7 +327,11 @@ public class SearchBar : Box {
   /* Performs the replacement for the currently matched text */
   private void replace_current() {
 
+    /* Replace the current match */
     _ot.replace_current( _replace_entry.text );
+
+    /* Jump to the next match */
+    select_matched_text( _next );
 
   }
 
