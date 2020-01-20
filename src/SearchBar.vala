@@ -88,7 +88,7 @@ public class SearchBar : Box {
     _search_entry.activate.connect( search_next );
     _search_entry.focus_out_event.connect( search_focus_out );
 
-    pack_start( _search_entry, true, true );
+    pack_start( _search_entry, true, true, 2 );
 
   }
 
@@ -134,7 +134,7 @@ public class SearchBar : Box {
     _search_next = new Gtk.Button.from_icon_name( "go-down-symbolic", IconSize.SMALL_TOOLBAR );
     _search_next.clicked.connect( search_next );
 
-    pack_start( _search_next, false, false );
+    pack_start( _search_next, false, false, 2 );
 
   }
 
@@ -262,7 +262,7 @@ public class SearchBar : Box {
     _search_prev = new Gtk.Button.from_icon_name( "go-up-symbolic", IconSize.SMALL_TOOLBAR );
     _search_prev.clicked.connect( search_previous );
 
-    pack_start( _search_prev, false, false );
+    pack_start( _search_prev, false, false, 2 );
 
   }
 
@@ -305,7 +305,7 @@ public class SearchBar : Box {
     _replace_entry.placeholder_text = _( "Replace with…");
     _replace_entry.search_changed.connect( replace_text_changed );
 
-    pack_start( _replace_entry, true, true );
+    pack_start( _replace_entry, true, true, 2 );
 
   }
 
@@ -320,7 +320,7 @@ public class SearchBar : Box {
     _replace_current = new Gtk.Button.with_label( _( "Replace" ) );
     _replace_current.clicked.connect( replace_current );
 
-    pack_start( _replace_current, false, false );
+    pack_start( _replace_current, false, false, 2 );
 
   }
 
@@ -341,7 +341,7 @@ public class SearchBar : Box {
     _replace_all = new Gtk.Button.with_label( _( "Replace All" ) );
     _replace_all.clicked.connect( replace_all );
 
-    pack_start( _replace_all, false, false );
+    pack_start( _replace_all, false, false, 2 );
 
   }
 
