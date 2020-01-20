@@ -55,6 +55,7 @@ public class SearchBar : Box {
     add_search_entry();
     add_search_next();
     add_search_previous();
+    add_spacer();
     add_replace_entry();
     add_replace_current();
     add_replace_all();
@@ -85,7 +86,7 @@ public class SearchBar : Box {
     _search_entry.search_changed.connect( search );
     _search_entry.activate.connect( search_next );
 
-    pack_start( _search_entry, true, true, 5 );
+    pack_start( _search_entry, true, true );
 
   }
 
@@ -131,7 +132,7 @@ public class SearchBar : Box {
     _search_next = new Gtk.Button.from_icon_name( "go-down-symbolic", IconSize.SMALL_TOOLBAR );
     _search_next.clicked.connect( search_next );
 
-    pack_start( _search_next, false, false, 5 );
+    pack_start( _search_next, false, false );
 
   }
 
@@ -256,7 +257,7 @@ public class SearchBar : Box {
     _search_prev = new Gtk.Button.from_icon_name( "go-up-symbolic", IconSize.SMALL_TOOLBAR );
     _search_prev.clicked.connect( search_previous );
 
-    pack_start( _search_prev, false, false, 5 );
+    pack_start( _search_prev, false, false );
 
   }
 
@@ -266,6 +267,12 @@ public class SearchBar : Box {
     /* Select the matched text */
     select_matched_text( _prev );
 
+  }
+
+  /* Adds a spacer between the search and replace portions of the search bar */
+  private void add_spacer() {
+    var lbl = new Label( " " );
+    pack_start( lbl, false, false, 2 );
   }
 
   /* Returns true if the selected text is a matched pattern */
@@ -293,7 +300,7 @@ public class SearchBar : Box {
     _replace_entry.placeholder_text = _( "Replace with…");
     _replace_entry.search_changed.connect( replace_text_changed );
 
-    pack_start( _replace_entry, true, true, 5 );
+    pack_start( _replace_entry, true, true );
 
   }
 
@@ -305,10 +312,10 @@ public class SearchBar : Box {
   /* Adds the replace current button and adds it to this box */
   private void add_replace_current() {
 
-    _replace_current = new Gtk.Button.with_label( _( "Replace Current" ) );
+    _replace_current = new Gtk.Button.with_label( _( "Replace" ) );
     _replace_current.clicked.connect( replace_current );
 
-    pack_start( _replace_current, false, false, 5 );
+    pack_start( _replace_current, false, false );
 
   }
 
@@ -327,7 +334,7 @@ public class SearchBar : Box {
     _replace_all = new Gtk.Button.with_label( _( "Replace All" ) );
     _replace_all.clicked.connect( replace_all );
 
-    pack_start( _replace_all, false, false, 5 );
+    pack_start( _replace_all, false, false );
 
   }
 

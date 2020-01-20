@@ -549,6 +549,7 @@ public class FormattedText {
   public void apply_tags( Array<UndoTagInfo> tags ) {
     for( int i=((int)tags.length - 1); i>=0; i-- ) {
       var info = tags.index( i );
+      stdout.printf( "In apply_tags, tag: %d, start: %d, end: %d, extra: %s\n", info.tag, info.start, info.end, info.extra );
       _formats[info.tag].add_tag( info.start, info.end, info.extra );
     }
     changed();
