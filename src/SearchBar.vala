@@ -31,6 +31,10 @@ public class SearchMatch {
 
   public SearchMatch() {}
 
+  public string to_string() {
+    return( (node == null) ? "none" : "name: %s, str: %s, start: %d, end: %d".printf( name.to_string(), (name ? node.name.text.text : node.note.text.text), start, end ) );
+  }
+
 }
 
 public class SearchBar : Box {
@@ -44,6 +48,7 @@ public class SearchBar : Box {
   private Button       _replace_all;
   private SearchMatch  _next;
   private SearchMatch  _prev;
+  private int          _ignore_update;
 
   /* Default constructor */
   public SearchBar( OutlineTable ot ) {
@@ -52,6 +57,7 @@ public class SearchBar : Box {
 
     _next = new SearchMatch();
     _prev = new SearchMatch();
+    _ignore_update = 0;
 
     add_search_entry();
     add_search_next();
@@ -73,9 +79,11 @@ public class SearchBar : Box {
     if( !show ) {
       _search_entry.text = "";
       search();
+      _ignore_update = 2;
     } else {
       _search_entry.grab_focus();
       update_state();
+      _ignore_update = 0;
     }
   }
 
@@ -86,7 +94,6 @@ public class SearchBar : Box {
     _search_entry.placeholder_text = _( "Find text…");
     _search_entry.search_changed.connect( search );
     _search_entry.activate.connect( search_next );
-    _search_entry.focus_out_event.connect( search_focus_out );
 
     pack_start( _search_entry, true, true, 2 );
 
@@ -105,6 +112,13 @@ public class SearchBar : Box {
 
   /* Called whenever the cursor changes position or the selected node changes */
   private void update_next_previous() {
+
+    if( _ignore_update > 0 ) {
+      if( _ignore_update == 1 ) {
+        _ignore_update = 0;
+      }
+      return;
+    }
 
     /* Get the next and previous matches */
     find_next_match();
@@ -149,9 +163,14 @@ public class SearchBar : Box {
 
     if( _next.node != null ) {
       switch( _next.node.mode ) {
-        case NodeMode.EDITABLE :  _next.name = true;   start = _next.node.name.cursor + 1;  break;
-        case NodeMode.NOTEEDIT :  _next.name = false;  start = _next.node.note.cursor + 1;  break;
-        default                :  _next.name = true;   start = 0;                         break;
+        case NodeMode.EDITABLE :
+          _next.name = true;
+          start = _next.node.name.is_selected() ? _next.node.name.selend : _next.node.name.cursor + 1;
+          break;
+        case NodeMode.NOTEEDIT :
+          _next.name = false;
+          start = _next.node.note.is_selected() ? _next.node.note.selend : _next.node.note.cursor + 1;
+          break;
       }
     } else if( _ot.nodes.length > 0 ) {
       _next.node = _ot.nodes.index( 0 );
@@ -232,26 +251,30 @@ public class SearchBar : Box {
     select_matched_text( _next );
   }
 
-  /* Called when the search box loses focus */
-  private bool search_focus_out( EventFocus e ) {
-    select_matched_text( _next );
-    return( false );
-  }
-
   /* Selects the matched text */
   private void select_matched_text( SearchMatch match ) {
 
     if( match.node == null ) return;
 
+    var selchange = (match.node != _ot.selected);
+    var curchange = (match.name ? match.node.name.cursor : match.node.note.cursor) != match.end;
+
     /* Set the matched node to edit mode and select the matched text */
-    _ot.selected = match.node;
+    _ignore_update = selchange ? 1 : 0;
+    _ot.selected   = match.node;
     _ot.edit_selected( match.name );
+
     if( match.name ) {
       _ot.selected.name.change_selection( match.start, match.end );
       _ot.selected.name.set_cursor_only( match.end );
     } else {
       _ot.selected.note.change_selection( match.start, match.end );
       _ot.selected.note.set_cursor_only( match.end );
+    }
+
+    /* Make sure that we update the search bar */
+    if( !curchange ) {
+      _ot.cursor_changed();
     }
 
   }
@@ -304,9 +327,18 @@ public class SearchBar : Box {
     _replace_entry = new Gtk.SearchEntry();
     _replace_entry.placeholder_text = _( "Replace with…");
     _replace_entry.search_changed.connect( replace_text_changed );
+    _replace_entry.focus_in_event.connect( replace_focus_in );
 
     pack_start( _replace_entry, true, true, 2 );
 
+  }
+
+  /* Called when the search box loses focus */
+  private bool replace_focus_in( EventFocus e ) {
+    if( !is_match_selected() ) {
+      select_matched_text( _next );
+    }
+    return( false );
   }
 
   /* Called whenever the replacement text is changed */
