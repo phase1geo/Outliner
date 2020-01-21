@@ -242,6 +242,40 @@ public class OutlineTable : DrawingArea {
     return( null );
   }
 
+  /* Called when the given coordinates are clicked within a CanvasText item. */
+  private bool clicked_in_text( Node clicked, CanvasText text, EventButton e, NodeMode select_mode ) {
+
+    bool   shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
+    bool   control = (bool)(e.state & ModifierType.CONTROL_MASK);
+    string url     = "";
+
+    /* Set the selected node to the clicked node */
+    selected = clicked;
+
+    /*
+     If the mouse click was within a URL and the control key was pressed, open
+     the URL in an external application.
+    */
+    if( control && text.is_within_url( e.x, e.y, ref url ) ) {
+      _active = clicked;
+      Utils.open_url( url );
+      return( false );
+    }
+
+    /* Set the cursor or selection */
+    switch( e.type ) {
+      case EventType.BUTTON_PRESS        :  text.set_cursor_at_char( e.x, e.y, shift );  break;
+      case EventType.DOUBLE_BUTTON_PRESS :  text.set_cursor_at_word( e.x, e.y, shift );  break;
+      case EventType.TRIPLE_BUTTON_PRESS :  text.set_cursor_all( false );                break;
+    }
+
+    /* Sets the selected mode */
+    set_selected_mode( select_mode );
+
+    return( true );
+
+  }
+
   /* Selects the node at the given coordinates */
   private bool set_current_at_position( double x, double y, EventButton e ) {
 
@@ -257,37 +291,9 @@ public class OutlineTable : DrawingArea {
         _active = clicked;
         return( false );
       } else if( clicked.is_within_name( x, y ) ) {
-        bool shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
-        bool control = (bool)(e.state & ModifierType.CONTROL_MASK);
-        string url = "";
-        selected = clicked;
-        if( control && clicked.is_within_url( x, y, ref url ) ) {
-          _active = clicked;
-          Utils.open_url( url );
-          return( false );
-        }
-        switch( e.type ) {
-          case EventType.BUTTON_PRESS        :  clicked.name.set_cursor_at_char( e.x, e.y, shift );  break;
-          case EventType.DOUBLE_BUTTON_PRESS :  clicked.name.set_cursor_at_word( e.x, e.y, shift );  break;
-          case EventType.TRIPLE_BUTTON_PRESS :  clicked.name.set_cursor_all( false );                break;
-        }
-        set_selected_mode( NodeMode.EDITABLE );
+        return( clicked_in_text( clicked, clicked.name, e, NodeMode.EDITABLE ) );
       } else if( clicked.is_within_note( x, y ) ) {
-        bool shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
-        bool control = (bool)(e.state & ModifierType.CONTROL_MASK);
-        string url = "";
-        selected = clicked;
-        if( control && clicked.is_within_url( x, y, ref url ) ) {
-          _active = clicked;
-          Utils.open_url( url );
-          return( false );
-        }
-        switch( e.type ) {
-          case EventType.BUTTON_PRESS        :  clicked.note.set_cursor_at_char( e.x, e.y, shift );  break;
-          case EventType.DOUBLE_BUTTON_PRESS :  clicked.note.set_cursor_at_word( e.x, e.y, shift );  break;
-          case EventType.TRIPLE_BUTTON_PRESS :  clicked.note.set_cursor_all( false );                break;
-        }
-        set_selected_mode( NodeMode.NOTEEDIT );
+        return( clicked_in_text( clicked, clicked.note, e, NodeMode.NOTEEDIT ) );
       } else {
         _active = clicked;
       }
