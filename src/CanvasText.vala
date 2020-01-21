@@ -167,6 +167,25 @@ public class CanvasText : Object {
     return( Utils.is_within_bounds( x, y, posx, posy, _width, _height ) );
   }
 
+  /*
+   Returns true if the given coordinates within a URL and returns the matching
+   URL.
+  */
+  public bool is_within_url( double x, double y, ref string url ) {
+    int adjusted_x = (int)(x - posx) * Pango.SCALE;
+    int adjusted_y = (int)(y - posy) * Pango.SCALE;
+    int cursor, trailing;
+    if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
+      var cindex = text.text.char_count( cursor + trailing );
+      var extra  = text.get_extra( FormatTag.URL, cindex );
+      if( extra != null ) {
+        url = extra;
+        return( true );
+      }
+    }
+    return( false );
+  }
+
   /* Returns true if text is currently selected */
   public bool is_selected() {
     return( _selstart != _selend );

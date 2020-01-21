@@ -257,8 +257,15 @@ public class OutlineTable : DrawingArea {
         _active = clicked;
         return( false );
       } else if( clicked.is_within_name( x, y ) ) {
-        bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
+        bool shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
+        bool control = (bool)(e.state & ModifierType.CONTROL_MASK);
+        string url = "";
         selected = clicked;
+        if( control && clicked.is_within_url( x, y, ref url ) ) {
+          _active = clicked;
+          Utils.open_url( url );
+          return( false );
+        }
         switch( e.type ) {
           case EventType.BUTTON_PRESS        :  clicked.name.set_cursor_at_char( e.x, e.y, shift );  break;
           case EventType.DOUBLE_BUTTON_PRESS :  clicked.name.set_cursor_at_word( e.x, e.y, shift );  break;
@@ -266,8 +273,15 @@ public class OutlineTable : DrawingArea {
         }
         set_selected_mode( NodeMode.EDITABLE );
       } else if( clicked.is_within_note( x, y ) ) {
-        bool shift = (bool)(e.state & ModifierType.SHIFT_MASK);
+        bool shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
+        bool control = (bool)(e.state & ModifierType.CONTROL_MASK);
+        string url = "";
         selected = clicked;
+        if( control && clicked.is_within_url( x, y, ref url ) ) {
+          _active = clicked;
+          Utils.open_url( url );
+          return( false );
+        }
         switch( e.type ) {
           case EventType.BUTTON_PRESS        :  clicked.note.set_cursor_at_char( e.x, e.y, shift );  break;
           case EventType.DOUBLE_BUTTON_PRESS :  clicked.note.set_cursor_at_word( e.x, e.y, shift );  break;
@@ -1391,7 +1405,7 @@ public class OutlineTable : DrawingArea {
   /* Retrieves the node prior to the given root node */
   public Node? get_previous_node( Node root ) {
     int index = root_index( root );
-    return( (index == 0) ? null : nodes.index( index - 1 ).get_last_node() );
+    return( (index <= 0) ? null : nodes.index( index - 1 ).get_last_node() );
   }
 
   /* Retrieves the node after to the given root node */

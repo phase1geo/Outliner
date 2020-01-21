@@ -27,7 +27,6 @@ public class FormatBar : Gtk.Popover {
   private OutlineTable _table;
   private Button       _copy;
   private Button       _cut;
-  private Button       _paste;
   private ToggleButton _bold;
   private ToggleButton _italics;
   private ToggleButton _underline;
@@ -62,11 +61,6 @@ public class FormatBar : Gtk.Popover {
     _cut.relief = ReliefStyle.NONE;
     _cut.set_tooltip_markup( Utils.tooltip_with_accel( _( "Cut" ), "Ctrl + X" ) );
     _cut.clicked.connect( handle_cut );
-
-    _paste = new Button.from_icon_name( "edit-paste-symbolic", IconSize.SMALL_TOOLBAR );
-    _paste.relief = ReliefStyle.NONE;
-    _paste.set_tooltip_markup( Utils.tooltip_with_accel( _( "Paste" ), "Ctrl + V" ) );
-    _paste.clicked.connect( handle_paste );
 
     _bold = new ToggleButton();
     _bold.image  = new Image.from_icon_name( "format-text-bold-symbolic", IconSize.SMALL_TOOLBAR );
@@ -130,7 +124,6 @@ public class FormatBar : Gtk.Popover {
 
     box.pack_start( _copy,               false, false, 0 );
     box.pack_start( _cut,                false, false, 0 );
-    box.pack_start( _paste,              false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _bold,               false, false, 0 );
     box.pack_start( _italics,            false, false, 0 );
@@ -184,15 +177,12 @@ public class FormatBar : Gtk.Popover {
   private void format_text( FormatTag tag, string? extra=null ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
       _table.selected.name.add_tag( tag, extra, _table.undo_text );
-      // _table.selected.name.clear_selection();
     } else {
       _table.selected.note.add_tag( tag, extra, _table.undo_text );
-      // _table.selected.note.clear_selection();
     }
     _table.queue_draw();
     _table.changed();
     _table.grab_focus();
-    // close();
   }
 
   private void unformat_text( FormatTag tag ) {
@@ -215,12 +205,6 @@ public class FormatBar : Gtk.Popover {
   /* Cuts the selected text to the clipboard */
   private void handle_cut() {
     _table.do_cut();
-    close();
-  }
-
-  /* Pastes the clipboard text into the entry */
-  private void handle_paste() {
-    _table.do_paste();
     close();
   }
 

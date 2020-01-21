@@ -460,6 +460,15 @@ public class Node {
     return( Utils.is_within_bounds( x, y, this.x, this.y, width, (_h - 8) ) );
   }
 
+  /* Returns true if the given coordinates lie within a URL */
+  public bool is_within_url( double x, double y, ref string url ) {
+    if( is_within_name( x, y ) ) {
+      return( name.is_within_url( x, y, ref url ) );
+    } else {
+      return( note.is_within_url( x, y, ref url ) );
+    }
+  }
+
   /*************************/
   /* FILE HANDLING METHODS */
   /*************************/

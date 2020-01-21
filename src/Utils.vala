@@ -98,4 +98,11 @@ public class Utils {
     return( "%s   <i>(%s)</i>".printf( tooltip, accel ) );
   }
 
+  /* Opens the given URL in the proper external default application */
+  public static void open_url( string url ) {
+    try {
+      AppInfo.launch_default_for_uri( url, null );
+    } catch( GLib.Error e ) {}
+  }
+
 }
