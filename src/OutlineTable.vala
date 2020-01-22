@@ -358,7 +358,16 @@ public class OutlineTable : DrawingArea {
             _move_parent = selected.parent;
             _move_index  = (_move_parent == null) ? root_index( selected ) : selected.index();
             selected.mode = NodeMode.MOVETO;
-            selected.parent.remove_child( selected );
+            if( selected.is_root() ) {
+              var index = root_index( selected );
+              nodes.remove_index( index );
+              if( index < nodes.length ) {
+                nodes.index( index ).y = (index == 0) ? 0 : nodes.index( index - 1 ).get_last_node().last_y;
+                nodes.index( index ).adjust_nodes_all( nodes.index( index ).last_y, true );
+              }
+            } else {
+              selected.parent.remove_child( selected );
+            }
           }
           selected.x = e.x;
           selected.y = e.y;
@@ -415,8 +424,10 @@ public class OutlineTable : DrawingArea {
               undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
               break;
             case NodeMode.ATTACHBELOW :
-              if( !_active.is_leaf() ) {
-                _active.add_child( selected, 0 );
+              if( _active.is_root() ) {
+                var index = root_index( _active );
+                selected.x = 0;
+                insert_node( null, selected, (index + 1) );
               } else {
                 _active.parent.add_child( selected, (_active.index() + 1) );
               }
@@ -1496,10 +1507,19 @@ public class OutlineTable : DrawingArea {
     if( node.is_root() ) {
       var index = root_index( node );
       nodes.remove_index( index );
-      nodes.index( index ).y = (index == 0) ? 0 : nodes.index( index - 1 ).get_last_node().last_y;
-      nodes.index( index ).adjust_nodes_all( nodes.index( index ).last_y, true );
-      if( was_selected ) {
-        selected = (index == nodes.length) ? nodes.index( index - 1 ).get_last_node() : nodes.index( index );
+      if( nodes.length > 0 ) {
+        if( index < nodes.length ) {
+          nodes.index( index ).y = (index == 0) ? 0 : nodes.index( index - 1 ).get_last_node().last_y;
+          nodes.index( index ).adjust_nodes_all( nodes.index( index ).last_y, true );
+        }
+        if( was_selected ) {
+          selected = (index == nodes.length) ? nodes.index( index - 1 ).get_last_node() : nodes.index( index );
+        }
+      } else {
+        var new_node = create_node();
+        insert_node( null, new_node, 0 );
+        selected = new_node;
+        selected.mode = NodeMode.EDITABLE;
       }
     } else {
       var next = node.get_next_node() ?? node.get_previous_node();
