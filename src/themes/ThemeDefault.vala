@@ -45,7 +45,7 @@ public class ThemeDefault : Theme {
     symbol_color       = get_color( "#444444" );
     note_color         = get_color( "Blue" );
     attachable_color   = get_color( "#9bdb4d" );
-    url                = get_color( "Orange" );
+    url                = get_color( "Blue" );
     hilite             = get_color( "#3689e6" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );

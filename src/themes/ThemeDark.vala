@@ -45,7 +45,7 @@ public class ThemeDark : Theme {
     symbol_color       = get_color( "#cccccc" );
     note_color         = get_color( "#f9c440" );
     attachable_color   = get_color( "#9bdb4d" );
-    url                = get_color( "Blue" );
+    url                = get_color( "Orange" );
     hilite             = get_color( "yellow" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );

@@ -27,7 +27,7 @@ public class LinkEditor : Popover {
   private bool         _add = true;
   private Entry        _entry;
   private Button       _apply;
-  private string       _url_re = "\\b(mailto:.+@[a-z0-9-]+\\.[a-z0-9.-]+|[a-zA-Z0-9]+://[a-z0-9-]+\\.[a-z0-9.-]+(?:/|(?:/[][a-zA-Z0-9!#$%&'*+,.:;=?@_~-]+)*))\\b";
+  private string       _url_re = "^(mailto:.+@[a-z0-9-]+\\.[a-z0-9.-]+|[a-zA-Z0-9]+://[a-z0-9-]+\\.[a-z0-9.-]+(?:/|(?:/[][a-zA-Z0-9!#$%&'*+,.:;=?@_~-]+)*))$";
   private CanvasText   _text;
 
   /* Default constructor */
@@ -126,9 +126,13 @@ public class LinkEditor : Popover {
     Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
     pointing_to = rect;
 
+    /* Check to see if the selected text is already a valid URL */
+    var selected_text = text.get_selected_text();
+    var use_selected  = (selected_text != null) && Regex.match_simple( _url_re, selected_text );
+
     _add        = true;
-    _entry.text = "";
-    _apply.set_sensitive( false );
+    _entry.text = use_selected ? selected_text : "";
+    _apply.set_sensitive( use_selected );
 
     show_popover( true );
 

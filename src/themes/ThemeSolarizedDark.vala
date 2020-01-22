@@ -45,7 +45,7 @@ public class ThemeSolarizedDark : Theme {
     symbol_color       = get_color( "#B58900" );
     note_color         = get_color( "#f37329" );
     attachable_color   = get_color( "#6C71C4" );
-    url                = get_color( "Blue" );
+    url                = get_color( "Orange" );
     hilite             = get_color( "Green" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
