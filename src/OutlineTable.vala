@@ -373,8 +373,10 @@ public class OutlineTable : DrawingArea {
           selected.y = e.y;
           var current = node_at_coordinates( e.x, e.y );
           if( current != null ) {
-            if( current.is_within_attach( e.x, e.y ) ) {
+            if( current.is_within_attachto( e.x, e.y ) ) {
               current.mode = NodeMode.ATTACHTO;
+            } else if( current.is_within_attachabove( e.x, e.y ) ) {
+              current.mode = NodeMode.ATTACHABOVE;
             } else {
               current.mode = NodeMode.ATTACHBELOW;
             }
@@ -421,6 +423,16 @@ public class OutlineTable : DrawingArea {
           switch( _active.mode ) {
             case NodeMode.ATTACHTO :
               _active.add_child( selected );
+              undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
+              break;
+            case NodeMode.ATTACHABOVE :
+              if( _active.is_root() ) {
+                var index = root_index( _active );
+                selected.x = 0;
+                insert_node( null, selected, index );
+              } else {
+                _active.parent.add_child( selected, _active.index() );
+              }
               undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
               break;
             case NodeMode.ATTACHBELOW :

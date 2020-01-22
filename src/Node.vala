@@ -26,7 +26,8 @@ public enum NodeMode {
   NONE = 0,      // Indicates that this node is nothing special
   SELECTED,      // Selects the node to perform an action on
   ATTACHTO,      // Shows the node as something that can be attached as a child
-  ATTACHBELOW,   // Shows the node as something that can be attached as a sibling
+  ATTACHABOVE,   // Shows the node as something that can be attached as a sibling above
+  ATTACHBELOW,   // Shows the node as something that can be attached as a sibling below
   MOVETO,        // Indicates that the node is being dragged by the user
   EDITABLE,      // Indicates that the node text is being edited
   NOTEEDIT,      // Indicates that the note text is being edited
@@ -455,9 +456,14 @@ public class Node {
     return( Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
   }
 
-  /* Returns true if the given coordinates lie within the attach area */
-  public bool is_within_attach( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, this.y, width, (_h - 8) ) );
+  /* Returns true if the given coordinates lie within the attachto area */
+  public bool is_within_attachto( double x, double y ) {
+    return( Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
+  }
+
+  /* Returns true if the given coordinates lie within the attachabove area */
+  public bool is_within_attachabove( double x, double y ) {
+    return( Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
   }
 
   /*************************/
@@ -668,11 +674,18 @@ public class Node {
     ctx.rectangle( _x, _y, _w, _h );
     ctx.fill();
 
-    /* If we are attaching below this node, draw the below indicator */
-    if( mode == NodeMode.ATTACHBELOW ) {
-      Utils.set_context_color( ctx, theme.attachable_color );
-      ctx.rectangle( _x, (last_y - 4), _w, 4 );
-      ctx.fill();
+    /* If we are attaching above or below this node, draw the below indicator */
+    switch( mode ) {
+      case NodeMode.ATTACHABOVE :
+        Utils.set_context_color( ctx, theme.attachable_color );
+        ctx.rectangle( _x, (y - 4), _w, 4 );
+        ctx.fill();
+        break;
+      case NodeMode.ATTACHBELOW :
+        Utils.set_context_color( ctx, theme.attachable_color );
+        ctx.rectangle( _x, (last_y - 4), _w, 4 );
+        ctx.fill();
+        break;
     }
 
   }
