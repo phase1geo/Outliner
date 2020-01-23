@@ -51,6 +51,8 @@ public class Node {
   private bool         _expanded  = true;
   private bool         _hide_note = true;
 
+  private static Image _note_icon = null;
+
   /* Signals */
   public signal void select_mode( bool name, bool mode );
   public signal void cursor_changed( bool name );
@@ -411,9 +413,9 @@ public class Node {
   /* Returns the area where we will draw the note icon */
   private void note_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + padx;
-    y = this.y + pady + ((name.get_line_height() / 2) - 5);
-    w = 10;
-    h = 10;
+    y = this.y + pady + ((name.get_line_height() / 2) - 8);
+    w = 16;
+    h = 16;
   }
 
   /* Returns the area where the expander will draw the expander icon */
@@ -752,22 +754,10 @@ public class Node {
 
     note_bbox( out x, out y, out w, out h );
 
-    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, alpha );
+    var pixbuf = new Pixbuf.from_resource( "/com/github/phase1geo/outliner/images/accessories-text-editor-symbolic" );
 
-    ctx.new_path();
-    ctx.set_line_width( 1 );
-    ctx.move_to( (x + 2), y );
-    ctx.line_to( (x + w), y );
-    ctx.stroke();
-    ctx.move_to( x, (y + 3) );
-    ctx.line_to( (x + w), (y + 3) );
-    ctx.stroke();
-    ctx.move_to( x, (y + 6) );
-    ctx.line_to( (x + w), (y + 6) );
-    ctx.stroke();
-    ctx.move_to( x, (y + 9) );
-    ctx.line_to( (x + w), (y + 9) );
-    ctx.stroke();
+    cairo_set_source_pixbuf( ctx, pixbuf, x, y );
+    ctx.paint_with_alpha( alpha );
 
   }
 
