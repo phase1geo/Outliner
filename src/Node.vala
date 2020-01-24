@@ -44,7 +44,7 @@ public class Node {
   private CanvasText   _note;
   private NodeMode     _mode      = NodeMode.NONE;
   private double       _x         = 0;
-  private double       _y         = 0;
+  private double       _y         = 40;
   private double       _w         = 500;
   private double       _h         = 80;
   private int          _depth     = 0;
@@ -188,10 +188,10 @@ public class Node {
     _note.set_font( note_fd );
 
     position_name();
-    update_width( ot.get_allocated_width() );
+    update_width( (int)ot.get_allocated_width() );
 
     /* Detect any size changes by the drawing area */
-    ot.size_allocate.connect( table_size_changed );
+    ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
 
@@ -223,10 +223,10 @@ public class Node {
     _note.copy( node.note );
 
     position_name();
-    update_width( ot.get_allocated_width() );
+    update_width( (int)ot.get_allocated_width() );
 
     /* Detect any size changes by the drawing area */
-    ot.size_allocate.connect( table_size_changed );
+    ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
 
@@ -234,13 +234,14 @@ public class Node {
 
   /* Destructor */
   ~Node() {
-    _ot.size_allocate.disconnect( table_size_changed );
     _ot.zoom_changed.disconnect( table_zoom_changed );
   }
 
-  /* Called whenever the canvas width changes */
-  private void table_size_changed( Allocation alloc ) {
-    update_width( alloc.width );
+  /* If the window size changes, adjust our width */
+  private bool window_size_changed( EventConfigure e ) {
+    stdout.printf( "In update width, width: %d, x: %d\n", e.width, e.x );
+    update_width( e.width );
+    return( false );
   }
 
   /* Updates the size of the name and note information */
@@ -278,13 +279,12 @@ public class Node {
   }
 
   /* Called whenever the canvas width changes */
-  private void update_width( double width ) {
+  private void update_width( int width ) {
 
-    if( _w == width ) return;
-
+    /* Update our width information */
     _w = width;
-    _name.max_width = _w - _name.posx;
-    _note.max_width = _w - _note.posx;
+    _name.max_width = _w - (_name.posx * 2);
+    _note.max_width = _w - (_note.posx * 2);
 
   }
 
@@ -306,6 +306,12 @@ public class Node {
 
   }
 
+  /* Adjusts all of the nodes in the document */
+  public void adjust_nodes_all( double last_y, bool deleted, int child_start = 0 ) {
+    last_y = adjust_nodes( last_y, deleted, child_start );
+    _ot.adjust_nodes( get_root_node(), last_y, deleted );
+  }
+
   /* Adjusts the posy value of all of the nodes displayed below this node */
   public double adjust_nodes( double last_y, bool deleted, int child_start = 0 ) {
 
@@ -319,12 +325,6 @@ public class Node {
 
     return( last_y );
 
-  }
-
-  /* Adjusts all of the nodes in the document */
-  public void adjust_nodes_all( double last_y, bool deleted, int child_start = 0 ) {
-    last_y = adjust_nodes( last_y, deleted, child_start );
-    _ot.adjust_nodes( get_root_node(), last_y, deleted );
   }
 
   /* Adjusts the posy value of all nodes that are descendants of the give node */
@@ -341,7 +341,7 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_name() {
-    name.posx = note.posx = x + (padx * 3) + (depth * indent) + 20;
+    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 36;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
   }
@@ -412,7 +412,7 @@ public class Node {
 
   /* Returns the area where we will draw the note icon */
   private void note_bbox( out double x, out double y, out double w, out double h ) {
-    x = this.x + padx;
+    x = this.x + (padx * 2) + 10;
     y = this.y + pady + ((name.get_line_height() / 2) - 8);
     w = 16;
     h = 16;
@@ -420,7 +420,7 @@ public class Node {
 
   /* Returns the area where the expander will draw the expander icon */
   private void expander_bbox( out double x, out double y, out double w, out double h ) {
-    x = this.x + (padx * 2) + 10 + (depth * indent);
+    x = this.x + (padx * 4) + 26 + (depth * indent);
     y = this.y + pady + ((name.get_line_height() / 2) - 5);
     w = 10;
     h = 10;

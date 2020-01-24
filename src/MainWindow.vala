@@ -249,7 +249,7 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 0 );
 
     /* Create and pack the canvas */
-    var ot = new OutlineTable( _settings );
+    var ot = new OutlineTable( this, _settings );
     ot.map_event.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );

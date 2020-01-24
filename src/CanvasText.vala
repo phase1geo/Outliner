@@ -73,6 +73,7 @@ public class CanvasText : Object {
       if( _max_width != value ) {
         _max_width = value;
         _pango_layout.set_width( (int)value * Pango.SCALE );
+        update_size( true );
       }
     }
   }

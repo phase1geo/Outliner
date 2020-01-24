@@ -25,6 +25,7 @@ using Cairo;
 
 public class OutlineTable : DrawingArea {
 
+  private MainWindow      _win;
   private Document        _doc;
   private Node?           _selected = null;
   private Node?           _active   = null;
@@ -44,6 +45,7 @@ public class OutlineTable : DrawingArea {
   private Node?           _move_parent   = null;
   private int             _move_index    = -1;
 
+  public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
   public UndoBuffer     undo_buffer { get; set; }
   public UndoTextBuffer undo_text   { get; set; }
@@ -100,7 +102,9 @@ public class OutlineTable : DrawingArea {
   public signal void cursor_changed();
 
   /* Default constructor */
-  public OutlineTable( GLib.Settings settings ) {
+  public OutlineTable( MainWindow win, GLib.Settings settings ) {
+
+    _win = win;
 
     /* Create the document for this table */
     _doc = new Document( this, settings );
