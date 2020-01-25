@@ -239,7 +239,9 @@ public class Node {
 
   /* If the window size changes, adjust our width */
   private bool window_size_changed( EventConfigure e ) {
-    update_width( e.width - 130 );
+    int w, h;
+    _ot.win.get_size( out w, out h );
+    update_width( w );
     return( false );
   }
 
