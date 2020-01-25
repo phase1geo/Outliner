@@ -475,10 +475,17 @@ public class OutlineTable : DrawingArea {
           queue_draw();
           changed();
         } else if( _active.is_within_note_icon( e.x, e.y ) ) {
-          _active.hide_note = !_active.hide_note;
-          if( !_active.hide_note && (_active.note.text.text == "") ) {
-            selected = _active;
-            set_selected_mode( NodeMode.NOTEEDIT );
+          var control = (bool)(e.state & ModifierType.CONTROL_MASK);
+          if( control ) {
+            _active.set_notes_display( _active.hide_note );
+            _active.adjust_nodes_all( _active.last_y, true );
+            see( _active );
+          } else {
+            _active.hide_note = !_active.hide_note;
+            if( !_active.hide_note && (_active.note.text.text == "") ) {
+              selected = _active;
+              set_selected_mode( NodeMode.NOTEEDIT );
+            }
           }
           queue_draw();
           changed();
@@ -522,6 +529,7 @@ public class OutlineTable : DrawingArea {
           case 46    :  handle_control_period();        break;
           case 98    :  handle_control_b();             break;
           case 117   :  handle_control_u();             break;
+          case 104   :  handle_control_h();             break;
           case 105   :  handle_control_i();             break;
           case 116   :  handle_control_t();             break;
         }
@@ -1030,6 +1038,11 @@ public class OutlineTable : DrawingArea {
       selected.note.add_tag( FormatTag.BOLD, null, undo_text );
       queue_draw();
     }
+  }
+
+  /* Toggles the show all notes status given the state of the currently selected node */
+  private void handle_control_h() {
+    set_notes_display( (selected == null) ? nodes.index( 0 ).hide_note : selected.hide_note );
   }
 
   /* Causes selected text to be italicized */
@@ -1632,6 +1645,17 @@ public class OutlineTable : DrawingArea {
     if( (selected == null) || selected.is_root() ) return;
     undo_buffer.add_item( new UndoNodeUnindent( selected ) );
     unindent_node( selected );
+  }
+
+  /* Set the notes display for all nodes to the given value */
+  public void set_notes_display( bool show ) {
+    for( int i=0; i<nodes.length; i++ ) {
+      nodes.index( i ).set_notes_display( show );
+    }
+    nodes.index( 0 ).adjust_nodes_all( nodes.index( 0 ).last_y, true );
+    see( selected );
+    queue_draw();
+    changed();
   }
 
   /*******************/

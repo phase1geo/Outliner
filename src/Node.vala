@@ -623,6 +623,21 @@ public class Node {
 
   }
 
+  /* Set the notes display for this node and all descendant nodes */
+  public void set_notes_display( bool show ) {
+    _hide_note = !show;
+    if( note.text.text != "" ) {
+      update_height();
+    }
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).set_notes_display( show );
+    }
+  }
+
+  /**************************/
+  /* SEARCH/REPLACE METHODS */
+  /**************************/
+
   /* Performs depth first search */
   public void do_search( string pattern ) {
 
