@@ -239,8 +239,7 @@ public class Node {
 
   /* If the window size changes, adjust our width */
   private bool window_size_changed( EventConfigure e ) {
-    stdout.printf( "In update width, width: %d, x: %d\n", e.width, e.x );
-    update_width( e.width );
+    update_width( e.width - 130 );
     return( false );
   }
 
