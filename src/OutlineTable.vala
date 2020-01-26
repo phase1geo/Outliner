@@ -44,6 +44,7 @@ public class OutlineTable : DrawingArea {
   private CanvasText      _orig_text;
   private Node?           _move_parent   = null;
   private int             _move_index    = -1;
+  private bool            _debug         = false;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -399,7 +400,7 @@ public class OutlineTable : DrawingArea {
 
       var current = node_at_coordinates( e.x, e.y );
       if( current != _active ) {
-        if( _active != null ) {
+        if( (_active != null) && (_active != selected) ) {
           _active.mode = NodeMode.NONE;
         }
         if( (current != null) && (current != selected) ) {
@@ -528,6 +529,7 @@ public class OutlineTable : DrawingArea {
           case 92    :  handle_control_backslash();     break;
           case 46    :  handle_control_period();        break;
           case 98    :  handle_control_b();             break;
+          case 100   :  handle_control_d();             break;
           case 117   :  handle_control_u();             break;
           case 104   :  handle_control_h();             break;
           case 105   :  handle_control_i();             break;
@@ -1037,6 +1039,16 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_text_selected() ) {
       selected.note.add_tag( FormatTag.BOLD, null, undo_text );
       queue_draw();
+    }
+  }
+
+  /* This is just used from debugging purposes */
+  private void handle_control_d() {
+    if( !_debug ) return;
+    if( selected == null ) {
+      stdout.printf( "Nothing is selected\n" );
+    } else {
+      stdout.printf( "Selected mode: %s\n", selected.mode.to_string() );
     }
   }
 

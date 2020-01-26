@@ -51,7 +51,7 @@ public class Node {
   private bool         _expanded  = true;
   private bool         _hide_note = true;
 
-  private static Image _note_icon = null;
+  private static Pixbuf? _note_icon = null;
 
   /* Signals */
   public signal void select_mode( bool name, bool mode );
@@ -235,6 +235,15 @@ public class Node {
   /* Destructor */
   ~Node() {
     _ot.zoom_changed.disconnect( table_zoom_changed );
+  }
+
+  /* Create the note icon pixbuf if we need to */
+  private void initialize_note_icon() {
+    if( _note_icon == null ) {
+      try {
+        _note_icon = new Pixbuf.from_resource( "/com/github/phase1geo/outliner/images/accessories-text-editor-symbolic" );
+      } catch( GLib.Error e ) {}
+    }
   }
 
   /* If the window size changes, adjust our width */
@@ -770,9 +779,9 @@ public class Node {
 
     note_bbox( out x, out y, out w, out h );
 
-    var pixbuf = new Pixbuf.from_resource( "/com/github/phase1geo/outliner/images/accessories-text-editor-symbolic" );
+    initialize_note_icon();
 
-    cairo_set_source_pixbuf( ctx, pixbuf, x, y );
+    cairo_set_source_pixbuf( ctx, _note_icon, x, y );
     ctx.paint_with_alpha( alpha );
 
   }
