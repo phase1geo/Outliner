@@ -770,12 +770,17 @@ public class Node {
 
   }
 
+  /* Draw the note icon */
   private void draw_note_icon( Cairo.Context ctx, Theme theme ) {
 
-    if( (mode == NodeMode.MOVETO) || ((_note.text.text == "") && (mode != NodeMode.HOVER) && (mode != NodeMode.SELECTED) && (mode != NodeMode.NOTEEDIT)) ) return;
+    if( ((mode == NodeMode.NONE) && (note.text.text == "")) ||
+        (mode == NodeMode.MOVETO) ||
+        (mode == NodeMode.ATTACHTO) ||
+        (mode == NodeMode.ATTACHBELOW) ||
+        (mode == NodeMode.ATTACHABOVE) ) return;
 
     double x, y, w, h;
-    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text.text == "")) ? 0.3 : this.alpha;
+    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text.text == "")) ? 0.4 : this.alpha;
 
     note_bbox( out x, out y, out w, out h );
 

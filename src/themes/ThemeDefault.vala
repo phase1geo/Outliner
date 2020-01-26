@@ -39,7 +39,7 @@ public class ThemeDefault : Theme {
     root_foreground    = get_color( "Black" );
     nodesel_background = get_color( "#64baff" );
     nodesel_foreground = get_color( "Black" );
-    textsel_background = get_color( "#0d52bf" );
+    textsel_background = get_color( "#64baff" );
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "Black" );
     symbol_color       = get_color( "#444444" );

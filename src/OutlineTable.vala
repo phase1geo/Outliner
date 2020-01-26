@@ -483,9 +483,9 @@ public class OutlineTable : DrawingArea {
             see( _active );
           } else {
             _active.hide_note = !_active.hide_note;
-            if( !_active.hide_note && (_active.note.text.text == "") ) {
+            if( _active.note.text.text == "" ) {
               selected = _active;
-              set_selected_mode( NodeMode.NOTEEDIT );
+              set_selected_mode( _active.hide_note ? NodeMode.SELECTED : NodeMode.NOTEEDIT );
             }
           }
           queue_draw();
