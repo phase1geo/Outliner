@@ -26,11 +26,11 @@ public class UndoNodeCut : UndoItem {
   private int   _index;
 
   /* Default constructor */
-  public UndoNodeCut( Node node, int? index=null ) {
+  public UndoNodeCut( Node node ) {
     base( _( "cut item" ) );
     _node   = node;
     _parent = node.parent;
-    _index  = index ?? _node.index();
+    _index  = node.index();
   }
 
   /* Causes the stored item to be put into the before state */

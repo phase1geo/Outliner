@@ -140,7 +140,7 @@ public class Node {
     set {
       if( value != _expanded ) {
         _expanded = value;
-        adjust_nodes_all( last_y, false );
+        adjust_nodes( last_y, false );
       }
     }
   }
@@ -152,7 +152,7 @@ public class Node {
       if( value != _hide_note ) {
         _hide_note = value;
         update_height();
-        adjust_nodes_all( last_y, false );
+        adjust_nodes( last_y, false );
       }
     }
   }
@@ -196,6 +196,9 @@ public class Node {
     ot.theme_changed.connect( table_theme_changed );
 
   }
+
+  /* Constructor of root node */
+  public Node.root() {}
 
   /* Copy constructor */
   public Node.from_node( OutlineTable ot, Node node ) {
@@ -310,16 +313,10 @@ public class Node {
     }
 
     if( orig_height != _h ) {
-      adjust_nodes_all( last_y, false );
+      adjust_nodes( last_y, false );
       _ot.see( this );
     }
 
-  }
-
-  /* Adjusts all of the nodes in the document */
-  public void adjust_nodes_all( double last_y, bool deleted, int child_start = 0 ) {
-    last_y = adjust_nodes( last_y, deleted, child_start );
-    _ot.adjust_nodes( get_root_node(), last_y, deleted );
   }
 
   /* Adjusts the posy value of all of the nodes displayed below this node */
@@ -379,9 +376,7 @@ public class Node {
   /* Returns the node displayed before this node */
   public Node? get_previous_node() {
     var index = index();
-    if( index == -1 ) {
-      return( _ot.get_previous_node( this ) );
-    } else if( index == 0 ) {
+    if( index == 0 ) {
       return( parent );
     } else {
       return( parent.children.index( index - 1 ).get_last_node() );
@@ -401,7 +396,7 @@ public class Node {
         }
         child = child.parent;
       }
-      return( _ot.get_next_node( child ) );
+      return( null );
     }
   }
 
@@ -581,7 +576,7 @@ public class Node {
     child.x      = 0;
     child.y      = (prev == null) ? 0 : prev.last_y;
 
-    child.adjust_nodes_all( child.last_y, false );
+    child.adjust_nodes( child.last_y, false );
 
   }
 
@@ -590,7 +585,7 @@ public class Node {
 
     var prev = node.get_previous_node();
 
-    node.adjust_nodes_all( ((prev == null) ? 0 : prev.last_y), true );
+    node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true );
     children.remove_index( node.index() );
     node.parent = null;
 
