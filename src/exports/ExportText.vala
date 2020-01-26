@@ -41,7 +41,7 @@ public class ExportText : Object {
 
     try {
 
-      var nodes = table.nodes;
+      var nodes = table.root.children;
       for( int i=0; i<nodes.length; i++ ) {
         string title = nodes.index( i ).name.text.text + "\n";
         os.write( title.data );
@@ -59,7 +59,7 @@ public class ExportText : Object {
 
   /* Draws the given node and its children to the output stream */
   private static void export_node( FileOutputStream os, Node node, string prefix = "        " ) {
-    
+
     try {
 
       string title = prefix;

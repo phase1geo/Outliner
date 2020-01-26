@@ -44,7 +44,7 @@ public class Node {
   private CanvasText   _note;
   private NodeMode     _mode      = NodeMode.NONE;
   private double       _x         = 0;
-  private double       _y         = 40;
+  private double       _y         = 0;
   private double       _w         = 500;
   private double       _h         = 80;
   private int          _depth     = 0;
@@ -68,7 +68,7 @@ public class Node {
       return( _mode );
     }
     set {
-      if( _mode != value ) {
+      if( (_mode != value) && !is_root() ) {
         var note_was_edited = _mode == NodeMode.NOTEEDIT;
         _mode = value;
         name.edit = (_mode == NodeMode.EDITABLE);
@@ -376,7 +376,7 @@ public class Node {
   /* Returns the node displayed before this node */
   public Node? get_previous_node() {
     var index = index();
-    if( index == 0 ) {
+    if( index <= 0 ) {
       return( parent );
     } else {
       return( parent.children.index( index - 1 ).get_last_node() );
@@ -804,6 +804,8 @@ public class Node {
 
   /* Draw the node to the screen */
   public void draw( Cairo.Context ctx, Theme theme ) {
+
+    if( is_root() ) return;
 
     draw_background( ctx, theme );
     draw_note_icon( ctx, theme );
