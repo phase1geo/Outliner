@@ -377,7 +377,7 @@ public class Node {
   public Node? get_previous_node() {
     var index = index();
     if( index <= 0 ) {
-      return( parent );
+      return( parent.is_root() ? null : parent );
     } else {
       return( parent.children.index( index - 1 ).get_last_node() );
     }
@@ -402,7 +402,7 @@ public class Node {
 
   /* Returns the node within this tree that contains the given coordinates */
   public Node? get_containing_node( double x, double y ) {
-    if( is_within( x, y ) ) {
+    if( !is_root() && is_within( x, y ) ) {
       return( this );
     } else if( expanded ) {
       for( int i=0; i<children.length; i++ ) {
@@ -645,8 +645,10 @@ public class Node {
   /* Performs depth first search */
   public void do_search( string pattern ) {
 
-    name.text.do_search( pattern );
-    note.text.do_search( pattern );
+    if( !is_root() ) {
+      name.text.do_search( pattern );
+      note.text.do_search( pattern );
+    }
 
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).do_search( pattern );
@@ -668,8 +670,10 @@ public class Node {
    given string.
   */
   public void replace_all( string str, ref UndoReplaceAll undo ) {
-    replace_all_text( str, name, ref undo );
-    replace_all_text( str, note, ref undo );
+    if( !is_root() ) {
+      replace_all_text( str, name, ref undo );
+      replace_all_text( str, note, ref undo );
+    }
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).replace_all( str, ref undo );
     }
