@@ -40,7 +40,6 @@ public class UndoNodePaste : UndoItem {
 
   /* Causes the stored item to be put into the after state */
   public override void redo( OutlineTable table ) {
-    table.selected = _node;
     table.insert_node( _parent, _node, _index );
   }
 

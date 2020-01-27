@@ -35,7 +35,6 @@ public class UndoNodeDelete : UndoItem {
 
   /* Causes the stored item to be put into the before state */
   public override void undo( OutlineTable table ) {
-    table.selected = _node;
     table.insert_node( _parent, _node, _index );
   }
 

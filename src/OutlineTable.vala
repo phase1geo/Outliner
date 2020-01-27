@@ -638,9 +638,6 @@ public class OutlineTable : DrawingArea {
     /* Add an undo item for this operation */
     undo_buffer.add_item( new UndoNodePaste( node ) );
 
-    /* Make sure the new node becomes the currently selected node */
-    selected = node;
-
     queue_draw();
     changed();
     see( node );
@@ -1402,9 +1399,6 @@ public class OutlineTable : DrawingArea {
       node.name.text.set_text( title );
     }
 
-    selected = node;
-    set_selected_mode( NodeMode.EDITABLE );
-
     return( node );
 
   }
@@ -1412,6 +1406,7 @@ public class OutlineTable : DrawingArea {
   /* Inserts the given node into the given parent at the specified index */
   public void insert_node( Node parent, Node node, int index ) {
     parent.add_child( node, index );
+    selected = node;
     queue_draw();
     changed();
     see( node );
@@ -1424,6 +1419,7 @@ public class OutlineTable : DrawingArea {
     var sel   = selected;
     var node  = create_node( title );
     insert_node( sel.parent, node, index );
+    set_selected_mode( NodeMode.EDITABLE );
     undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
 
@@ -1434,6 +1430,7 @@ public class OutlineTable : DrawingArea {
     var sel   = selected;
     var node  = create_node();
     insert_node( sel, node, (int)index );
+    set_selected_mode( NodeMode.EDITABLE );
     undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
 
@@ -1488,12 +1485,12 @@ public class OutlineTable : DrawingArea {
    parent.
   */
   public void unindent_node( Node node ) {
-    if( (selected == null) || selected.is_root() ) return;
-    var parent       = selected.parent;
+    if( node.parent.is_root() ) return;
+    var parent       = node.parent;
     var parent_index = parent.index();
     var grandparent  = parent.parent;
-    parent.remove_child( selected );
-    grandparent.add_child( selected, (parent_index + 1) );
+    parent.remove_child( node );
+    grandparent.add_child( node, (parent_index + 1) );
     see( selected );
     queue_draw();
     changed();
@@ -1504,7 +1501,7 @@ public class OutlineTable : DrawingArea {
    below its parent.
   */
   public void unindent() {
-    if( (selected == null) || selected.is_root() ) return;
+    if( selected == null ) return;
     undo_buffer.add_item( new UndoNodeUnindent( selected ) );
     unindent_node( selected );
   }

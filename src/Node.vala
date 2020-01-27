@@ -44,7 +44,7 @@ public class Node {
   private CanvasText   _note;
   private NodeMode     _mode      = NodeMode.NONE;
   private double       _x         = 0;
-  private double       _y         = 0;
+  private double       _y         = 40;
   private double       _w         = 500;
   private double       _h         = 80;
   private int          _depth     = 0;
@@ -348,7 +348,7 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_name() {
-    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 36;
+    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
   }
@@ -425,7 +425,7 @@ public class Node {
 
   /* Returns the area where the expander will draw the expander icon */
   private void expander_bbox( out double x, out double y, out double w, out double h ) {
-    x = this.x + (padx * 4) + 26 + (depth * indent);
+    x = this.x + (padx * 4) + 10 + (depth * indent);
     y = this.y + pady + ((name.get_line_height() / 2) - 5);
     w = 10;
     h = 10;
@@ -576,6 +576,7 @@ public class Node {
     child.x      = 0;
     child.y      = (prev == null) ? 0 : prev.last_y;
 
+    /* Re-draw all nodes */
     child.adjust_nodes( child.last_y, false );
 
   }
