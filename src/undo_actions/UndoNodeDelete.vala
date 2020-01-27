@@ -26,16 +26,15 @@ public class UndoNodeDelete : UndoItem {
   private int   _index;
 
   /* Default constructor */
-  public UndoNodeDelete( Node node, int? index=null ) {
+  public UndoNodeDelete( Node node ) {
     base( _( "delete item" ) );
     _node   = node;
     _parent = node.parent;
-    _index  = index ?? _node.index();
+    _index  = node.index();
   }
 
   /* Causes the stored item to be put into the before state */
   public override void undo( OutlineTable table ) {
-    table.selected = _node;
     table.insert_node( _parent, _node, _index );
   }
 

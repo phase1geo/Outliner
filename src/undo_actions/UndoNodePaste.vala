@@ -26,11 +26,11 @@ public class UndoNodePaste : UndoItem {
   private int   _index;
 
   /* Default constructor */
-  public UndoNodePaste( Node node, int index ) {
+  public UndoNodePaste( Node node ) {
     base( _( "paste item" ) );
     _node   = node;
     _parent = node.parent;
-    _index  = index;
+    _index  = node.index();
   }
 
   /* Causes the stored item to be put into the before state */
@@ -40,7 +40,6 @@ public class UndoNodePaste : UndoItem {
 
   /* Causes the stored item to be put into the after state */
   public override void redo( OutlineTable table ) {
-    table.selected = _node;
     table.insert_node( _parent, _node, _index );
   }
 

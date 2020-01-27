@@ -172,8 +172,8 @@ public class SearchBar : Box {
           start = _next.node.note.is_selected() ? _next.node.note.selend : _next.node.note.cursor + 1;
           break;
       }
-    } else if( _ot.nodes.length > 0 ) {
-      _next.node = _ot.nodes.index( 0 );
+    } else if( _ot.root.children.length > 0 ) {
+      _next.node = _ot.root.children.index( 0 );
     } else {
       return;
     }
