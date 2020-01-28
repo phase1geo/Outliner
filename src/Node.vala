@@ -52,8 +52,7 @@ public class Node {
   private bool         _hide_note = true;
 
   private static Pixbuf? _note_icon = null;
-
-  /* Signals */
+/* Signals */
   public signal void select_mode( bool name, bool mode );
   public signal void cursor_changed( bool name );
 
@@ -188,7 +187,7 @@ public class Node {
     _note.set_font( note_fd );
 
     position_name();
-    update_width( (int)ot.get_allocated_width() );
+    update_width();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
@@ -226,7 +225,7 @@ public class Node {
     _note.copy( node.note );
 
     position_name();
-    update_width( (int)ot.get_allocated_width() );
+    update_width();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
@@ -251,9 +250,7 @@ public class Node {
 
   /* If the window size changes, adjust our width */
   private bool window_size_changed( EventConfigure e ) {
-    int w, h;
-    _ot.win.get_size( out w, out h );
-    update_width( w );
+    update_width();
     return( false );
   }
 
@@ -292,10 +289,14 @@ public class Node {
   }
 
   /* Called whenever the canvas width changes */
-  private void update_width( int width ) {
+  private void update_width() {
+
+    /* Get the width of the table */
+    int w, h;
+    _ot.win.get_size( out w, out h );
 
     /* Update our width information */
-    _w = width;
+    _w = w;
     _name.max_width = _w - (_name.posx * 2);
     _note.max_width = _w - (_note.posx * 2);
 

@@ -44,7 +44,7 @@ public class OutlineTable : DrawingArea {
   private CanvasText      _orig_text;
   private Node?           _move_parent   = null;
   private int             _move_index    = -1;
-  private bool            _debug         = false;
+  private bool            _debug         = true;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -74,7 +74,7 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
-  public Node root { private set; get; default = new Node.root(); }
+  public Node root { private set; get; }
   public string? hilite_color {
     get {
       return( _hilite_color );
@@ -109,6 +109,9 @@ public class OutlineTable : DrawingArea {
 
     /* Create the document for this table */
     _doc = new Document( this, settings );
+
+    /* Create the root node */
+    root = new Node.root();
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -1008,6 +1011,7 @@ public class OutlineTable : DrawingArea {
 
   /* This is just used from debugging purposes */
   private void handle_control_d() {
+    stdout.printf( "HERE!\n" );
     if( !_debug ) return;
     if( selected == null ) {
       stdout.printf( "Nothing is selected\n" );
@@ -1204,9 +1208,9 @@ public class OutlineTable : DrawingArea {
     _press_type = EventType.NOTHING;
 
     /* Create the main idea node */
-    selected = new Node( this );
+    var node = new Node( this );
+    insert_node( root, node, 0 );
     set_selected_mode( NodeMode.EDITABLE );
-    root.add_child( selected, 0 );
 
     queue_draw();
 
