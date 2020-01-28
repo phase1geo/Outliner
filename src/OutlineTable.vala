@@ -44,6 +44,7 @@ public class OutlineTable : DrawingArea {
   private CanvasText      _orig_text;
   private Node?           _move_parent   = null;
   private int             _move_index    = -1;
+  private NodeMenu        _node_menu;
   private bool            _debug         = true;
 
   public MainWindow     win         { get { return( _win ); } }
@@ -112,6 +113,9 @@ public class OutlineTable : DrawingArea {
 
     /* Create the root node */
     root = new Node.root();
+
+    /* Create contextual menu(s) */
+    _node_menu = new NodeMenu( this );
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -330,7 +334,7 @@ public class OutlineTable : DrawingArea {
         queue_draw();
         break;
       case Gdk.BUTTON_SECONDARY :
-        // TBD - show_contextual_menu( e );
+        show_contextual_menu( e );
         break;
     }
 
@@ -542,6 +546,21 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Displays the contextual menu based on what is currently selected */
+  private void show_contextual_menu( EventButton event ) {
+
+#if GTK322
+    if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {
+      _node_menu.popup_at_pointer( event );
+    }
+#else
+    if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {
+      _node_menu.popup( null, null, null, event.button, event.time );
+    }
+#endif
+
+  }
+
   /* Creates a serialized version of the node for copy */
   public string serialize_for_copy( Node node ) {
     string    str;
@@ -567,7 +586,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Copies the given node to the designated node clipboard */
-  private void copy_node_to_clipboard( Node node ) {
+  public void copy_node_to_clipboard( Node node ) {
     var text = serialize_for_copy( node );
     node_clipboard.set_text( text, -1 );
     node_clipboard.store();
@@ -596,7 +615,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Copies the given node to the clipboard and then removes it from the document */
-  private void cut_node_to_clipboard( Node node ) {
+  public void cut_node_to_clipboard( Node node ) {
     var text = serialize_for_copy( node );
     node_clipboard.set_text( text, -1 );
     node_clipboard.store();
@@ -628,7 +647,7 @@ public class OutlineTable : DrawingArea {
    Pastes the given node into the table after the currently selected node as
    a sibling node.
   */
-  private void paste_node() {
+  public void paste_node() {
 
     /* Create the new node from the clipboard */
     var node = new Node( this );
@@ -636,7 +655,11 @@ public class OutlineTable : DrawingArea {
     deserialize_for_paste( text, node );
 
     /* Insert the node into the appropriate position in the table */
-    insert_node( selected.parent, node, (selected.index() + 1) );
+    if( selected.children.length > 0 ) {
+      insert_node( selected, node, 0 );
+    } else {
+      insert_node( selected.parent, node, (selected.index() + 1) );
+    }
 
     /* Add an undo item for this operation */
     undo_buffer.add_item( new UndoNodePaste( node ) );
