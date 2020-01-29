@@ -28,6 +28,14 @@ public class NodeMenu : Gtk.Menu {
   private Gtk.MenuItem _cut;
   private Gtk.MenuItem _paste;
   private Gtk.MenuItem _delete;
+  private Gtk.MenuItem _edit_text;
+  private Gtk.MenuItem _edit_note;
+  private Gtk.MenuItem _note_display;
+  private Gtk.MenuItem _add_above;
+  private Gtk.MenuItem _add_below;
+  private Gtk.MenuItem _indent;
+  private Gtk.MenuItem _unindent;
+  private Gtk.MenuItem _expander;
 
   public NodeMenu( OutlineTable ot ) {
 
@@ -49,12 +57,53 @@ public class NodeMenu : Gtk.Menu {
     _delete.activate.connect( delete_node );
     Utils.add_accel_label( _delete, 65535, 0 );
 
+    _edit_text = new Gtk.MenuItem.with_label( _( "Edit Text" ) );
+    _edit_text.activate.connect( edit_text );
+    Utils.add_accel_label( _edit_text, 'e', 0 );
+
+    _edit_note = new Gtk.MenuItem.with_label( _( "Edit Note" ) );
+    _edit_note.activate.connect( edit_note );
+    Utils.add_accel_label( _edit_note, 'e', Gdk.ModifierType.SHIFT_MASK );
+
+    _note_display = new Gtk.MenuItem.with_label( _( "Show Note" ) );
+    _note_display.activate.connect( toggle_note );
+
+    _add_above = new Gtk.MenuItem.with_label( _( "Add Row Above" ) );
+    _add_above.activate.connect( add_row_above );
+    Utils.add_accel_label( _add_above, 65293, Gdk.ModifierType.SHIFT_MASK );
+
+    _add_below = new Gtk.MenuItem.with_label( _( "Add Row Below" ) );
+    _add_below.activate.connect( add_row_below );
+    Utils.add_accel_label( _add_below, 65293, 0 );
+
+    _indent = new Gtk.MenuItem.with_label( _( "Indent" ) );
+    _indent.activate.connect( indent );
+    Utils.add_accel_label( _indent, 65289, 0 );
+
+    _unindent = new Gtk.MenuItem.with_label( _( "Unindent" ) );
+    _unindent.activate.connect( unindent );
+    Utils.add_accel_label( _unindent, 65289, Gdk.ModifierType.SHIFT_MASK );
+
+    _expander = new Gtk.MenuItem.with_label( _( "Expand Children" ) );
+    _expander.activate.connect( toggle_expand );
+
     /* Add the menu items to the menu */
     add( _copy );
     add( _cut );
     add( _paste );
     add( _delete );
     add( new SeparatorMenuItem() );
+    add( _edit_text );
+    add( _edit_note );
+    add( _note_display );
+    add( new SeparatorMenuItem() );
+    add( _indent );
+    add( _unindent );
+    add( _expander );
+    add( new SeparatorMenuItem() );
+    add( _add_above );
+    add( _add_below );
+
 
     /* Make the menu visible */
     show_all();
@@ -69,6 +118,19 @@ public class NodeMenu : Gtk.Menu {
 
     /* Set the menu sensitivity */
     _paste.set_sensitive( _ot.node_clipboard.wait_is_text_available() );
+    _indent.set_sensitive( _ot.indentable() );
+    _unindent.set_sensitive( _ot.unindentable() );
+
+    if( _ot.selected.hide_note ) {
+      _note_display.label = _( "Show Note" );
+      _note_display.set_sensitive( (_ot.selected.note.text.text != "") );
+    } else {
+      _note_display.label = _( "Hide Note" );
+      _note_display.set_sensitive( true );
+    }
+
+    _expander.label = _ot.selected.expanded ? _( "Hide Children" ) : _( "Show Children" );
+    _expander.set_sensitive( _ot.selected.children.length > 0 );
 
   }
 
@@ -90,6 +152,46 @@ public class NodeMenu : Gtk.Menu {
   /* Deletes the currently selected node */
   private void delete_node() {
     _ot.delete_current_node();
+  }
+
+  /* Edit the current node's name field */
+  private void edit_text() {
+    _ot.edit_selected( true );
+  }
+
+  /* Edit the current node's note field */
+  private void edit_note() {
+    _ot.edit_selected( false );
+  }
+
+  /* Toggles the note display status of the currently selected node */
+  private void toggle_note() {
+    _ot.toggle_note( _ot.selected, false );
+  }
+
+  /* Adds a new row above the currently selected row */
+  private void add_row_above() {
+    _ot.add_sibling_node( false );
+  }
+
+  /* Adds a new row below the currently selected row */
+  private void add_row_below() {
+    _ot.add_sibling_node( true );
+  }
+
+  /* Indents the currently selected row by one level */
+  private void indent() {
+    _ot.indent();
+  }
+
+  /* Unindents the currently selected row by one level */
+  private void unindent() {
+    _ot.unindent();
+  }
+
+  /* Toggles the expand/collapse property of the node */
+  private void toggle_expand() {
+    _ot.toggle_expand( _ot.selected );
   }
 
 }

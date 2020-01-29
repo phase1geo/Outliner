@@ -450,26 +450,14 @@ public class OutlineTable : DrawingArea {
       /* If the user clicked in an expander, toggle the expander */
       if( !_motion ) {
         if( _active.is_within_expander( e.x, e.y ) ) {
-          _active.expanded = !_active.expanded;
-          selected = null;
-          undo_buffer.add_item( new UndoNodeExpander( _active ) );
-          queue_draw();
-          changed();
+          toggle_expand( _active );
         } else if( _active.is_within_note_icon( e.x, e.y ) ) {
           var control = (bool)(e.state & ModifierType.CONTROL_MASK);
           if( control ) {
-            _active.set_notes_display( _active.hide_note );
-            _active.adjust_nodes( _active.last_y, true );
-            see( _active );
+            toggle_notes( _active );
           } else {
-            _active.hide_note = !_active.hide_note;
-            if( _active.note.text.text == "" ) {
-              selected = _active;
-              set_selected_mode( _active.hide_note ? NodeMode.SELECTED : NodeMode.NOTEEDIT );
-            }
+            toggle_note( _active, true );
           }
-          queue_draw();
-          changed();
         }
       }
 
@@ -559,6 +547,34 @@ public class OutlineTable : DrawingArea {
     }
 #endif
 
+  }
+
+  /* Expands or collapses the current node's children */
+  public void toggle_expand( Node node ) {
+    node.expanded = !node.expanded;
+    undo_buffer.add_item( new UndoNodeExpander( node ) );
+    queue_draw();
+    changed();
+  }
+
+  /* Shows or hides all notes within the given node's tree */
+  public void toggle_notes( Node node ) {
+    node.set_notes_display( node.hide_note );
+    node.adjust_nodes( node.last_y, true );
+    see( node );
+    queue_draw();
+    changed();
+  }
+
+  /* Shows or hides the note field associated with the given node's tree */
+  public void toggle_note( Node node, bool edit ) {
+    node.hide_note = !node.hide_note;
+    if( node.note.text.text == "" ) {
+      selected = node;
+      set_selected_mode( (node.hide_note || !edit) ? NodeMode.SELECTED : NodeMode.NOTEEDIT );
+    }
+    queue_draw();
+    changed();
   }
 
   /* Creates a serialized version of the node for copy */
@@ -1481,6 +1497,16 @@ public class OutlineTable : DrawingArea {
     delete_node( selected );
     queue_draw();
     changed();
+  }
+
+  /* Returns true if the currently selected row is indentable */
+  public bool indentable() {
+    return( (selected != null) && (selected.index() > 0) );
+  }
+
+  /* Returns true if the currently selected row is unindentable */
+  public bool unindentable() {
+    return( (selected != null) && !selected.parent.is_root() );
   }
 
   /*
