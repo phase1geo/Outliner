@@ -56,5 +56,10 @@
       <summary>Search option for non-task nodes</summary>
       <description>Specifies whether non-task nodes should be searched or not</description>
     </key>
+    <key name="export-html-use-ul-style" type="b">
+      <default>false</default>
+      <summary>When exporting to HTML, use ul output styling instead of ol</summary>
+      <description>When exporting to HTML, use ul output styling instead of ol</description>
+    </key>
   </schema>
 </schemalist>

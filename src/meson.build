@@ -1,4 +1,5 @@
 sources += files(
+  'exports/ExportHTML.vala',
   'exports/ExportMarkdown.vala',
   'exports/ExportMinder.vala',
   'exports/ExportOPML.vala',

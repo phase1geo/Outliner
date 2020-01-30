@@ -52,7 +52,8 @@ public class Node {
   private bool         _hide_note = true;
 
   private static Pixbuf? _note_icon = null;
-/* Signals */
+
+  /* Signals */
   public signal void select_mode( bool name, bool mode );
   public signal void cursor_changed( bool name );
 

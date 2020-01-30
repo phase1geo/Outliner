@@ -759,6 +759,13 @@ public class MainWindow : ApplicationWindow {
     FileChooserDialog dialog = new FileChooserDialog( _( "Export As" ), this, FileChooserAction.SAVE,
       _( "Cancel" ), ResponseType.CANCEL, _( "Export" ), ResponseType.ACCEPT );
 
+    /* HTML */
+    FileFilter html_filter = new FileFilter();
+    html_filter.set_filter_name( _( "HTML" ) );
+    html_filter.add_pattern( "*.html" );
+    html_filter.add_pattern( "*.htm" );
+    dialog.add_filter( html_filter );
+
     /* Markdown */
     FileFilter md_filter = new FileFilter();
     md_filter.set_filter_name( _( "Markdown" ) );
@@ -795,8 +802,11 @@ public class MainWindow : ApplicationWindow {
       var fname  = dialog.get_filename();
       var filter = dialog.get_filter();
       var table  = get_current_table( "action_export" );
+      var use_ul = _settings.get_boolean( "export-html-use-ul-style" );
 
-      if( md_filter == filter ) {
+      if( html_filter == filter ) {
+        ExportHTML.export( repair_filename( fname, {".html", ".htm"} ), table, use_ul );
+      } else if( md_filter == filter ) {
         ExportMarkdown.export( repair_filename( fname, {".md", ".markdown"} ), table );
       } else if( minder_filter == filter ) {
         ExportMinder.export( repair_filename( fname, {".minder"} ), table );
