@@ -62,6 +62,32 @@ public enum FormatTag {
     return( LENGTH );
   }
 
+  public string to_html_start( string? extra ) {
+    switch( this ) {
+      case BOLD       :  return( "<b>");
+      case ITALICS    :  return( "<i>" );
+      case UNDERLINE  :  return( "<u>" );
+      case STRIKETHRU :  return( "<del>" );
+      case COLOR      :  return( "<span style=\"color:%s;\">".printf( extra ) );
+      case HILITE     :  return( "<span style=\"background-color:%s;\">".printf( extra ) );
+      case URL        :  return( "<a href=\"%s\">".printf( extra ) );
+    }
+    return( "" );
+  }
+
+  public string to_html_end() {
+    switch( this ) {
+      case BOLD       :  return( "</b>" );
+      case ITALICS    :  return( "</i>" );
+      case UNDERLINE  :  return( "</u>" );
+      case STRIKETHRU :  return( "</del>" );
+      case COLOR      :  return( "</span>" );
+      case HILITE     :  return( "</span>" );
+      case URL        :  return( "</a>" );
+    }
+    return( "" );
+  }
+
 }
 
 /* Stores information for undo/redo operation on tags */
@@ -564,6 +590,48 @@ public class FormattedText {
       _formats[i].get_attributes( i, ref attrs, _attr_tags );
     }
     return( attrs );
+  }
+
+  /* Generates an HTML version of the formatted text */
+  public string htmlize() {
+    var tags = get_tags_in_range( 0, text.length );
+    if( tags.length > 0 ) {
+      var str   = "";
+      var start = 0;
+      var stack = new Queue<UndoTagInfo>();
+      tags.sort( (a, b) => {
+        return( (a.start == b.start) ?
+                  ((int)(a.end < b.end) - (int)(a.end > b.end)) :
+                  ((int)(a.start > b.start) - (int)(a.start < b.start)) );
+      });
+      for( int i=0; i<tags.length; i++ ) {
+        var curr     = tags.index( i );
+        var curr_tag = (FormatTag)curr.tag;
+        while( true ) {
+          var last     = stack.peek_tail();
+          var last_tag = (FormatTag)last.tag;
+          if( last == null ) {
+            str  += text.slice( start, curr.start );
+            start = curr.start;
+            str  += curr_tag.to_html_start( curr.extra );
+            stack.push_tail( curr );
+            break;
+          } else if( last.end <= curr.start ) {
+            str  += text.slice( start, last.end );
+            str  += last_tag.to_html_end();
+            start = last.end;
+            stack.pop_tail();
+          } else if( last.end < curr.end ) {  // If there is overlap,
+            str  += text.slice( start, last.end );
+            str  += last_tag.to_html_end();
+            start = last.end;
+          }
+        }
+      }
+      return( str );
+    } else {
+      return( text );
+    }
   }
 
   /*
