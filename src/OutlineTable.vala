@@ -1050,12 +1050,11 @@ public class OutlineTable : DrawingArea {
 
   /* This is just used from debugging purposes */
   private void handle_control_d() {
-    stdout.printf( "HERE!\n" );
     if( !_debug ) return;
     if( selected == null ) {
       stdout.printf( "Nothing is selected\n" );
     } else {
-      stdout.printf( "Selected mode: %s\n", selected.mode.to_string() );
+      stdout.printf( "HTMLized text: %s\n", selected.name.text.htmlize() );
     }
   }
 

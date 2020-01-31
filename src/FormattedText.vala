@@ -90,6 +90,28 @@ public enum FormatTag {
 
 }
 
+/* Used by the HTMLizer code */
+public class HtmlTag {
+  public FormatTag tag   { private set; get; }
+  public int       pos   { private set; get; }
+  public bool      begin { private set; get; }
+  public string?   extra { private set; get; }
+  public HtmlTag.start( FormatTag tag, int pos, string? extra ) {
+    this.tag   = tag;
+    this.pos   = pos;
+    this.begin = true;
+    this.extra = extra;
+  }
+  public HtmlTag.end( FormatTag tag, int pos ) {
+    this.tag   = tag;
+    this.pos   = pos;
+    this.begin = false;
+  }
+  public string to_string() {
+    return( "(%s %s, %d, %s)".printf( tag.to_string(), (begin ? "start" : "end"), pos, extra ) );
+  }
+}
+
 /* Stores information for undo/redo operation on tags */
 public class UndoTagInfo {
   public int     start { private set; get; }
@@ -101,6 +123,10 @@ public class UndoTagInfo {
     this.start = start;
     this.end   = end;
     this.extra = extra;
+  }
+  public void append_to_htmltag_list( ref List<HtmlTag> tags ) {
+    tags.append( new HtmlTag.start( (FormatTag)tag, start, extra ) );
+    tags.append( new HtmlTag.end( (FormatTag)tag, end ) );
   }
 }
 
@@ -594,44 +620,42 @@ public class FormattedText {
 
   /* Generates an HTML version of the formatted text */
   public string htmlize() {
-    var tags = get_tags_in_range( 0, text.length );
-    if( tags.length > 0 ) {
-      var str   = "";
-      var start = 0;
-      var stack = new Queue<UndoTagInfo>();
-      tags.sort( (a, b) => {
-        return( (a.start == b.start) ?
-                  ((int)(a.end < b.end) - (int)(a.end > b.end)) :
-                  ((int)(a.start > b.start) - (int)(a.start < b.start)) );
-      });
-      for( int i=0; i<tags.length; i++ ) {
-        var curr     = tags.index( i );
-        var curr_tag = (FormatTag)curr.tag;
-        while( true ) {
-          var last     = stack.peek_tail();
-          var last_tag = (FormatTag)last.tag;
-          if( last == null ) {
-            str  += text.slice( start, curr.start );
-            start = curr.start;
-            str  += curr_tag.to_html_start( curr.extra );
-            stack.push_tail( curr );
+    var tags      = get_tags_in_range( 0, text.length );
+    var str       = "";
+    var start     = 0;
+    var html_tags = new List<HtmlTag>();
+    var tag_stack = new Array<HtmlTag>();
+    for( int i=0; i<tags.length; i++ ) {
+      tags.index( i ).append_to_htmltag_list( ref html_tags );
+    }
+    CompareFunc<HtmlTag> ht_cmp = (a, b) => {
+      return( (int)(a.pos > b.pos) - (int)(a.pos < b.pos) );
+    };
+    html_tags.sort( ht_cmp );
+    for( int i=0; i<html_tags.length(); i++ ) {
+      var html_tag = html_tags.nth_data( i );
+      var text     = text.slice( start, html_tag.pos );
+      str += text;
+      if( html_tag.begin ) {
+        tag_stack.append_val( html_tag );
+        str += html_tag.tag.to_html_start( html_tag.extra );
+      } else {
+        var str2 = "";
+        for( int j=(int)(tag_stack.length - 1); j>=0; j-- ) {
+          if( tag_stack.index( j ).tag == html_tag.tag ) {
+            str += tag_stack.index( j ).tag.to_html_end();
+            tag_stack.remove_index( j );
             break;
-          } else if( last.end <= curr.start ) {
-            str  += text.slice( start, last.end );
-            str  += last_tag.to_html_end();
-            start = last.end;
-            stack.pop_tail();
-          } else if( last.end < curr.end ) {  // If there is overlap,
-            str  += text.slice( start, last.end );
-            str  += last_tag.to_html_end();
-            start = last.end;
+          } else {
+            str += tag_stack.index( j ).tag.to_html_end();
+            str2 = tag_stack.index( j ).tag.to_html_start( tag_stack.index( j ).extra ) + str2;
           }
         }
+        str += str2;
       }
-      return( str );
-    } else {
-      return( text );
+      start = html_tag.pos;
     }
+    return( str + text.slice( start, text.index_of_nth_char( text.length ) ) );
   }
 
   /*

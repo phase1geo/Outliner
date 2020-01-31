@@ -58,16 +58,22 @@ public class ExportHTML : Object {
     return( body );
   }
 
+  private static Xml.Node* make_div( string div_class, FormattedText text ) {
+    var      html = "<div class=\"" + div_class + "\">" + text.htmlize() + "</div>";
+    Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
+    var      node = doc->get_root_element()->copy( 1 );
+    delete doc;
+    return( node );
+  }
+
   /* Traverses the node tree exporting XML nodes in OPML format */
   private static Xml.Node* export_node( Node node, bool use_ul ) {
     string    ul_syms[3] = {"disc", "circle", "square"};
     string    ol_syms[5] = {"I", "A", "1", "a", "i"};
     Xml.Node* li         = new Xml.Node( null, "li" );
-    Xml.Node* name       = li->new_text_child( null, "div", node.name.text.text );
-    name->set_prop( "class", "text" );
+    li->add_child( make_div( "text", node.name.text ) );
     if( node.note.text.text != "" ) {
-      Xml.Node* note = li->new_text_child( null, "div", node.note.text.text );
-      note->set_prop( "class", "note" );
+      li->add_child( make_div( "note", node.note.text ) );
     }
     if( node.children.length > 0 ) {
       Xml.Node* list = new Xml.Node( null, (use_ul ? "ul" : "ol") );
