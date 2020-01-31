@@ -618,6 +618,10 @@ public class FormattedText {
     return( attrs );
   }
 
+  private string get_html_slice( int start, int end ) {
+    return( text.slice( start, end ).replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ) );
+  }
+
   /* Generates an HTML version of the formatted text */
   public string htmlize() {
     var tags      = get_tags_in_range( 0, text.length );
@@ -634,7 +638,7 @@ public class FormattedText {
     html_tags.sort( ht_cmp );
     for( int i=0; i<html_tags.length(); i++ ) {
       var html_tag = html_tags.nth_data( i );
-      var text     = text.slice( start, html_tag.pos );
+      var text     = get_html_slice( start, html_tag.pos );
       str += text;
       if( html_tag.begin ) {
         tag_stack.append_val( html_tag );
@@ -655,7 +659,7 @@ public class FormattedText {
       }
       start = html_tag.pos;
     }
-    return( str + text.slice( start, text.index_of_nth_char( text.length ) ) );
+    return( str + get_html_slice( start, text.index_of_nth_char( text.length ) ) );
   }
 
   /*
