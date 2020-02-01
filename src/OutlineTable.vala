@@ -408,8 +408,10 @@ public class OutlineTable : DrawingArea {
       if( current != null ) {
         var orig_over = current.over_note_icon;
         current.over_note_icon = false;
+        set_tooltip_markup( null );
         if( current.is_within_note_icon( e.x, e.y ) ) {
           current.over_note_icon = true;
+          set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
           set_cursor( null );
         } else if( current.is_within_name( e.x, e.y ) ) {
           set_cursor( CursorType.XTERM );
