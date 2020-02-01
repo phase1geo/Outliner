@@ -396,10 +396,17 @@ public class OutlineTable : DrawingArea {
           _active.mode = NodeMode.NONE;
         }
         if( (current != null) && (current != selected) ) {
-          current.mode = NodeMode.HOVER;
+          current.over_note_icon = current.is_within_note_icon( e.x, e.y );
+          current.mode           = NodeMode.HOVER;
           _active = current;
         }
         queue_draw();
+      } else if( (current != null) && (current.mode == NodeMode.HOVER) ) {
+        var orig_over = current.over_note_icon;
+        current.over_note_icon = current.is_within_note_icon( e.x, e.y );
+        if( orig_over != current.over_note_icon ) {
+          queue_draw();
+        }
       }
 
     }

@@ -163,6 +163,7 @@ public class Node {
   public Node?       parent    { get; set; default = null; }
   public Array<Node> children  { get; set; default = new Array<Node>(); }
   public double      last_y    { get { return( _y + _h ); } }
+  public bool        over_note_icon { get; set; default = false; }
 
   /* Constructor */
   public Node( OutlineTable ot ) {
@@ -782,7 +783,7 @@ public class Node {
         (mode == NodeMode.ATTACHABOVE) ) return;
 
     double x, y, w, h;
-    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text.text == "")) ? 0.4 : this.alpha;
+    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text.text == "") && !over_note_icon) ? 0.4 : this.alpha;
 
     note_bbox( out x, out y, out w, out h );
 
