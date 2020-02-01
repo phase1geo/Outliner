@@ -59,7 +59,8 @@ public class MainWindow : ApplicationWindow {
     { "action_search",        action_search },
     { "action_quit",          action_quit },
     { "action_export",        action_export },
-    { "action_print",         action_print }
+    { "action_print",         action_print },
+    { "action_shortcuts",     action_shortcuts }
   };
 
   private delegate void ChangedFunc();
@@ -384,15 +385,16 @@ public class MainWindow : ApplicationWindow {
   /* Adds keyboard shortcuts for the menu actions */
   private void add_keyboard_shortcuts( Gtk.Application app ) {
 
-    app.set_accels_for_action( "win.action_new",     { "<Control>n" } );
-    app.set_accels_for_action( "win.action_open",    { "<Control>o" } );
-    app.set_accels_for_action( "win.action_save",    { "<Control>s" } );
-    app.set_accels_for_action( "win.action_save_as", { "<Control><Shift>s" } );
-    app.set_accels_for_action( "win.action_undo",    { "<Control>z" } );
-    app.set_accels_for_action( "win.action_redo",    { "<Control><Shift>z" } );
-    app.set_accels_for_action( "win.action_search",  { "<Control>f" } );
-    app.set_accels_for_action( "win.action_quit",    { "<Control>q" } );
-    app.set_accels_for_action( "win.action_print",   { "<Control>p" } );
+    app.set_accels_for_action( "win.action_new",       { "<Control>n" } );
+    app.set_accels_for_action( "win.action_open",      { "<Control>o" } );
+    app.set_accels_for_action( "win.action_save",      { "<Control>s" } );
+    app.set_accels_for_action( "win.action_save_as",   { "<Control><Shift>s" } );
+    app.set_accels_for_action( "win.action_undo",      { "<Control>z" } );
+    app.set_accels_for_action( "win.action_redo",      { "<Control><Shift>z" } );
+    app.set_accels_for_action( "win.action_search",    { "<Control>f" } );
+    app.set_accels_for_action( "win.action_quit",      { "<Control>q" } );
+    app.set_accels_for_action( "win.action_print",     { "<Control>p" } );
+    app.set_accels_for_action( "win.action_shortcuts", { "F1" } );
 
   }
 
@@ -502,6 +504,12 @@ public class MainWindow : ApplicationWindow {
     cbox.pack_start( clbl,       false, true,  10 );
     cbox.pack_end(   _condensed, false, false, 10 );
     box.pack_start( cbox, false, false, 10 );
+
+    /* Add button to display shortcuts */
+    var shortcuts = new ModelButton();
+    shortcuts.text = _( "Shortcuts Cheatsheet" );
+    shortcuts.action_name = "win.action_shortcuts";
+    box.pack_start( shortcuts, false, false, 10 );
 
     box.show_all();
 
@@ -867,6 +875,32 @@ public class MainWindow : ApplicationWindow {
     var condensed  = table.condensed;
     _theme_buttons.get( theme_name ).active = true;
     _condensed.state = condensed;
+  }
+
+  /* Displays the shortcuts cheatsheet */
+  private void action_shortcuts() {
+
+    var builder = new Builder.from_resource( "/com/github/phase1geo/outliner/shortcuts/shortcuts.ui" );
+    var win     = builder.get_object( "shortcuts" ) as ShortcutsWindow;
+    var table   = get_current_table( "action_shortcuts" );
+
+    win.transient_for = this;
+    win.view_name     = null;
+
+    /* Display the most relevant information based on the current state */
+    if( table.selected != null ) {
+      if( (table.selected.mode == NodeMode.EDITABLE) ||
+          (table.selected.mode == NodeMode.NOTEEDIT) ) {
+        win.section_name = "text-editing";
+      } else {
+        win.section_name = "node";
+      }
+    } else {
+      win.section_name = "general";
+    }
+
+    win.show();
+
   }
 
 }

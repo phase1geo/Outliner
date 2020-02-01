@@ -26,7 +26,8 @@ public class NodeMenu : Gtk.Menu {
   private OutlineTable _ot;
   private Gtk.MenuItem _copy;
   private Gtk.MenuItem _cut;
-  private Gtk.MenuItem _paste;
+  private Gtk.MenuItem _paste_above;
+  private Gtk.MenuItem _paste_below;
   private Gtk.MenuItem _delete;
   private Gtk.MenuItem _edit_text;
   private Gtk.MenuItem _edit_note;
@@ -49,9 +50,13 @@ public class NodeMenu : Gtk.Menu {
     _cut.activate.connect( cut );
     Utils.add_accel_label( _cut, 'x', Gdk.ModifierType.CONTROL_MASK );
 
-    _paste = new Gtk.MenuItem.with_label( _( "Paste" ) );
-    _paste.activate.connect( paste );
-    Utils.add_accel_label( _paste, 'v', Gdk.ModifierType.CONTROL_MASK );
+    _paste_above = new Gtk.MenuItem.with_label( _( "Paste Above" ) );
+    _paste_above.activate.connect( paste_above );
+    Utils.add_accel_label( _paste_above, 'v', (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK) );
+
+    _paste_below = new Gtk.MenuItem.with_label( _( "Paste Below" ) );
+    _paste_below.activate.connect( paste_below );
+    Utils.add_accel_label( _paste_below, 'v', Gdk.ModifierType.CONTROL_MASK );
 
     _delete = new Gtk.MenuItem.with_label( _( "Delete" ) );
     _delete.activate.connect( delete_node );
@@ -90,7 +95,8 @@ public class NodeMenu : Gtk.Menu {
     /* Add the menu items to the menu */
     add( _copy );
     add( _cut );
-    add( _paste );
+    add( _paste_above );
+    add( _paste_below );
     add( _delete );
     add( new SeparatorMenuItem() );
     add( _edit_text );
@@ -116,8 +122,11 @@ public class NodeMenu : Gtk.Menu {
   /* Called when the menu is popped up */
   private void on_popup() {
 
+    var pasteable = _ot.node_clipboard.wait_is_text_available();
+
     /* Set the menu sensitivity */
-    _paste.set_sensitive( _ot.node_clipboard.wait_is_text_available() );
+    _paste_above.set_sensitive( pasteable );
+    _paste_below.set_sensitive( pasteable );
     _indent.set_sensitive( _ot.indentable() );
     _unindent.set_sensitive( _ot.unindentable() );
 
@@ -145,8 +154,13 @@ public class NodeMenu : Gtk.Menu {
   }
 
   /* Pastes the given node as a sibling of the selected node */
-  private void paste() {
-    _ot.paste_node();
+  private void paste_above() {
+    _ot.paste_node( false );
+  }
+
+  /* Pastes the given node as a sibling of the selected node */
+  private void paste_below() {
+    _ot.paste_node( true );
   }
 
   /* Deletes the currently selected node */

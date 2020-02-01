@@ -540,7 +540,7 @@ public class OutlineTable : DrawingArea {
         switch( e.keyval ) {
           case 99    :  do_copy();                      break;
           case 120   :  do_cut();                       break;
-          case 118   :  do_paste();                     break;
+          case 118   :  do_paste( shift );              break;
           case 65293 :  handle_control_return();        break;
           case 65289 :  handle_control_tab();           break;
           case 65363 :  handle_control_right( shift );  break;
@@ -717,7 +717,7 @@ public class OutlineTable : DrawingArea {
    Pastes the given node into the table after the currently selected node as
    a sibling node.
   */
-  public void paste_node() {
+  public void paste_node( bool below ) {
 
     /* Create the new node from the clipboard */
     var node = new Node( this );
@@ -725,10 +725,14 @@ public class OutlineTable : DrawingArea {
     deserialize_for_paste( text, node );
 
     /* Insert the node into the appropriate position in the table */
-    if( selected.children.length > 0 ) {
-      insert_node( selected, node, 0 );
+    if( below ) {
+      if( selected.children.length > 0 ) {
+        insert_node( selected, node, 0 );
+      } else {
+        insert_node( selected.parent, node, (selected.index() + 1) );
+      }
     } else {
-      insert_node( selected.parent, node, (selected.index() + 1) );
+      insert_node( selected.parent, node, selected.index() );
     }
 
     /* Add an undo item for this operation */
@@ -752,10 +756,10 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Handles a paste operation of a node or text to the table */
-  public void do_paste() {
+  public void do_paste( bool shift ) {
     if( selected == null ) return;
     switch( selected.mode ) {
-      case NodeMode.SELECTED :  paste_node();                 break;
+      case NodeMode.SELECTED :  paste_node( !shift );         break;
       case NodeMode.EDITABLE :  paste_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  paste_text( selected.note );  break;
     }
