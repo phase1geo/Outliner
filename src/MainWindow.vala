@@ -60,7 +60,11 @@ public class MainWindow : ApplicationWindow {
     { "action_quit",          action_quit },
     { "action_export",        action_export },
     { "action_print",         action_print },
-    { "action_shortcuts",     action_shortcuts }
+    { "action_shortcuts",     action_shortcuts },
+    { "action_zoom_in1",      action_zoom_in },
+    { "action_zoom_in2",      action_zoom_in },
+    { "action_zoom_out",      action_zoom_out },
+    { "action_zoom_actual",   action_zoom_actual }
   };
 
   private delegate void ChangedFunc();
@@ -391,16 +395,20 @@ public class MainWindow : ApplicationWindow {
   /* Adds keyboard shortcuts for the menu actions */
   private void add_keyboard_shortcuts( Gtk.Application app ) {
 
-    app.set_accels_for_action( "win.action_new",       { "<Control>n" } );
-    app.set_accels_for_action( "win.action_open",      { "<Control>o" } );
-    app.set_accels_for_action( "win.action_save",      { "<Control>s" } );
-    app.set_accels_for_action( "win.action_save_as",   { "<Control><Shift>s" } );
-    app.set_accels_for_action( "win.action_undo",      { "<Control>z" } );
-    app.set_accels_for_action( "win.action_redo",      { "<Control><Shift>z" } );
-    app.set_accels_for_action( "win.action_search",    { "<Control>f" } );
-    app.set_accels_for_action( "win.action_quit",      { "<Control>q" } );
-    app.set_accels_for_action( "win.action_print",     { "<Control>p" } );
-    app.set_accels_for_action( "win.action_shortcuts", { "F1" } );
+    app.set_accels_for_action( "win.action_new",         { "<Control>n" } );
+    app.set_accels_for_action( "win.action_open",        { "<Control>o" } );
+    app.set_accels_for_action( "win.action_save",        { "<Control>s" } );
+    app.set_accels_for_action( "win.action_save_as",     { "<Control><Shift>s" } );
+    app.set_accels_for_action( "win.action_undo",        { "<Control>z" } );
+    app.set_accels_for_action( "win.action_redo",        { "<Control><Shift>z" } );
+    app.set_accels_for_action( "win.action_search",      { "<Control>f" } );
+    app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
+    app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
+    app.set_accels_for_action( "win.action_shortcuts",   { "F1" } );
+    app.set_accels_for_action( "win.action_zoom_in1",    { "<Control>plus" } );
+    app.set_accels_for_action( "win.action_zoom_in2",    { "<Control>equal" } );
+    app.set_accels_for_action( "win.action_zoom_out",    { "<Control>minus" } );
+    app.set_accels_for_action( "win.action_zoom_actual", { "<Control>0" } );
 
   }
 
@@ -774,6 +782,27 @@ public class MainWindow : ApplicationWindow {
   /* Called when the user uses the Control-f keyboard shortcut */
   private void action_search() {
     _search_btn.clicked();
+  }
+
+  /* Called when the user uses the Control-Plus/Equal shortcut */
+  private void action_zoom_in() {
+    var value = (int)_zoom.get_value();
+    if( value < 200 ) {
+      _zoom.set_value( value + 25 );
+    }
+  }
+
+  /* Called when the user uses the Control-Minus shortcut */
+  private void action_zoom_out() {
+    var value = (int)_zoom.get_value();
+    if( value > 25 ) {
+      _zoom.set_value( value - 25 );
+    }
+  }
+
+  /* Called when the user uses the Control-0 shortcut */
+  private void action_zoom_actual() {
+    _zoom.set_value( 100 );
   }
 
   /* Called when the user uses the Control-q keyboard shortcut */
