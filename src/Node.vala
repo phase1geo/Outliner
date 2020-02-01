@@ -102,7 +102,7 @@ public class Node {
     }
     set {
       _x = value;
-      position_name();
+      position_text();
     }
   }
   public double y {
@@ -111,7 +111,7 @@ public class Node {
     }
     set {
       _y = value;
-      position_name();
+      position_text();
     }
   }
   public double width {
@@ -188,7 +188,9 @@ public class Node {
     _note.cursor_changed.connect( note_cursor_changed );
     _note.set_font( note_fd );
 
-    position_name();
+    pady = ot.condensed ? 2 : 10;
+
+    position_text();
     update_width();
 
     /* Detect any size changes by the drawing area */
@@ -226,7 +228,7 @@ public class Node {
     _note.set_font( note_fd );
     _note.copy( node.note );
 
-    position_name();
+    position_text();
     update_width();
 
     /* Detect any size changes by the drawing area */
@@ -350,7 +352,7 @@ public class Node {
   }
 
   /* Adjusts the position of the text object */
-  private void position_name() {
+  private void position_text() {
     name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
@@ -639,6 +641,18 @@ public class Node {
     }
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).set_notes_display( show );
+    }
+  }
+
+  /* Set the node to display in normal or condensed mode */
+  public void set_condensed( bool condensed ) {
+    if( !is_root() ) {
+      pady = condensed ? 2 : 10;
+      position_text();
+      update_height();
+    }
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).set_condensed( condensed );
     }
   }
 

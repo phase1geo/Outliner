@@ -45,6 +45,7 @@ public class OutlineTable : DrawingArea {
   private Node?           _move_parent   = null;
   private int             _move_index    = -1;
   private NodeMenu        _node_menu;
+  private bool            _condensed     = false;
   private bool            _debug         = true;
 
   public MainWindow     win         { get { return( _win ); } }
@@ -95,6 +96,18 @@ public class OutlineTable : DrawingArea {
     }
   }
   public Clipboard node_clipboard { set; get; default = Clipboard.get_for_display( Display.get_default(), Atom.intern( "org.github.phase1geo.outliner", false ) );}
+  public bool condensed {
+    get {
+      return( _condensed );
+    }
+    set {
+      if( _condensed != value ) {
+        _condensed = value;
+        root.set_condensed( value );
+        queue_draw();
+      }
+    }
+  }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();

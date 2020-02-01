@@ -489,6 +489,19 @@ public class MainWindow : ApplicationWindow {
     }
     box.pack_start( theme_box, false, false, 10 );
 
+    /* Add condensed mode switch */
+    var cbox      = new Box( Orientation.HORIZONTAL, 0 );
+    var clbl      = new Label( _( "Condensed Mode" ) );
+    var condensed = new Switch();
+    condensed.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.condensed = state;
+      return( false );
+    });
+    cbox.pack_start( clbl,      false, true,  10 );
+    cbox.pack_end(   condensed, false, false, 10 );
+    box.pack_start( cbox, false, false, 10 );
+
     box.show_all();
 
     /* Create the popover and associate it with the menu button */
