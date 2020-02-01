@@ -173,6 +173,20 @@ public class OutlineTable : DrawingArea {
     cursor_changed();
   }
 
+  /* Sets the cursor of the drawing area */
+  private void set_cursor( CursorType? type = null ) {
+
+    var     win    = get_window();
+    Cursor? cursor = win.get_cursor();
+
+    if( type == null ) {
+      win.set_cursor( null );
+    } else if( (cursor == null) || (cursor.cursor_type != type) ) {
+      win.set_cursor( new Cursor.for_display( get_display(), type ) );
+    }
+
+  }
+
   /* Called whenever we want to change the current selected node's mode */
   private void set_selected_mode( NodeMode mode ) {
     if( selected == null ) return;
@@ -391,22 +405,32 @@ public class OutlineTable : DrawingArea {
     } else {
 
       var current = node_at_coordinates( e.x, e.y );
+      if( current != null ) {
+        var orig_over = current.over_note_icon;
+        current.over_note_icon = false;
+        if( current.is_within_note_icon( e.x, e.y ) ) {
+          current.over_note_icon = true;
+          set_cursor( null );
+        } else if( current.is_within_name( e.x, e.y ) ) {
+          set_cursor( CursorType.XTERM );
+        } else if( current.is_within_note( e.x, e.y ) ) {
+          set_cursor( CursorType.XTERM );
+        } else {
+          set_cursor( null );
+        }
+        if( orig_over != current.over_note_icon ) {
+          queue_draw();
+        }
+      }
       if( current != _active ) {
         if( (_active != null) && (_active != selected) ) {
           _active.mode = NodeMode.NONE;
         }
         if( (current != null) && (current != selected) ) {
-          current.over_note_icon = current.is_within_note_icon( e.x, e.y );
-          current.mode           = NodeMode.HOVER;
-          _active = current;
+          current.mode = NodeMode.HOVER;
+          _active      = current;
         }
         queue_draw();
-      } else if( (current != null) && (current.mode == NodeMode.HOVER) ) {
-        var orig_over = current.over_note_icon;
-        current.over_note_icon = current.is_within_note_icon( e.x, e.y );
-        if( orig_over != current.over_note_icon ) {
-          queue_draw();
-        }
       }
 
     }
