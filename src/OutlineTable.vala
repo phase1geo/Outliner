@@ -557,6 +557,7 @@ public class OutlineTable : DrawingArea {
           case 104   :  handle_control_h();             break;
           case 105   :  handle_control_i();             break;
           case 116   :  handle_control_t();             break;
+          case 119   :  handle_control_w();             break;
         }
       } else if( nomod || shift ) {
         if( _im_context.filter_keypress( e ) ) {
@@ -1153,6 +1154,11 @@ public class OutlineTable : DrawingArea {
       selected.note.add_tag( FormatTag.STRIKETHRU, null, undo_text );
       queue_draw();
     }
+  }
+
+  /* Closes the current tab, requesting a save if necessary */
+  private void handle_control_w() {
+    win.close_current_tab();
   }
 
   /* Handles a Home keypress */
