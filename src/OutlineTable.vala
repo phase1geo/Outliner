@@ -1380,6 +1380,11 @@ public class OutlineTable : DrawingArea {
   /* Loads the table information from the given XML node */
   public void load( Xml.Node* n ) {
 
+    string? c = n->get_prop( "condensed" );
+    if( c != null ) {
+      _condensed = bool.parse( c );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -1420,6 +1425,8 @@ public class OutlineTable : DrawingArea {
 
   /* Saves the table information to the given XML node */
   public void save( Xml.Node* n ) {
+
+    n->set_prop( "condensed", _condensed.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );

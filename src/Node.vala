@@ -228,6 +228,8 @@ public class Node {
     _note.set_font( note_fd );
     _note.copy( node.note );
 
+    pady = ot.condensed ? 2 : 10;
+
     position_text();
     update_width();
 

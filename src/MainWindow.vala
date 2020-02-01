@@ -42,6 +42,7 @@ public class MainWindow : ApplicationWindow {
   private Button?         _undo_btn       = null;
   private Button?         _redo_btn       = null;
   private SpinButton      _zoom;
+  private Switch          _condensed;
   private bool            _debug          = false;
   private bool            _prefer_dark    = false;
   private HashMap<string,RadioButton> _theme_buttons;
@@ -492,14 +493,14 @@ public class MainWindow : ApplicationWindow {
     /* Add condensed mode switch */
     var cbox      = new Box( Orientation.HORIZONTAL, 0 );
     var clbl      = new Label( _( "Condensed Mode" ) );
-    var condensed = new Switch();
-    condensed.state_set.connect( (state) => {
+    _condensed = new Switch();
+    _condensed.state_set.connect( (state) => {
       var table = get_current_table();
       table.condensed = state;
       return( false );
     });
-    cbox.pack_start( clbl,      false, true,  10 );
-    cbox.pack_end(   condensed, false, false, 10 );
+    cbox.pack_start( clbl,       false, true,  10 );
+    cbox.pack_end(   _condensed, false, false, 10 );
     box.pack_start( cbox, false, false, 10 );
 
     box.show_all();
@@ -859,9 +860,13 @@ public class MainWindow : ApplicationWindow {
 */
   }
 
+  /* Called whenever the properties button is clicked */
   private void properties_clicked() {
-    string theme_name = get_current_table( "properties_clicked" ).get_theme().name;
+    var table      = get_current_table( "properties_clicked" );
+    var theme_name = table.get_theme().name;
+    var condensed  = table.condensed;
     _theme_buttons.get( theme_name ).active = true;
+    _condensed.state = condensed;
   }
 
 }
