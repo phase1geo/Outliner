@@ -404,7 +404,10 @@ public class OutlineTable : DrawingArea {
 
     } else {
 
+      /* Get the current node */
       var current = node_at_coordinates( e.x, e.y );
+
+      /* Check the location of the cursor and update the UI appropriately */
       if( current != null ) {
         var orig_over = current.over_note_icon;
         current.over_note_icon = false;
@@ -423,10 +426,15 @@ public class OutlineTable : DrawingArea {
         if( orig_over != current.over_note_icon ) {
           queue_draw();
         }
+      } else {
+        set_cursor( null );
       }
+
+      /* If the current node is not the active node, set the mode to HOVER */
       if( current != _active ) {
         if( (_active != null) && (_active != selected) ) {
-          _active.mode = NodeMode.NONE;
+          _active.over_note_icon = false;
+          _active.mode           = NodeMode.NONE;
         }
         if( (current != null) && (current != selected) ) {
           current.mode = NodeMode.HOVER;
