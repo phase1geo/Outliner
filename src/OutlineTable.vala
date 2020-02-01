@@ -540,7 +540,8 @@ public class OutlineTable : DrawingArea {
         switch( e.keyval ) {
           case 99    :  do_copy();                      break;
           case 120   :  do_cut();                       break;
-          case 118   :  do_paste( shift );              break;
+          case 118   :  do_paste( false );              break;
+          case 86    :  do_paste( true );               break;
           case 65293 :  handle_control_return();        break;
           case 65289 :  handle_control_tab();           break;
           case 65363 :  handle_control_right( shift );  break;
