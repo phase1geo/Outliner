@@ -27,6 +27,7 @@ public enum FormatTag {
   ITALICS,
   UNDERLINE,
   STRIKETHRU,
+  HEADER,
   COLOR,
   HILITE,
   URL,
@@ -40,6 +41,7 @@ public enum FormatTag {
       case ITALICS    :  return( "italics" );
       case UNDERLINE  :  return( "underline" );
       case STRIKETHRU :  return( "strikethru" );
+      case HEADER     :  return( "header" );
       case COLOR      :  return( "color" );
       case HILITE     :  return( "hilite" );
       case URL        :  return( "url" );
@@ -54,6 +56,7 @@ public enum FormatTag {
       case "italics"    :  return( ITALICS );
       case "underline"  :  return( UNDERLINE );
       case "strikethru" :  return( STRIKETHRU );
+      case "header"     :  return( HEADER );
       case "color"      :  return( COLOR );
       case "hilite"     :  return( HILITE );
       case "url"        :  return( URL );
@@ -68,6 +71,7 @@ public enum FormatTag {
       case ITALICS    :  return( "<i>" );
       case UNDERLINE  :  return( "<u>" );
       case STRIKETHRU :  return( "<del>" );
+      case HEADER     :  return( "<h%s>".printf( extra ) );
       case COLOR      :  return( "<span style=\"color:%s;\">".printf( extra ) );
       case HILITE     :  return( "<span style=\"background-color:%s;\">".printf( extra ) );
       case URL        :  return( "<a href=\"%s\">".printf( extra ) );
@@ -75,12 +79,13 @@ public enum FormatTag {
     return( "" );
   }
 
-  public string to_html_end() {
+  public string to_html_end( string? extra ) {
     switch( this ) {
       case BOLD       :  return( "</b>" );
       case ITALICS    :  return( "</i>" );
       case UNDERLINE  :  return( "</u>" );
       case STRIKETHRU :  return( "</del>" );
+      case HEADER     :  return( "</h%s>".printf( extra ) );
       case COLOR      :  return( "</span>" );
       case HILITE     :  return( "</span>" );
       case URL        :  return( "</a>" );
@@ -377,6 +382,29 @@ public class FormattedText {
     }
   }
 
+  private class HeaderInfo : TagAttrs {
+    public HeaderInfo() {}
+    public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
+      var scale_factor = 1.1;
+      switch( extra ) {
+        case "1" :  scale_factor = 2.1;  break;
+        case "2" :  scale_factor = 1.8;  break;
+        case "3" :  scale_factor = 1.5;  break;
+        case "4" :  scale_factor = 1.3;  break;
+        case "5" :  scale_factor = 1.2;  break;
+        case "6" :  scale_factor = 1.1;  break;
+      }
+      var scale = attr_scale_new( scale_factor );
+      var bold  = attr_weight_new( Weight.BOLD );
+      scale.start_index = start;
+      scale.end_index   = end;
+      list.change( (owned)scale );
+      bold.start_index = start;
+      bold.end_index   = end;
+      list.change( (owned)bold );
+    }
+  }
+
   private class ColorInfo : TagAttrs {
     public ColorInfo() {}
     public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
@@ -475,6 +503,7 @@ public class FormattedText {
       _attr_tags[FormatTag.ITALICS]    = new ItalicsInfo();
       _attr_tags[FormatTag.UNDERLINE]  = new UnderlineInfo();
       _attr_tags[FormatTag.STRIKETHRU] = new StrikeThruInfo();
+      _attr_tags[FormatTag.HEADER]     = new HeaderInfo();
       _attr_tags[FormatTag.COLOR]      = new ColorInfo();
       _attr_tags[FormatTag.HILITE]     = new HighlightInfo();
       _attr_tags[FormatTag.URL]        = new UrlInfo( theme.url );
@@ -647,11 +676,11 @@ public class FormattedText {
         var str2 = "";
         for( int j=(int)(tag_stack.length - 1); j>=0; j-- ) {
           if( tag_stack.index( j ).tag == html_tag.tag ) {
-            str += tag_stack.index( j ).tag.to_html_end();
+            str += tag_stack.index( j ).tag.to_html_end( html_tag.extra );
             tag_stack.remove_index( j );
             break;
           } else {
-            str += tag_stack.index( j ).tag.to_html_end();
+            str += tag_stack.index( j ).tag.to_html_end( html_tag.extra );
             str2 = tag_stack.index( j ).tag.to_html_start( tag_stack.index( j ).extra ) + str2;
           }
         }

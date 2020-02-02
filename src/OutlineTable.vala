@@ -178,7 +178,6 @@ public class OutlineTable : DrawingArea {
 
   /* Called whenever the selection mode changed of the current node */
   private void select_mode_changed( bool name, bool mode ) {
-    stdout.printf( "Select mode changed, name: %s, mode: %s\n", name.to_string(), mode.to_string() );
     _show_format = mode;
   }
 
@@ -228,20 +227,17 @@ public class OutlineTable : DrawingArea {
   /* Make sure that the given node is fully in view */
   public void see( Node node ) {
     if( root.children.length == 0 ) return;
-    stdout.printf( "In see, node: %s\n", node.name.text.text );
     var vp = parent.parent as Viewport;
     var vh = vp.get_allocated_height();
     var sw = parent.parent.parent as ScrolledWindow;
     var y1 = sw.vadjustment.value;
     var y2 = y1 + vh;
-    stdout.printf( "node.y: %g, y1: %g, y2: %g, vh: %g\n", node.y, y1, y2, vh );
     if( node.y < y1 ) {
       _scroll_adjust = node.y;
     } else if( node.last_y > y2 ) {
       _scroll_adjust = node.last_y - vh;
     }
     if( node.last_y <= get_allocated_height() ) {
-      stdout.printf( "Calling see_internal\n" );
       see_internal();
     }
   }
@@ -1385,12 +1381,8 @@ public class OutlineTable : DrawingArea {
   /* Shows/Hides the formatting toolbar */
   private void update_format_bar() {
 
-    stdout.printf( "In update_format_bar\n" );
-
     /* If we have nothing to do, just return */
     if( _show_format == null ) return;
-
-    stdout.printf( "  HERE..., show_format: %s\n", _show_format.to_string() );
 
     /* Update the format bar */
     if( _show_format ) {

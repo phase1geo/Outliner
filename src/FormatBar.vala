@@ -31,6 +31,7 @@ public class FormatBar : Gtk.Popover {
   private ToggleButton _italics;
   private ToggleButton _underline;
   private ToggleButton _strike;
+  private MenuButton   _header;
   private ToggleButton _hilite;
   private ColorButton  _hilite_chooser;
   private ToggleButton _color;
@@ -86,6 +87,20 @@ public class FormatBar : Gtk.Popover {
     _strike.set_tooltip_text( _( "Strikethrough" ) );
     _strike.toggled.connect( handle_strikethru );
 
+    _header = new MenuButton();
+    _header.label  = "<H1>";
+    _header.relief = ReliefStyle.NONE;
+    _header.popup = new Gtk.Menu();
+    for( int i=0; i<7; i++ ) {
+      var mi = new Gtk.MenuItem.with_label( (i == 0) ? _( "None" ) : "<H%d>".printf( i ) );
+      mi.activate.connect(() => {
+        int level = i;
+        handle_header( level );
+      });
+      _header.popup.add( mi );
+    }
+    _header.popup.show_all();
+
     _hilite        = new ToggleButton();
     _hilite.label  = " ";
     _hilite.relief = ReliefStyle.NONE;
@@ -129,6 +144,7 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( _italics,            false, false, 0 );
     box.pack_start( _underline,          false, false, 0 );
     box.pack_start( _strike,             false, false, 0 );
+    box.pack_start( _header,             false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _hilite,             false, false, 0 );
     box.pack_start( _hilite_chooser,     false, false, 0 );
@@ -248,6 +264,19 @@ public class FormatBar : Gtk.Popover {
         format_text( FormatTag.STRIKETHRU );
       } else {
         unformat_text( FormatTag.STRIKETHRU );
+      }
+    }
+  }
+
+  /* Toggles the header status of the currently selected text */
+  private void handle_header( int level ) {
+    stdout.printf( "In handle_header, level: %d\n", level );
+    if( !_ignore_active ) {
+      if( level > 0 ) {
+        format_text( FormatTag.HEADER, level.to_string() );
+        _header.label = "<H%d>".printf( level );
+      } else {
+        unformat_text( FormatTag.HEADER );
       }
     }
   }
