@@ -92,9 +92,9 @@ public class FormatBar : Gtk.Popover {
     _header.relief = ReliefStyle.NONE;
     _header.popup = new Gtk.Menu();
     for( int i=0; i<7; i++ ) {
-      var mi = new Gtk.MenuItem.with_label( (i == 0) ? _( "None" ) : "<H%d>".printf( i ) );
+      var mi    = new Gtk.MenuItem.with_label( (i == 0) ? _( "None" ) : "<H%d>".printf( i ) );
+      var level = i;
       mi.activate.connect(() => {
-        int level = i;
         handle_header( level );
       });
       _header.popup.add( mi );
@@ -270,7 +270,6 @@ public class FormatBar : Gtk.Popover {
 
   /* Toggles the header status of the currently selected text */
   private void handle_header( int level ) {
-    stdout.printf( "In handle_header, level: %d\n", level );
     if( !_ignore_active ) {
       if( level > 0 ) {
         format_text( FormatTag.HEADER, level.to_string() );
