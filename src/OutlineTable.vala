@@ -151,7 +151,7 @@ public class OutlineTable : DrawingArea {
     this.motion_notify_event.connect( on_motion );
     this.button_release_event.connect( on_release );
     this.key_press_event.connect( on_keypress );
-    this.scroll_event.connect( on_scroll );
+    // this.scroll_event.connect( on_scroll );
     this.size_allocate.connect( (a) => {
       see_internal();
     });
