@@ -107,10 +107,11 @@ public class HtmlTag {
     this.begin = true;
     this.extra = extra;
   }
-  public HtmlTag.end( FormatTag tag, int pos ) {
+  public HtmlTag.end( FormatTag tag, int pos, string? extra ) {
     this.tag   = tag;
     this.pos   = pos;
     this.begin = false;
+    this.extra = extra;
   }
   public string to_string() {
     return( "(%s %s, %d, %s)".printf( tag.to_string(), (begin ? "start" : "end"), pos, extra ) );
@@ -131,7 +132,7 @@ public class UndoTagInfo {
   }
   public void append_to_htmltag_list( ref List<HtmlTag> tags ) {
     tags.append( new HtmlTag.start( (FormatTag)tag, start, extra ) );
-    tags.append( new HtmlTag.end( (FormatTag)tag, end ) );
+    tags.append( new HtmlTag.end( (FormatTag)tag, end, extra ) );
   }
 }
 
