@@ -268,7 +268,9 @@ public class FormattedText {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
         if( (start < info.end) && (end > info.start) ) {
-          tags.append_val( new UndoTagInfo( tag, info.start, info.end, info.extra ) );
+          var save_start = (info.start < start) ? start : info.start;
+          var save_end   = (info.end   > end)   ? end   : info.end;
+          tags.append_val( new UndoTagInfo( tag, (save_start - start), (save_end - start), info.extra ) );
         }
       }
     }
@@ -627,10 +629,10 @@ public class FormattedText {
   }
 
   /* Reapplies tags that were previously removed */
-  public void apply_tags( Array<UndoTagInfo> tags ) {
+  public void apply_tags( Array<UndoTagInfo> tags, int start = 0 ) {
     for( int i=((int)tags.length - 1); i>=0; i-- ) {
       var info = tags.index( i );
-      _formats[info.tag].add_tag( info.start, info.end, info.extra );
+      _formats[info.tag].add_tag( (info.start + start), (info.end + start), info.extra );
     }
     changed();
   }

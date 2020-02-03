@@ -831,10 +831,17 @@ public class OutlineTable : DrawingArea {
   /* Handles a Control-Return keypress */
   private void handle_control_return() {
     if( is_node_editable() ) {
-      string name   = selected.name.text.text;
-      int    curpos = selected.name.cursor;
-      selected.name.text.remove_text( curpos, (selected.name.text.text.length - curpos ) );
-      add_sibling_node( true, name.substring( curpos ) );
+      var sel    = selected;
+      var curpos = selected.name.cursor;
+      var title  = selected.name.text.text.substring( curpos );
+      var endpos = selected.name.text.text.length;
+      var index  = selected.index() + 1;
+      var tags   = selected.name.text.get_tags_in_range( curpos, endpos );
+      var node   = create_node( title, tags );
+      selected.name.text.remove_text( curpos, (endpos - curpos ) );
+      insert_node( sel.parent, node, index );
+      set_selected_mode( NodeMode.EDITABLE );
+      undo_buffer.add_item( new UndoNodeSplit( selected ) );
     } else if( is_note_editable() ) {
       selected.note.insert( "\n", undo_text );
       queue_draw();
@@ -1517,12 +1524,16 @@ public class OutlineTable : DrawingArea {
   /************************/
 
   /* Creates a new node that is ready to be edited */
-  private Node create_node( string? title = null ) {
+  private Node create_node( string? title = null, Array<UndoTagInfo>? tags = null ) {
 
     var node = new Node( this );
 
     if( title != null ) {
       node.name.text.set_text( title );
+    }
+
+    if( tags != null ) {
+      node.name.text.apply_tags( tags );
     }
 
     return( node );
@@ -1539,11 +1550,11 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Adds a sibling node of the currently selected node */
-  public void add_sibling_node( bool below, string? title = null ) {
+  public void add_sibling_node( bool below, string? title = null, Array<UndoTagInfo>? tags = null ) {
     if( (selected == null) || selected.is_root() ) return;
     var index = selected.index() + (below ? 1 : 0);
     var sel   = selected;
-    var node  = create_node( title );
+    var node  = create_node( title, tags );
     insert_node( sel.parent, node, index );
     set_selected_mode( NodeMode.EDITABLE );
     undo_buffer.add_item( new UndoNodeInsert( node ) );
