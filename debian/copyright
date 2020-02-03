@@ -3,7 +3,7 @@ Upstream-Name: Outliner
 Source: {{ repo-url }}
 
 Files: *
-Copyright: 2018 Trevor Williams <phase1geo@gmail.com>
+Copyright: 2020 Trevor Williams <phase1geo@gmail.com>
 License: GPL-3.0+
 
 License: GPL-3.0+

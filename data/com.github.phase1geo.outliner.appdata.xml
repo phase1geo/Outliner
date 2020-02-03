@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2018 Trevor Williams <phase1geo@gmail.com> -->
+<!-- Copyright 2020 Trevor Williams <phase1geo@gmail.com> -->
 <component type="desktop-application">
     <id>com.github.phase1geo.outliner.desktop</id>
     <metadata_license>CC0-1.0</metadata_license>
