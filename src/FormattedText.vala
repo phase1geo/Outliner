@@ -302,10 +302,35 @@ public class FormattedText {
     }
 
     /* Inserts all of the attributes for this tag */
-    public void get_attributes( int tag_index, ref AttrList attrs, TagAttrs[] tag ) {
+    public void get_attributes( TagAttr tag_attr, ref AttrList attrs ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
-        tag[tag_index].add_attrs( ref attrs, info.start, info.end, info.extra );
+        tag_attr.add_attrs( ref attrs, info.start, info.end, info.extra );
+      }
+    }
+
+    /* Inserts all of the text tags for this tag */
+    public void get_text_tags( TagAttr tag_attr, ref TextTagTable table ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info     = _info.index( i );
+        var tag_name = tag_attr.text_tag_name( info.extra );
+        if( !table.lookup( tag_name ) ) {
+          var tag = new TextTag( tag_name );
+          tag_attr.init_text_tag( tag, info.extra );
+          table.add( tag );
+        }
+      }
+    }
+
+    /* Applies all of the text tags to the given buffer */
+    public void apply_text_tags( TagAttr tag_attr, TextBuffer buf ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info     = _info.index( i );
+        var tag_name = tag_attr.text_tag_name( info.extra );
+        TextIter start, end;
+        buf.get_iter_at_offset( out start, info.start );
+        buf.get_iter_at_offset( out end,   info.end );
+        buf.apply_tag_by_name( tag_name, start, end );
       }
     }
 
@@ -354,6 +379,10 @@ public class FormattedText {
         list.change( (owned)attr );
       }
     }
+    public virtual string text_tag_name( string? extra ) {
+      return( "bold" );
+    }
+    public virtual void init_text_tag( ref TextTag tag, string? extra ) {}
     protected RGBA get_color( string value ) {
       RGBA c = {1.0, 1.0, 1.0, 1.0};
       c.parse( value );
@@ -365,11 +394,25 @@ public class FormattedText {
     public BoldInfo() {
       attrs.append_val( attr_weight_new( Weight.BOLD ) );
     }
+    public override string text_tag_name( string? extra ) {
+      return( "bold" );
+    }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.weight     = Weight.BOLD;
+      tag.weight_set = true;
+    }
   }
 
   private class ItalicsInfo : TagAttrs {
     public ItalicsInfo() {
       attrs.append_val( attr_style_new( Style.ITALIC ) );
+    }
+    public override string text_tag_name( string? extra ) {
+      return( "italics" );
+    }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.style     = Style.ITALIC;
+      tag.style_set = true;
     }
   }
 
@@ -377,27 +420,46 @@ public class FormattedText {
     public UnderlineInfo() {
       attrs.append_val( attr_underline_new( Underline.SINGLE ) );
     }
+    public override string text_tag_name( string? extra ) {
+      return( "underline" );
+    }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.underline     = Underline.SINGLE;
+      tag.underline_set = true;
+    }
   }
 
   private class StrikeThruInfo : TagAttrs {
     public StrikeThruInfo() {
       attrs.append_val( attr_strikethrough_new( true ) );
     }
+    public override string text_tag_name( string? extra ) {
+      return( "strikethru" );
+    }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.strikethrough     = true;
+      tag.strikethrough_set = true;
+    }
   }
 
   private class HeaderInfo : TagAttrs {
     public HeaderInfo() {}
-    public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
-      var scale_factor = 1.1;
+    private double get_scale_factor( string? extra ) {
       switch( extra ) {
-        case "1" :  scale_factor = 2.1;  break;
-        case "2" :  scale_factor = 1.8;  break;
-        case "3" :  scale_factor = 1.5;  break;
-        case "4" :  scale_factor = 1.3;  break;
-        case "5" :  scale_factor = 1.2;  break;
-        case "6" :  scale_factor = 1.1;  break;
+        case "1" :  return( 2.1 );
+        case "2" :  return( 1.8 );
+        case "3" :  return( 1.5 );
+        case "4" :  return( 1.3 );
+        case "5" :  return( 1.2 );
+        case "6" :  return( 1.1 );
+        default  :  return( 1.1 );
       }
-      var scale = attr_scale_new( scale_factor );
+    }
+    public override string text_tag_name( string? extra ) {
+      return( "header:" + extra );
+    }
+    public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
+      var scale = attr_scale_new( get_scale_factor( extra ) );
       var bold  = attr_weight_new( Weight.BOLD );
       scale.start_index = start;
       scale.end_index   = end;
@@ -406,10 +468,19 @@ public class FormattedText {
       bold.end_index   = end;
       list.change( (owned)bold );
     }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.scale      = get_scale_factor( extra );
+      tag.scale_set  = true;
+      tag.weight     = Weight.BOLD;
+      tag.weight_set = true;
+    }
   }
 
   private class ColorInfo : TagAttrs {
     public ColorInfo() {}
+    public override string text_tag_name( string? extra ) {
+      return( "color:" + extra );
+    }
     public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
       var color = get_color( extra );
       var attr  = attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) );
@@ -417,10 +488,17 @@ public class FormattedText {
       attr.end_index   = end;
       list.change( (owned)attr );
     }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.foreground     = extra;
+      tag.foreground_set = true;
+    }
   }
 
   private class HighlightInfo : TagAttrs {
     public HighlightInfo() {}
+    public override void text_tag_name( string? extra ) {
+      return( "hilite:" + extra );
+    }
     public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
       var color = get_color( extra );
       var bg    = attr_background_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) );
@@ -431,6 +509,10 @@ public class FormattedText {
       alpha.start_index = start;
       alpha.end_index   = end;
       list.change( (owned)alpha );
+    }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.background     = color;
+      tag.background_set = true;
     }
   }
 
@@ -446,7 +528,13 @@ public class FormattedText {
       attrs.remove_range( 0, 2 );
       set_color( color );
     }
-
+    public override string text_tag_name( string? extra ) {
+      return( "url" );
+    }
+    public override void init_text_tag( ref TextTag tag, string? extra ) {
+      tag.foreground     = "#0000ff";
+      tag.foreground_set = true;
+    }
   }
 
   private class MatchInfo : TagAttrs {
@@ -645,7 +733,7 @@ public class FormattedText {
   public AttrList get_attributes() {
     var attrs = new AttrList();
     for( int i=0; i<FormatTag.LENGTH; i++ ) {
-      _formats[i].get_attributes( i, ref attrs, _attr_tags );
+      _formats[i].get_attributes( _attr_tags[i], ref attrs );
     }
     return( attrs );
   }
@@ -692,6 +780,26 @@ public class FormattedText {
       start = html_tag.pos;
     }
     return( str + get_html_slice( start, text.index_of_nth_char( text.length ) ) );
+  }
+
+  /* Populate the given text tag table with the list of text tags */
+  private TextTagTable make_text_tag_table() {
+    var table = new TextTagTable();
+    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+      _formats[i].get_text_tags( _attr_tags[i], ref table );
+    }
+    return( table );
+  }
+
+  /* Creates an RTF string out of this formatted text and returns it */
+  public string make_rtf() {
+    var tags = get_tags_in_range( 0, text.length );
+    var buf  = new TextBuffer( make_text_tag_table() );
+    buf.text = text;
+    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+      _formats[i].apply_text_tags( _attr_tags[i], buf );
+    }
+    return( buf.serialize() );
   }
 
   /*
