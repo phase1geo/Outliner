@@ -655,7 +655,7 @@ public class FormattedText {
   }
 
   /* Generates an HTML version of the formatted text */
-  public string htmlize() {
+  public string make_html() {
     var tags      = get_tags_in_range( 0, text.length );
     var str       = "";
     var start     = 0;

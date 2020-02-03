@@ -59,7 +59,7 @@ public class ExportHTML : Object {
   }
 
   private static Xml.Node* make_div( string div_class, FormattedText text ) {
-    var      html = "<div class=\"" + div_class + "\">" + text.htmlize() + "</div>";
+    var      html = "<div class=\"" + div_class + "\">" + text.make_html() + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );
     delete doc;

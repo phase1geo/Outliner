@@ -1133,7 +1133,7 @@ public class OutlineTable : DrawingArea {
     if( selected == null ) {
       stdout.printf( "Nothing is selected\n" );
     } else {
-      stdout.printf( "HTMLized text: %s\n", selected.name.text.htmlize() );
+      stdout.printf( "HTMLized text: %s\n", selected.name.text.make_html() );
     }
   }
 
