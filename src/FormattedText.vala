@@ -65,57 +65,6 @@ public enum FormatTag {
     return( LENGTH );
   }
 
-  public string to_html_start( string? extra ) {
-    switch( this ) {
-      case BOLD       :  return( "<b>");
-      case ITALICS    :  return( "<i>" );
-      case UNDERLINE  :  return( "<u>" );
-      case STRIKETHRU :  return( "<del>" );
-      case HEADER     :  return( "<h%s>".printf( extra ) );
-      case COLOR      :  return( "<span style=\"color:%s;\">".printf( extra ) );
-      case HILITE     :  return( "<span style=\"background-color:%s;\">".printf( extra ) );
-      case URL        :  return( "<a href=\"%s\">".printf( extra ) );
-    }
-    return( "" );
-  }
-
-  public string to_html_end( string? extra ) {
-    switch( this ) {
-      case BOLD       :  return( "</b>" );
-      case ITALICS    :  return( "</i>" );
-      case UNDERLINE  :  return( "</u>" );
-      case STRIKETHRU :  return( "</del>" );
-      case HEADER     :  return( "</h%s>".printf( extra ) );
-      case COLOR      :  return( "</span>" );
-      case HILITE     :  return( "</span>" );
-      case URL        :  return( "</a>" );
-    }
-    return( "" );
-  }
-
-  public string to_rtf_start( string? extra ) {
-    switch( this ) {
-      case BOLD       :  return( "\\b" );
-      case ITALICS    :  return( "\\i" );
-      case UNDERLINE  :  return( "\\ul" );
-      case STRIKETHRU :  return( "\\strike" );
-      case HEADER     :
-        switch( extra ) {
-          case "1" :  return( "\\b\\fs40" );
-          case "2" :  return( "\\b\\fs34" );
-          case "3" :  return( "\\b\\fs29" );
-          case "4" :  return( "\\b\\fs25" );
-          case "5" :  return( "\\b\\fs23" );
-          case "6" :  return( "\\b\\fs21" );
-          default  :  return( "\\b\\fs21" );
-        }
-      case COLOR      :  return( "\\cf4" );
-      case HILITE     :  return( "\\highlight7" );
-      case URL        :  return( "\\cs1\\ul\\cf2" );
-    }
-    return( "" );
-  }
-
 }
 
 /* Used by the HTMLizer code */

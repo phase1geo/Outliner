@@ -58,7 +58,7 @@ public class ExportHTML : Object {
     return( body );
   }
 
-  public static string text_to_html( FormattedText text ) {
+  public static string from_text( FormattedText text ) {
     FormattedText.ExportStartFunc start_func = (tag, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "<b>");
@@ -92,7 +92,7 @@ public class ExportHTML : Object {
   }
 
   private static Xml.Node* make_div( string div_class, FormattedText text ) {
-    var      html = "<div class=\"" + div_class + "\">" + text_to_html( text ) + "</div>";
+    var      html = "<div class=\"" + div_class + "\">" + from_text( text ) + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );
     delete doc;

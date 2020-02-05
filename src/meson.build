@@ -5,6 +5,7 @@ sources += files(
   'exports/ExportOPML.vala',
   'exports/ExportPDF.vala',
   'exports/ExportPrint.vala',
+  'exports/ExportRTF.vala',
   'exports/ExportText.vala',
 
   'themes/ThemeDark.vala',

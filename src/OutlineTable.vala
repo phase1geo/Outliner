@@ -1130,7 +1130,9 @@ public class OutlineTable : DrawingArea {
   /* This is just used from debugging purposes */
   private void handle_control_d() {
     if( !_debug ) return;
-    // TBD
+    if( selected != null ) {
+      stdout.printf( "RTF: %s\n", ExportRTF.from_text( selected.name.text ) );
+    }
   }
 
   /* Toggles the show all notes status given the state of the currently selected node */
