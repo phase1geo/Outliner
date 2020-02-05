@@ -93,21 +93,44 @@ public enum FormatTag {
     return( "" );
   }
 
+  public string to_rtf_start( string? extra ) {
+    switch( this ) {
+      case BOLD       :  return( "\\b" );
+      case ITALICS    :  return( "\\i" );
+      case UNDERLINE  :  return( "\\ul" );
+      case STRIKETHRU :  return( "\\strike" );
+      case HEADER     :
+        switch( extra ) {
+          case "1" :  return( "\\b\\fs40" );
+          case "2" :  return( "\\b\\fs34" );
+          case "3" :  return( "\\b\\fs29" );
+          case "4" :  return( "\\b\\fs25" );
+          case "5" :  return( "\\b\\fs23" );
+          case "6" :  return( "\\b\\fs21" );
+          default  :  return( "\\b\\fs21" );
+        }
+      case COLOR      :  return( "\\cf4" );
+      case HILITE     :  return( "\\highlight7" );
+      case URL        :  return( "\\cs1\\ul\\cf2" );
+    }
+    return( "" );
+  }
+
 }
 
 /* Used by the HTMLizer code */
-public class HtmlTag {
+public class PosTag {
   public FormatTag tag   { private set; get; }
   public int       pos   { private set; get; }
   public bool      begin { private set; get; }
   public string?   extra { private set; get; }
-  public HtmlTag.start( FormatTag tag, int pos, string? extra ) {
+  public PosTag.start( FormatTag tag, int pos, string? extra ) {
     this.tag   = tag;
     this.pos   = pos;
     this.begin = true;
     this.extra = extra;
   }
-  public HtmlTag.end( FormatTag tag, int pos, string? extra ) {
+  public PosTag.end( FormatTag tag, int pos, string? extra ) {
     this.tag   = tag;
     this.pos   = pos;
     this.begin = false;
@@ -130,9 +153,9 @@ public class UndoTagInfo {
     this.end   = end;
     this.extra = extra;
   }
-  public void append_to_htmltag_list( ref List<HtmlTag> tags ) {
-    tags.append( new HtmlTag.start( (FormatTag)tag, start, extra ) );
-    tags.append( new HtmlTag.end( (FormatTag)tag, end, extra ) );
+  public void append_to_postag_list( ref List<PosTag> tags ) {
+    tags.append( new PosTag.start( (FormatTag)tag, start, extra ) );
+    tags.append( new PosTag.end( (FormatTag)tag, end, extra ) );
   }
 }
 
@@ -309,31 +332,6 @@ public class FormattedText {
       }
     }
 
-    /* Inserts all of the text tags for this tag */
-    public void get_text_tags( TagAttr tag_attr, ref TextTagTable table ) {
-      for( int i=0; i<_info.length; i++ ) {
-        var info     = _info.index( i );
-        var tag_name = tag_attr.text_tag_name( info.extra );
-        if( !table.lookup( tag_name ) ) {
-          var tag = new TextTag( tag_name );
-          tag_attr.init_text_tag( tag, info.extra );
-          table.add( tag );
-        }
-      }
-    }
-
-    /* Applies all of the text tags to the given buffer */
-    public void apply_text_tags( TagAttr tag_attr, TextBuffer buf ) {
-      for( int i=0; i<_info.length; i++ ) {
-        var info     = _info.index( i );
-        var tag_name = tag_attr.text_tag_name( info.extra );
-        TextIter start, end;
-        buf.get_iter_at_offset( out start, info.start );
-        buf.get_iter_at_offset( out end,   info.end );
-        buf.apply_tag_by_name( tag_name, start, end );
-      }
-    }
-
     /* Returns the extra data associated with the given cursor position */
     public string? get_extra( int index ) {
       for( int i=0; i<_info.length; i++ ) {
@@ -366,9 +364,9 @@ public class FormattedText {
 
   }
 
-  private class TagAttrs {
+  private class TagAttr {
     public Array<Pango.Attribute> attrs;
-    public TagAttrs() {
+    public TagAttr() {
       attrs = new Array<Pango.Attribute>();
     }
     public virtual void add_attrs( ref AttrList list, int start, int end, string? extra ) {
@@ -379,10 +377,6 @@ public class FormattedText {
         list.change( (owned)attr );
       }
     }
-    public virtual string text_tag_name( string? extra ) {
-      return( "bold" );
-    }
-    public virtual void init_text_tag( ref TextTag tag, string? extra ) {}
     protected RGBA get_color( string value ) {
       RGBA c = {1.0, 1.0, 1.0, 1.0};
       c.parse( value );
@@ -390,59 +384,31 @@ public class FormattedText {
     }
   }
 
-  private class BoldInfo : TagAttrs {
+  private class BoldInfo : TagAttr {
     public BoldInfo() {
       attrs.append_val( attr_weight_new( Weight.BOLD ) );
     }
-    public override string text_tag_name( string? extra ) {
-      return( "bold" );
-    }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.weight     = Weight.BOLD;
-      tag.weight_set = true;
-    }
   }
 
-  private class ItalicsInfo : TagAttrs {
+  private class ItalicsInfo : TagAttr {
     public ItalicsInfo() {
       attrs.append_val( attr_style_new( Style.ITALIC ) );
     }
-    public override string text_tag_name( string? extra ) {
-      return( "italics" );
-    }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.style     = Style.ITALIC;
-      tag.style_set = true;
-    }
   }
 
-  private class UnderlineInfo : TagAttrs {
+  private class UnderlineInfo : TagAttr {
     public UnderlineInfo() {
       attrs.append_val( attr_underline_new( Underline.SINGLE ) );
     }
-    public override string text_tag_name( string? extra ) {
-      return( "underline" );
-    }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.underline     = Underline.SINGLE;
-      tag.underline_set = true;
-    }
   }
 
-  private class StrikeThruInfo : TagAttrs {
+  private class StrikeThruInfo : TagAttr {
     public StrikeThruInfo() {
       attrs.append_val( attr_strikethrough_new( true ) );
     }
-    public override string text_tag_name( string? extra ) {
-      return( "strikethru" );
-    }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.strikethrough     = true;
-      tag.strikethrough_set = true;
-    }
   }
 
-  private class HeaderInfo : TagAttrs {
+  private class HeaderInfo : TagAttr {
     public HeaderInfo() {}
     private double get_scale_factor( string? extra ) {
       switch( extra ) {
@@ -455,9 +421,6 @@ public class FormattedText {
         default  :  return( 1.1 );
       }
     }
-    public override string text_tag_name( string? extra ) {
-      return( "header:" + extra );
-    }
     public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
       var scale = attr_scale_new( get_scale_factor( extra ) );
       var bold  = attr_weight_new( Weight.BOLD );
@@ -468,19 +431,10 @@ public class FormattedText {
       bold.end_index   = end;
       list.change( (owned)bold );
     }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.scale      = get_scale_factor( extra );
-      tag.scale_set  = true;
-      tag.weight     = Weight.BOLD;
-      tag.weight_set = true;
-    }
   }
 
-  private class ColorInfo : TagAttrs {
+  private class ColorInfo : TagAttr {
     public ColorInfo() {}
-    public override string text_tag_name( string? extra ) {
-      return( "color:" + extra );
-    }
     public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
       var color = get_color( extra );
       var attr  = attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) );
@@ -488,17 +442,10 @@ public class FormattedText {
       attr.end_index   = end;
       list.change( (owned)attr );
     }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.foreground     = extra;
-      tag.foreground_set = true;
-    }
   }
 
-  private class HighlightInfo : TagAttrs {
+  private class HighlightInfo : TagAttr {
     public HighlightInfo() {}
-    public override void text_tag_name( string? extra ) {
-      return( "hilite:" + extra );
-    }
     public override void add_attrs( ref AttrList list, int start, int end, string? extra ) {
       var color = get_color( extra );
       var bg    = attr_background_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) );
@@ -510,13 +457,9 @@ public class FormattedText {
       alpha.end_index   = end;
       list.change( (owned)alpha );
     }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.background     = color;
-      tag.background_set = true;
-    }
   }
 
-  private class UrlInfo : TagAttrs {
+  private class UrlInfo : TagAttr {
     public UrlInfo( RGBA color ) {
       set_color( color );
     }
@@ -528,16 +471,9 @@ public class FormattedText {
       attrs.remove_range( 0, 2 );
       set_color( color );
     }
-    public override string text_tag_name( string? extra ) {
-      return( "url" );
-    }
-    public override void init_text_tag( ref TextTag tag, string? extra ) {
-      tag.foreground     = "#0000ff";
-      tag.foreground_set = true;
-    }
   }
 
-  private class MatchInfo : TagAttrs {
+  private class MatchInfo : TagAttr {
     public MatchInfo( RGBA f, RGBA b ) {
       set_color( f, b );
     }
@@ -551,7 +487,7 @@ public class FormattedText {
     }
   }
 
-  private class SelectInfo : TagAttrs {
+  private class SelectInfo : TagAttr {
     public SelectInfo( RGBA f, RGBA b ) {
       set_color( f, b );
     }
@@ -565,11 +501,15 @@ public class FormattedText {
     }
   }
 
-  private static TagAttrs[] _attr_tags = null;
+  private static TagAttr[] _attr_tags = null;
   private TagInfo[]         _formats   = new TagInfo[FormatTag.LENGTH];
   private string            _text      = "";
 
   public signal void changed();
+
+  public delegate string ExportStartFunc( FormatTag tag, string? extra );
+  public delegate string ExportEndFunc( FormatTag tag, string? extra );
+  public delegate string ExportEncodeFunc( string str );
 
   public string text {
     get {
@@ -589,7 +529,7 @@ public class FormattedText {
   /* Initializes this instance */
   private void initialize( Theme theme ) {
     if( _attr_tags == null ) {
-      _attr_tags = new TagAttrs[FormatTag.LENGTH];
+      _attr_tags = new TagAttr[FormatTag.LENGTH];
       _attr_tags[FormatTag.BOLD]       = new BoldInfo();
       _attr_tags[FormatTag.ITALICS]    = new ItalicsInfo();
       _attr_tags[FormatTag.UNDERLINE]  = new UnderlineInfo();
@@ -738,68 +678,49 @@ public class FormattedText {
     return( attrs );
   }
 
-  private string get_html_slice( int start, int end ) {
-    return( text.slice( start, end ).replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ) );
+  /*
+  private string get_rtf_slice( int start, int end ) {
+    // return( text.slice( start, end ).replace( @"\", @"\\" ).replace( "{", @"\{" ).replace( "}", @"\}" );
   }
+  */
 
   /* Generates an HTML version of the formatted text */
-  public string make_html() {
+  public string export( ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
     var tags      = get_tags_in_range( 0, text.length );
     var str       = "";
     var start     = 0;
-    var html_tags = new List<HtmlTag>();
-    var tag_stack = new Array<HtmlTag>();
+    var pos_tags  = new List<PosTag>();
+    var tag_stack = new Array<PosTag>();
     for( int i=0; i<tags.length; i++ ) {
-      tags.index( i ).append_to_htmltag_list( ref html_tags );
+      tags.index( i ).append_to_postag_list( ref pos_tags );
     }
-    CompareFunc<HtmlTag> ht_cmp = (a, b) => {
+    CompareFunc<PosTag> pt_cmp = (a, b) => {
       return( (int)(a.pos > b.pos) - (int)(a.pos < b.pos) );
     };
-    html_tags.sort( ht_cmp );
-    for( int i=0; i<html_tags.length(); i++ ) {
-      var html_tag = html_tags.nth_data( i );
-      var text     = get_html_slice( start, html_tag.pos );
-      str += text;
-      if( html_tag.begin ) {
-        tag_stack.append_val( html_tag );
-        str += html_tag.tag.to_html_start( html_tag.extra );
+    pos_tags.sort( pt_cmp );
+    for( int i=0; i<pos_tags.length(); i++ ) {
+      var pos_tag = pos_tags.nth_data( i );
+      str += encode_func( text.slice( start, pos_tag.pos ) );
+      if( pos_tag.begin ) {
+        tag_stack.append_val( pos_tag );
+        str += start_func( pos_tag.tag, pos_tag.extra );
       } else {
         var str2 = "";
         for( int j=(int)(tag_stack.length - 1); j>=0; j-- ) {
-          if( tag_stack.index( j ).tag == html_tag.tag ) {
-            str += tag_stack.index( j ).tag.to_html_end( html_tag.extra );
+          if( tag_stack.index( j ).tag == pos_tag.tag ) {
+            str += end_func( tag_stack.index( j ).tag, pos_tag.extra );
             tag_stack.remove_index( j );
             break;
           } else {
-            str += tag_stack.index( j ).tag.to_html_end( html_tag.extra );
-            str2 = tag_stack.index( j ).tag.to_html_start( tag_stack.index( j ).extra ) + str2;
+            str += end_func( tag_stack.index( j ).tag, pos_tag.extra );
+            str2 = start_func( tag_stack.index( j ).tag, tag_stack.index( j ).extra ) + str2;
           }
         }
         str += str2;
       }
-      start = html_tag.pos;
+      start = pos_tag.pos;
     }
-    return( str + get_html_slice( start, text.index_of_nth_char( text.length ) ) );
-  }
-
-  /* Populate the given text tag table with the list of text tags */
-  private TextTagTable make_text_tag_table() {
-    var table = new TextTagTable();
-    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
-      _formats[i].get_text_tags( _attr_tags[i], ref table );
-    }
-    return( table );
-  }
-
-  /* Creates an RTF string out of this formatted text and returns it */
-  public string make_rtf() {
-    var tags = get_tags_in_range( 0, text.length );
-    var buf  = new TextBuffer( make_text_tag_table() );
-    buf.text = text;
-    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
-      _formats[i].apply_text_tags( _attr_tags[i], buf );
-    }
-    return( buf.serialize() );
+    return( str + encode_func( text.slice( start, text.index_of_nth_char( text.length ) ) ) );
   }
 
   /*

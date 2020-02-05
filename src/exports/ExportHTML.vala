@@ -58,8 +58,41 @@ public class ExportHTML : Object {
     return( body );
   }
 
+  public static string text_to_html( FormattedText text ) {
+    FormattedText.ExportStartFunc start_func = (tag, extra) => {
+      switch( tag ) {
+        case FormatTag.BOLD       :  return( "<b>");
+        case FormatTag.ITALICS    :  return( "<i>" );
+        case FormatTag.UNDERLINE  :  return( "<u>" );
+        case FormatTag.STRIKETHRU :  return( "<del>" );
+        case FormatTag.HEADER     :  return( "<h%s>".printf( extra ) );
+        case FormatTag.COLOR      :  return( "<span style=\"color:%s;\">".printf( extra ) );
+        case FormatTag.HILITE     :  return( "<span style=\"background-color:%s;\">".printf( extra ) );
+        case FormatTag.URL        :  return( "<a href=\"%s\">".printf( extra ) );
+      }
+      return( "" );
+    };
+    FormattedText.ExportEndFunc end_func = (tag, extra) => {
+      switch( tag ) {
+        case FormatTag.BOLD       :  return( "</b>" );
+        case FormatTag.ITALICS    :  return( "</i>" );
+        case FormatTag.UNDERLINE  :  return( "</u>" );
+        case FormatTag.STRIKETHRU :  return( "</del>" );
+        case FormatTag.HEADER     :  return( "</h%s>".printf( extra ) );
+        case FormatTag.COLOR      :  return( "</span>" );
+        case FormatTag.HILITE     :  return( "</span>" );
+        case FormatTag.URL        :  return( "</a>" );
+      }
+      return( "" );
+    };
+    FormattedText.ExportEncodeFunc encode_func = (str) => {
+      return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ) );
+    };
+    return( text.export( start_func, end_func, encode_func ) );
+  }
+
   private static Xml.Node* make_div( string div_class, FormattedText text ) {
-    var      html = "<div class=\"" + div_class + "\">" + text.make_html() + "</div>";
+    var      html = "<div class=\"" + div_class + "\">" + text_to_html( text ) + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );
     delete doc;

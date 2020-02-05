@@ -1130,11 +1130,7 @@ public class OutlineTable : DrawingArea {
   /* This is just used from debugging purposes */
   private void handle_control_d() {
     if( !_debug ) return;
-    if( selected == null ) {
-      stdout.printf( "Nothing is selected\n" );
-    } else {
-      stdout.printf( "HTMLized text: %s\n", selected.name.text.make_html() );
-    }
+    // TBD
   }
 
   /* Toggles the show all notes status given the state of the currently selected node */
