@@ -1131,7 +1131,8 @@ public class OutlineTable : DrawingArea {
   private void handle_control_d() {
     if( !_debug ) return;
     if( selected != null ) {
-      stdout.printf( "RTF: %s\n", ExportRTF.from_text( selected.name.text ) );
+      update_statistics();
+      // stdout.printf( "RTF: %s\n", ExportRTF.from_text( selected.name.text ) );
     }
   }
 
@@ -1399,6 +1400,28 @@ public class OutlineTable : DrawingArea {
     /* Clear the show format indicator */
     _show_format = null;
 
+  }
+
+  private void update_node_statistics( Node node, ref int char_count, ref int word_count, ref int row_count ) {
+    var name = node.name.text.text;
+    var note = node.note.text.text;
+    char_count += (name.char_count() + note.char_count());
+    word_count += (name.strip().split_set( " \t\r\n" ).length +
+                   note.strip().split_set( " \t\r\n" ).length);
+    row_count++;
+    for( int i=0; i<node.children.length; i++ ) {
+      update_node_statistics( node.children.index( i ), ref char_count, ref word_count, ref row_count );
+    }
+  }
+
+  public void update_statistics() {
+    int char_count = 0;
+    int word_count = 0;
+    int row_count  = 0;
+    for( int i=0; i<root.children.length; i++ ) {
+      update_node_statistics( root.children.index( i ), ref char_count, ref word_count, ref row_count );
+    }
+    stdout.printf( "char_count: %d, word_count: %d, row_count: %d\n", char_count, word_count, row_count );
   }
 
   /***************************/

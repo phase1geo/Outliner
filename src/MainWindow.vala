@@ -38,6 +38,7 @@ public class MainWindow : ApplicationWindow {
   private HeaderBar?      _header         = null;
   private DynamicNotebook _nb;
   private Button          _search_btn;
+  private Button          _stats_btn;
   private Popover?        _export         = null;
   private Button?         _undo_btn       = null;
   private Button?         _redo_btn       = null;
@@ -155,6 +156,7 @@ public class MainWindow : ApplicationWindow {
     /* Add the buttons on the right side in the reverse order */
     add_properties_button();
     add_export_button();
+    add_stats_button();
     add_search_button();
 
     /* Display the UI */
@@ -421,6 +423,21 @@ public class MainWindow : ApplicationWindow {
     _search_btn.clicked.connect( toggle_search_bar );
     _header.pack_end( _search_btn );
 
+  }
+
+  /* Adds the statistics functionality */
+  private void add_stats_button() {
+
+    _stats_btn = new Button.from_icon_name( "org.gnome.PowerStats", IconSize.LARGE_TOOLBAR );
+    _stats_btn.set_tooltip_markup( _( "Statistics" ) );
+    _stats_btn.clicked.connect( toggle_stats );
+    _header.pack_end( _stats_btn );
+
+  }
+
+  /* Toggle the statistics bar */
+  private void toggle_stats() {
+    get_current_table( "toggle_stats" ).update_statistics();
   }
 
   /* Adds the export functionality */
