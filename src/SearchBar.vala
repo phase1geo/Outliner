@@ -94,6 +94,11 @@ public class SearchBar : Box {
     _search_entry.placeholder_text = _( "Find text…");
     _search_entry.search_changed.connect( search );
     _search_entry.activate.connect( search_next );
+    _search_entry.icon_release.connect((pos, e) => {
+      if( pos == EntryIconPosition.SECONDARY ) {
+        _search_entry.grab_focus();
+      }
+    });
 
     pack_start( _search_entry, true, true, 2 );
 
@@ -136,7 +141,8 @@ public class SearchBar : Box {
 
     _search_next.set_sensitive( _next.node != null );
     _search_prev.set_sensitive( _prev.node != null );
-    _replace_entry.set_sensitive( found );
+    _replace_entry.editable  = found;
+    _replace_entry.can_focus = found;
     _replace_current.set_sensitive( (_replace_entry.text != "") && is_match_selected() );
     _replace_all.set_sensitive( (_replace_entry.text != "") && found );
 
@@ -325,9 +331,15 @@ public class SearchBar : Box {
   private void add_replace_entry() {
 
     _replace_entry = new Gtk.SearchEntry();
-    _replace_entry.placeholder_text = _( "Replace with…");
+    _replace_entry.placeholder_text  = _( "Replace with…");
+    _replace_entry.primary_icon_name = null;
     _replace_entry.search_changed.connect( replace_text_changed );
     _replace_entry.focus_in_event.connect( replace_focus_in );
+    _replace_entry.icon_release.connect((pos, e) => {
+      if( (pos == EntryIconPosition.SECONDARY) && _replace_entry.can_focus ) {
+        _replace_entry.grab_focus();
+      }
+    });
 
     pack_start( _replace_entry, true, true, 2 );
 
