@@ -38,12 +38,14 @@ public class MainWindow : ApplicationWindow {
   private HeaderBar?      _header         = null;
   private DynamicNotebook _nb;
   private Button          _search_btn;
-  private Button          _stats_btn;
   private Popover?        _export         = null;
   private Button?         _undo_btn       = null;
   private Button?         _redo_btn       = null;
   private SpinButton      _zoom;
   private Switch          _condensed;
+  private Label           _stats_chars;
+  private Label           _stats_words;
+  private Label           _stats_rows;
   private bool            _debug          = false;
   private bool            _prefer_dark    = false;
   private HashMap<string,RadioButton> _theme_buttons;
@@ -428,16 +430,50 @@ public class MainWindow : ApplicationWindow {
   /* Adds the statistics functionality */
   private void add_stats_button() {
 
-    _stats_btn = new Button.from_icon_name( "org.gnome.PowerStats", IconSize.LARGE_TOOLBAR );
-    _stats_btn.set_tooltip_markup( _( "Statistics" ) );
-    _stats_btn.clicked.connect( toggle_stats );
-    _header.pack_end( _stats_btn );
+    var stats_btn = new MenuButton();
+    stats_btn.set_image( new Image.from_icon_name( "org.gnome.PowerStats", IconSize.LARGE_TOOLBAR ) );
+    stats_btn.set_tooltip_markup( _( "Statistics" ) );
+    stats_btn.clicked.connect( stats_clicked );
+
+    var grid = new Grid();
+    grid.border_width       = 10;
+    grid.row_spacing        = 10;
+    grid.column_homogeneous = true;
+    grid.column_spacing     = 10;
+
+    var lbl_chars = new Label( _( "Characters" ) + ":" );
+    _stats_chars  = new Label( "0" );
+
+    var lbl_words = new Label( _( "Words" ) + ":" );
+    _stats_words  = new Label( "0" );
+
+    var lbl_rows = new Label( _( "Rows" ) + ":" );
+    _stats_rows  = new Label( "0" );
+
+    grid.attach( lbl_chars, 0, 0 );
+    grid.attach( _stats_chars, 1, 0 );
+    grid.attach( lbl_words, 0, 1 );
+    grid.attach( _stats_words, 1, 1 );
+    grid.attach( lbl_rows, 0, 2 );
+    grid.attach( _stats_rows, 1, 2 );
+    grid.show_all();
+
+    /* Create the popover and associate it with the menu button */
+    stats_btn.popover = new Popover( null );
+    stats_btn.popover.add( grid );
+
+    /* Add the button to the header bar */
+    _header.pack_end( stats_btn );
 
   }
 
   /* Toggle the statistics bar */
-  private void toggle_stats() {
-    get_current_table( "toggle_stats" ).update_statistics();
+  private void stats_clicked() {
+    int char_count, word_count, row_count;
+    get_current_table( "toggle_stats" ).calculate_statistics( out char_count, out word_count, out row_count );
+    _stats_chars.label = char_count.to_string();
+    _stats_words.label = word_count.to_string();
+    _stats_rows.label  = row_count.to_string();
   }
 
   /* Adds the export functionality */
@@ -535,6 +571,9 @@ public class MainWindow : ApplicationWindow {
     cbox.pack_start( clbl,       false, true,  10 );
     cbox.pack_end(   _condensed, false, false, 10 );
     box.pack_start( cbox, false, false, 10 );
+
+    /* Add a separator for the ModelButtons */
+    box.pack_start( new Separator( Orientation.HORIZONTAL ) );
 
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();

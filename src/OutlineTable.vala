@@ -1131,7 +1131,6 @@ public class OutlineTable : DrawingArea {
   private void handle_control_d() {
     if( !_debug ) return;
     if( selected != null ) {
-      update_statistics();
       // stdout.printf( "RTF: %s\n", ExportRTF.from_text( selected.name.text ) );
     }
   }
@@ -1402,6 +1401,7 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Calculates the statistics for the current node */
   private void update_node_statistics( Node node, ref int char_count, ref int word_count, ref int row_count ) {
     var name = node.name.text.text;
     var note = node.note.text.text;
@@ -1414,14 +1414,14 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  public void update_statistics() {
-    int char_count = 0;
-    int word_count = 0;
-    int row_count  = 0;
+  /* Calculate all of the document statistics and return them */
+  public void calculate_statistics( out int char_count, out int word_count, out int row_count ) {
+    char_count = 0;
+    word_count = 0;
+    row_count  = 0;
     for( int i=0; i<root.children.length; i++ ) {
       update_node_statistics( root.children.index( i ), ref char_count, ref word_count, ref row_count );
     }
-    stdout.printf( "char_count: %d, word_count: %d, row_count: %d\n", char_count, word_count, row_count );
   }
 
   /***************************/
