@@ -617,7 +617,7 @@ public class OutlineTable : DrawingArea {
   /* Shows or hides all notes within the given node's tree */
   public void toggle_notes( Node node ) {
     node.set_notes_display( node.hide_note );
-    node.adjust_nodes( node.last_y, true );
+    node.adjust_nodes( node.last_y, false, "toggle_notes" );
     see( node );
     queue_draw();
     changed();
@@ -1677,7 +1677,7 @@ public class OutlineTable : DrawingArea {
   /* Set the notes display for all nodes to the given value */
   public void set_notes_display( bool show ) {
     root.set_notes_display( show );
-    // nodes.index( 0 ).adjust_nodes_all( nodes.index( 0 ).last_y, true );
+    // nodes.index( 0 ).adjust_nodes_all( nodes.index( 0 ).last_y, true, "set_notes_display" );
     see( selected );
     queue_draw();
     changed();

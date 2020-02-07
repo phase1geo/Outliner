@@ -50,6 +50,7 @@ public class Node {
   private int          _depth     = 0;
   private bool         _expanded  = true;
   private bool         _hide_note = true;
+  private bool         _debug     = false;
 
   private static Pixbuf? _note_icon = null;
 
@@ -76,7 +77,7 @@ public class Node {
         if( !note.edit && note_was_edited && (note.text.text == "") ) {
           hide_note = true;
         }
-        update_height();
+        update_height( true );
       }
     }
   }
@@ -140,7 +141,7 @@ public class Node {
     set {
       if( value != _expanded ) {
         _expanded = value;
-        adjust_nodes( last_y, false );
+        adjust_nodes( last_y, false, "expanded" );
       }
     }
   }
@@ -151,8 +152,8 @@ public class Node {
     set {
       if( value != _hide_note ) {
         _hide_note = value;
-        update_height();
-        adjust_nodes( last_y, false );
+        update_height( true );
+        adjust_nodes( last_y, false, "hide_note" );
       }
     }
   }
@@ -177,13 +178,13 @@ public class Node {
     note_fd.set_size( 10 * Pango.SCALE );
 
     _name = new CanvasText( ot, ot.get_allocated_width() );
-    _name.resized.connect( update_height );
+    _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
     _name.set_font( name_fd );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
-    _note.resized.connect( update_height );
+    _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
     _note.set_font( note_fd );
@@ -215,14 +216,14 @@ public class Node {
     note_fd.set_size( 10 * Pango.SCALE );
 
     _name = new CanvasText( ot, ot.get_allocated_width() );
-    _name.resized.connect( update_height );
+    _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
     _name.set_font( name_fd );
     _name.copy( node.name );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
-    _note.resized.connect( update_height );
+    _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
     _note.set_font( note_fd );
@@ -309,7 +310,7 @@ public class Node {
   }
 
   /* Updates the size of this node */
-  private void update_height() {
+  private void update_height( bool adjust ) {
 
     var orig_height = _h;
 
@@ -319,22 +320,34 @@ public class Node {
       _h += pady + _note.height;
     }
 
-    if( orig_height != _h ) {
-      adjust_nodes( last_y, false );
+    if( adjust && (orig_height != _h) ) {
+      adjust_nodes( last_y, false, "update_height" );
       _ot.see( this );
     }
 
   }
 
+  /*
+   Updates the height information due to either the name or the note being
+   resized.
+  */
+  private void update_height_from_resize() {
+    update_height( true );
+  }
+
   /* Adjusts the posy value of all of the nodes displayed below this node */
-  public double adjust_nodes( double last_y, bool deleted, int child_start = 0 ) {
+  public double adjust_nodes( double last_y, bool deleted, string msg, int child_start = 0 ) {
+
+    if( _debug ) {
+      stdout.printf( "In adjust_nodes (%s)\n", msg );
+    }
 
     if( expanded && !deleted ) {
       last_y = adjust_descendants( last_y, child_start );
     }
 
     if( parent != null ) {
-      last_y = parent.adjust_nodes( last_y, false, (index() + 1) );
+      last_y = parent.adjust_nodes( last_y, false, "adjust_nodes", (index() + 1) );
     }
 
     return( last_y );
@@ -584,7 +597,7 @@ public class Node {
     child.y      = (prev == null) ? 0 : prev.last_y;
 
     /* Re-draw all nodes */
-    child.adjust_nodes( child.last_y, false );
+    child.adjust_nodes( child.last_y, false, "add_child" );
 
   }
 
@@ -593,7 +606,7 @@ public class Node {
 
     var prev = node.get_previous_node();
 
-    node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true );
+    node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true, "remove_child" );
     children.remove_index( node.index() );
     node.parent = null;
 
@@ -639,7 +652,7 @@ public class Node {
   public void set_notes_display( bool show ) {
     _hide_note = !show;
     if( note.text.text != "" ) {
-      update_height();
+      update_height( false );
     }
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).set_notes_display( show );
@@ -651,10 +664,13 @@ public class Node {
     if( !is_root() ) {
       pady = condensed ? 2 : 10;
       position_text();
-      update_height();
+      update_height( false );
     }
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).set_condensed( condensed );
+    }
+    if( is_root() ) {
+      adjust_nodes( last_y, false, "set_condensed" );
     }
   }
 
