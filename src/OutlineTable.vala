@@ -366,7 +366,7 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Update the format bar display */
-    update_format_bar();
+    update_format_bar( "on_press" );
 
     return( false );
 
@@ -519,7 +519,7 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Update the format bar state */
-    update_format_bar();
+    update_format_bar( "on_release" );
 
     _pressed = false;
 
@@ -562,31 +562,30 @@ public class OutlineTable : DrawingArea {
           case 119   :  handle_control_w();             break;
         }
       } else if( nomod || shift ) {
-        if( _im_context.filter_keypress( e ) ) {
-          return( true );
-        }
-        switch( e.keyval ) {
-          case 65288 :  handle_backspace();         break;
-          case 65535 :  handle_delete();            break;
-          case 65307 :  handle_escape();            break;
-          case 65293 :  handle_return( shift );     break;
-          case 65289 :  handle_tab();               break;
-          case 65056 :  handle_shift_tab();         break;
-          case 65363 :  handle_right( shift );      break;
-          case 65361 :  handle_left( shift );       break;
-          case 65360 :  handle_home();              break;
-          case 65367 :  handle_end();               break;
-          case 65362 :  handle_up( shift );         break;
-          case 65364 :  handle_down( shift );       break;
-          case 65365 :  handle_pageup();            break;
-          case 65366 :  handle_pagedn();            break;
-          default    :  handle_printable( e.str );  break;
+        if( !_im_context.filter_keypress( e ) ) {
+          switch( e.keyval ) {
+            case 65288 :  handle_backspace();         break;
+            case 65535 :  handle_delete();            break;
+            case 65307 :  handle_escape();            break;
+            case 65293 :  handle_return( shift );     break;
+            case 65289 :  handle_tab();               break;
+            case 65056 :  handle_shift_tab();         break;
+            case 65363 :  handle_right( shift );      break;
+            case 65361 :  handle_left( shift );       break;
+            case 65360 :  handle_home();              break;
+            case 65367 :  handle_end();               break;
+            case 65362 :  handle_up( shift );         break;
+            case 65364 :  handle_down( shift );       break;
+            case 65365 :  handle_pageup();            break;
+            case 65366 :  handle_pagedn();            break;
+            default    :  handle_printable( e.str );  break;
+          }
         }
       }
     }
 
     /* Update the format bar state, if necessary */
-    update_format_bar();
+    update_format_bar( "on_keypress" );
 
     return( true );
 
@@ -1385,7 +1384,11 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Shows/Hides the formatting toolbar */
-  private void update_format_bar() {
+  private void update_format_bar( string? msg ) {
+
+    if( _debug && (msg != null) ) {
+      // stdout.printf( "In update_format_bar, msg: %s\n", msg );
+    }
 
     /* If we have nothing to do, just return */
     if( _show_format == null ) return;
