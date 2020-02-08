@@ -495,6 +495,7 @@ public class OutlineTable : DrawingArea {
           changed();
         } else {
           selected = _active;
+          set_selected_mode( NodeMode.SELECTED );
           queue_draw();
         }
       }
