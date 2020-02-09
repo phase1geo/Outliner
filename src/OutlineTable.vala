@@ -670,10 +670,11 @@ public class OutlineTable : DrawingArea {
    text formatting at this point.
   */
   private void copy_selected_text( CanvasText ct ) {
-    var text = ct.get_selected_text();
-    if( text != null ) {
+    var text = new FormattedText( get_theme() );
+    var html = ExportHTML.to_text( ct.text, ct.selstart, ct.selend, text );
+    if( html != null ) {
       var clipboard = Clipboard.get_default( get_display() );
-      clipboard.set_text( text, -1 );
+      clipboard.set_text( html, -1 );
     }
   }
 

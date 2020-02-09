@@ -58,7 +58,7 @@ public class ExportHTML : Object {
     return( body );
   }
 
-  public static string from_text( FormattedText text ) {
+  public static string from_text( FormattedText text, int start, int end ) {
     FormattedText.ExportStartFunc start_func = (tag, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "<b>");
@@ -88,11 +88,11 @@ public class ExportHTML : Object {
     FormattedText.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ) );
     };
-    return( text.export( start_func, end_func, encode_func ) );
+    return( text.export( start, end, start_func, end_func, encode_func ) );
   }
 
   private static Xml.Node* make_div( string div_class, FormattedText text ) {
-    var      html = "<div class=\"" + div_class + "\">" + from_text( text ) + "</div>";
+    var      html = "<div class=\"" + div_class + "\">" + from_text( text, 0, text.text.char_count() ) + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );
     delete doc;
@@ -123,6 +123,72 @@ public class ExportHTML : Object {
       }
     }
     return( li );
+  }
+
+  /* Parses the given style string for tag information */
+  private void parse_style( string style, int start, int end, FormattedText text ) {
+    var opts = style.split( ";" );
+    foreach( unowned string opt in opts ) {
+      var key_value = opt.split( ":" );
+      if( key_value.length == 2 ) {
+        switch( key_value[0] ) {
+          case "color"            :  text.add_tag( FormatTag.COLOR,  start, end, key_value[1] );  break;
+          case "background-color" :  text.add_tag( FormatTag.HILITE, start, end, key_value[1] );  break;
+        }
+      }
+    }
+  }
+
+  /* Parses the given element for tag information */
+  private void parse_element( Xml.Node* node, FormattedText text ) {
+    var start = 0;
+    var end   = text.text.char_count();
+    switch( node->name.down() ) {
+      case "a"    :
+        var url = node->get_prop( "href" );
+        text.add_tag( FormatTag.URL, start, end, url );
+        break;
+      case "span" :
+        var style = node->get_prop( "style" );
+        if( style != null ) {
+          parse_style( style, start, end, text );
+        }
+        break;
+      case "h1"  :  text.add_tag( FormatTag.HEADER,     start, end, "1" );  break;
+      case "h2"  :  text.add_tag( FormatTag.HEADER,     start, end, "2" );  break;
+      case "h3"  :  text.add_tag( FormatTag.HEADER,     start, end, "3" );  break;
+      case "h4"  :  text.add_tag( FormatTag.HEADER,     start, end, "4" );  break;
+      case "h5"  :  text.add_tag( FormatTag.HEADER,     start, end, "5" );  break;
+      case "h6"  :  text.add_tag( FormatTag.HEADER,     start, end, "6" );  break;
+      case "b"   :  text.add_tag( FormatTag.BOLD,       start, end );  break;
+      case "i"   :  text.add_tag( FormatTag.ITALICS,    start, end );  break;
+      case "u"   :  text.add_tag( FormatTag.UNDERLINE,  start, end );  break;
+      case "del" :  text.add_tag( FormatTag.STRIKETHRU, start, end );  break;
+    }
+  }
+
+  /* Parses the given HTML node for text and tag information */
+  private void parse_xml_node( Xml.Node* node, FormattedText text ) {
+    for( Xml.Node* it=node->children; it!=null; it=it->next ) {
+      parse_xml_node( it, text );
+    }
+    switch( node->type ) {
+      case Xml.ElementType.ELEMENT_NODE       :
+        parse_element( node, text );
+        break;
+      case Xml.ElementType.CDATA_SECTION_NODE :
+      case Xml.ElementType.TEXT_NODE          :
+        text.insert_text( text.text.char_count(), node->get_content() );
+        break;
+    }
+  }
+
+  /* Converts the given HTML string to the given formatted text */
+  public void to_text( string str, FormattedText text ) {
+    var doc  = Xml.Parser.parse_memory( str, str.length );
+    var root = doc->get_root_element();
+    parse_xml_node( root, text );
+    delete doc;
   }
 
 }

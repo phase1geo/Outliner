@@ -634,10 +634,9 @@ public class FormattedText {
   */
 
   /* Generates an HTML version of the formatted text */
-  public string export( ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
-    var tags      = get_tags_in_range( 0, text.length );
+  public string export( int start, int end, ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
+    var tags      = get_tags_in_range( start, end );
     var str       = "";
-    var start     = 0;
     var pos_tags  = new List<PosTag>();
     var tag_stack = new Array<PosTag>();
     for( int i=0; i<tags.length; i++ ) {
@@ -669,7 +668,7 @@ public class FormattedText {
       }
       start = pos_tag.pos;
     }
-    return( str + encode_func( text.slice( start, text.index_of_nth_char( text.length ) ) ) );
+    return( str + encode_func( text.slice( start, end ) ) );
   }
 
   /*
