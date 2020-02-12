@@ -51,6 +51,7 @@ dependencies = [
     dependency('granite'),
     dependency('gtk+-3.0'),
     dependency('libxml-2.0'),
+    dependency('webkit2gtk-4.0'),
     math_dep
 ]
 

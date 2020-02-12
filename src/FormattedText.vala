@@ -21,6 +21,7 @@
 
 using Pango;
 using Gdk;
+using Gtk;
 
 public enum FormatTag {
   BOLD = 0,
@@ -329,6 +330,9 @@ public class FormattedText {
         list.change( (owned)attr );
       }
     }
+    public virtual TextTag text_tag( string? extra ) {
+      return( new TextTag() );
+    }
     protected RGBA get_color( string value ) {
       RGBA c = {1.0, 1.0, 1.0, 1.0};
       c.parse( value );
@@ -340,11 +344,23 @@ public class FormattedText {
     public BoldInfo() {
       attrs.append_val( attr_weight_new( Weight.BOLD ) );
     }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "bold" );
+      ttag.weight     = Weight.BOLD;
+      ttag.weight_set = true;
+      return( ttag );
+    }
   }
 
   private class ItalicsInfo : TagAttr {
     public ItalicsInfo() {
-      attrs.append_val( attr_style_new( Style.ITALIC ) );
+      attrs.append_val( attr_style_new( Pango.Style.ITALIC ) );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "italics" );
+      ttag.style     = Pango.Style.ITALIC;
+      ttag.style_set = true;
+      return( ttag );
     }
   }
 
@@ -352,11 +368,23 @@ public class FormattedText {
     public UnderlineInfo() {
       attrs.append_val( attr_underline_new( Underline.SINGLE ) );
     }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "underline" );
+      ttag.underline     = Underline.SINGLE;
+      ttag.underline_set = true;
+      return( ttag );
+    }
   }
 
   private class StrikeThruInfo : TagAttr {
     public StrikeThruInfo() {
       attrs.append_val( attr_strikethrough_new( true ) );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "strikethru" );
+      ttag.strikethrough     = true;
+      ttag.strikethrough_set = true;
+      return( ttag );
     }
   }
 
@@ -383,6 +411,12 @@ public class FormattedText {
       bold.end_index   = end;
       list.change( (owned)bold );
     }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "header" + extra );
+      ttag.scale     = get_scale_factor( extra );
+      ttag.scale_set = true;
+      return( ttag );
+    }
   }
 
   private class ColorInfo : TagAttr {
@@ -393,6 +427,12 @@ public class FormattedText {
       attr.start_index = start;
       attr.end_index   = end;
       list.change( (owned)attr );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "color" + extra );
+      ttag.foreground_rgba = get_color( extra );
+      ttag.foreground_set  = true;
+      return( ttag );
     }
   }
 
@@ -409,6 +449,12 @@ public class FormattedText {
       alpha.end_index   = end;
       list.change( (owned)alpha );
     }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "hilite" + extra );
+      ttag.background_rgba = get_color( extra );
+      ttag.background_set  = true;
+      return( ttag );
+    }
   }
 
   private class UrlInfo : TagAttr {
@@ -422,6 +468,14 @@ public class FormattedText {
     public void update_color( RGBA color ) {
       attrs.remove_range( 0, 2 );
       set_color( color );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "url" );
+      ttag.foreground     = "#0000ff";
+      ttag.underline      = Underline.SINGLE;
+      ttag.foreground_set = true;
+      ttag.underline_set  = true;
+      return( ttag );
     }
   }
 
@@ -672,6 +726,23 @@ public class FormattedText {
       start = pos_tag.pos;
     }
     return( str + encode_func( text.slice( start, end ) ) );
+  }
+
+  /* Populate the given text buffer with the text and formatting tags */
+  public void to_buffer( TextBuffer buf, int start, int end ) {
+    buf.text = text;
+    var tags = get_tags_in_range( start, end );
+    TextIter ti_start, ti_end;
+    for( int i=0; i<tags.length; i++ ) {
+      var tag  = tags.index( i );
+      var ttag = _attr_tags[tag.tag].text_tag( tag.extra );
+      if( buf.tag_table.lookup( ttag.name ) == null ) {
+        buf.tag_table.add( ttag );
+      }
+      buf.get_iter_at_offset( out ti_start, tag.start );
+      buf.get_iter_at_offset( out ti_end,   tag.end );
+      buf.apply_tag_by_name( ttag.name, ti_start, ti_end );
+    }
   }
 
   /*

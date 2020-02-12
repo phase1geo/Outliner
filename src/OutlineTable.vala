@@ -672,8 +672,18 @@ public class OutlineTable : DrawingArea {
   private void copy_selected_text( CanvasText ct ) {
     var html = ExportHTML.from_text( ct.text, ct.selstart, ct.selend );
     if( html != null ) {
-      var clipboard = Clipboard.get_default( get_display() );
-      clipboard.set_text( "<html>" + html + "</html>", -1 );
+      var dom  = new WebKit.WebView();
+      dom.editable = true;
+      dom.load_changed.connect( (e) => {
+        if( e == WebKit.LoadEvent.FINISHED ) {
+          stdout.printf( "Done loading\n" );
+          dom.execute_editing_command( WebKit.EDITING_COMMAND_SELECT_ALL );
+          dom.execute_editing_command( WebKit.EDITING_COMMAND_COPY );
+        }
+      });
+      dom.load_html( ("<html><body><div>" + html + "</div></body></html>"), null );
+      // var clipboard = Clipboard.get_default( get_display() );
+      // clipboard.set_text( "<html>" + html + "</html>", -1 );
     }
   }
 
@@ -750,6 +760,11 @@ public class OutlineTable : DrawingArea {
   /* Pastes the text into the provided CanvasText */
   private void paste_text( CanvasText ct ) {
     var clipboard = Clipboard.get_default( get_display() );
+    var buf       = new TextBuffer( null );
+    stdout.printf( "image: %s\n", clipboard.wait_is_image_available().to_string() );
+    stdout.printf( "rtf:   %s\n", clipboard.wait_is_rich_text_available( buf ).to_string() );
+    stdout.printf( "text:  %s\n", clipboard.wait_is_text_available().to_string() );
+    stdout.printf( "uris:  %s\n", clipboard.wait_is_uris_available().to_string() );
     var text      = clipboard.wait_for_text();
     if( text != null ) {
       var ft = new FormattedText( get_theme() );
