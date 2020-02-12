@@ -124,8 +124,11 @@ public class FormattedText {
       public FormattedRange.from_xml( Xml.Node* n ) {
         load( n );
       }
-      public bool combine( int s, int e ) {
+      public bool combine( int s, int e, string? x ) {
         bool changed = false;
+        if( (x != null) && (x != extra) ) {
+          return( false );
+        }
         if( (s <= end) && (e > end) ) {
           end     = e;
           changed = true;
@@ -197,7 +200,7 @@ public class FormattedText {
     /* Adds the given range from this format type */
     public void add_tag( int start, int end, string? extra ) {
       for( int i=0; i<_info.length; i++ ) {
-        if( (extra == null) && _info.index( i ).combine( start, end ) ) {
+        if( _info.index( i ).combine( start, end, extra ) ) {
           return;
         }
       }

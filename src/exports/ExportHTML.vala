@@ -125,8 +125,10 @@ public class ExportHTML : Object {
     return( li );
   }
 
+  /****************************************************************************/
+
   /* Parses the given style string for tag information */
-  private void parse_style( string style, int start, int end, FormattedText text ) {
+  private static void parse_style( string style, int start, int end, FormattedText text ) {
     var opts = style.split( ";" );
     foreach( unowned string opt in opts ) {
       var key_value = opt.split( ":" );
@@ -140,9 +142,9 @@ public class ExportHTML : Object {
   }
 
   /* Parses the given element for tag information */
-  private void parse_element( Xml.Node* node, FormattedText text ) {
-    var start = 0;
+  private static void parse_element( Xml.Node* node, string str, FormattedText text ) {
     var end   = text.text.char_count();
+    var start = end - str.char_count();
     switch( node->name.down() ) {
       case "a"    :
         var url = node->get_prop( "href" );
@@ -168,27 +170,34 @@ public class ExportHTML : Object {
   }
 
   /* Parses the given HTML node for text and tag information */
-  private void parse_xml_node( Xml.Node* node, FormattedText text ) {
+  private static string parse_xml_node( Xml.Node* node, FormattedText text ) {
+    var str = "";
     for( Xml.Node* it=node->children; it!=null; it=it->next ) {
-      parse_xml_node( it, text );
+      str += parse_xml_node( it, text );
     }
     switch( node->type ) {
       case Xml.ElementType.ELEMENT_NODE       :
-        parse_element( node, text );
+        parse_element( node, str, text );
         break;
       case Xml.ElementType.CDATA_SECTION_NODE :
       case Xml.ElementType.TEXT_NODE          :
+        str += node->get_content();
         text.insert_text( text.text.char_count(), node->get_content() );
         break;
     }
+    return( str );
   }
 
   /* Converts the given HTML string to the given formatted text */
-  public void to_text( string str, FormattedText text ) {
+  public static bool to_text( string str, FormattedText text ) {
     var doc  = Xml.Parser.parse_memory( str, str.length );
+    if( doc == null ) {
+      return( false );
+    }
     var root = doc->get_root_element();
     parse_xml_node( root, text );
     delete doc;
+    return( true );
   }
 
 }

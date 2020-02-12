@@ -615,6 +615,37 @@ public class CanvasText : Object {
     }
   }
 
+  /* Inserts the given formatted text at the current cursor position */
+  public void insert_formatted_text( FormattedText t, UndoTextBuffer undo_buffer ) {
+    var slen  = t.text.char_count();
+    var ttags = t.get_tags_in_range( 0, slen );
+    var cur   = _cursor;
+    if( _selstart != _selend ) {
+      var spos = text.text.index_of_nth_char( _selstart );
+      var epos = text.text.index_of_nth_char( _selend );
+      var str  = text.text.slice( spos, epos );
+      var tags = text.get_tags_in_range( spos, epos );
+      text.replace_text( spos, (epos - spos), t.text );
+      for( int i=0; i<ttags.length; i++ ) {
+        var ttag = ttags.index( i );
+        text.add_tag( (FormatTag)ttag.tag, (ttag.start + spos), (ttag.end + spos), ttag.extra );
+      }
+      set_cursor_only( _selstart + slen );
+      change_selection( null, _selstart, "insert" );
+      undo_buffer.add_replace( spos, str, t.text, tags, cur );
+    } else {
+      var cpos = text.text.index_of_nth_char( _cursor );
+      text.insert_text( cpos, t.text );
+      for( int i=0; i<ttags.length; i++ ) {
+        var ttag = ttags.index( i );
+        var tag  = (FormatTag)ttag.tag;
+        text.add_tag( (FormatTag)ttag.tag, (ttag.start + cpos), (ttag.end + cpos), ttag.extra );
+      }
+      set_cursor_only( _cursor + slen );
+      undo_buffer.add_insert( cpos, t.text, cur );
+    }
+  }
+
   /*
    Returns the currently selected text or, if no text is currently selected,
    returns null.
