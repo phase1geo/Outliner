@@ -335,6 +335,16 @@ public class Node {
     update_height( true );
   }
 
+  /*
+   Checks to see if the current node is the last node and, if it is, sets the
+   height of the OutlineTable to the calculated last_y of this node.
+  */
+  private void set_ot_height() {
+    if( this == get_root_node().get_last_node() ) {
+      _ot.set_size_request( -1, (int)last_y );
+    }
+  }
+
   /* Adjusts the posy value of all of the nodes displayed below this node */
   public double adjust_nodes( double last_y, bool deleted, string msg, int child_start = 0 ) {
 
@@ -350,12 +360,8 @@ public class Node {
       last_y = parent.adjust_nodes( last_y, false, "adjust_nodes", (index() + 1) );
     }
 
-    var final_node = get_root_node().get_last_node();
-
     /* If the current node is the last node, update the widget size to match the current height */
-    if( this == final_node ) {
-      _ot.set_size_request( -1, (int)last_y );
-    }
+    set_ot_height();
 
     return( last_y );
 
@@ -364,10 +370,14 @@ public class Node {
   /* Adjusts the posy value of all nodes that are descendants of the give node */
   private double adjust_descendants( double last_y, int child_start ) {
     if( expanded ) {
+      Node? child = null;
       for( int i=child_start; i<children.length; i++ ) {
-        var child = children.index( i );
+        child   = children.index( i );
         child.y = last_y;
         last_y  = child.adjust_descendants( child.last_y, 0 );
+      }
+      if( child != null ) {
+        child.set_ot_height();
       }
     }
     return( last_y );
