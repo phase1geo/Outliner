@@ -350,6 +350,13 @@ public class Node {
       last_y = parent.adjust_nodes( last_y, false, "adjust_nodes", (index() + 1) );
     }
 
+    var final_node = get_root_node().get_last_node();
+
+    /* If the current node is the last node, update the widget size to match the current height */
+    if( this == final_node ) {
+      _ot.set_size_request( -1, (int)last_y );
+    }
+
     return( last_y );
 
   }

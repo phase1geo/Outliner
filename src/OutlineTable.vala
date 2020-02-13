@@ -1467,6 +1467,10 @@ public class OutlineTable : DrawingArea {
       }
     }
 
+    /* Update the size of this widget */
+    set_size_request( -1, (int)root.get_last_node().last_y );
+
+    /* Draw everything */
     queue_draw();
 
   }
