@@ -759,12 +759,34 @@ public class OutlineTable : DrawingArea {
 
   /* Pastes the text into the provided CanvasText */
   private void paste_text( CanvasText ct ) {
-    var clipboard = Clipboard.get_default( get_display() );
+    var clipboard  = Clipboard.get_default( get_display() );
+    var clipboard1 = Clipboard.get_for_display( get_display(), Atom.intern( "PRIMARY", true ) );
+    var clipboard2 = Clipboard.get_for_display( get_display(), Atom.intern( "SECONDARY", true ) );
     var buf       = new TextBuffer( null );
-    stdout.printf( "image: %s\n", clipboard.wait_is_image_available().to_string() );
-    stdout.printf( "rtf:   %s\n", clipboard.wait_is_rich_text_available( buf ).to_string() );
-    stdout.printf( "text:  %s\n", clipboard.wait_is_text_available().to_string() );
-    stdout.printf( "uris:  %s\n", clipboard.wait_is_uris_available().to_string() );
+    stdout.printf( "0 get_selection: %s\n", clipboard.get_selection().name() );
+    stdout.printf( "0 image:     %s\n", clipboard.wait_is_image_available().to_string() );
+    stdout.printf( "0 rtf:       %s\n", clipboard.wait_is_rich_text_available( buf ).to_string() );
+    stdout.printf( "0 text:      %s\n", clipboard.wait_is_text_available().to_string() );
+    stdout.printf( "0 uris:      %s\n", clipboard.wait_is_uris_available().to_string() );
+    stdout.printf( "0 clipboard: %s\n", clipboard.wait_is_target_available( Atom.intern( "CLIPBOARD", true ) ).to_string() );
+    stdout.printf( "0 primary:   %s\n", clipboard.wait_is_target_available( Atom.intern( "PRIMARY", true ) ).to_string() );
+    stdout.printf( "0 secondary: %s\n", clipboard.wait_is_target_available( Atom.intern( "SECONDARY", true ) ).to_string() );
+    stdout.printf( "1 get_selection: %s\n", clipboard1.get_selection().name() );
+    stdout.printf( "1 image:     %s\n", clipboard1.wait_is_image_available().to_string() );
+    stdout.printf( "1 rtf:       %s\n", clipboard1.wait_is_rich_text_available( buf ).to_string() );
+    stdout.printf( "1 text:      %s\n", clipboard1.wait_is_text_available().to_string() );
+    stdout.printf( "1 uris:      %s\n", clipboard1.wait_is_uris_available().to_string() );
+    stdout.printf( "1 clipboard: %s\n", clipboard1.wait_is_target_available( Atom.intern( "CLIPBOARD", true ) ).to_string() );
+    stdout.printf( "1 primary:   %s\n", clipboard1.wait_is_target_available( Atom.intern( "PRIMARY", true ) ).to_string() );
+    stdout.printf( "1 secondary: %s\n", clipboard1.wait_is_target_available( Atom.intern( "SECONDARY", true ) ).to_string() );
+    stdout.printf( "2 get_selection: %s\n", clipboard2.get_selection().name() );
+    stdout.printf( "2 image:     %s\n", clipboard2.wait_is_image_available().to_string() );
+    stdout.printf( "2 rtf:       %s\n", clipboard2.wait_is_rich_text_available( buf ).to_string() );
+    stdout.printf( "2 text:      %s\n", clipboard2.wait_is_text_available().to_string() );
+    stdout.printf( "2 uris:      %s\n", clipboard2.wait_is_uris_available().to_string() );
+    stdout.printf( "2 clipboard: %s\n", clipboard2.wait_is_target_available( Atom.intern( "CLIPBOARD", true ) ).to_string() );
+    stdout.printf( "2 primary:   %s\n", clipboard2.wait_is_target_available( Atom.intern( "PRIMARY", true ) ).to_string() );
+    stdout.printf( "2 secondary: %s\n", clipboard2.wait_is_target_available( Atom.intern( "SECONDARY", true ) ).to_string() );
     var text      = clipboard.wait_for_text();
     if( text != null ) {
       var ft = new FormattedText( get_theme() );
