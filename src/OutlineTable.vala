@@ -95,7 +95,8 @@ public class OutlineTable : DrawingArea {
       update_css();
     }
   }
-  public Clipboard node_clipboard { set; get; default = Clipboard.get_for_display( Display.get_default(), Atom.intern( "org.github.phase1geo.outliner", false ) );}
+  public Clipboard node_clipboard { set; get; default = Clipboard.get_for_display( Display.get_default(), Atom.intern( "org.github.phase1geo.outliner.node", false ) );}
+  public Clipboard text_clipboard { set; get; default = Clipboard.get_for_display( Display.get_default(), Atom.intern( "org.github.phase1geo.outliner.text", false ) );}
   public bool condensed {
     get {
       return( _condensed );
@@ -635,10 +636,10 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Creates a serialized version of the node for copy */
-  public string serialize_for_copy( Node node ) {
+  public string serialize_node_for_copy( Node node ) {
     string    str;
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
-    Xml.Node* root = new Xml.Node( null, "outliner" );
+    Xml.Node* root = new Xml.Node( null, "olnode" );
     doc->set_root_element( root );
     root->add_child( node.save() );
     doc->dump_memory( out str );
@@ -647,7 +648,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Takes an XML string as input and populates the passed node with its contents */
-  public void deserialize_for_paste( string str, Node node ) {
+  public void deserialize_node_for_paste( string str, Node node ) {
     Xml.Doc* doc = Xml.Parser.parse_doc( str );
     if( doc == null ) return;
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
@@ -658,9 +659,39 @@ public class OutlineTable : DrawingArea {
     delete doc;
   }
 
+  /* Serializes the selected text for copy */
+  public string? serialize_text_for_copy( CanvasText ct ) {
+    var ft = ct.get_selected_formatted_text( this );
+    if( ft != null ) {
+      string    str;
+      Xml.Doc*  doc  = new Xml.Doc( "1.0" );
+      Xml.Node* root = new Xml.Node( null, "oltext" );
+      doc->set_root_element( root );
+      root->add_child( ft.save() );
+      doc->dump_memory( out str );
+      delete doc;
+      stdout.printf( "serialized: %s\n", str );
+      return( str );
+    }
+    return( null );
+  }
+
+  /* Deserializes the XML string and inserts it into the given canvas text */
+  public void deserialize_text_for_paste( string str, CanvasText ct ) {
+    Xml.Doc* doc = Xml.Parser.parse_doc( str );
+    if( doc == null ) return;
+    for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
+      if( it->type == Xml.ElementType.ELEMENT_NODE ) {
+        var ft = new FormattedText( get_theme() );
+        ft.load( it );
+        ct.insert_formatted_text( ft, undo_text );
+      }
+    }
+  }
+
   /* Copies the given node to the designated node clipboard */
   public void copy_node_to_clipboard( Node node ) {
-    var text = serialize_for_copy( node );
+    var text = serialize_node_for_copy( node );
     node_clipboard.set_text( text, -1 );
     node_clipboard.store();
   }
@@ -670,21 +701,16 @@ public class OutlineTable : DrawingArea {
    text formatting at this point.
   */
   private void copy_selected_text( CanvasText ct ) {
-    var html = ExportHTML.from_text( ct.text, ct.selstart, ct.selend );
-    if( html != null ) {
-      var dom  = new WebKit.WebView();
-      dom.editable = true;
-      dom.load_changed.connect( (e) => {
-        if( e == WebKit.LoadEvent.FINISHED ) {
-          stdout.printf( "Done loading\n" );
-          dom.execute_editing_command( WebKit.EDITING_COMMAND_SELECT_ALL );
-          dom.execute_editing_command( WebKit.EDITING_COMMAND_COPY );
-        }
-      });
-      dom.load_html( ("<html><body><div>" + html + "</div></body></html>"), null );
-      // var clipboard = Clipboard.get_default( get_display() );
-      // clipboard.set_text( "<html>" + html + "</html>", -1 );
-    }
+
+    /* Store the text for Outliner text copy */
+    var text = serialize_text_for_copy( ct );
+    text_clipboard.set_text( text, -1 );
+    text_clipboard.store();
+
+    /* Store the text for copying outside of Outliner */
+    var clipboard = Clipboard.get_default( get_display() );
+    clipboard.set_text( ct.get_selected_text(), -1 );
+
   }
 
   /* Handles a copy operation on a node or selected text */
@@ -699,7 +725,7 @@ public class OutlineTable : DrawingArea {
 
   /* Copies the given node to the clipboard and then removes it from the document */
   public void cut_node_to_clipboard( Node node ) {
-    var text = serialize_for_copy( node );
+    var text = serialize_node_for_copy( node );
     node_clipboard.set_text( text, -1 );
     node_clipboard.store();
     undo_buffer.add_item( new UndoNodeCut( node ) );
@@ -735,7 +761,7 @@ public class OutlineTable : DrawingArea {
     /* Create the new node from the clipboard */
     var node = new Node( this );
     var text = node_clipboard.wait_for_text();
-    deserialize_for_paste( text, node );
+    deserialize_node_for_paste( text, node );
 
     /* Insert the node into the appropriate position in the table */
     if( below ) {
@@ -759,40 +785,9 @@ public class OutlineTable : DrawingArea {
 
   /* Pastes the text into the provided CanvasText */
   private void paste_text( CanvasText ct ) {
-    var clipboard  = Clipboard.get_default( get_display() );
-    var clipboard1 = Clipboard.get_for_display( get_display(), Atom.intern( "PRIMARY", true ) );
-    var clipboard2 = Clipboard.get_for_display( get_display(), Atom.intern( "SECONDARY", true ) );
-    var buf       = new TextBuffer( null );
-    stdout.printf( "0 get_selection: %s\n", clipboard.get_selection().name() );
-    stdout.printf( "0 image:     %s\n", clipboard.wait_is_image_available().to_string() );
-    stdout.printf( "0 rtf:       %s\n", clipboard.wait_is_rich_text_available( buf ).to_string() );
-    stdout.printf( "0 text:      %s\n", clipboard.wait_is_text_available().to_string() );
-    stdout.printf( "0 uris:      %s\n", clipboard.wait_is_uris_available().to_string() );
-    stdout.printf( "0 clipboard: %s\n", clipboard.wait_is_target_available( Atom.intern( "CLIPBOARD", true ) ).to_string() );
-    stdout.printf( "0 primary:   %s\n", clipboard.wait_is_target_available( Atom.intern( "PRIMARY", true ) ).to_string() );
-    stdout.printf( "0 secondary: %s\n", clipboard.wait_is_target_available( Atom.intern( "SECONDARY", true ) ).to_string() );
-    stdout.printf( "1 get_selection: %s\n", clipboard1.get_selection().name() );
-    stdout.printf( "1 image:     %s\n", clipboard1.wait_is_image_available().to_string() );
-    stdout.printf( "1 rtf:       %s\n", clipboard1.wait_is_rich_text_available( buf ).to_string() );
-    stdout.printf( "1 text:      %s\n", clipboard1.wait_is_text_available().to_string() );
-    stdout.printf( "1 uris:      %s\n", clipboard1.wait_is_uris_available().to_string() );
-    stdout.printf( "1 clipboard: %s\n", clipboard1.wait_is_target_available( Atom.intern( "CLIPBOARD", true ) ).to_string() );
-    stdout.printf( "1 primary:   %s\n", clipboard1.wait_is_target_available( Atom.intern( "PRIMARY", true ) ).to_string() );
-    stdout.printf( "1 secondary: %s\n", clipboard1.wait_is_target_available( Atom.intern( "SECONDARY", true ) ).to_string() );
-    stdout.printf( "2 get_selection: %s\n", clipboard2.get_selection().name() );
-    stdout.printf( "2 image:     %s\n", clipboard2.wait_is_image_available().to_string() );
-    stdout.printf( "2 rtf:       %s\n", clipboard2.wait_is_rich_text_available( buf ).to_string() );
-    stdout.printf( "2 text:      %s\n", clipboard2.wait_is_text_available().to_string() );
-    stdout.printf( "2 uris:      %s\n", clipboard2.wait_is_uris_available().to_string() );
-    stdout.printf( "2 clipboard: %s\n", clipboard2.wait_is_target_available( Atom.intern( "CLIPBOARD", true ) ).to_string() );
-    stdout.printf( "2 primary:   %s\n", clipboard2.wait_is_target_available( Atom.intern( "PRIMARY", true ) ).to_string() );
-    stdout.printf( "2 secondary: %s\n", clipboard2.wait_is_target_available( Atom.intern( "SECONDARY", true ) ).to_string() );
-    var text      = clipboard.wait_for_text();
+    var text = text_clipboard.wait_for_text();
     if( text != null ) {
-      var ft = new FormattedText( get_theme() );
-      if( ExportHTML.to_text( text, ft ) ) {
-        ct.insert_formatted_text( ft, undo_text );
-      }
+      deserialize_text_for_paste( text, ct );
       queue_draw();
       changed();
     }

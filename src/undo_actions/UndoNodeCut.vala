@@ -41,7 +41,7 @@ public class UndoNodeCut : UndoItem {
 
   /* Causes the stored item to be put into the after state */
   public override void redo( OutlineTable table ) {
-    var text = table.serialize_for_copy( _node );
+    var text = table.serialize_node_for_copy( _node );
     table.node_clipboard.set_text( text, -1 );
     table.node_clipboard.store();
     table.delete_node( _node );

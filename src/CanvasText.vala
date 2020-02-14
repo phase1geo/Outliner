@@ -683,6 +683,16 @@ public class CanvasText : Object {
     y = posy + (rect.y / Pango.SCALE);
   }
 
+  /* Returns a populated FormattedText instance containing the selected text range */
+  public FormattedText? get_selected_formatted_text( OutlineTable table ) {
+    if( _selstart != _selend ) {
+      var spos = text.text.index_of_nth_char( _selstart );
+      var epos = text.text.index_of_nth_char( _selend );
+      return( new FormattedText.copy_range( table.get_theme(), text, spos, epos ) );
+    }
+    return( null );
+  }
+
   /* Add tag to selected area */
   public void add_tag( FormatTag tag, string? extra, UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );

@@ -208,6 +208,14 @@ public class FormattedText {
       _info.append_val( new FormattedRange( start, end, extra ) );
     }
 
+    /* Adds the given TagInfo contents to the existing list */
+    public void add_tags_at_offset( TagInfo other, int offset ) {
+      for( int i=0; i<other._info.length; i++ ) {
+        var other_info = other._info.index( i );
+        add_tag( (other_info.start + offset), (other_info.end + offset), other_info.extra );
+      }
+    }
+
     /* Replaces the given range(s) with the given range */
     public void replace_tag( int start, int end, string? extra ) {
       _info.remove_range( 0, _info.length );
@@ -523,13 +531,26 @@ public class FormattedText {
     }
   }
 
+  /* Default copy constructor */
   public FormattedText( Theme theme ) {
     initialize( theme );
   }
 
+  /* Copy contructor with a string */
   public FormattedText.with_text( Theme theme, string txt ) {
     initialize( theme );
     _text = txt;
+  }
+
+  /* Copies the selected portion of the given FormattedText instance to this instance */
+  public FormattedText.copy_range( Theme theme, FormattedText text, int start, int end ) {
+    initialize( theme );
+    _text = text.text.slice( start, end );
+    var tags = get_tags_in_range( start, end );
+    for( int i=0; i<tags.length; i++ ) {
+      var tag = tags.index( i );
+      _formats[tag.tag].add_tag( (tag.start - start), (tag.end - start), tag.extra );
+    }
   }
 
   /* Initializes this instance */
@@ -580,6 +601,14 @@ public class FormattedText {
       f.adjust( index, str.length );
     }
     changed();
+  }
+
+  /* Inserts the formatted text at the given position */
+  public void insert_formatted_text( int index, FormattedText text ) {
+    insert_text( index, text.text );
+    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+      _formats[i].add_tags_at_offset( text._formats[i], index );
+    }
   }
 
   /* Replaces the given text range with the given string */
