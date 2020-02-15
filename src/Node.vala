@@ -862,7 +862,7 @@ public class Node {
   /* Draw the node to the screen */
   public void draw( Cairo.Context ctx, Theme theme ) {
 
-    if( is_root() ) return;
+    if( is_root() && (mode != NodeMode.MOVETO) ) return;
 
     draw_background( ctx, theme );
     draw_note_icon( ctx, theme );

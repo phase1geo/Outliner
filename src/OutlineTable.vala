@@ -394,7 +394,6 @@ public class OutlineTable : DrawingArea {
             selected.mode = NodeMode.MOVETO;
             selected.parent.remove_child( selected );
           }
-          selected.x = e.x;
           selected.y = e.y;
           var current = node_at_coordinates( e.x, e.y );
           if( current != null ) {
