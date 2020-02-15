@@ -670,7 +670,6 @@ public class OutlineTable : DrawingArea {
       root->add_child( ft.save() );
       doc->dump_memory( out str );
       delete doc;
-      stdout.printf( "serialized: %s\n", str );
       return( str );
     }
     return( null );

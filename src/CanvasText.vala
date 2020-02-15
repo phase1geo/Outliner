@@ -638,7 +638,6 @@ public class CanvasText : Object {
       text.insert_text( cpos, t.text );
       for( int i=0; i<ttags.length; i++ ) {
         var ttag = ttags.index( i );
-        var tag  = (FormatTag)ttag.tag;
         text.add_tag( (FormatTag)ttag.tag, (ttag.start + cpos), (ttag.end + cpos), ttag.extra );
       }
       set_cursor_only( _cursor + slen );

@@ -46,29 +46,32 @@ public class ExportRTF : Object {
   }
 
   public static string from_text( FormattedText text ) {
-    FormattedText.ExportStartFunc start_func = (tag, extra) => {
+    FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "\\b" );
         case FormatTag.ITALICS    :  return( "\\i" );
         case FormatTag.UNDERLINE  :  return( "\\ul" );
         case FormatTag.STRIKETHRU :  return( "\\strike" );
         case FormatTag.HEADER     :
-          switch( extra ) {
-            case "1" :  return( "\\b\\fs40" );
-            case "2" :  return( "\\b\\fs34" );
-            case "3" :  return( "\\b\\fs29" );
-            case "4" :  return( "\\b\\fs25" );
-            case "5" :  return( "\\b\\fs23" );
-            case "6" :  return( "\\b\\fs21" );
-            default  :  return( "\\b\\fs21" );
+          if( start == 0 ) {
+            switch( extra ) {
+              case "1" :  return( "\\b\\fs40" );
+              case "2" :  return( "\\b\\fs34" );
+              case "3" :  return( "\\b\\fs29" );
+              case "4" :  return( "\\b\\fs25" );
+              case "5" :  return( "\\b\\fs23" );
+              case "6" :  return( "\\b\\fs21" );
+              default  :  return( "\\b\\fs21" );
+            }
           }
+          break;
         case FormatTag.COLOR      :  return( "\\cf4" );
         case FormatTag.HILITE     :  return( "\\highlight7" );
         case FormatTag.URL        :  return( "\\cs1\\ul\\cf2" );
       }
       return( "" );
     };
-    FormattedText.ExportEndFunc end_func = (tag, extra) => {
+    FormattedText.ExportEndFunc end_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :
         case FormatTag.ITALICS    :

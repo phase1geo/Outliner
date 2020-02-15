@@ -38,23 +38,51 @@ public class ExportMarkdown : Object {
 
   /* Draws each of the top-level nodes */
   private static void export_top_nodes( FileOutputStream os, OutlineTable table ) {
-
-    try {
-
-      var nodes = table.root.children;
-      for( int i=0; i<nodes.length; i++ ) {
-        string title = "# " + nodes.index( i ).name.text.text + "\n\n";
-        os.write( title.data );
-        var children = nodes.index( i ).children;
-        for( int j=0; j<children.length; j++ ) {
-          export_node( os, children.index( j ) );
-        }
-      }
-
-    } catch( Error e ) {
-      // Handle the error
+    var nodes = table.root.children;
+    for( int i=0; i<nodes.length; i++ ) {
+      export_node( os, nodes.index( i ), "" );
     }
+  }
 
+  public static string from_text( FormattedText text, int start, int end ) {
+    FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
+      switch( tag ) {
+        case FormatTag.BOLD       :  return( "**");
+        case FormatTag.ITALICS    :  return( "_" );
+        case FormatTag.UNDERLINE  :  return( "__" );
+        case FormatTag.STRIKETHRU :  return( "~~" );
+        case FormatTag.HEADER     :
+          if( start == 0 ) {
+            switch( extra ) {
+              case "1" :  return( "# " );
+              case "2" :  return( "## " );
+              case "3" :  return( "### " );
+              case "4" :  return( "#### " );
+              case "5" :  return( "##### " );
+              case "6" :  return( "###### " );
+              default  :  return( "" );
+            }
+          }
+          break;
+        case FormatTag.URL :  return( "[" );
+        default            :  return( "" );
+      }
+      return( "" );
+    };
+    FormattedText.ExportEndFunc end_func = (tag, start, extra) => {
+      switch( tag ) {
+        case FormatTag.BOLD       :  return( "**" );
+        case FormatTag.ITALICS    :  return( "_" );
+        case FormatTag.UNDERLINE  :  return( "__" );
+        case FormatTag.STRIKETHRU :  return( "~~" );
+        case FormatTag.URL        :  return( "](%s)".printf( extra ) );
+        default                   :  return( "" );
+      }
+    };
+    FormattedText.ExportEncodeFunc encode_func = (str) => {
+      return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "#", "\\#" ) );
+    };
+    return( text.export( start, end, start_func, end_func, encode_func ) );
   }
 
   /* Draws the given node and its children to the output stream */
@@ -74,12 +102,12 @@ public class ExportMarkdown : Object {
       }
       */
 
-      title += node.name.text.text + "\n";
+      title += from_text( node.name.text, 0, node.name.text.text.char_count() ) + "\n";
 
       os.write( title.data );
 
       if( node.note.text.text != "" ) {
-        string note = prefix + "  " + node.note.text.text + "\n";
+        string note = prefix + "  " + from_text( node.note.text, 0, node.note.text.text.char_count() ) + "\n";
         os.write( note.data );
       }
 

@@ -521,8 +521,8 @@ public class FormattedText {
 
   public signal void changed();
 
-  public delegate string ExportStartFunc( FormatTag tag, string? extra );
-  public delegate string ExportEndFunc( FormatTag tag, string? extra );
+  public delegate string ExportStartFunc( FormatTag tag, int start, string? extra );
+  public delegate string ExportEndFunc( FormatTag tag, int start, string? extra );
   public delegate string ExportEncodeFunc( string str );
 
   public string text {
@@ -546,7 +546,7 @@ public class FormattedText {
   public FormattedText.copy_range( Theme theme, FormattedText text, int start, int end ) {
     initialize( theme );
     _text = text.text.slice( start, end );
-    var tags = get_tags_in_range( start, end );
+    var tags = text.get_tags_in_range( start, end );
     for( int i=0; i<tags.length; i++ ) {
       var tag = tags.index( i );
       _formats[tag.tag].add_tag( (tag.start - start), (tag.end - start), tag.extra );
@@ -737,17 +737,17 @@ public class FormattedText {
       str += encode_func( text.slice( start, pos_tag.pos ) );
       if( pos_tag.begin ) {
         tag_stack.append_val( pos_tag );
-        str += start_func( pos_tag.tag, pos_tag.extra );
+        str += start_func( pos_tag.tag, pos_tag.pos, pos_tag.extra );
       } else {
         var str2 = "";
         for( int j=(int)(tag_stack.length - 1); j>=0; j-- ) {
           if( tag_stack.index( j ).tag == pos_tag.tag ) {
-            str += end_func( tag_stack.index( j ).tag, pos_tag.extra );
+            str += end_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, pos_tag.extra );
             tag_stack.remove_index( j );
             break;
           } else {
-            str += end_func( tag_stack.index( j ).tag, pos_tag.extra );
-            str2 = start_func( tag_stack.index( j ).tag, tag_stack.index( j ).extra ) + str2;
+            str += end_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, pos_tag.extra );
+            str2 = start_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, tag_stack.index( j ).extra ) + str2;
           }
         }
         str += str2;

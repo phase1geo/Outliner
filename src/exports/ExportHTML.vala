@@ -59,7 +59,7 @@ public class ExportHTML : Object {
   }
 
   public static string from_text( FormattedText text, int start, int end ) {
-    FormattedText.ExportStartFunc start_func = (tag, extra) => {
+    FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "<b>");
         case FormatTag.ITALICS    :  return( "<i>" );
@@ -72,7 +72,7 @@ public class ExportHTML : Object {
       }
       return( "" );
     };
-    FormattedText.ExportEndFunc end_func = (tag, extra) => {
+    FormattedText.ExportEndFunc end_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "</b>" );
         case FormatTag.ITALICS    :  return( "</i>" );
