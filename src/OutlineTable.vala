@@ -398,11 +398,14 @@ public class OutlineTable : DrawingArea {
           var current = node_at_coordinates( e.x, e.y );
           if( current != null ) {
             if( current.is_within_attachto( e.x, e.y ) ) {
-              current.mode = NodeMode.ATTACHTO;
+              current.mode   = NodeMode.ATTACHTO;
+              selected.depth = current.depth + 1;
             } else if( current.is_within_attachabove( e.x, e.y ) ) {
-              current.mode = NodeMode.ATTACHABOVE;
+              current.mode   = NodeMode.ATTACHABOVE;
+              selected.depth = current.get_previous_node().depth;
             } else {
-              current.mode = NodeMode.ATTACHBELOW;
+              current.mode   = NodeMode.ATTACHBELOW;
+              selected.depth = current.depth;
             }
             if( current != _active ) {
               if( _active != null ) {

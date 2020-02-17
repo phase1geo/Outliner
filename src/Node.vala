@@ -773,7 +773,7 @@ public class Node {
   private void draw_expander( Cairo.Context ctx, Theme theme ) {
 
     /* Don't draw the expander if we are moving a node */
-    if( mode == NodeMode.MOVETO ) return;
+    // if( mode == NodeMode.MOVETO ) return;
 
     double ex, ey, ew, eh;
     var r  = 3;
@@ -826,7 +826,6 @@ public class Node {
   private void draw_note_icon( Cairo.Context ctx, Theme theme ) {
 
     if( ((mode == NodeMode.NONE) && (note.text.text == "")) ||
-        (mode == NodeMode.MOVETO) ||
         (mode == NodeMode.ATTACHTO) ||
         (mode == NodeMode.ATTACHBELOW) ||
         (mode == NodeMode.ATTACHABOVE) ) return;

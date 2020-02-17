@@ -23,71 +23,125 @@ using GLib;
 
 public class ExportMinder : Object {
 
+  private static int id = 0;
+
   /* Exports the given drawing area to the file of the given name */
   public static bool export( string fname, OutlineTable table ) {
+    id = 0;
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
-    Xml.Node* opml = new Xml.Node( null, "opml" );
-    string    expand_state;
-    Xml.Node* body = export_body( table, out expand_state );
-    opml->new_prop( "version", "2.0" );
-    opml->add_child( export_head( Path.get_basename( fname ), expand_state ) );
-    opml->add_child( body );
-    doc->set_root_element( opml );
+    Xml.Node* root = new Xml.Node( null, "minder" );
+    root->add_child( export_theme() );
+    root->add_child( export_drawarea() );
+    root->add_child( export_nodes( table ) );
+    doc->set_root_element( root );
     doc->save_format_file( fname, 1 );
     delete doc;
     return( true );
   }
 
-  /* Generates the header for the document */
-  private static Xml.Node* export_head( string? title, string expand_state ) {
-    Xml.Node* head = new Xml.Node( null, "head" );
-    var now  = new DateTime.now_local();
-    head->new_text_child( null, "title", (title ?? "Mind Map") );
-    head->new_text_child( null, "dateCreated", now.to_string() );
-    if( expand_state != "" ) {
-      head->new_text_child( null, "expansionState", expand_state );
-    }
-    return( head );
+  private static Xml.Node* export_theme() {
+    Xml.Node* theme = new Xml.Node( null, "theme" );
+    theme->set_prop( "name",  "Default" );
+    theme->set_prop( "index", "0" );
+    return( theme );
   }
 
-  /* Generates the body for the document */
-  private static Xml.Node* export_body( OutlineTable table, out string expand_state ) {
-    Xml.Node*  body    = new Xml.Node( null, "body" );
-    Array<int> estate  = new Array<int>();
+  private static Xml.Node* export_drawarea() {
+    Xml.Node* da = new Xml.Node( null, "drawarea" );
+    da->set_prop( "x", "0.0" );
+    da->set_prop( "y", "0.0" );
+    da->set_prop( "scale", "1" );
+    return( da );
+  }
+
+  private static Xml.Node* export_nodes( OutlineTable table ) {
+    Xml.Node* nodes = new Xml.Node( null, "nodes" );
     for( int i=0; i<table.root.children.length; i++ ) {
-      body->add_child( export_node( table.root.children.index( i ), ref estate ) );
+      var node = table.root.children.index( i );
+      nodes->add_child( export_node( node ) );
     }
-    expand_state = "";
-    for( int i=0; i<estate.length; i++ ) {
-      if( i > 0 ) {
-        expand_state += ",";
-      }
-      expand_state += estate.index( i ).to_string();
-    }
-    return( body );
+    return( nodes );
   }
 
-  /* Traverses the node tree exporting XML nodes in OPML format */
-  private static Xml.Node* export_node( Node node, ref Array<int> expand_state ) {
-    Xml.Node* n = new Xml.Node( null, "outline" );
-    n->new_prop( "text", node.name.text.text );
-    /*
-    if( is_leaf() && (_task_count > 0) ) {
-      bool checked = _task_done > 0;
-      node->new_prop( "checked", checked.to_string() );
-    }
-    */
-    if( node.note.text.text != "" ) {
-      n->new_prop( "note", node.note.text.text );
-    }
-    if( (node.children.length > 1) && node.expanded ) {
-      expand_state.append_val( node.id );
-    }
-    for( int i=0; i<node.children.length; i++ ) {
-      n->add_child( export_node( node.children.index( i ), ref expand_state ) );
+  private static Xml.Node* export_node( Node node ) {
+    Xml.Node* n = new Xml.Node( null, "node" );
+    var       next_id = id++;
+    n->set_prop( "id", next_id.to_string() );
+    n->set_prop( "posx", "0" );
+    n->set_prop( "poxy", "0" );
+    n->set_prop( "maxwidth", "200" );
+    n->set_prop( "width", "200" );
+    n->set_prop( "height", "50" );
+    n->set_prop( "side", "left" );
+    n->set_prop( "fold", "false" );
+    n->set_prop( "treesize", "500" );
+    n->set_prop( "layout", "To left" );
+    n->add_child( export_node_style( node ) );
+    n->add_child( export_node_formatting( node ) );
+    n->add_child( export_node_name( node ) );
+    n->add_child( export_node_note( node ) );
+    if( node.children.length > 0 ) {
+      Xml.Node* nodes = new Xml.Node( null, "nodes" );
+      for( int i=0; i<node.children.length; i++ ) {
+        nodes->add_child( export_node( node.children.index( i ) ) );
+      }
+      n->add_child( nodes );
     }
     return( n );
   }
+
+  private static Xml.Node* export_node_style( Node node ) {
+    Xml.Node* style = new Xml.Node( null, "style" );
+    style->set_prop( "linktype", "curved" );
+    style->set_prop( "linkwidth", "4" );
+    style->set_prop( "linkarrow", "false" );
+    style->set_prop( "linkdash", "solid" );
+    style->set_prop( "nodeborder", "underlined" );
+    style->set_prop( "nodewidth", "200" );
+    style->set_prop( "nodeborderwidth", "4" );
+    style->set_prop( "nodefill", "false" );
+    style->set_prop( "nodemargin", "8" );
+    style->set_prop( "nodepadding", "6" );
+    style->set_prop( "nodefont", "Sans 11" );
+    style->set_prop( "nodemarkup", "true" );
+    return( style );
+  }
+
+  private static Xml.Node* export_node_formatting( Node node ) {
+    Xml.Node* formatting = new Xml.Node( null, "formatting" );
+    var       text       = node.name.text;
+    var       end        = text.text.char_count();
+    if( text.is_tag_applied_in_range( FormatTag.URL, 0, end ) ) {
+      var tags = text.get_tags_in_range( 0, end );
+      for( int i=0; i<tags.length; i++ ) {
+        var tag = tags.index( i );
+        if( tag.tag == FormatTag.URL ) {
+          Xml.Node* urllink = new Xml.Node( null, "urllink" );
+          urllink->set_prop( "url",      tag.extra );
+          urllink->set_prop( "spos",     tag.start.to_string() );
+          urllink->set_prop( "epos",     tag.end.to_string() );
+          urllink->set_prop( "embedded", "false" );
+          urllink->set_prop( "ignore",   "false" );
+          formatting->add_child( urllink );
+        }
+      }
+    }
+    return( formatting );
+  }
+
+  private static Xml.Node* export_node_name( Node node ) {
+    Xml.Node* name = new Xml.Node( null, "nodename" );
+    name->add_content( node.name.text.text );
+    return( name );
+  }
+
+  private static Xml.Node* export_node_note( Node node ) {
+    Xml.Node* note = new Xml.Node( null, "nodenote" );
+    note->add_content( node.note.text.text );
+    return( note );
+  }
+
+  /**********************************************************************/
 
   /*
    Reads the contents of an OPML file and creates a new document based on
