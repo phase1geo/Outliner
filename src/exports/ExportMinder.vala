@@ -56,27 +56,33 @@ public class ExportMinder : Object {
 
   private static Xml.Node* export_nodes( OutlineTable table ) {
     Xml.Node* nodes = new Xml.Node( null, "nodes" );
-    for( int i=0; i<table.root.children.length; i++ ) {
-      var node = table.root.children.index( i );
-      nodes->add_child( export_node( node ) );
+    Xml.Node* root  = export_root_node( table );
+    if( table.root.children.length > 0 ) {
+      Xml.Node* root_nodes = new Xml.Node( null, "nodes" );
+      for( int i=0; i<table.root.children.length; i++ ) {
+        var node = table.root.children.index( i );
+        root_nodes->add_child( export_node( node ) );
+      }
+      root->add_child( root_nodes );
     }
+    nodes->add_child( root );
     return( nodes );
+  }
+
+  private static Xml.Node* export_root_node( OutlineTable table ) {
+    Xml.Node* root = new Xml.Node( null, "node" );
+    Xml.Node* name = new Xml.Node( null, "nodename" );
+    name->add_content( table.document.label );
+    export_node_properties( root );
+    root->add_child( export_node_style() );
+    root->add_child( name );
+    return( root );
   }
 
   private static Xml.Node* export_node( Node node ) {
     Xml.Node* n = new Xml.Node( null, "node" );
-    var       next_id = id++;
-    n->set_prop( "id", next_id.to_string() );
-    n->set_prop( "posx", "0" );
-    n->set_prop( "poxy", "0" );
-    n->set_prop( "maxwidth", "200" );
-    n->set_prop( "width", "200" );
-    n->set_prop( "height", "50" );
-    n->set_prop( "side", "left" );
-    n->set_prop( "fold", "false" );
-    n->set_prop( "treesize", "500" );
-    n->set_prop( "layout", "To left" );
-    n->add_child( export_node_style( node ) );
+    export_node_properties( n );
+    n->add_child( export_node_style() );
     n->add_child( export_node_formatting( node ) );
     n->add_child( export_node_name( node ) );
     n->add_child( export_node_note( node ) );
@@ -90,20 +96,34 @@ public class ExportMinder : Object {
     return( n );
   }
 
-  private static Xml.Node* export_node_style( Node node ) {
+  private static void export_node_properties( Xml.Node* node ) {
+    var next_id = id++;
+    node->set_prop( "id", next_id.to_string() );
+    // node->set_prop( "posx",     "0" );
+    // node->set_prop( "poxy",     "0" );
+    node->set_prop( "maxwidth", "200" );
+    // node->set_prop( "width",    "200" );
+    // node->set_prop( "height",   "50" );
+    node->set_prop( "side",     "right" );
+    node->set_prop( "fold",     "false" );
+    // node->set_prop( "treesize", "500" );
+    node->set_prop( "layout",   _( "To right" ) );
+  }
+
+  private static Xml.Node* export_node_style() {
     Xml.Node* style = new Xml.Node( null, "style" );
-    style->set_prop( "linktype", "curved" );
-    style->set_prop( "linkwidth", "4" );
-    style->set_prop( "linkarrow", "false" );
-    style->set_prop( "linkdash", "solid" );
-    style->set_prop( "nodeborder", "underlined" );
-    style->set_prop( "nodewidth", "200" );
+    style->set_prop( "linktype",        "curved" );
+    style->set_prop( "linkwidth",       "4" );
+    style->set_prop( "linkarrow",       "false" );
+    style->set_prop( "linkdash",        "solid" );
+    style->set_prop( "nodeborder",      "underlined" );
+    style->set_prop( "nodewidth",       "200" );
     style->set_prop( "nodeborderwidth", "4" );
-    style->set_prop( "nodefill", "false" );
-    style->set_prop( "nodemargin", "8" );
-    style->set_prop( "nodepadding", "6" );
-    style->set_prop( "nodefont", "Sans 11" );
-    style->set_prop( "nodemarkup", "true" );
+    style->set_prop( "nodefill",        "false" );
+    style->set_prop( "nodemargin",      "8" );
+    style->set_prop( "nodepadding",     "6" );
+    style->set_prop( "nodefont",        "Sans 11" );
+    style->set_prop( "nodemarkup",      "true" );
     return( style );
   }
 
