@@ -123,6 +123,14 @@ public class Node {
       _w = value;
     }
   }
+  public double height {
+    get {
+      return( _h );
+    }
+    set {
+      _h = value;
+    }
+  }
   public int depth {
     get {
       return( _depth );
@@ -333,6 +341,45 @@ public class Node {
   */
   private void update_height_from_resize() {
     update_height( true );
+  }
+
+  /*
+   Returns true if this node is on the border of a page and we will return the
+   number of pixels to draw on the first page.
+  */
+  public bool on_page_boundary( int page_size, out double inc_size ) {
+
+    var int_y     = (int)_y;
+    var int_pady  = (int)pady;
+    var int_nameh = (int)_name.height;
+    var int_noteh = (int)_note.height;
+
+    /* If the node starts at the top of the next page, return true */
+    if( ((int)_y % page_size) == 0 ) {
+      inc_size = 0;
+      return( true );
+
+    /*
+     If the node name straddles the page boundary, make sure that we set inc_size
+     such that we don't cut off a line.
+    */
+    } else if( (int_y / page_size) != ((int_y + int_pady + int_nameh) / page_size) ) {
+      inc_size = name.get_page_include_size( page_size );
+      return( true );
+
+    /*
+     If the node note straddles the page boundary, make sure that we set inc_size
+     such that we don't cut off a line.
+    */
+    } else if( (int_y / page_size) != ((int_y + (int_pady * 2) + int_nameh + int_noteh) / page_size) ) {
+      inc_size = note.get_page_include_size( page_size );
+      return( true );
+    }
+
+    inc_size = _h;
+
+    return( false );
+
   }
 
   /*
@@ -737,7 +784,7 @@ public class Node {
   /*******************/
 
   /* Draws the background for the given row */
-  private void draw_background( Cairo.Context ctx, Theme theme ) {
+  public void draw_background( Cairo.Context ctx, Theme theme ) {
 
 
     RGBA   background = theme.background;
@@ -770,7 +817,7 @@ public class Node {
   }
 
   /* Draw the expander icon */
-  private void draw_expander( Cairo.Context ctx, Theme theme ) {
+  public void draw_expander( Cairo.Context ctx, Theme theme ) {
 
     /* Don't draw the expander if we are moving a node */
     // if( mode == NodeMode.MOVETO ) return;
@@ -807,7 +854,7 @@ public class Node {
   }
 
   /* Draw the node title */
-  private void draw_name( Cairo.Context ctx, Theme theme ) {
+  public void draw_name( Cairo.Context ctx, Theme theme ) {
 
     RGBA color = theme.foreground;
 
@@ -843,7 +890,7 @@ public class Node {
   }
 
   /* Draw the note */
-  private void draw_note( Cairo.Context ctx, Theme theme ) {
+  public void draw_note( Cairo.Context ctx, Theme theme ) {
 
     if( hide_note || (mode == NodeMode.MOVETO) ) return;
 
@@ -859,7 +906,7 @@ public class Node {
   }
 
   /* Draw the node to the screen */
-  public void draw( Cairo.Context ctx, Theme theme ) {
+  public void draw( Cairo.Context ctx, Theme theme, double y_offset = 0 ) {
 
     if( is_root() && (mode != NodeMode.MOVETO) ) return;
 

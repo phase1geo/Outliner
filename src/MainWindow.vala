@@ -953,10 +953,8 @@ public class MainWindow : ApplicationWindow {
 
   /* Exports the model to the printer */
   private void action_print() {
-/* TBD
     var print = new ExportPrint();
-    print.print( _canvas, this );
-*/
+    print.print( get_current_table( "action_print" ), this );
   }
 
   /* Called whenever the properties button is clicked */

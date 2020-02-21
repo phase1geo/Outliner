@@ -150,6 +150,7 @@ public class CanvasText : Object {
     update_size( true );
   }
 
+  /* Sets the font size to the given size */
   public void set_font_size( int size ) {
     var fd = _line_layout.get_font_description();
     fd.set_size( size * Pango.SCALE );
@@ -249,6 +250,21 @@ public class CanvasText : Object {
       height = log_rect.height;
     }
     return( height / Pango.SCALE );
+  }
+
+  /* Returns the number of pixels to include on the current page of this text item */
+  public double get_page_include_size( int page_size ) {
+    Pango.Rectangle ink_rect, log_rect;
+    var line_count = _pango_layout.get_line_count();
+    for( int i=0; i<line_count; i++ ) {
+      _pango_layout.get_line_readonly( i ).get_extents( out ink_rect, out log_rect );
+      var ly = log_rect.y      / Pango.SCALE;
+      var lh = log_rect.height / Pango.SCALE;
+      if( ((int)ly / page_size) != ((int)(ly + lh) / page_size) ) {
+        return( ly - _posy );
+      }
+    }
+    return( _height );
   }
 
   /* Called whenever the text changes */

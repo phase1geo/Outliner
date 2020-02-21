@@ -23,7 +23,14 @@ using Gtk;
 
 public class ExportPrint : Object {
 
-  private OutlineTable _table;
+  struct PageBoundary {
+    public Node   node;
+    public double include_size;
+  }
+
+  private OutlineTable         _table;
+  private PrintOperation       _op;
+  private Array<PageBoundary?> _boundaries;
 
   /* Default constructor */
   public ExportPrint() {}
@@ -31,22 +38,26 @@ public class ExportPrint : Object {
   /* Perform print operation */
   public void print( OutlineTable table, MainWindow main ) {
 
-    _table = table;
+    _table      = table;
+    _op         = new PrintOperation();
+    _boundaries = new Array<PageBoundary?>();
+    // _boundaries.append_val( { table.root.get_next_node(), 0 } );
 
-    var op       = new PrintOperation();
     var settings = new PrintSettings();
-    op.set_print_settings( settings );
-    op.set_n_pages( 1 );
-    op.set_unit( Unit.MM );
+
+    _op.set_print_settings( settings );
+    // _op.set_unit( Unit.POINTS );
+    _op.set_unit( Unit.NONE );
 
     /* Connect to the draw_page signal */
-    op.draw_page.connect( draw_page );
+    _op.begin_print.connect( begin_print );
+    _op.draw_page.connect( draw_page );
 
     try {
-      var res = op.run( PrintOperationAction.PRINT_DIALOG, main );
+      var res = _op.run( PrintOperationAction.PRINT_DIALOG, main );
       switch( res ) {
         case PrintOperationResult.APPLY :
-          settings = op.get_print_settings();
+          settings = _op.get_print_settings();
           // Save the settings to a file - settings.to_file( fname );
           break;
         case PrintOperationResult.ERROR :
@@ -62,26 +73,58 @@ public class ExportPrint : Object {
 
   }
 
+  /* Calculates the page breaks in the document */
+  public void begin_print( PrintContext context ) {
+
+    var include_size = 1.0;
+    var sf           = ((7.5 / 8.5) * context.get_width()) / _table.get_allocated_width();
+    var page_size    = (int)(((10.0 / 11.0) * context.get_height()) / sf);
+    var node         = _table.root.get_next_node();
+
+    while( node != null ) {
+      if( node.on_page_boundary( page_size, out include_size ) ) {
+        _boundaries.append_val( { node, include_size } );
+      }
+      node = node.get_next_node();
+    }
+
+    _op.set_n_pages( (int)_boundaries.length );
+
+  }
+
   /* Draws the page */
   public void draw_page( PrintOperation op, PrintContext context, int page_nr ) {
 
-    var ctx         = context.get_cairo_context();
-    var page_width  = context.get_width();
-    var page_height = context.get_height();
-    var margin_x    = 0.5 * context.get_dpi_x();
-    var margin_y    = 0.5 * context.get_dpi_y();
+    var alloc_width  = _table.get_allocated_width();
+    var ctx          = context.get_cairo_context();
+    var sf           = ((7.5 / 8.5) * context.get_width()) / alloc_width;
+    var margin       = (0.5 / 8.5) * context.get_width();
+    var theme        = MainWindow.themes.get_theme( "default" );
+    var start        = _boundaries.index( page_nr );
+    var node         = start.node;
+    var end_node     = (_boundaries.length == (page_nr + 1)) ? null : _boundaries.index( page_nr + 1 ).node;
 
-    /* Calculate the required scaling factor to get the document to fit */
-    double width  = (page_width  - (2 * margin_x)) / _table.get_allocated_width();
-    double height = (page_height - (2 * margin_y)) / _table.get_allocated_height();
-    double sf     = (width < height) ? width : height;
+    /* Clip the area */
+    ctx.rectangle( margin, margin, (context.get_width() - margin), (context.get_height() - margin) );
+    ctx.clip();
 
     /* Scale and translate the image */
+    ctx.translate( margin, (0 - ((node.y - start.include_size) * sf)) + margin );
     ctx.scale( sf, sf );
-    ctx.translate( margin_x, margin_y );
 
-    /* Draw the map */
-    _table.draw_all( ctx );
+    stdout.printf( "node.y: %g, translated: %g\n", (node.y * sf), (0 - ((node.y - start.include_size) * sf)) );
+
+    /* Draw the nodes, starting with the start node */
+    while( true ) {
+      node.draw_background( ctx, theme );
+      node.draw_expander( ctx, theme );
+      node.draw_name( ctx, theme );
+      node.draw_note( ctx, theme );
+      if( node == end_node ) {
+        break;
+      }
+      node = node.get_next_node();
+    }
 
   }
 
