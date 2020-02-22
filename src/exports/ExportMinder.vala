@@ -169,14 +169,11 @@ public class ExportMinder : Object {
   */
   public static bool import( string fname, OutlineTable table ) {
 
-    /* Read in the contents of the OPML file */
-    stdout.printf( "Importing fname: %s\n", fname );
+    /* Read in the contents of the Minder file */
     var doc = Xml.Parser.parse_file( fname );
     if( doc == null ) {
       return( false );
     }
-
-    stdout.printf( "Loading the contents of the file\n" );
 
     /* Load the contents of the file */
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
@@ -185,10 +182,7 @@ public class ExportMinder : Object {
       }
     }
 
-    /* Draw the table */
-    table.queue_draw();
-
-    /* Delete the OPML document */
+    /* Delete the XML document */
     delete doc;
 
     return( true );
@@ -205,14 +199,25 @@ public class ExportMinder : Object {
   }
 
   /* Parses the given text node and stores it to the CanvasText item */
-  private static void import_node_text( Xml.Node* n, CanvasText ct ) {
+  private static void import_node_text( Xml.Node* n, CanvasText ct, Array<UndoTagInfo>? tags ) {
 
-    ct.text.insert_text( 0, n->get_content() );
+    /* Let's convert the text from Markdown */
+    var html = Utils.markdown_to_html( n->get_content(), "div" );
+
+    /* Convert HTML to FormattedText */
+    if( ExportHTML.to_text( html, ct.text ) ) {
+
+      /* Add the tags if there are any */
+      if( tags != null ) {
+        ct.text.apply_tags( tags );
+      }
+
+    }
 
   }
 
   /* Parses the given urllink tag and saves the information as a URL */
-  private static void import_text_link( Xml.Node* ul, CanvasText ct ) {
+  private static void import_text_link( Xml.Node* ul, CanvasText ct, Array<UndoTagInfo> formatting ) {
 
     var url   = "";
     var start = -1;
@@ -223,29 +228,29 @@ public class ExportMinder : Object {
       url = u;
     }
 
-    var s = ul->get_prop( "start" );
+    var s = ul->get_prop( "spos" );
     if( s != null ) {
       start = int.parse( s );
     }
 
-    var e = ul->get_prop( "end" );
+    var e = ul->get_prop( "epos" );
     if( e != null ) {
       end = int.parse( e );
     }
 
     if( (url != "") && (start != -1) && (end != -1) ) {
-      ct.text.add_tag( FormatTag.URL, start, end, url );
+      formatting.append_val( new UndoTagInfo( FormatTag.URL, start, end, url ) );
     }
 
   }
 
   /* Parses the node formatting tag */
-  private static void import_node_formatting( Xml.Node* f, CanvasText ct ) {
+  private static void import_node_formatting( Xml.Node* f, CanvasText ct, Array<UndoTagInfo> formatting ) {
 
     for( Xml.Node* it=f->children; it!= null; it=it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
-          case "urllink" :  import_text_link( it, ct );  break;
+          case "urllink" :  import_text_link( it, ct, formatting );  break;
         }
       }
     }
@@ -255,7 +260,8 @@ public class ExportMinder : Object {
   /* Imports all Minder information useful for the node */
   private static Node import_node( Xml.Node* n, OutlineTable table ) {
 
-    var node = new Node( table );
+    var node       = new Node( table );
+    var formatting = new Array<UndoTagInfo>();
 
     var f = n->get_prop( "fold" );
     if( f != null ) {
@@ -266,12 +272,12 @@ public class ExportMinder : Object {
     for( Xml.Node* it=n->children; it!=null; it=it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
-          case "formatting" :  import_node_formatting( it, node.name );  break;
-          case "nodename"   :  import_node_text( it, node.name );        break;
-          case "nodenote"   :  import_node_text( it, node.note );        break;
+          case "formatting" :  import_node_formatting( it, node.name, formatting );  break;
+          case "nodename"   :  import_node_text( it, node.name, formatting );        break;
+          case "nodenote"   :  import_node_text( it, node.note, null );              break;
           case "nodes" :
             for( Xml.Node* it2=it->children; it2!=null; it2=it2->next ) {
-              if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
+              if( (it2->type == Xml.ElementType.ELEMENT_NODE) && (it2->name == "node") ) {
                 node.add_child( import_node( it2, table ) );
               }
             }

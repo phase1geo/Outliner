@@ -308,10 +308,10 @@ public class MainWindow : ApplicationWindow {
     /* Make the drawing area new */
     switch( reason ) {
       case TabAddReason.NEW    :
-      case TabAddReason.IMPORT :
         ot.initialize_for_new();
         _nb.current = tab;
         break;
+      case TabAddReason.IMPORT :
       case TabAddReason.OPEN :
         _nb.current = tab;
         break;
@@ -703,16 +703,19 @@ public class MainWindow : ApplicationWindow {
       update_title( table );
       table.document.load();
       return( true );
-    } else {
-      var table = add_tab( fname, TabAddReason.IMPORT );
+    } else if( fname.has_suffix( ".opml" ) ||
+               fname.has_suffix( ".minder" ) ) {
+      var rname = fname.slice( 0, fname.last_index_of( "." ) ) + ".outliner";
+      var table = add_tab( rname, TabAddReason.IMPORT );
       update_title( table );
       if( fname.has_suffix( ".opml" ) ) {
         ExportOPML.import( fname, table );
-        return( true );
       } else if( fname.has_suffix( ".minder" ) ) {
         ExportMinder.import( fname, table );
-        return( true );
       }
+      table.queue_draw();
+      table.changed();
+      return( true );
     }
     return( false );
   }
