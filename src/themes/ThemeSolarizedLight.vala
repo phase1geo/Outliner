@@ -43,7 +43,8 @@ public class ThemeSolarizedLight : Theme {
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "#586E75" );
     symbol_color       = get_color( "#B58900" );
-    note_color         = get_color( "#268BD2" );
+    note_foreground    = get_color( "#268BD2" );
+    note_background    = get_color( "#FDF6E3" );
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
     hilite             = get_color( "yellow" );

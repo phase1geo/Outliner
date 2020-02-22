@@ -43,7 +43,8 @@ public class ThemeDefault : Theme {
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "Black" );
     symbol_color       = get_color( "#444444" );
-    note_color         = get_color( "Blue" );
+    note_foreground    = get_color( "Blue" );
+    note_background    = get_color( "e0e0e0" );
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
     hilite             = get_color( "#3689e6" );

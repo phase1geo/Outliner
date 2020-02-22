@@ -38,7 +38,8 @@ public class Theme : Object {
   public    RGBA   textsel_foreground { protected set; get; }
   public    RGBA   text_cursor        { protected set; get; }
   public    RGBA   symbol_color       { protected set; get; }
-  public    RGBA   note_color         { protected set; get; }
+  public    RGBA   note_foreground    { protected set; get; }
+  public    RGBA   note_background    { protected set; get; }
   public    RGBA   attachable_color   { protected set; get; }
   public    bool   prefer_dark        { protected set; get; }
 
