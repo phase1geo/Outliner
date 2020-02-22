@@ -34,6 +34,12 @@ public enum NodeMode {
   HOVER          // Indicates that the cursor is hovering over this node
 }
 
+public class NodeDrawOptions {
+  public bool show_note_icon { get; set; default = true; }
+  public bool show_modes     { get; set; default = true; }
+  public NodeDrawOptions() {}
+}
+
 public class Node {
 
   private static int next_id = 0;
@@ -364,7 +370,7 @@ public class Node {
      such that we don't cut off a line.
     */
     } else if( (int_y / page_size) != ((int_y + int_pady + int_nameh) / page_size) ) {
-      inc_size = name.get_page_include_size( page_size );
+      inc_size = name.get_page_include_size( page_size ) + int_y + int_pady;
       return( true );
 
     /*
@@ -372,7 +378,7 @@ public class Node {
      such that we don't cut off a line.
     */
     } else if( (int_y / page_size) != ((int_y + (int_pady * 2) + int_nameh + int_noteh) / page_size) ) {
-      inc_size = note.get_page_include_size( page_size );
+      inc_size = note.get_page_include_size( page_size ) + int_y + (int_pady * 2) + int_nameh;
       return( true );
     }
 
@@ -784,13 +790,14 @@ public class Node {
   /*******************/
 
   /* Draws the background for the given row */
-  public void draw_background( Cairo.Context ctx, Theme theme ) {
+  public void draw_background( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
 
-    RGBA   background = theme.background;
-    double alpha      = this.alpha;
+    var background = theme.background;
+    var alpha      = this.alpha;
+    var tmode      = opts.show_modes ? mode : NodeMode.NONE;
 
-    switch( mode ) {
+    switch( tmode ) {
       case NodeMode.SELECTED :  background = theme.nodesel_background;  break;
       case NodeMode.ATTACHTO :  background = theme.attachable_color;    break;
       case NodeMode.MOVETO   :  alpha      = 0.3;                       break;
@@ -801,7 +808,7 @@ public class Node {
     ctx.fill();
 
     /* If we are attaching above or below this node, draw the below indicator */
-    switch( mode ) {
+    switch( tmode ) {
       case NodeMode.ATTACHABOVE :
         Utils.set_context_color( ctx, theme.attachable_color );
         ctx.rectangle( _x, (y - 4), _w, 4 );
@@ -817,10 +824,7 @@ public class Node {
   }
 
   /* Draw the expander icon */
-  public void draw_expander( Cairo.Context ctx, Theme theme ) {
-
-    /* Don't draw the expander if we are moving a node */
-    // if( mode == NodeMode.MOVETO ) return;
+  public void draw_expander( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     double ex, ey, ew, eh;
     var r  = 3;
@@ -854,31 +858,35 @@ public class Node {
   }
 
   /* Draw the node title */
-  public void draw_name( Cairo.Context ctx, Theme theme ) {
+  public void draw_name( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
-    RGBA color = theme.foreground;
+    var color = theme.foreground;
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
 
-    if( mode == NodeMode.EDITABLE ) {
+    if( tmode == NodeMode.EDITABLE ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
       ctx.rectangle( (name.posx - (padx / 2)), name.posy, name.max_width, name.height );
       ctx.stroke();
     }
 
-    _name.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : color), alpha );
+    _name.draw( ctx, theme, (((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : color), alpha );
 
   }
 
   /* Draw the note icon */
-  private void draw_note_icon( Cairo.Context ctx, Theme theme ) {
+  private void draw_note_icon( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
-    if( ((mode == NodeMode.NONE) && (note.text.text == "")) ||
-        (mode == NodeMode.ATTACHTO) ||
-        (mode == NodeMode.ATTACHBELOW) ||
-        (mode == NodeMode.ATTACHABOVE) ) return;
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
+
+    if( !opts.show_note_icon ||
+        (((tmode == NodeMode.NONE) && (note.text.text == "")) ||
+         (tmode == NodeMode.ATTACHTO) ||
+         (tmode == NodeMode.ATTACHBELOW) ||
+         (tmode == NodeMode.ATTACHABOVE)) ) return;
 
     double x, y, w, h;
-    double alpha = (((mode == NodeMode.HOVER) || (mode == NodeMode.SELECTED)) && (note.text.text == "") && !over_note_icon) ? 0.4 : this.alpha;
+    double alpha = (((tmode == NodeMode.HOVER) || (tmode == NodeMode.SELECTED)) && (note.text.text == "") && !over_note_icon) ? 0.4 : this.alpha;
 
     note_bbox( out x, out y, out w, out h );
 
@@ -890,42 +898,46 @@ public class Node {
   }
 
   /* Draw the note */
-  public void draw_note( Cairo.Context ctx, Theme theme ) {
+  public void draw_note( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
-    if( hide_note || (mode == NodeMode.MOVETO) ) return;
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
 
-    if( mode == NodeMode.NOTEEDIT ) {
+    if( hide_note || (tmode == NodeMode.MOVETO) ) return;
+
+    if( tmode == NodeMode.NOTEEDIT ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
       ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
       ctx.stroke();
     }
 
-    _note.draw( ctx, theme, (((mode == NodeMode.SELECTED) || (mode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.note_color), alpha );
+    _note.draw( ctx, theme, (((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.note_color), alpha );
 
   }
 
   /* Draw the node to the screen */
-  public void draw( Cairo.Context ctx, Theme theme, double y_offset = 0 ) {
+  public void draw( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
-    if( is_root() && (mode != NodeMode.MOVETO) ) return;
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
 
-    draw_background( ctx, theme );
-    draw_note_icon( ctx, theme );
-    draw_expander( ctx, theme );
-    draw_name( ctx, theme );
-    draw_note( ctx, theme );
+    if( is_root() && (tmode != NodeMode.MOVETO) ) return;
+
+    draw_background( ctx, theme, opts );
+    draw_note_icon( ctx, theme, opts );
+    draw_expander( ctx, theme, opts );
+    draw_name( ctx, theme, opts );
+    draw_note( ctx, theme, opts );
 
   }
 
   /* Draws the entire node tree */
-  public void draw_tree( Cairo.Context ctx, Theme theme ) {
+  public void draw_tree( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
-    draw( ctx, theme );
+    draw( ctx, theme, opts );
 
     if( expanded ) {
       for( int i=0; i<children.length; i++ ) {
-        children.index( i ).draw_tree( ctx, theme );
+        children.index( i ).draw_tree( ctx, theme, opts );
       }
     }
 

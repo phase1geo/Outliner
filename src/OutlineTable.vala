@@ -47,6 +47,7 @@ public class OutlineTable : DrawingArea {
   private NodeMenu        _node_menu;
   private bool            _condensed     = false;
   private bool            _debug         = true;
+  private NodeDrawOptions _draw_options;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -130,6 +131,9 @@ public class OutlineTable : DrawingArea {
 
     /* Create contextual menu(s) */
     _node_menu = new NodeMenu( this );
+
+    /* Create the node draw options */
+    _draw_options = new NodeDrawOptions();
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -1748,9 +1752,9 @@ public class OutlineTable : DrawingArea {
 
   /* Draws all of the root node trees */
   public void draw_all( Context ctx ) {
-    root.draw_tree( ctx, _theme );
+    root.draw_tree( ctx, _theme, _draw_options );
     if( (selected != null) && ((selected.parent == null) || selected.parent.expanded) ) {
-      selected.draw( ctx, _theme );
+      selected.draw( ctx, _theme, _draw_options );
     }
   }
 

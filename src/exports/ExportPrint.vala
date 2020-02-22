@@ -23,14 +23,10 @@ using Gtk;
 
 public class ExportPrint : Object {
 
-  struct PageBoundary {
-    public Node   node;
-    public double include_size;
-  }
-
-  private OutlineTable         _table;
-  private PrintOperation       _op;
-  private Array<PageBoundary?> _boundaries;
+  private OutlineTable    _table;
+  private PrintOperation  _op;
+  private Array<double?>  _boundaries;
+  private NodeDrawOptions _draw_options;
 
   /* Default constructor */
   public ExportPrint() {}
@@ -38,10 +34,14 @@ public class ExportPrint : Object {
   /* Perform print operation */
   public void print( OutlineTable table, MainWindow main ) {
 
-    _table      = table;
-    _op         = new PrintOperation();
-    _boundaries = new Array<PageBoundary?>();
-    // _boundaries.append_val( { table.root.get_next_node(), 0 } );
+    _table        = table;
+    _op           = new PrintOperation();
+    _boundaries   = new Array<double?>();
+    _draw_options = new NodeDrawOptions();
+
+    /* Initialize the draw options */
+    _draw_options.show_modes     = false;
+    _draw_options.show_note_icon = false;
 
     var settings = new PrintSettings();
 
@@ -80,15 +80,19 @@ public class ExportPrint : Object {
     var sf           = ((7.5 / 8.5) * context.get_width()) / _table.get_allocated_width();
     var page_size    = (int)(((10.0 / 11.0) * context.get_height()) / sf);
     var node         = _table.root.get_next_node();
+    var last_node    = node;
 
     while( node != null ) {
       if( node.on_page_boundary( page_size, out include_size ) ) {
-        _boundaries.append_val( { node, include_size } );
+        _boundaries.append_val( include_size );
       }
+      last_node = node;
       node = node.get_next_node();
     }
 
-    _op.set_n_pages( (int)_boundaries.length );
+    _boundaries.append_val( last_node.last_y );
+
+    _op.set_n_pages( (int)(_boundaries.length - 1) );
 
   }
 
@@ -101,30 +105,18 @@ public class ExportPrint : Object {
     var margin       = (0.5 / 8.5) * context.get_width();
     var theme        = MainWindow.themes.get_theme( "default" );
     var start        = _boundaries.index( page_nr );
-    var node         = start.node;
-    var end_node     = (_boundaries.length == (page_nr + 1)) ? null : _boundaries.index( page_nr + 1 ).node;
-
-    /* Clip the area */
-    ctx.rectangle( margin, margin, (context.get_width() - margin), (context.get_height() - margin) );
-    ctx.clip();
+    var end          = _boundaries.index( page_nr + 1 ) - 1;
 
     /* Scale and translate the image */
-    ctx.translate( margin, (0 - ((node.y - start.include_size) * sf)) + margin );
+    ctx.translate( margin, ((0 - start) * sf) + margin );
     ctx.scale( sf, sf );
 
-    stdout.printf( "node.y: %g, translated: %g\n", (node.y * sf), (0 - ((node.y - start.include_size) * sf)) );
+    /* Clip the area */
+    ctx.rectangle( 0, start, (alloc_width - (margin * sf)), end );
+    ctx.clip();
 
-    /* Draw the nodes, starting with the start node */
-    while( true ) {
-      node.draw_background( ctx, theme );
-      node.draw_expander( ctx, theme );
-      node.draw_name( ctx, theme );
-      node.draw_note( ctx, theme );
-      if( node == end_node ) {
-        break;
-      }
-      node = node.get_next_node();
-    }
+    /* Draw all of the nodes */
+    _table.root.draw_tree( ctx, theme, _draw_options );
 
   }
 

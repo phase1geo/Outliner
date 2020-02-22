@@ -257,11 +257,11 @@ public class CanvasText : Object {
     Pango.Rectangle ink_rect, log_rect;
     var line_count = _pango_layout.get_line_count();
     for( int i=0; i<line_count; i++ ) {
-      _pango_layout.get_line_readonly( i ).get_extents( out ink_rect, out log_rect );
-      var ly = log_rect.y      / Pango.SCALE;
-      var lh = log_rect.height / Pango.SCALE;
-      if( ((int)ly / page_size) != ((int)(ly + lh) / page_size) ) {
-        return( ly - _posy );
+      _pango_layout.get_line_readonly( i ).get_pixel_extents( out ink_rect, out log_rect );
+      var ly = (int)log_rect.y;
+      var lh = (int)log_rect.height;
+      if( (ly / page_size) != ((ly + lh) / page_size) ) {
+        return( ly );
       }
     }
     return( _height );
