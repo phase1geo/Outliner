@@ -306,13 +306,15 @@ public class MainWindow : ApplicationWindow {
     update_title( ot );
 
     /* Make the drawing area new */
-    if( reason == TabAddReason.NEW ) {
-      ot.initialize_for_new();
-    }
-
-    /* Indicate that the tab has changed */
-    if( reason != TabAddReason.LOAD ) {
-      _nb.current = tab;
+    switch( reason ) {
+      case TabAddReason.NEW    :
+      case TabAddReason.IMPORT :
+        ot.initialize_for_new();
+        _nb.current = tab;
+        break;
+      case TabAddReason.OPEN :
+        _nb.current = tab;
+        break;
     }
 
     ot.grab_focus();
@@ -701,20 +703,16 @@ public class MainWindow : ApplicationWindow {
       update_title( table );
       table.document.load();
       return( true );
- /*
-    } else if( fname.has_suffix( ".opml" ) ) {
-      _doc = new Document( _table, _settings );
-      _table.initialize_for_open();
-      update_title();
-      ExportOPML.import( fname, _table );
-      return( true );
-    } else if( fname.has_suffix( ".minder" ) ) {
-      _doc = new Docuemnt( _table, _settings );
-      _table.initialize_for_open();
-      update_title();
-      ExportMinder.import( fname, _table );
-      return( true );
-*/
+    } else {
+      var table = add_tab( fname, TabAddReason.IMPORT );
+      update_title( table );
+      if( fname.has_suffix( ".opml" ) ) {
+        ExportOPML.import( fname, table );
+        return( true );
+      } else if( fname.has_suffix( ".minder" ) ) {
+        ExportMinder.import( fname, table );
+        return( true );
+      }
     }
     return( false );
   }

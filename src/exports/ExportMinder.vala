@@ -170,25 +170,23 @@ public class ExportMinder : Object {
   public static bool import( string fname, OutlineTable table ) {
 
     /* Read in the contents of the OPML file */
+    stdout.printf( "Importing fname: %s\n", fname );
     var doc = Xml.Parser.parse_file( fname );
     if( doc == null ) {
       return( false );
     }
 
+    stdout.printf( "Loading the contents of the file\n" );
+
     /* Load the contents of the file */
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
-      if( it->type == Xml.ElementType.ELEMENT_NODE ) {
-        Array<int>? expand_state = null;
-        switch( it->name ) {
-          case "head" :
-            import_header( it, ref expand_state );
-            break;
-          case "body" :
-            import_body( table, it, ref expand_state );
-            break;
-        }
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "nodes") ) {
+        import_nodes( it, table );
       }
     }
+
+    /* Draw the table */
+    table.queue_draw();
 
     /* Delete the OPML document */
     delete doc;
@@ -197,88 +195,93 @@ public class ExportMinder : Object {
 
   }
 
-  /* Parses the OPML head block for information that we will use */
-  private static void import_header( Xml.Node* n, ref Array<int>? expand_state ) {
-    for( Xml.Node* it = n->children; it != null; it = it->next ) {
-      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "expansionState") ) {
-        if( (it->children != null) && (it->children->type == Xml.ElementType.TEXT_NODE) ) {
-          expand_state = new Array<int>();
-          string[] values = n->children->get_content().split( "," );
-          foreach (string val in values) {
-            int intval = int.parse( val );
-            expand_state.append_val( intval );
-          }
-        }
+  /* Parses the given top-level nodes */
+  private static void import_nodes( Xml.Node* nodes, OutlineTable table ) {
+    for( Xml.Node* it=nodes->children; it!=null; it=it->next ) {
+      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
+        table.root.add_child( import_node( it, table ) );
       }
     }
   }
 
-  /* Imports the OPML data, creating a mind map */
-  public static void import_body( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state) {
+  /* Parses the given text node and stores it to the CanvasText item */
+  private static void import_node_text( Xml.Node* n, CanvasText ct ) {
 
-    /* Clear the existing nodes */
-    table.root.children.remove_range( 0, table.root.children.length );
+    ct.text.insert_text( 0, n->get_content() );
 
-    /* Load the contents of the file */
-    var i = 0;
-    for( Xml.Node* it = n->children; it != null; it = it->next ) {
-      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "outline") ) {
-        table.root.add_child( import_node( table, it, ref expand_state ), i++ );
+  }
+
+  /* Parses the given urllink tag and saves the information as a URL */
+  private static void import_text_link( Xml.Node* ul, CanvasText ct ) {
+
+    var url   = "";
+    var start = -1;
+    var end   = -1;
+
+    var u = ul->get_prop( "url" );
+    if( u != null ) {
+      url = u;
+    }
+
+    var s = ul->get_prop( "start" );
+    if( s != null ) {
+      start = int.parse( s );
+    }
+
+    var e = ul->get_prop( "end" );
+    if( e != null ) {
+      end = int.parse( e );
+    }
+
+    if( (url != "") && (start != -1) && (end != -1) ) {
+      ct.text.add_tag( FormatTag.URL, start, end, url );
+    }
+
+  }
+
+  /* Parses the node formatting tag */
+  private static void import_node_formatting( Xml.Node* f, CanvasText ct ) {
+
+    for( Xml.Node* it=f->children; it!= null; it=it->next ) {
+      if( it->type == Xml.ElementType.ELEMENT_NODE ) {
+        switch( it->name ) {
+          case "urllink" :  import_text_link( it, ct );  break;
+        }
       }
     }
 
   }
 
-  /* Main method for importing an OPML <outline> into a node */
-  public static Node import_node( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state ) {
+  /* Imports all Minder information useful for the node */
+  private static Node import_node( Xml.Node* n, OutlineTable table ) {
 
-    Node node = new Node( table );
+    var node = new Node( table );
 
-    /* Get the node name */
-    string? t = n->get_prop( "text" );
-    if( t != null ) {
-      node.name.text.set_text( t );
+    var f = n->get_prop( "fold" );
+    if( f != null ) {
+      node.expanded = !bool.parse( f );
     }
 
-    /* Get the task information */
-    string? c = n->get_prop( "checked" );
-    if( c != null ) {
-    /*
-      _task_count = 1;
-      _task_done  = bool.parse( t ) ? 1 : 0;
-      propagate_task_info_up( _task_count, _task_done );
-    */
-    }
-
-    /* Get the note information */
-    string? o = n->get_prop( "note" );
-    if( o != null ) {
-      node.note.text.set_text( o );
-    }
-
-    /* Figure out if this node is folded */
-    if( expand_state != null ) {
-      node.expanded = false;
-      for( int i=0; i<expand_state.length; i++ ) {
-        if( expand_state.index( i ) == node.id ) {
-          node.expanded = true;
-          expand_state.remove_index( i );
-          break;
+    /* Parse any children nodes */
+    for( Xml.Node* it=n->children; it!=null; it=it->next ) {
+      if( it->type == Xml.ElementType.ELEMENT_NODE ) {
+        switch( it->name ) {
+          case "formatting" :  import_node_formatting( it, node.name );  break;
+          case "nodename"   :  import_node_text( it, node.name );        break;
+          case "nodenote"   :  import_node_text( it, node.note );        break;
+          case "nodes" :
+            for( Xml.Node* it2=it->children; it2!=null; it2=it2->next ) {
+              if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
+                node.add_child( import_node( it2, table ) );
+              }
+            }
+            break;
         }
-      }
-    }
-
-    /* Parse the child nodes */
-    for( Xml.Node* it = n->children; it != null; it = it->next ) {
-      if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "outline") ) {
-        var child = import_node( table, it, ref expand_state );
-        node.add_child( child );
       }
     }
 
     return( node );
 
   }
-
 
 }
