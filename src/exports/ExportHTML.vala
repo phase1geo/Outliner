@@ -134,8 +134,30 @@ public class ExportHTML : Object {
       var key_value = opt.split( ":" );
       if( key_value.length == 2 ) {
         switch( key_value[0] ) {
+          case "foreground"       :
           case "color"            :  text.add_tag( FormatTag.COLOR,  start, end, key_value[1] );  break;
+          case "background"       :
           case "background-color" :  text.add_tag( FormatTag.HILITE, start, end, key_value[1] );  break;
+          case "style" :
+            if( key_value[1] == "italic" ) {
+              text.add_tag( FormatTag.ITALICS, start, end );
+            }
+            break;
+          case "weight" :
+            if( key_value[1] == "bold" ) {
+              text.add_tag( FormatTag.BOLD, start, end );
+            }
+            break;
+          case "underline" :
+            if( key_value[1] == "single" ) {
+              text.add_tag( FormatTag.UNDERLINE, start, end );
+            }
+            break;
+          case "strikethrough" :
+            if( key_value[1] == "true" ) {
+              text.add_tag( FormatTag.STRIKETHRU, start, end );
+            }
+            break;
         }
       }
     }
@@ -165,7 +187,9 @@ public class ExportHTML : Object {
       case "b"   :  text.add_tag( FormatTag.BOLD,       start, end );  break;
       case "i"   :  text.add_tag( FormatTag.ITALICS,    start, end );  break;
       case "u"   :  text.add_tag( FormatTag.UNDERLINE,  start, end );  break;
+      case "s"   :
       case "del" :  text.add_tag( FormatTag.STRIKETHRU, start, end );  break;
+      case "li"  :  text.insert_text( start, "- " );  break;
     }
   }
 
