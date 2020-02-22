@@ -377,7 +377,7 @@ public class Node {
      If the node note straddles the page boundary, make sure that we set inc_size
      such that we don't cut off a line.
     */
-    } else if( (int_y / page_size) != ((int_y + (int_pady * 2) + int_nameh + int_noteh) / page_size) ) {
+    } else if( !hide_note && ((int_y / page_size) != ((int_y + (int_pady * 2) + int_nameh + int_noteh) / page_size)) ) {
       inc_size = note.get_page_include_size( page_size ) + int_y + (int_pady * 2) + int_nameh;
       return( true );
     }
@@ -740,7 +740,7 @@ public class Node {
       children.index( i ).set_condensed( condensed );
     }
     if( is_root() ) {
-      adjust_nodes( last_y, false, "set_condensed" );
+      adjust_nodes( 0, false, "set_condensed" );
     }
   }
 
