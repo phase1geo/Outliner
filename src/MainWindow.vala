@@ -674,11 +674,6 @@ public class MainWindow : ApplicationWindow {
     dialog.add_filter( filter );
 
     filter = new FileFilter();
-    filter.set_filter_name( "Freemind / Freeplane" );
-    filter.add_pattern( "*.mm" );
-    dialog.add_filter( filter );
-
-    filter = new FileFilter();
     filter.set_filter_name( "Minder" );
     filter.add_pattern( "*.minder" );
     dialog.add_filter( filter );
