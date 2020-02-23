@@ -178,18 +178,20 @@ public class ExportHTML : Object {
           parse_style( style, start, end, text );
         }
         break;
-      case "h1"  :  text.add_tag( FormatTag.HEADER,     start, end, "1" );  break;
-      case "h2"  :  text.add_tag( FormatTag.HEADER,     start, end, "2" );  break;
-      case "h3"  :  text.add_tag( FormatTag.HEADER,     start, end, "3" );  break;
-      case "h4"  :  text.add_tag( FormatTag.HEADER,     start, end, "4" );  break;
-      case "h5"  :  text.add_tag( FormatTag.HEADER,     start, end, "5" );  break;
-      case "h6"  :  text.add_tag( FormatTag.HEADER,     start, end, "6" );  break;
-      case "b"   :  text.add_tag( FormatTag.BOLD,       start, end );  break;
-      case "i"   :  text.add_tag( FormatTag.ITALICS,    start, end );  break;
-      case "u"   :  text.add_tag( FormatTag.UNDERLINE,  start, end );  break;
-      case "s"   :
-      case "del" :  text.add_tag( FormatTag.STRIKETHRU, start, end );  break;
-      case "li"  :  text.insert_text( start, "- " );  break;
+      case "h1"     :  text.add_tag( FormatTag.HEADER,     start, end, "1" );  break;
+      case "h2"     :  text.add_tag( FormatTag.HEADER,     start, end, "2" );  break;
+      case "h3"     :  text.add_tag( FormatTag.HEADER,     start, end, "3" );  break;
+      case "h4"     :  text.add_tag( FormatTag.HEADER,     start, end, "4" );  break;
+      case "h5"     :  text.add_tag( FormatTag.HEADER,     start, end, "5" );  break;
+      case "h6"     :  text.add_tag( FormatTag.HEADER,     start, end, "6" );  break;
+      case "strong" :
+      case "b"      :  text.add_tag( FormatTag.BOLD,       start, end );  break;
+      case "em"     :
+      case "i"      :  text.add_tag( FormatTag.ITALICS,    start, end );  break;
+      case "u"      :  text.add_tag( FormatTag.UNDERLINE,  start, end );  break;
+      case "s"      :
+      case "del"    :  text.add_tag( FormatTag.STRIKETHRU, start, end );  break;
+      case "li"     :  text.insert_text( start, "- " );  break;
     }
   }
 

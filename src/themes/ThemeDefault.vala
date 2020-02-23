@@ -44,7 +44,7 @@ public class ThemeDefault : Theme {
     text_cursor        = get_color( "Black" );
     symbol_color       = get_color( "#444444" );
     note_foreground    = get_color( "Blue" );
-    note_background    = get_color( "e0e0e0" );
+    note_background    = get_color( "#cdcdcd" );
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
     hilite             = get_color( "#3689e6" );

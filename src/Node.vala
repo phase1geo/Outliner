@@ -904,7 +904,12 @@ public class Node {
 
     if( hide_note || (tmode == NodeMode.MOVETO) ) return;
 
-    Utils.set_context_color_with_alpha( ctx, theme.note_background, alpha );
+    var use_select_color = (tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO);
+    var bg_color         = use_select_color ? theme.nodesel_background : theme.note_background;
+    var fg_color         = use_select_color ? theme.nodesel_foreground : theme.note_foreground;
+
+    /* Draw the background color */
+    Utils.set_context_color_with_alpha( ctx, bg_color, alpha );
     ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
     ctx.fill();
 
@@ -915,7 +920,7 @@ public class Node {
       ctx.stroke();
     }
 
-    _note.draw( ctx, theme, (((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.note_foreground), alpha );
+    _note.draw( ctx, theme, fg_color, alpha );
 
   }
 
