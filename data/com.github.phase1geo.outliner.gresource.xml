@@ -10,6 +10,8 @@
         <file alias="com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/com.github.phase1geo.outliner.svg</file>
         <file alias="16-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/16/com.github.phase1geo.outliner.svg</file>
         <file alias="accessories-text-editor-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/accessories-text-editor-symbolic.svg</file>
+        <file alias="code-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/code-symbolic.svg</file>
+        <file alias="header-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/header-symbolic.svg</file>
         <file alias="24-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/24/com.github.phase1geo.outliner.svg</file>
         <file alias="32-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/32/com.github.phase1geo.outliner.svg</file>
         <file alias="48-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/48/com.github.phase1geo.outliner.svg</file>

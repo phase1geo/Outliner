@@ -89,13 +89,13 @@ public class FormatBar : Gtk.Popover {
     _strike.toggled.connect( handle_strikethru );
 
     _code = new ToggleButton();
-    _code.label = "{}";
+    _code.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/code-symbolic" );
     _code.relief = ReliefStyle.NONE;
     _code.set_tooltip_text( _( "Code Block" ) );
     _code.toggled.connect( handle_code );
 
     _header = new MenuButton();
-    _header.label  = "<H1>";
+    _header.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/header-symbolic" );
     _header.relief = ReliefStyle.NONE;
     _header.popup = new Gtk.Menu();
     for( int i=0; i<7; i++ ) {
@@ -292,7 +292,6 @@ public class FormatBar : Gtk.Popover {
     if( !_ignore_active ) {
       if( level > 0 ) {
         format_text( FormatTag.HEADER, level.to_string() );
-        _header.label = "<H%d>".printf( level );
       } else {
         unformat_text( FormatTag.HEADER );
       }
