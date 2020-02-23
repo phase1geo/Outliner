@@ -51,6 +51,7 @@ public class ExportMarkdown : Object {
         case FormatTag.ITALICS    :  return( "_" );
         case FormatTag.UNDERLINE  :  return( "__" );
         case FormatTag.STRIKETHRU :  return( "~~" );
+        case FormatTag.CODE       :  return( "`" );
         case FormatTag.HEADER     :
           if( start == 0 ) {
             switch( extra ) {
@@ -75,12 +76,13 @@ public class ExportMarkdown : Object {
         case FormatTag.ITALICS    :  return( "_" );
         case FormatTag.UNDERLINE  :  return( "__" );
         case FormatTag.STRIKETHRU :  return( "~~" );
+        case FormatTag.CODE       :  return( "`" );
         case FormatTag.URL        :  return( "](%s)".printf( extra ) );
         default                   :  return( "" );
       }
     };
     FormattedText.ExportEncodeFunc encode_func = (str) => {
-      return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "#", "\\#" ) );
+      return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "#", "\\#" ).replace( "`", "\\`" ) );
     };
     return( text.export( start, end, start_func, end_func, encode_func ) );
   }
