@@ -31,6 +31,7 @@ public class FormatBar : Gtk.Popover {
   private ToggleButton _italics;
   private ToggleButton _underline;
   private ToggleButton _strike;
+  private ToggleButton _code;
   private MenuButton   _header;
   private ToggleButton _hilite;
   private ColorButton  _hilite_chooser;
@@ -86,6 +87,12 @@ public class FormatBar : Gtk.Popover {
     _strike.relief = ReliefStyle.NONE;
     _strike.set_tooltip_text( _( "Strikethrough" ) );
     _strike.toggled.connect( handle_strikethru );
+
+    _code = new ToggleButton();
+    _code.label = "{}";
+    _code.relief = ReliefStyle.NONE;
+    _code.set_tooltip_text( _( "Code Block" ) );
+    _code.toggled.connect( handle_code );
 
     _header = new MenuButton();
     _header.label  = "<H1>";
@@ -144,6 +151,7 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( _italics,            false, false, 0 );
     box.pack_start( _underline,          false, false, 0 );
     box.pack_start( _strike,             false, false, 0 );
+    box.pack_start( _code,               false, false, 0 );
     box.pack_start( _header,             false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _hilite,             false, false, 0 );
@@ -268,6 +276,17 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Toggles the code status of the currently selected text */
+  private void handle_code() {
+    if( !_ignore_active ) {
+      if( _code.active ) {
+        format_text( FormatTag.CODE );
+      } else {
+        unformat_text( FormatTag.CODE );
+      }
+    }
+  }
+
   /* Toggles the header status of the currently selected text */
   private void handle_header( int level ) {
     if( !_ignore_active ) {
@@ -346,6 +365,7 @@ public class FormatBar : Gtk.Popover {
     set_toggle_button( text, FormatTag.ITALICS,    _italics );
     set_toggle_button( text, FormatTag.UNDERLINE,  _underline );
     set_toggle_button( text, FormatTag.STRIKETHRU, _strike );
+    set_toggle_button( text, FormatTag.CODE,       _code );
     set_toggle_button( text, FormatTag.HILITE,     _hilite );
     set_toggle_button( text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );

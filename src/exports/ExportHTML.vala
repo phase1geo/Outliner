@@ -158,6 +158,11 @@ public class ExportHTML : Object {
               text.add_tag( FormatTag.STRIKETHRU, start, end );
             }
             break;
+          case "font_family" :
+            if( key_value[1] == "monospace" ) {
+              text.add_tag( FormatTag.CODE, start, end );
+            }
+            break;
         }
       }
     }
@@ -191,6 +196,8 @@ public class ExportHTML : Object {
       case "u"      :  text.add_tag( FormatTag.UNDERLINE,  start, end );  break;
       case "s"      :
       case "del"    :  text.add_tag( FormatTag.STRIKETHRU, start, end );  break;
+      case "tt"     :
+      case "code"   :  text.add_tag( FormatTag.CODE,       start, end );  break;
       case "li"     :  text.insert_text( start, "- " );  break;
     }
   }

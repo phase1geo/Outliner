@@ -28,6 +28,7 @@ public enum FormatTag {
   ITALICS,
   UNDERLINE,
   STRIKETHRU,
+  CODE,
   HEADER,
   COLOR,
   HILITE,
@@ -42,6 +43,7 @@ public enum FormatTag {
       case ITALICS    :  return( "italics" );
       case UNDERLINE  :  return( "underline" );
       case STRIKETHRU :  return( "strikethru" );
+      case CODE       :  return( "code" );
       case HEADER     :  return( "header" );
       case COLOR      :  return( "color" );
       case HILITE     :  return( "hilite" );
@@ -57,6 +59,7 @@ public enum FormatTag {
       case "italics"    :  return( ITALICS );
       case "underline"  :  return( UNDERLINE );
       case "strikethru" :  return( STRIKETHRU );
+      case "code"       :  return( CODE );
       case "header"     :  return( HEADER );
       case "color"      :  return( COLOR );
       case "hilite"     :  return( HILITE );
@@ -396,6 +399,18 @@ public class FormattedText {
     }
   }
 
+  private class CodeInfo : TagAttr {
+    public CodeInfo( OutlineTable table ) {
+      attrs.append_val( attr_family_new( "Monospace" ) );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "code" );
+      ttag.family     = "Monospace";
+      ttag.family_set = true;
+      return( ttag );
+    }
+  }
+
   private class HeaderInfo : TagAttr {
     public HeaderInfo() {}
     private double get_scale_factor( string? extra ) {
@@ -516,8 +531,8 @@ public class FormattedText {
   }
 
   private static TagAttr[] _attr_tags = null;
-  private TagInfo[]         _formats   = new TagInfo[FormatTag.LENGTH];
-  private string            _text      = "";
+  private TagInfo[]        _formats   = new TagInfo[FormatTag.LENGTH];
+  private string           _text      = "";
 
   public signal void changed();
 
@@ -532,19 +547,19 @@ public class FormattedText {
   }
 
   /* Default copy constructor */
-  public FormattedText( Theme theme ) {
-    initialize( theme );
+  public FormattedText( OutlineTable table ) {
+    initialize( table );
   }
 
   /* Copy contructor with a string */
-  public FormattedText.with_text( Theme theme, string txt ) {
-    initialize( theme );
+  public FormattedText.with_text( OutlineTable table, string txt ) {
+    initialize( table );
     _text = txt;
   }
 
   /* Copies the selected portion of the given FormattedText instance to this instance */
-  public FormattedText.copy_range( Theme theme, FormattedText text, int start, int end ) {
-    initialize( theme );
+  public FormattedText.copy_range( OutlineTable table, FormattedText text, int start, int end ) {
+    initialize( table );
     _text = text.text.slice( start, end );
     var tags = text.get_tags_in_range( start, end );
     for( int i=0; i<tags.length; i++ ) {
@@ -554,13 +569,15 @@ public class FormattedText {
   }
 
   /* Initializes this instance */
-  private void initialize( Theme theme ) {
+  private void initialize( OutlineTable table ) {
     if( _attr_tags == null ) {
+      var theme = table.get_theme();
       _attr_tags = new TagAttr[FormatTag.LENGTH];
       _attr_tags[FormatTag.BOLD]       = new BoldInfo();
       _attr_tags[FormatTag.ITALICS]    = new ItalicsInfo();
       _attr_tags[FormatTag.UNDERLINE]  = new UnderlineInfo();
       _attr_tags[FormatTag.STRIKETHRU] = new StrikeThruInfo();
+      _attr_tags[FormatTag.CODE]       = new CodeInfo( table );
       _attr_tags[FormatTag.HEADER]     = new HeaderInfo();
       _attr_tags[FormatTag.COLOR]      = new ColorInfo();
       _attr_tags[FormatTag.HILITE]     = new HighlightInfo();

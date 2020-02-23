@@ -687,7 +687,7 @@ public class OutlineTable : DrawingArea {
     if( doc == null ) return;
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
-        var ft = new FormattedText( get_theme() );
+        var ft = new FormattedText( this );
         ft.load( it );
         ct.insert_formatted_text( ft, undo_text );
       }

@@ -109,7 +109,7 @@ public class CanvasText : Object {
 
   /* Default constructor */
   public CanvasText( OutlineTable table, double max_width ) {
-    _text         = new FormattedText( table.get_theme() );
+    _text         = new FormattedText( table );
     _text.changed.connect( text_changed );
     _max_width    = max_width;
     _line_layout  = table.create_pango_layout( "M" );
@@ -121,7 +121,7 @@ public class CanvasText : Object {
 
   /* Constructor initializing string */
   public CanvasText.with_text( OutlineTable table, double max_width, string txt ) {
-    _text         = new FormattedText.with_text( table.get_theme(), txt );
+    _text         = new FormattedText.with_text( table, txt );
     _text.changed.connect( text_changed );
     _max_width    = max_width;
     _line_layout  = table.create_pango_layout( "M" );
@@ -703,7 +703,7 @@ public class CanvasText : Object {
     if( _selstart != _selend ) {
       var spos = text.text.index_of_nth_char( _selstart );
       var epos = text.text.index_of_nth_char( _selend );
-      return( new FormattedText.copy_range( table.get_theme(), text, spos, epos ) );
+      return( new FormattedText.copy_range( table, text, spos, epos ) );
     }
     return( null );
   }
