@@ -98,13 +98,17 @@ public class FormatBar : Gtk.Popover {
     _header.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/header-symbolic" );
     _header.relief = ReliefStyle.NONE;
     _header.popup = new Gtk.Menu();
+    unowned SList<RadioMenuItem>? group = null;
     for( int i=0; i<7; i++ ) {
-      var mi    = new Gtk.MenuItem.with_label( (i == 0) ? _( "None" ) : "<H%d>".printf( i ) );
+      var mi    = new Gtk.RadioMenuItem.with_label( group, (i == 0) ? _( "None" ) : "<H%d>".printf( i ) );
       var level = i;
       mi.activate.connect(() => {
         handle_header( level );
       });
       _header.popup.add( mi );
+      if( group == null ) {
+        group = mi.get_group();
+      }
     }
     _header.popup.show_all();
 
@@ -349,9 +353,32 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Returns true if the given tag button should be active */
+  /* Sets the active status of the given toggle button */
   private void set_toggle_button( CanvasText text, FormatTag tag, ToggleButton btn ) {
     btn.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
+  }
+
+  private void activate_header( int index ) {
+    var buttons = _header.popup.get_children();
+    var button  = (CheckMenuItem)buttons.nth_data( index );
+    button.set_active( true );
+  }
+
+  /* Sets the active status of the correct header radio menu item */
+  private void set_header( CanvasText text ) {
+    var header  = text.text.get_first_extra_in_range( FormatTag.HEADER, text.selstart, text.selend );
+    if( header == null ) {
+      activate_header( 0 );
+    } else {
+      switch( header ) {
+        case "1" :  activate_header( 1 );  break;
+        case "2" :  activate_header( 2 );  break;
+        case "3" :  activate_header( 3 );  break;
+        case "4" :  activate_header( 4 );  break;
+        case "5" :  activate_header( 5 );  break;
+        case "6" :  activate_header( 6 );  break;
+      }
+    }
   }
 
   /*
@@ -368,6 +395,7 @@ public class FormatBar : Gtk.Popover {
     set_toggle_button( text, FormatTag.HILITE,     _hilite );
     set_toggle_button( text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );
+    set_header( text );
     _ignore_active = false;
   }
 

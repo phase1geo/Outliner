@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="49.875"
-     inkscape:cx="10.983396"
-     inkscape:cy="6.5674729"
+     inkscape:cx="10.181391"
+     inkscape:cy="7.8143184"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -54,19 +54,21 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-292.76665)">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:4.70977163px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.11774429"
-       x="-0.37420824"
-       y="227.46109"
-       id="text817"
-       transform="scale(0.76586228,1.3057178)"><tspan
-         sodipodi:role="line"
-         id="tspan815"
-         x="-0.37420824"
-         y="227.46109"
-         style="stroke-width:0.11774429">H<tspan
-   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.70976782px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.11774429"
-   id="tspan819">x</tspan></tspan></text>
+    <g
+       aria-label="Hx"
+       transform="matrix(0.74756421,0,0,0.92120975,0,91.761404)"
+       style="font-style:normal;font-weight:normal;font-size:4.59148121px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.11478703"
+       id="text817">
+      <path
+         d="m 1.9774024,222.02657 v -1.35418 H 0.60080682 v 1.35418 h -0.66139366 v -3.159 h 0.66139366 v 1.25777 H 1.9774024 v -1.25777 h 0.6613937 v 3.159 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.59164143px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.11478703"
+         id="path825"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 4.5736529,222.02657 -0.4170143,-0.8587 -0.7331381,0.8587 H 2.7486548 l 1.1389423,-1.26002 -0.6255215,-1.16584 h 0.6546676 l 0.3878682,0.77798 0.6636357,-0.77798 h 0.6905398 l -1.082892,1.17705 0.6591516,1.24881 z"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.59164143px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.11478703"
+         id="path827"
+         inkscape:connector-curvature="0" />
+    </g>
   </g>
 </svg>

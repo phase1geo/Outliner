@@ -307,6 +307,17 @@ public class FormattedText {
       return( null );
     }
 
+    /* Returns the first extra value found within the given range */
+    public string? get_first_extra_in_range( int start, int end ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (start < info.end) && (end > info.start) ) {
+          return( info.extra );
+        }
+      }
+      return( null );
+    }
+
     /* Returns the list of ranges this tag is associated with */
     public Xml.Node* save( string tag ) {
       Xml.Node* n = new Xml.Node( null, tag );
@@ -797,6 +808,14 @@ public class FormattedText {
   */
   public string? get_extra( FormatTag tag, int index ) {
     return( _formats[tag].get_extra( index ) );
+  }
+
+  /*
+   Returns the first extra data stored in the given range, if any exist.  If nothing
+   is found, returns null.
+  */
+  public string? get_first_extra_in_range( FormatTag tag, int start, int end ) {
+    return( _formats[tag].get_first_extra_in_range( start, end ) );
   }
 
   /*
