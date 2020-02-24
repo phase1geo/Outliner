@@ -13,17 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/License-GPL-3.0-blue.svg">
-  </a>
-  <a href="releases">
-    <img src="https://img.shields.io/badge/Release-v%201.0.0-orange.svg">
-  </a>
-</p>
-
-<p align="center">
     <img src="https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-light.png" alt="Screenshot"> <br>
-  <a href="issues/new"> Report a problem! </a>
 </p>
 
 ## Installation
@@ -89,3 +79,9 @@ To help, access the links below:
 ### License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE.md) file for details.
+
+<p align="center">
+    <a href="https://appcenter.elementary.io/com.github.phase1geo.outliner">
+        <img src="https://appcenter.elementary.io/badge.svg">
+    </a>
+</p>
