@@ -1,18 +1,419 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Outliner translation file
+# Copyright (C) 2020
 # This file is distributed under the same license as the com.github.phase1geo.outliner package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Trevor Williams <phase1geo@gmail.com>, 2020.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-30 22:59-0400\n"
+"POT-Creation-Date: 2020-02-23 21:35-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: src/DynamicNotebook.vala:234 src/DynamicNotebook.vala:258
+msgid "Close Tab"
+msgstr ""
+
+#: src/DynamicNotebook.vala:261
+msgid "Open in a New Window"
+msgstr ""
+
+#: src/DynamicNotebook.vala:262
+msgid "Duplicate"
+msgstr ""
+
+#: src/DynamicNotebook.vala:314
+msgid "Close Other Tab"
+msgstr ""
+
+#: src/DynamicNotebook.vala:314
+msgid "Close Other Tabs"
+msgstr ""
+
+#: src/DynamicNotebook.vala:485
+msgid "Clear All"
+msgstr ""
+
+#: src/DynamicNotebook.vala:767 src/DynamicNotebook.vala:798
+msgid "New Tab"
+msgstr ""
+
+#: src/DynamicNotebook.vala:768
+msgid "Undo Close Tab"
+msgstr ""
+
+#: src/DynamicNotebook.vala:810
+msgid "Closed Tabs"
+msgstr ""
+
+#: src/exports/ExportMinder.vala:110
+msgid "To right"
+msgstr ""
+
+#: src/FormatBar.vala:59 src/NodeMenu.vala:45
+msgid "Copy"
+msgstr ""
+
+#: src/FormatBar.vala:64 src/NodeMenu.vala:49
+msgid "Cut"
+msgstr ""
+
+#: src/FormatBar.vala:70
+msgid "Bold"
+msgstr ""
+
+#: src/FormatBar.vala:76
+msgid "Italic"
+msgstr ""
+
+#: src/FormatBar.vala:82
+msgid "Underline"
+msgstr ""
+
+#: src/FormatBar.vala:88
+msgid "Strikethrough"
+msgstr ""
+
+#: src/FormatBar.vala:94
+msgid "Code Block"
+msgstr ""
+
+#: src/FormatBar.vala:103
+msgid "None"
+msgstr ""
+
+#: src/FormatBar.vala:118
+msgid "Apply Highlight Color"
+msgstr ""
+
+#: src/FormatBar.vala:125
+msgid "Change Highlight Color"
+msgstr ""
+
+#: src/FormatBar.vala:139
+msgid "Change Font Color"
+msgstr ""
+
+#: src/FormatBar.vala:146
+msgid "Link"
+msgstr ""
+
+#: src/LinkEditor.vala:43
+msgid "URL"
+msgstr ""
+
+#: src/LinkEditor.vala:55
+msgid "Apply"
+msgstr ""
+
+#: src/LinkEditor.vala:62 src/MainWindow.vala:630 src/MainWindow.vala:670
+#: src/MainWindow.vala:773 src/MainWindow.vala:869
+msgid "Cancel"
+msgstr ""
+
+#: src/MainWindow.vala:103 src/MainWindow.vala:776
+msgid "Outliner"
+msgstr ""
+
+#: src/MainWindow.vala:132
+msgid "New File"
+msgstr ""
+
+#: src/MainWindow.vala:137 src/MainWindow.vala:670
+msgid "Open File"
+msgstr ""
+
+#: src/MainWindow.vala:142
+msgid "Save File As"
+msgstr ""
+
+#: src/MainWindow.vala:147
+msgid "Undo"
+msgstr ""
+
+#: src/MainWindow.vala:153
+msgid "Redo"
+msgstr ""
+
+#: src/MainWindow.vala:219
+msgid "Unnamed Document"
+msgstr ""
+
+#: src/MainWindow.vala:426
+msgid "Search   <i>(Control-F)</i>"
+msgstr ""
+
+#: src/MainWindow.vala:437
+msgid "Statistics"
+msgstr ""
+
+#: src/MainWindow.vala:446
+msgid "Characters"
+msgstr ""
+
+#: src/MainWindow.vala:449
+msgid "Words"
+msgstr ""
+
+#: src/MainWindow.vala:452
+msgid "Rows"
+msgstr ""
+
+#: src/MainWindow.vala:487 src/MainWindow.vala:869
+msgid "Export"
+msgstr ""
+
+#: src/MainWindow.vala:494
+msgid "Export..."
+msgstr ""
+
+#: src/MainWindow.vala:498
+msgid "Print"
+msgstr ""
+
+#: src/MainWindow.vala:521
+msgid "Properties"
+msgstr ""
+
+#: src/MainWindow.vala:528
+msgid "Zoom"
+msgstr ""
+
+#: src/MainWindow.vala:566
+msgid "Condensed Mode"
+msgstr ""
+
+#: src/MainWindow.vala:582
+msgid "Shortcuts Cheatsheet"
+msgstr ""
+
+#: src/MainWindow.vala:621
+msgid "Save current unnamed document?"
+msgstr ""
+
+#: src/MainWindow.vala:622
+msgid "Changes will be permanently lost if not saved."
+msgstr ""
+
+#: src/MainWindow.vala:627
+msgid "Discard Changes"
+msgstr ""
+
+#: src/MainWindow.vala:633 src/MainWindow.vala:773
+msgid "Save"
+msgstr ""
+
+#: src/MainWindow.vala:670
+msgid "Open"
+msgstr ""
+
+#: src/MainWindow.vala:772
+msgid "Save File"
+msgstr ""
+
+#: src/MainWindow.vala:868
+msgid "Export As"
+msgstr ""
+
+#: src/MainWindow.vala:873
+msgid "HTML"
+msgstr ""
+
+#: src/MainWindow.vala:880
+msgid "Markdown"
+msgstr ""
+
+#: src/MainWindow.vala:887
+msgid "Minder"
+msgstr ""
+
+#: src/MainWindow.vala:893
+msgid "OPML"
+msgstr ""
+
+#: src/MainWindow.vala:899
+msgid "PDF"
+msgstr ""
+
+#: src/MainWindow.vala:905
+msgid "PlainText"
+msgstr ""
+
+#: src/NodeMenu.vala:53
+msgid "Paste Above"
+msgstr ""
+
+#: src/NodeMenu.vala:57
+msgid "Paste Below"
+msgstr ""
+
+#: src/NodeMenu.vala:61
+msgid "Delete"
+msgstr ""
+
+#: src/NodeMenu.vala:65
+msgid "Edit Text"
+msgstr ""
+
+#: src/NodeMenu.vala:69
+msgid "Edit Note"
+msgstr ""
+
+#: src/NodeMenu.vala:73 src/NodeMenu.vala:134
+msgid "Show Note"
+msgstr ""
+
+#: src/NodeMenu.vala:76
+msgid "Add Row Above"
+msgstr ""
+
+#: src/NodeMenu.vala:80
+msgid "Add Row Below"
+msgstr ""
+
+#: src/NodeMenu.vala:84
+msgid "Indent"
+msgstr ""
+
+#: src/NodeMenu.vala:88
+msgid "Unindent"
+msgstr ""
+
+#: src/NodeMenu.vala:92
+msgid "Expand Children"
+msgstr ""
+
+#: src/NodeMenu.vala:137
+msgid "Hide Note"
+msgstr ""
+
+#: src/NodeMenu.vala:141
+msgid "Hide Children"
+msgstr ""
+
+#: src/NodeMenu.vala:141
+msgid "Show Children"
+msgstr ""
+
+#: src/OutlineTable.vala:437
+msgid "Show note"
+msgstr ""
+
+#: src/OutlineTable.vala:437
+msgid "Hide note"
+msgstr ""
+
+#: src/SearchBar.vala:94
+msgid "Find text…"
+msgstr ""
+
+#: src/SearchBar.vala:334
+msgid "Replace with…"
+msgstr ""
+
+#: src/SearchBar.vala:364
+msgid "Replace"
+msgstr ""
+
+#: src/SearchBar.vala:385
+msgid "Replace All"
+msgstr ""
+
+#: src/themes/ThemeDefault.vala:31
+msgid "Default"
+msgstr ""
+
+#: src/themes/ThemeSolarizedLight.vala:31
+msgid "Solarized Light"
+msgstr ""
+
+#: src/themes/ThemeDark.vala:31
+msgid "Dark"
+msgstr ""
+
+#: src/themes/ThemeSolarizedDark.vala:31
+msgid "Solarized Dark"
+msgstr ""
+
+#: src/undo_actions/UndoTextTagRemove.vala:31
+msgid "format tag remove"
+msgstr ""
+
+#: src/undo_actions/UndoTextDelete.vala:30
+msgid "text deletion"
+msgstr ""
+
+#: src/undo_actions/UndoNodeExpander.vala:29
+msgid "expander change"
+msgstr ""
+
+#: src/undo_actions/UndoNodeInsert.vala:30
+msgid "insert item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeName.vala:30
+msgid "title change"
+msgstr ""
+
+#: src/undo_actions/UndoTextReplace.vala:31
+msgid "text replacement"
+msgstr ""
+
+#: src/undo_actions/UndoNodeNote.vala:30
+msgid "note change"
+msgstr ""
+
+#: src/undo_actions/UndoNodeMove.vala:32
+msgid "move item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeIndent.vala:28
+msgid "indent item"
+msgstr ""
+
+#: src/undo_actions/UndoTextTagAdd.vala:31
+msgid "format tag add"
+msgstr ""
+
+#: src/undo_actions/UndoTextInsert.vala:29
+msgid "text insertion"
+msgstr ""
+
+#: src/undo_actions/UndoReplaceAll.vala:47
+msgid "replace all"
+msgstr ""
+
+#: src/undo_actions/UndoNodePaste.vala:30
+msgid "paste item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeDelete.vala:30
+msgid "delete item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeUnindent.vala:28
+msgid "unindent item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeCut.vala:30
+msgid "cut item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeSplit.vala:32
+msgid "split item"
+msgstr ""
+
+#: src/UndoBuffer.vala:81
+msgid "Undo "
+msgstr ""
+
+#: src/UndoBuffer.vala:87
+msgid "Redo "
+msgstr ""

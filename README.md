@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-    <img  src="{{ repo-url }}/blob/master/data/images/screenshot.png" alt="Screenshot"> <br>
+    <img  src="{{ repo-url }}/blob/master/data/images/screenshot-solarized-light.png" alt="Screenshot"> <br>
   <a href="{{ repo-url }}/issues/new"> Report a problem! </a>
 </p>
 
@@ -35,8 +35,9 @@ These dependencies must be present before building:
  - `debhelper`
  - `libgranite-dev`
  - `libgtk-3-dev`
- - 'libxml2-dev'
-
+ - `libxml2-dev`
+ - `libwebkit2gtk-4.0-dev`
+ - `libmarkdown2-dev`
 
 Use the App script to simplify installation by running `./app install-deps`
  
