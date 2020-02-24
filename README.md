@@ -13,17 +13,17 @@
 </p>
 
 <p align="center">
-  <a href="{{ repo-url }}/blob/master/LICENSE">
+  <a href="blob/master/LICENSE">
     <img src="https://img.shields.io/badge/License-GPL-3.0-blue.svg">
   </a>
-  <a href="{{ repo-url }}/releases">
+  <a href="releases">
     <img src="https://img.shields.io/badge/Release-v%201.0.0-orange.svg">
   </a>
 </p>
 
 <p align="center">
-    <img  src="{{ repo-url }}/blob/master/data/images/screenshot-solarized-light.png" alt="Screenshot"> <br>
-  <a href="{{ repo-url }}/issues/new"> Report a problem! </a>
+    <img src="https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-light.png" alt="Screenshot"> <br>
+  <a href="issues/new"> Report a problem! </a>
 </p>
 
 ## Installation
