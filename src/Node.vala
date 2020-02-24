@@ -798,7 +798,7 @@ public class Node {
     var tmode      = opts.show_modes ? mode : NodeMode.NONE;
 
     switch( tmode ) {
-      case NodeMode.SELECTED :  background = theme.nodesel_background;  break;
+      case NodeMode.SELECTED :  background = theme.nodesel_background;  alpha = 0.5;  break;
       case NodeMode.ATTACHTO :  background = theme.attachable_color;    break;
       case NodeMode.MOVETO   :  alpha      = 0.3;                       break;
     }

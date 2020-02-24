@@ -204,8 +204,6 @@ public class ExportMinder : Object {
     /* Let's convert the text from Markdown */
     var html = Utils.markdown_to_html( n->get_content(), "div" );
 
-    stdout.printf( "html: %s\n", html );
-
     /* Convert HTML to FormattedText */
     if( ExportHTML.to_text( html, ct.text ) ) {
 

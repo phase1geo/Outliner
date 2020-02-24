@@ -65,6 +65,7 @@ public class ExportHTML : Object {
         case FormatTag.ITALICS    :  return( "<i>" );
         case FormatTag.UNDERLINE  :  return( "<u>" );
         case FormatTag.STRIKETHRU :  return( "<del>" );
+        case FormatTag.CODE       :  return( "<code>" );
         case FormatTag.HEADER     :  return( "<h%s>".printf( extra ) );
         case FormatTag.COLOR      :  return( "<span style=\"color:%s;\">".printf( extra ) );
         case FormatTag.HILITE     :  return( "<span style=\"background-color:%s;\">".printf( extra ) );
@@ -78,6 +79,7 @@ public class ExportHTML : Object {
         case FormatTag.ITALICS    :  return( "</i>" );
         case FormatTag.UNDERLINE  :  return( "</u>" );
         case FormatTag.STRIKETHRU :  return( "</del>" );
+        case FormatTag.CODE       :  return( "</code>" );
         case FormatTag.HEADER     :  return( "</h%s>".printf( extra ) );
         case FormatTag.COLOR      :  return( "</span>" );
         case FormatTag.HILITE     :  return( "</span>" );

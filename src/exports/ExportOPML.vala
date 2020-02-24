@@ -69,25 +69,34 @@ public class ExportOPML : Object {
 
   /* Traverses the node tree exporting XML nodes in OPML format */
   private static Xml.Node* export_node( Node node, ref Array<int> expand_state ) {
+
     Xml.Node* n = new Xml.Node( null, "outline" );
-    n->new_prop( "text", node.name.text.text );
-    /*
-    if( node.is_leaf() && (node._task_count > 0) ) {
-      bool checked = node._task_done > 0;
-      n->new_prop( "checked", checked.to_string() );
-    }
-    */
+
+    /* Add the node text */
+    var name_html = ExportHTML.from_text( node.name.text, 0, node.name.text.text.char_count() );
+    n->new_prop( "text", name_html );
+
+    /* Add the note */
     if( node.note.text.text != "" ) {
-      n->new_prop( "note", node.note.text.text );
+      var note_html = ExportHTML.from_text( node.note.text, 0, node.note.text.text.char_count() );
+      n->new_prop( "note", note_html );
     }
+
+    /* Calculate the expanded state value */
     if( (node.children.length > 1) && node.expanded ) {
       expand_state.append_val( node.id );
     }
+
+    /* Include any other child nodes */
     for( int i=0; i<node.children.length; i++ ) {
       n->add_child( export_node( node.children.index( i ), ref expand_state ) );
     }
+
     return( n );
+
   }
+
+  //----------------------------------------------------------------------------
 
   /*
    Reads the contents of an OPML file and creates a new document based on
@@ -163,23 +172,14 @@ public class ExportOPML : Object {
     /* Get the node name */
     string? t = n->get_prop( "text" );
     if( t != null ) {
-      node.name.text.set_text( t );
-    }
-
-    /* Get the task information */
-    string? c = n->get_prop( "checked" );
-    if( c != null ) {
-    /*
-      _task_count = 1;
-      _task_done  = bool.parse( t ) ? 1 : 0;
-      propagate_task_info_up( _task_count, _task_done );
-    */
+      stdout.printf( "t: %s\n", t );
+      ExportHTML.to_text( "<div>" + t + "</div>", node.name.text );
     }
 
     /* Get the note information */
     string? o = n->get_prop( "note" );
     if( o != null ) {
-      node.note.text.set_text( o );
+      ExportHTML.to_text( "<div>" + o + "</div>", node.note.text );
     }
 
     /* Figure out if this node is folded */

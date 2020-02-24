@@ -2,7 +2,7 @@
 Name=Outliner
 GenericName=Outliner
 Comment=Organize your words
-Categories=Office;
+Categories=Office;WordProcessor;
 Exec=com.github.phase1geo.outliner %f
 Icon=com.github.phase1geo.outliner
 Terminal=false
