@@ -237,12 +237,25 @@ public class OutlineTable : DrawingArea {
     var sw = parent.parent.parent as ScrolledWindow;
     var y1 = sw.vadjustment.value;
     var y2 = y1 + vh;
-    if( node.y < y1 ) {
-      _scroll_adjust = node.y;
-    } else if( node.last_y > y2 ) {
-      _scroll_adjust = node.last_y - vh;
+    int x, ytop, ybot;
+    switch( node.mode ) {
+      case NodeMode.EDITABLE :
+        node.name.get_cursor_pos( out x, out ytop, out ybot );
+        break;
+      case NodeMode.NOTEEDIT :
+        node.note.get_cursor_pos( out x, out ytop, out ybot );
+        break;
+      default :
+        ytop = (int)node.y;
+        ybot = (int)node.last_y;
+        break;
     }
-    if( node.last_y <= get_allocated_height() ) {
+    if( ytop < y1 ) {
+      _scroll_adjust = (double)ytop;
+    } else if( ybot > y2 ) {
+      _scroll_adjust = (double)ybot - vh;
+    }
+    if( ybot <= get_allocated_height() ) {
       see_internal();
     }
   }
@@ -821,10 +834,12 @@ public class OutlineTable : DrawingArea {
         }
       } else {
         selected.name.backspace( undo_text );
+        see( selected );
         queue_draw();
       }
     } else if( is_note_editable() ) {
       selected.note.backspace( undo_text );
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       delete_current_node();
@@ -835,9 +850,11 @@ public class OutlineTable : DrawingArea {
   private void handle_delete() {
     if( is_node_editable() ) {
       selected.name.delete( undo_text );
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.delete( undo_text );
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       delete_current_node();
@@ -857,12 +874,12 @@ public class OutlineTable : DrawingArea {
   private void handle_return( bool shift ) {
     if( is_note_editable() ) {
       selected.note.insert( "\n", undo_text );
-      queue_draw();
       see( selected );
+      queue_draw();
     } else if( is_node_editable() && shift ) {
       selected.name.insert( "\n", undo_text );
-      queue_draw();
       see( selected );
+      queue_draw();
     } else if( selected != null ) {
       add_sibling_node( !shift );
     }
@@ -899,6 +916,7 @@ public class OutlineTable : DrawingArea {
   private void handle_shift_tab() {
     if( is_note_editable() ) {
       selected.note.insert( "\t", undo_text );
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       unindent();
@@ -909,9 +927,11 @@ public class OutlineTable : DrawingArea {
   private void handle_control_tab() {
     if( is_node_editable() ) {
       selected.name.insert( "\t", undo_text );
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.insert( "\t", undo_text );
+      see( selected );
       queue_draw();
     }
   }
@@ -925,6 +945,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor( 1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -933,6 +954,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor( 1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       if( !selected.is_leaf() && !selected.expanded ) {
@@ -974,6 +996,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor( -1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -982,6 +1005,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor( -1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       if( !selected.is_leaf() && selected.expanded ) {
@@ -1002,6 +1026,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor_by_word( -1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1010,6 +1035,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor_by_word( -1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     }
   }
@@ -1023,6 +1049,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor_vertically( -1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1031,6 +1058,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor_vertically( -1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       var node = selected.get_previous_node();
@@ -1050,6 +1078,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor_to_start();
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1058,6 +1087,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor_to_start();
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     }
   }
@@ -1071,6 +1101,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor_vertically( 1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1079,6 +1110,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor_vertically( 1 );
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       var node = selected.get_next_node();
@@ -1098,6 +1130,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor_to_end();
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1106,6 +1139,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor_to_end();
       }
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     }
   }
@@ -1115,10 +1149,12 @@ public class OutlineTable : DrawingArea {
     if( is_node_editable() ) {
       selected.name.set_cursor_all( false );
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.set_cursor_all( false );
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     }
   }
@@ -1128,10 +1164,12 @@ public class OutlineTable : DrawingArea {
     if( is_node_editable() ) {
       selected.name.clear_selection();
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.clear_selection();
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     }
   }
@@ -1149,9 +1187,11 @@ public class OutlineTable : DrawingArea {
   private void handle_control_a() {
     if( is_node_editable() ) {
       selected.name.set_cursor_all( false );
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.set_cursor_all( false );
+      see( selected );
       queue_draw();
     }
   }
@@ -1160,9 +1200,11 @@ public class OutlineTable : DrawingArea {
   private void handle_control_b() {
     if( is_node_text_selected() ) {
       selected.name.add_tag( FormatTag.BOLD, null, undo_text );
+      see( selected );
       queue_draw();
     } else if( is_note_text_selected() ) {
       selected.note.add_tag( FormatTag.BOLD, null, undo_text );
+      see( selected );
       queue_draw();
     }
   }
@@ -1184,9 +1226,11 @@ public class OutlineTable : DrawingArea {
   private void handle_control_i() {
     if( is_node_text_selected() ) {
       selected.name.add_tag( FormatTag.ITALICS, null, undo_text );
+      see( selected );
       queue_draw();
     } else if( is_note_text_selected() ) {
       selected.note.add_tag( FormatTag.ITALICS, null, undo_text );
+      see( selected );
       queue_draw();
     }
   }
@@ -1195,9 +1239,11 @@ public class OutlineTable : DrawingArea {
   private void handle_control_u() {
     if( is_node_text_selected() ) {
       selected.name.add_tag( FormatTag.UNDERLINE, null, undo_text );
+      see( selected );
       queue_draw();
     } else if( is_note_text_selected() ) {
       selected.note.add_tag( FormatTag.UNDERLINE, null, undo_text );
+      see( selected );
       queue_draw();
     }
   }
@@ -1206,9 +1252,11 @@ public class OutlineTable : DrawingArea {
   private void handle_control_t() {
     if( is_node_text_selected() ) {
       selected.name.add_tag( FormatTag.STRIKETHRU, null, undo_text );
+      see( selected );
       queue_draw();
     } else if( is_note_text_selected() ) {
       selected.note.add_tag( FormatTag.STRIKETHRU, null, undo_text );
+      see( selected );
       queue_draw();
     }
   }
@@ -1223,10 +1271,12 @@ public class OutlineTable : DrawingArea {
     if( is_node_editable() ) {
       selected.name.move_cursor_to_start();
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.move_cursor_to_start();
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     }
   }
@@ -1236,10 +1286,12 @@ public class OutlineTable : DrawingArea {
     if( is_node_editable() ) {
       selected.name.move_cursor_to_end();
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.move_cursor_to_end();
       undo_text.mergeable = false;
+      see( selected );
       queue_draw();
     }
   }
@@ -1261,9 +1313,11 @@ public class OutlineTable : DrawingArea {
     if( !str.get_char( 0 ).isprint() ) return;
     if( is_node_editable() ) {
       selected.name.insert( str, undo_text );
+      see( selected );
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.insert( str, undo_text );
+      see( selected );
       queue_draw();
     } else if( selected != null ) {
       switch( str ) {
