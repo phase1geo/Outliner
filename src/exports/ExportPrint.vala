@@ -99,6 +99,7 @@ public class ExportPrint : Object {
   /* Draws the page */
   public void draw_page( PrintOperation op, PrintContext context, int page_nr ) {
 
+    var use_color    = op.get_print_settings().get_use_color();
     var alloc_width  = _table.get_allocated_width();
     var ctx          = context.get_cairo_context();
     var sf           = ((7.5 / 8.5) * context.get_width()) / alloc_width;
@@ -106,6 +107,8 @@ public class ExportPrint : Object {
     var theme        = MainWindow.themes.get_theme( "default" );
     var start        = _boundaries.index( page_nr );
     var end          = _boundaries.index( page_nr + 1 ) - 1;
+
+    stdout.printf( "In draw_page, use_color: %s\n", use_color.to_string() );
 
     /* Scale and translate the image */
     ctx.translate( margin, ((0 - start) * sf) + margin );
