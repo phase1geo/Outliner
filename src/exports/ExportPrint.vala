@@ -42,6 +42,8 @@ public class ExportPrint : Object {
     /* Initialize the draw options */
     _draw_options.show_modes     = false;
     _draw_options.show_note_icon = false;
+    _draw_options.show_note_bg   = false;
+    _draw_options.show_note_ol   = true;
 
     var settings = new PrintSettings();
 
@@ -99,16 +101,15 @@ public class ExportPrint : Object {
   /* Draws the page */
   public void draw_page( PrintOperation op, PrintContext context, int page_nr ) {
 
-    var use_color    = op.get_print_settings().get_use_color();
-    var alloc_width  = _table.get_allocated_width();
-    var ctx          = context.get_cairo_context();
-    var sf           = ((7.5 / 8.5) * context.get_width()) / alloc_width;
-    var margin       = (0.5 / 8.5) * context.get_width();
-    var theme        = MainWindow.themes.get_theme( "default" );
-    var start        = _boundaries.index( page_nr );
-    var end          = _boundaries.index( page_nr + 1 ) - 1;
-
-    stdout.printf( "In draw_page, use_color: %s\n", use_color.to_string() );
+    var settings    = op.get_print_settings();
+    var use_color   = settings.get( "cups-ColorModel" ) == "RGB";
+    var alloc_width = _table.get_allocated_width();
+    var ctx         = context.get_cairo_context();
+    var sf          = ((7.5 / 8.5) * context.get_width()) / alloc_width;
+    var margin      = (0.5 / 8.5) * context.get_width();
+    var theme       = MainWindow.themes.get_theme( use_color ? "printColor" : "printGrayscale" );
+    var start       = _boundaries.index( page_nr );
+    var end         = _boundaries.index( page_nr + 1 ) - 1;
 
     /* Scale and translate the image */
     ctx.translate( margin, ((0 - start) * sf) + margin );
@@ -118,9 +119,15 @@ public class ExportPrint : Object {
     ctx.rectangle( 0, start, (alloc_width - (margin * sf)), end );
     ctx.clip();
 
+    /* Set the theme in the formatted text */
+    var orig_theme = _table.get_theme();
+    FormattedText.set_theme( theme );
+
     /* Draw all of the nodes */
     _table.root.draw_tree( ctx, theme, _draw_options );
 
+    /* Restore the theme information */
+    FormattedText.set_theme( orig_theme );
   }
 
 }

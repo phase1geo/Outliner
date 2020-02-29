@@ -32,23 +32,27 @@ public class Themes : Object {
     /* Allocate memory for the themes array */
     _themes = new Array<Theme>();
 
-    /* Create the themes */
-    var default_theme         = new ThemeDefault();
-    var dark_theme            = new ThemeDark();
-    var solarized_light_theme = new ThemeSolarizedLight();
-    var solarized_dark_theme  = new ThemeSolarizedDark();
+    /* Create themes */
+    var theme_default     = new ThemeDefault();
+    var theme_dark        = new ThemeDark();
+    var theme_solar_light = new ThemeSolarizedLight();
+    var theme_solar_dark  = new ThemeSolarizedDark();
+    var theme_print_color = new ThemePrintColor();
+    var theme_print_gray  = new ThemePrintGrayscale();
 
     /* Add the themes to the list */
-    _themes.append_val( default_theme );
-    _themes.append_val( dark_theme );
-    _themes.append_val( solarized_light_theme );
-    _themes.append_val( solarized_dark_theme );
+    _themes.append_val( theme_default );
+    _themes.append_val( theme_dark );
+    _themes.append_val( theme_solar_light );
+    _themes.append_val( theme_solar_dark );
+    _themes.append_val( theme_print_color );
+    _themes.append_val( theme_print_gray );
 
   }
 
   /* Returns a list of theme names */
   public void names( ref Array<string> names ) {
-    for( int i=0; i<_themes.length; i++ ) {
+    for( int i=0; i<(_themes.length - 2); i++ ) {
       names.append_val( _themes.index( i ).name );
     }
   }
@@ -67,7 +71,7 @@ public class Themes : Object {
   public void add_css() {
     var provider = new Gtk.CssProvider ();
     var css      = "";
-    for( int i=0; i<_themes.length; i++ ) {
+    for( int i=0; i<(_themes.length - 2); i++ ) {
       css += "." + _themes.index( i ).name + " radio { background: " + _themes.index( i ).background.to_string() + "; color: " + _themes.index( i ).foreground.to_string() + "; } ";
     }
     try {

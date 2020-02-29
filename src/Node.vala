@@ -37,6 +37,8 @@ public enum NodeMode {
 public class NodeDrawOptions {
   public bool show_note_icon { get; set; default = true; }
   public bool show_modes     { get; set; default = true; }
+  public bool show_note_bg   { get; set; default = true; }
+  public bool show_note_ol   { get; set; default = false; }
   public NodeDrawOptions() {}
 }
 
@@ -909,11 +911,13 @@ public class Node {
     var fg_color         = use_select_color ? theme.nodesel_foreground : theme.note_foreground;
 
     /* Draw the background color */
-    Utils.set_context_color_with_alpha( ctx, bg_color, alpha );
-    ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
-    ctx.fill();
+    if( opts.show_note_bg ) {
+      Utils.set_context_color_with_alpha( ctx, bg_color, alpha );
+      ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      ctx.fill();
+    }
 
-    if( tmode == NodeMode.NOTEEDIT ) {
+    if( (tmode == NodeMode.NOTEEDIT) || opts.show_note_ol ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
       ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );

@@ -10,6 +10,8 @@ sources += files(
 
   'themes/ThemeDark.vala',
   'themes/ThemeDefault.vala',
+  'themes/ThemePrintColor.vala',
+  'themes/ThemePrintGrayscale.vala',
   'themes/ThemeSolarizedDark.vala',
   'themes/ThemeSolarizedLight.vala',
 
