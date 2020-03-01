@@ -63,19 +63,6 @@ Options:
   uninstall         Removes the application from the system (requires sudo)
 ```
 
-### Contributing
-
-To help, access the links below:
-
-- [Guide on Code Style]({{ repo-url }}/wiki/Guide-on-code-style)
-
-- [Proposing Design Changes]({{ repo-url }}/wiki/Proposing-Design-Changes)
-
-- [Reporting Bugs]({{ repo-url }}/wiki/Reporting-Bugs)
-
-- [Translate]({{ repo-url }}/wiki/Translate)
-
-
 ### License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE.md) file for details.
