@@ -769,18 +769,25 @@ public class CanvasText : Object {
   }
 
   /* Draws the node font to the screen */
-  public void draw( Cairo.Context ctx, Theme theme, RGBA fg, double alpha ) {
+  public void draw( Cairo.Context ctx, Theme theme, RGBA fg, double alpha, bool copy_layout ) {
+
+    var layout = _pango_layout;
+
+    if( copy_layout ) {
+      layout = _pango_layout.copy();
+      layout.set_attributes( _text.get_attributes_from_theme( theme ) );
+    }
 
     /* Output the text */
     ctx.move_to( posx, posy );
     Utils.set_context_color_with_alpha( ctx, fg, alpha );
-    Pango.cairo_show_layout( ctx, _pango_layout );
+    Pango.cairo_show_layout( ctx, layout );
     ctx.new_path();
 
     /* Draw the insertion cursor if we are in the 'editable' state */
     if( edit ) {
       var cpos = text.text.index_of_nth_char( _cursor );
-      var rect = _pango_layout.index_to_pos( cpos );
+      var rect = layout.index_to_pos( cpos );
       Utils.set_context_color_with_alpha( ctx, theme.text_cursor, alpha );
       double ix, iy;
       ix = posx + (rect.x / Pango.SCALE) - 1;

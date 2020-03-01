@@ -39,6 +39,7 @@ public class NodeDrawOptions {
   public bool show_modes     { get; set; default = true; }
   public bool show_note_bg   { get; set; default = true; }
   public bool show_note_ol   { get; set; default = false; }
+  public bool use_theme      { get; set; default = false; }
   public NodeDrawOptions() {}
 }
 
@@ -872,7 +873,7 @@ public class Node {
       ctx.stroke();
     }
 
-    _name.draw( ctx, theme, (((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : color), alpha );
+    _name.draw( ctx, theme, (((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : color), alpha, opts.use_theme );
 
   }
 
@@ -924,7 +925,7 @@ public class Node {
       ctx.stroke();
     }
 
-    _note.draw( ctx, theme, fg_color, alpha );
+    _note.draw( ctx, theme, fg_color, alpha, opts.use_theme );
 
   }
 

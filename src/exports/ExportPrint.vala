@@ -44,6 +44,7 @@ public class ExportPrint : Object {
     _draw_options.show_note_icon = false;
     _draw_options.show_note_bg   = false;
     _draw_options.show_note_ol   = true;
+    _draw_options.use_theme      = true;
 
     var settings = new PrintSettings();
 

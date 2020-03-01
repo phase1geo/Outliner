@@ -344,6 +344,12 @@ public class FormattedText {
     public TagAttr() {
       attrs = new Array<Pango.Attribute>();
     }
+    public TagAttr.copy_from( TagAttr ta ) {
+      attrs = new Array<Pango.Attribute>();
+      for( int i=0; i<ta.attrs.length; i++ ) {
+        attrs.append_val( ta.attrs.index( i ).copy() );
+      }
+    }
     public virtual void add_attrs( ref AttrList list, int start, int end, string? extra ) {
       for( int i=0; i<attrs.length; i++ ) {
         var attr = attrs.index( i ).copy();
@@ -738,6 +744,20 @@ public class FormattedText {
     for( int i=0; i<FormatTag.LENGTH; i++ ) {
       _formats[i].get_attributes( _attr_tags[i], ref attrs );
     }
+    return( attrs );
+  }
+
+  /*
+   Same as the above method; however, it applies the given theme colors to the
+   returns tags immediately without updating the main components.  This is useful
+   for changing the theme for a temporary context.
+  */
+  public AttrList get_attributes_from_theme( Theme theme ) {
+    var attrs = new AttrList();
+    for( int i=0; i<(FormatTag.LENGTH - 3); i++ ) {
+      _formats[i].get_attributes( _attr_tags[i], ref attrs );
+    }
+    _formats[FormatTag.URL].get_attributes( new UrlInfo( theme.url ), ref attrs );
     return( attrs );
   }
 
