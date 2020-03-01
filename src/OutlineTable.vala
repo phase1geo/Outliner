@@ -110,6 +110,7 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public NodeListType list_type { set; get; default = NodeListType.SECTION; }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();

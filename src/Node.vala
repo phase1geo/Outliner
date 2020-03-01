@@ -34,6 +34,13 @@ public enum NodeMode {
   HOVER          // Indicates that the cursor is hovering over this node
 }
 
+public enum NodeListType {
+  NONE = 0,   // Indicates that lists should not be annotated
+  ORDERED,    // Indicates that lists should show ordered annotations (ex. "I.", "A.", etc.)
+  UNORDERED,  // Indicates that lists should show unordered annotations (ex. "*", "-", "+", etc.)
+  SECTION     // Indicates that lists should show section annotations (ex. "1.0", "1.1.2", etc.)
+}
+
 public class NodeDrawOptions {
   public bool show_note_icon { get; set; default = true; }
   public bool show_modes     { get; set; default = true; }
@@ -58,6 +65,8 @@ public class Node {
   private double       _h         = 80;
   private int          _depth     = 0;
   private bool         _expanded  = true;
+  private Pango.Layout _lt_layout;
+  private double       _lt_width  = 0;
   private bool         _hide_note = true;
   private bool         _debug     = false;
 
@@ -194,6 +203,9 @@ public class Node {
     var note_fd = new Pango.FontDescription();
     note_fd.set_size( 10 * Pango.SCALE );
 
+    _lt_layout = ot.create_pango_layout( null );
+    _lt_layout.set_font_description( name_fd );
+
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
@@ -231,6 +243,9 @@ public class Node {
 
     var note_fd = new Pango.FontDescription();
     note_fd.set_size( 10 * Pango.SCALE );
+
+    _lt_layout = ot.create_pango_layout( null );
+    _lt_layout.set_font_description( name_fd );
 
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height_from_resize );
@@ -408,6 +423,9 @@ public class Node {
       stdout.printf( "In adjust_nodes (%s)\n", msg );
     }
 
+    /* Update the list type */
+    set_list_type();
+
     if( expanded && !deleted ) {
       last_y = adjust_descendants( last_y, child_start );
     }
@@ -430,6 +448,7 @@ public class Node {
       for( int i=child_start; i<children.length; i++ ) {
         child   = children.index( i );
         child.y = last_y;
+        child.set_list_type();
         last_y  = child.adjust_descendants( child.last_y, 0 );
       }
       if( child != null ) {
@@ -441,7 +460,8 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_text() {
-    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20;
+    var ltx = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + padx);
+    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + ltx;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
   }
@@ -788,6 +808,104 @@ public class Node {
     }
   }
 
+  /*********************/
+  /* NUMBERING METHODS */
+  /*********************/
+
+  /* Sets the line type value */
+  private void set_list_type() {
+    int width, height;
+    switch( _ot.list_type ) {
+      case NodeListType.ORDERED   :  _lt_layout.set_text( ordered_item() + ".", -1 );     break;
+      case NodeListType.UNORDERED :  _lt_layout.set_text( unordered_item() + ".", -1 );   break;
+      case NodeListType.SECTION   :  _lt_layout.set_text( ordered_section() + ".", -1 );  break;
+      default                     :  _lt_layout.set_text( "", -1 );                       break;
+    }
+    _lt_layout.get_size( out width, out height );
+    _lt_width = width / Pango.SCALE;
+    position_text();
+    update_width();
+  }
+
+  public string ordered_item() {
+    switch( depth ) {
+      case 1  :  return( roman_number( index() + 1 ).up() );
+      case 2  :  return( letter( index() ).up() );
+      default :
+        switch( (depth - 3) % 3 ) {
+          case 0  :  return( (index() + 1).to_string() );
+          case 1  :  return( letter( index() ).down() );
+          case 2  :  return( roman_number( index() + 1 ).down() );
+          default :  return( "" );
+        }
+    }
+  }
+
+  /* Returns the Roman number to represent the given index */
+  private string roman_number( int index ) {
+
+    var      value = "";
+    string[] huns  = {"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
+    string[] tens  = {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
+    string[] ones  = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
+
+    while( index >= 1000 ) {
+      value += "M";
+      index -= 1000;
+    }
+
+    value += huns[index/100];  index = index % 100;
+    value += tens[index/10];   index = index % 10;
+    value += ones[index];
+
+    return( value );
+
+  }
+
+  /* Returns the letter to represent the given index */
+  private string letter( int index ) {
+
+    var      value   = "";
+    string[] letters = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+                        "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
+    if( index == 0 ) {
+      return( "A" );
+    } else {
+      while( index > 0 ) {
+        value = letters[index % 26] + value;
+        index = index / 26;
+      }
+      return( value );
+    }
+
+  }
+
+  public string unordered_item() {
+
+    string[] shapes = {"", "", ""};
+
+    return( shapes[index() % 3] );
+
+  }
+
+  /* Returns a section number */
+  public string ordered_section() {
+
+    if( is_root() ) return( "" );
+
+    var value = (index() + 1).to_string();
+    var node  = parent;
+
+    while( !node.is_root() ) {
+      value = (node.index() + 1).to_string() + "." + value;
+      node  = node.parent;
+    }
+
+    return( value );
+
+  }
+
   /*******************/
   /* DRAWING METHODS */
   /*******************/
@@ -857,6 +975,18 @@ public class Node {
     }
 
     ctx.fill();
+
+  }
+
+  /* Draw the list type to the right of the expander */
+  public void draw_list_type( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
+
+    if( _ot.list_type == NodeListType.NONE ) return;
+
+    ctx.move_to( (name.posx - (_lt_width + padx)), name.posy );
+    Utils.set_context_color_with_alpha( ctx, theme.foreground, alpha );
+    Pango.cairo_show_layout( ctx, _lt_layout );
+    ctx.new_path();
 
   }
 
@@ -939,6 +1069,7 @@ public class Node {
     draw_background( ctx, theme, opts );
     draw_note_icon( ctx, theme, opts );
     draw_expander( ctx, theme, opts );
+    draw_list_type( ctx, theme, opts );
     draw_name( ctx, theme, opts );
     draw_note( ctx, theme, opts );
 
