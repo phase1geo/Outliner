@@ -998,7 +998,8 @@ public class MainWindow : ApplicationWindow {
     var theme_name = table.get_theme().name;
     var condensed  = table.condensed;
     _theme_buttons.get( theme_name ).active = true;
-    _condensed.state = condensed;
+    _condensed.state     = condensed;
+    _list_types.selected = table.list_type;
   }
 
   /* Displays the shortcuts cheatsheet */

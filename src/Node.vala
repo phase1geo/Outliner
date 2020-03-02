@@ -85,6 +85,7 @@ public class NodeDrawOptions {
   public bool show_modes     { get; set; default = true; }
   public bool show_note_bg   { get; set; default = true; }
   public bool show_note_ol   { get; set; default = false; }
+  public bool show_expander  { get; set; default = true; }
   public bool use_theme      { get; set; default = false; }
   public NodeDrawOptions() {}
 }
@@ -995,6 +996,8 @@ public class Node {
 
   /* Draw the expander icon */
   public void draw_expander( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
+
+    if( !opts.show_expander ) return;
 
     double ex, ey, ew, eh;
     var r  = 3;

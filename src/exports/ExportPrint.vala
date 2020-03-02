@@ -44,6 +44,7 @@ public class ExportPrint : Object {
     _draw_options.show_note_icon = false;
     _draw_options.show_note_bg   = false;
     _draw_options.show_note_ol   = true;
+    _draw_options.show_expander  = _table.list_type == NodeListType.NONE;
     _draw_options.use_theme      = true;
 
     var settings = new PrintSettings();
@@ -120,15 +121,9 @@ public class ExportPrint : Object {
     ctx.rectangle( 0, start, (alloc_width - (margin * sf)), end );
     ctx.clip();
 
-    /* Set the theme in the formatted text */
-    var orig_theme = _table.get_theme();
-    FormattedText.set_theme( theme );
-
     /* Draw all of the nodes */
     _table.root.draw_tree( ctx, theme, _draw_options );
 
-    /* Restore the theme information */
-    FormattedText.set_theme( orig_theme );
   }
 
 }
