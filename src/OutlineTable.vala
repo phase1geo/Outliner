@@ -48,6 +48,7 @@ public class OutlineTable : DrawingArea {
   private bool            _condensed     = false;
   private bool            _debug         = true;
   private NodeDrawOptions _draw_options;
+  private NodeListType    _list_type     = NodeListType.NONE;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -110,7 +111,19 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
-  public NodeListType list_type { set; get; default = NodeListType.SECTION; }
+  public NodeListType list_type {
+    get {
+      return( _list_type );
+    }
+    set {
+      if( _list_type != value ) {
+        _list_type = value;
+        root.set_all_list_types();
+        queue_draw();
+        changed();
+      }
+    }
+  }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -1535,6 +1548,11 @@ public class OutlineTable : DrawingArea {
       _condensed = bool.parse( c );
     }
 
+    string? lt = n->get_prop( "listtype" );
+    if( lt != null ) {
+      list_type = NodeListType.parse( lt );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -1581,6 +1599,7 @@ public class OutlineTable : DrawingArea {
   public void save( Xml.Node* n ) {
 
     n->set_prop( "condensed", _condensed.to_string() );
+    n->set_prop( "listtype",  list_type.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );

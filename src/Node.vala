@@ -36,9 +36,48 @@ public enum NodeMode {
 
 public enum NodeListType {
   NONE = 0,   // Indicates that lists should not be annotated
-  ORDERED,    // Indicates that lists should show ordered annotations (ex. "I.", "A.", etc.)
-  UNORDERED,  // Indicates that lists should show unordered annotations (ex. "*", "-", "+", etc.)
-  SECTION     // Indicates that lists should show section annotations (ex. "1.0", "1.1.2", etc.)
+  OUTLINE,    // Indicates that lists should show ordered outline annotations (ex. "I.", "A.", etc.)
+  SECTION,    // Indicates that lists should show section annotations (ex. "1.0", "1.1.2", etc.)
+  LENGTH;     // Not a value but can be used for for() loops
+
+  /* Displays the string value of this NodeSide */
+  public string to_string() {
+    switch( this ) {
+      case NONE    :  return( "none" );
+      case OUTLINE :  return( "outline" );
+      case SECTION :  return( "section" );
+      default      :  assert_not_reached();
+    }
+  }
+
+  public string label() {
+    switch( this ) {
+      case NONE    :  return( _( "None" ) );
+      case OUTLINE :  return( _( "Outline" ) );
+      case SECTION :  return( _( "Section" ) );
+      default      :  assert_not_reached();
+    }
+  }
+
+  /* Translates a string from to_string() to a NodeSide value */
+  public static NodeListType parse( string val ) {
+    switch( val ) {
+      case "none"    :  return( NONE );
+      case "outline" :  return( OUTLINE );
+      case "section" :  return( SECTION );
+      default        :  assert_not_reached();
+    }
+  }
+
+  /* Outputs the tooltip to be displayed for each type */
+  public string tooltip() {
+    switch( this ) {
+      case NONE    :  return( _( "No enumeration will be displayed" ) );
+      case OUTLINE :  return( _( "Shows outline-like enumeration (ex., I., A., 1.)" ) );
+      case SECTION :  return( _( "Shows section enumeration (ex., 2., 2.1., 2.1.3.)" ) );
+      default      :  assert_not_reached();
+    }
+  }
 }
 
 public class NodeDrawOptions {
@@ -423,9 +462,6 @@ public class Node {
       stdout.printf( "In adjust_nodes (%s)\n", msg );
     }
 
-    /* Update the list type */
-    set_list_type();
-
     if( expanded && !deleted ) {
       last_y = adjust_descendants( last_y, child_start );
     }
@@ -448,7 +484,6 @@ public class Node {
       for( int i=child_start; i<children.length; i++ ) {
         child   = children.index( i );
         child.y = last_y;
-        child.set_list_type();
         last_y  = child.adjust_descendants( child.last_y, 0 );
       }
       if( child != null ) {
@@ -692,16 +727,23 @@ public class Node {
     /* Re-draw all nodes */
     child.adjust_nodes( child.last_y, false, "add_child" );
 
+    /* Update the list type values */
+    set_list_types( child.index() );
+
   }
 
   /* Removes the child at the given index from this node */
   public void remove_child( Node node ) {
 
-    var prev = node.get_previous_node();
+    var prev  = node.get_previous_node();
+    var index = node.index();
 
     node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true, "remove_child" );
-    children.remove_index( node.index() );
+    children.remove_index( index );
     node.parent = null;
+
+    /* Update the list type values */
+    set_list_types( index );
 
   }
 
@@ -816,15 +858,30 @@ public class Node {
   private void set_list_type() {
     int width, height;
     switch( _ot.list_type ) {
-      case NodeListType.ORDERED   :  _lt_layout.set_text( ordered_item() + ".", -1 );     break;
-      case NodeListType.UNORDERED :  _lt_layout.set_text( unordered_item() + ".", -1 );   break;
-      case NodeListType.SECTION   :  _lt_layout.set_text( ordered_section() + ".", -1 );  break;
-      default                     :  _lt_layout.set_text( "", -1 );                       break;
+      case NodeListType.OUTLINE :  _lt_layout.set_text( ordered_item() + ".", -1 );     break;
+      case NodeListType.SECTION :  _lt_layout.set_text( ordered_section() + ".", -1 );  break;
+      default                   :  _lt_layout.set_text( "", -1 );                       break;
     }
     _lt_layout.get_size( out width, out height );
     _lt_width = width / Pango.SCALE;
     position_text();
     update_width();
+  }
+
+  /* Called whenever nodes are added or removed */
+  private void set_list_types( int index ) {
+    for( int i=index; i<children.length; i++ ) {
+      children.index( i ).set_list_type();
+    }
+  }
+
+  /* Used when the associated outline table needs to change the list type of all nodes */
+  public void set_all_list_types() {
+    for( int i=0; i<children.length; i++ ) {
+      var child = children.index( i );
+      child.set_list_type();
+      child.set_all_list_types();
+    }
   }
 
   public string ordered_item() {
@@ -878,14 +935,6 @@ public class Node {
       }
       return( value );
     }
-
-  }
-
-  public string unordered_item() {
-
-    string[] shapes = {"", "", ""};
-
-    return( shapes[index() % 3] );
 
   }
 

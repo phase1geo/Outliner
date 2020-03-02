@@ -42,6 +42,7 @@ public class MainWindow : ApplicationWindow {
   private Button?         _undo_btn       = null;
   private Button?         _redo_btn       = null;
   private SpinButton      _zoom;
+  private Granite.Widgets.ModeButton _list_types;
   private Switch          _condensed;
   private Label           _stats_chars;
   private Label           _stats_words;
@@ -539,9 +540,11 @@ public class MainWindow : ApplicationWindow {
     /* Add theme selector */
     var names     = new Array<string>();
     var theme_box = new Box( Orientation.HORIZONTAL, 0 );
+    var theme_lbl = new Label( _( "Theme:" ) );
+    theme_box.pack_start( theme_lbl, false, false, 10 );
     RadioButton? rb = null;
     themes.names( ref names );
-    for( int i=0; i<names.length; i++ ) {
+    for( int i=((int)names.length - 1); i>=0; i-- ) {
       var theme  = themes.get_theme( names.index( i ) );
       var button = new RadioButton.from_widget( rb );
       button.halign       = Align.CENTER;
@@ -554,12 +557,28 @@ public class MainWindow : ApplicationWindow {
         theme_changed( table );
       });
       _theme_buttons.set( theme.name, button );
-      theme_box.pack_start( button, false, false, 10 );
+      theme_box.pack_end( button, false, false, 10 );
       if( rb == null ) {
         rb = button;
       }
     }
     box.pack_start( theme_box, false, false, 10 );
+
+    /* Add list type selector */
+    var ltbox = new Box( Orientation.HORIZONTAL, 0 );
+    var ltlbl = new Label( _( "Enumeration Style:" ) );
+    _list_types = new Granite.Widgets.ModeButton();
+    _list_types.has_tooltip = true;
+    _list_types.button_release_event.connect( link_type_changed );
+    _list_types.query_tooltip.connect( link_type_show_tooltip );
+
+    for( int i=0; i<NodeListType.LENGTH; i++ ) {
+      _list_types.append_text( ((NodeListType)i).label() );
+    }
+
+    ltbox.pack_start( ltlbl,       false, false, 10 );
+    ltbox.pack_end(   _list_types, false, false, 10 );
+    box.pack_start( ltbox, false, false, 10 );
 
     /* Add condensed mode switch */
     var cbox      = new Box( Orientation.HORIZONTAL, 0 );
@@ -612,6 +631,26 @@ public class MainWindow : ApplicationWindow {
 
     queue_draw();
 
+  }
+
+  /* Causes the link type to change */
+  private bool link_type_changed( Gdk.EventButton e ) {
+    if( _list_types.selected < NodeListType.LENGTH ) {
+      get_current_table( "link_type_changed" ).list_type = (NodeListType)_list_types.selected;
+    }
+    return( false );
+  }
+
+  /* Displays the tooltip for the link type widget */
+  private bool link_type_show_tooltip( int x, int y, bool keyboard, Tooltip tooltip ) {
+    if( !keyboard ) {
+      int button_width = (int)(_list_types.get_allocated_width() / NodeListType.LENGTH);
+      if( (x / button_width) < NodeListType.LENGTH ) {
+        tooltip.set_text( ((NodeListType)(x / button_width)).tooltip() );
+        return( true );
+      }
+    }
+    return( false );
   }
 
   /* Displays the save warning dialog window */
