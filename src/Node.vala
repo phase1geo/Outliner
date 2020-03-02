@@ -1000,12 +1000,14 @@ public class Node {
     if( !opts.show_expander ) return;
 
     double ex, ey, ew, eh;
-    var r  = 3;
-    var lh = name.get_line_height();
+    var r     = 3;
+    var lh    = name.get_line_height();
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
+    var color = ((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.symbol_color;
 
     expander_bbox( out ex, out ey, out ew, out eh );
 
-    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, alpha );
+    Utils.set_context_color_with_alpha( ctx, color, alpha );
 
     if( children.length == 0 ) {
       var mid = y + pady + (lh / 2);
@@ -1035,8 +1037,13 @@ public class Node {
 
     if( _ot.list_type == NodeListType.NONE ) return;
 
-    ctx.move_to( (name.posx - (_lt_width + padx)), name.posy );
-    Utils.set_context_color_with_alpha( ctx, theme.foreground, alpha );
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
+    var color = ((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.foreground;
+    var nh    = name.get_line_height();
+    var lh    = Utils.get_line_height( _lt_layout );
+
+    ctx.move_to( (name.posx - (_lt_width + padx)), (name.posy + ((nh - lh) / 2)) );
+    Utils.set_context_color_with_alpha( ctx, color, alpha );
     Pango.cairo_show_layout( ctx, _lt_layout );
     ctx.new_path();
 

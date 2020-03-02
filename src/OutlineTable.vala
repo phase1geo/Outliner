@@ -1550,7 +1550,7 @@ public class OutlineTable : DrawingArea {
 
     string? lt = n->get_prop( "listtype" );
     if( lt != null ) {
-      list_type = NodeListType.parse( lt );
+      _list_type = NodeListType.parse( lt );
     }
 
     for( Xml.Node* it = n->children; it != null; it = it->next ) {

@@ -115,4 +115,19 @@ public class Utils {
     return( "<" + tag + ">" + html + "</" + tag + ">" );
   }
 
+  /* Returns the line height of the first line of the given pango layout */
+  public static double get_line_height( Pango.Layout layout ) {
+    int height;
+    var line = layout.get_line_readonly( 0 );
+    if( line == null ) {
+      int width;
+      layout.get_size( out width, out height );
+    } else {
+      Pango.Rectangle ink_rect, log_rect;
+      line.get_extents( out ink_rect, out log_rect );
+      height = log_rect.height;
+    }
+    return( height / Pango.SCALE );
+  }
+
 }

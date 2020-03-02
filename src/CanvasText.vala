@@ -239,17 +239,7 @@ public class CanvasText : Object {
 
   /* Returns the height of a single line of text */
   public double get_line_height() {
-    int height;
-    var line = _pango_layout.get_line_readonly( 0 );
-    if( line == null ) {
-      int width;
-      _line_layout.get_size( out width, out height );
-    } else {
-      Pango.Rectangle ink_rect, log_rect;
-      line.get_extents( out ink_rect, out log_rect );
-      height = log_rect.height;
-    }
-    return( height / Pango.SCALE );
+    return( Utils.get_line_height( _pango_layout ) );
   }
 
   /* Returns the number of pixels to include on the current page of this text item */
