@@ -1588,8 +1588,8 @@ public class OutlineTable : DrawingArea {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
         var node = new Node( this );
-        node.load( this, it );
         root.add_child( node, i++ );
+        node.load( this, it );
       }
     }
 

@@ -533,7 +533,7 @@ public class MainWindow : ApplicationWindow {
     _zoom.value_changed.connect( zoom_changed );
 
     zoom_box.pack_start( zoom_lbl, false, false, 10 );
-    zoom_box.pack_start( _zoom,    true,  true,  10 );
+    zoom_box.pack_end( _zoom,      false, false, 10 );
 
     box.pack_start( zoom_box, false, false, 10 );
 
