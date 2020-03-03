@@ -12,7 +12,7 @@
     </provides>
     <screenshots>
         <screenshot type="default">
-            <image>{{ screenshot-url }}</image>
+            <image>https://github.com/phase1geo/Outliner/blob/master/data/images/screenshot.png</image>
         </screenshot>
     </screenshots>
     <description>
@@ -55,8 +55,8 @@
       <content_attribute id="money-gambling">none</content_attribute>
     </content_rating> 
     <url type="homepage">https://github.com/phase1geo/Outliner</url>
-    <url type="bugtracker">{{ repo-url }}/issues</url>
-    <url type="help">{{ repo-url }}/issues</url>
+    <url type="bugtracker">https://github.com/phase1geo/Outliner/issues</url>
+    <url type="help">https://github.com/phase1geo/Outliner/wiki</url>
     <update_contact>phase1geo@gmail.com</update_contact>
     <custom>
         <value key="x-appcenter-color-primary">#D48E15</value>
