@@ -1,14 +1,14 @@
-# Outliner translation file
-# Copyright (C) 2020
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the com.github.phase1geo.outliner package.
-# Trevor Williams <phase1geo@gmail.com>, 2020.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-23 21:35-0600\n"
+"POT-Creation-Date: 2020-03-03 01:13-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,136 +113,144 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/LinkEditor.vala:62 src/MainWindow.vala:630 src/MainWindow.vala:670
-#: src/MainWindow.vala:773 src/MainWindow.vala:869
+#: src/LinkEditor.vala:62 src/MainWindow.vala:669 src/MainWindow.vala:709
+#: src/MainWindow.vala:812 src/MainWindow.vala:908
 msgid "Cancel"
 msgstr ""
 
-#: src/MainWindow.vala:103 src/MainWindow.vala:776
+#: src/MainWindow.vala:104 src/MainWindow.vala:815
 msgid "Outliner"
 msgstr ""
 
-#: src/MainWindow.vala:132
+#: src/MainWindow.vala:133
 msgid "New File"
 msgstr ""
 
-#: src/MainWindow.vala:137 src/MainWindow.vala:670
+#: src/MainWindow.vala:138 src/MainWindow.vala:709
 msgid "Open File"
 msgstr ""
 
-#: src/MainWindow.vala:142
+#: src/MainWindow.vala:143
 msgid "Save File As"
 msgstr ""
 
-#: src/MainWindow.vala:147
+#: src/MainWindow.vala:148
 msgid "Undo"
 msgstr ""
 
-#: src/MainWindow.vala:153
+#: src/MainWindow.vala:154
 msgid "Redo"
 msgstr ""
 
-#: src/MainWindow.vala:219
+#: src/MainWindow.vala:220
 msgid "Unnamed Document"
 msgstr ""
 
-#: src/MainWindow.vala:426
+#: src/MainWindow.vala:427
 msgid "Search   <i>(Control-F)</i>"
 msgstr ""
 
-#: src/MainWindow.vala:437
+#: src/MainWindow.vala:438
 msgid "Statistics"
 msgstr ""
 
-#: src/MainWindow.vala:446
+#: src/MainWindow.vala:447
 msgid "Characters"
 msgstr ""
 
-#: src/MainWindow.vala:449
+#: src/MainWindow.vala:450
 msgid "Words"
 msgstr ""
 
-#: src/MainWindow.vala:452
+#: src/MainWindow.vala:453
 msgid "Rows"
 msgstr ""
 
-#: src/MainWindow.vala:487 src/MainWindow.vala:869
+#: src/MainWindow.vala:488 src/MainWindow.vala:908
 msgid "Export"
 msgstr ""
 
-#: src/MainWindow.vala:494
+#: src/MainWindow.vala:495
 msgid "Export..."
 msgstr ""
 
-#: src/MainWindow.vala:498
+#: src/MainWindow.vala:499
 msgid "Print"
 msgstr ""
 
-#: src/MainWindow.vala:521
+#: src/MainWindow.vala:522
 msgid "Properties"
 msgstr ""
 
-#: src/MainWindow.vala:528
+#: src/MainWindow.vala:529
 msgid "Zoom"
 msgstr ""
 
-#: src/MainWindow.vala:566
+#: src/MainWindow.vala:543
+msgid "Theme:"
+msgstr ""
+
+#: src/MainWindow.vala:569
+msgid "Enumeration Style:"
+msgstr ""
+
+#: src/MainWindow.vala:585
 msgid "Condensed Mode"
 msgstr ""
 
-#: src/MainWindow.vala:582
+#: src/MainWindow.vala:601
 msgid "Shortcuts Cheatsheet"
 msgstr ""
 
-#: src/MainWindow.vala:621
+#: src/MainWindow.vala:660
 msgid "Save current unnamed document?"
 msgstr ""
 
-#: src/MainWindow.vala:622
+#: src/MainWindow.vala:661
 msgid "Changes will be permanently lost if not saved."
 msgstr ""
 
-#: src/MainWindow.vala:627
+#: src/MainWindow.vala:666
 msgid "Discard Changes"
 msgstr ""
 
-#: src/MainWindow.vala:633 src/MainWindow.vala:773
+#: src/MainWindow.vala:672 src/MainWindow.vala:812
 msgid "Save"
 msgstr ""
 
-#: src/MainWindow.vala:670
+#: src/MainWindow.vala:709
 msgid "Open"
 msgstr ""
 
-#: src/MainWindow.vala:772
+#: src/MainWindow.vala:811
 msgid "Save File"
 msgstr ""
 
-#: src/MainWindow.vala:868
+#: src/MainWindow.vala:907
 msgid "Export As"
 msgstr ""
 
-#: src/MainWindow.vala:873
+#: src/MainWindow.vala:912
 msgid "HTML"
 msgstr ""
 
-#: src/MainWindow.vala:880
+#: src/MainWindow.vala:919
 msgid "Markdown"
 msgstr ""
 
-#: src/MainWindow.vala:887
+#: src/MainWindow.vala:926
 msgid "Minder"
 msgstr ""
 
-#: src/MainWindow.vala:893
+#: src/MainWindow.vala:932
 msgid "OPML"
 msgstr ""
 
-#: src/MainWindow.vala:899
+#: src/MainWindow.vala:938
 msgid "PDF"
 msgstr ""
 
-#: src/MainWindow.vala:905
+#: src/MainWindow.vala:944
 msgid "PlainText"
 msgstr ""
 
@@ -302,11 +310,11 @@ msgstr ""
 msgid "Show Children"
 msgstr ""
 
-#: src/OutlineTable.vala:437
+#: src/OutlineTable.vala:464
 msgid "Show note"
 msgstr ""
 
-#: src/OutlineTable.vala:437
+#: src/OutlineTable.vala:464
 msgid "Hide note"
 msgstr ""
 
