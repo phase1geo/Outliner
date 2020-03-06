@@ -908,6 +908,15 @@ public class FormattedText {
     if( t != null ) {
       _text = t;
     }
+    string? pa = n->get_prop( "parse-as" );
+    if( pa != null ) {
+      var str = _text;
+      _text = "";  // Clear the text
+      switch( pa ) {
+        case "html"     :  ExportHTML.to_text( "<div>" + str + "</div>", this );              break;
+        case "markdown" :  ExportHTML.to_text( Utils.markdown_to_html( str, "div" ), this );  break;
+      }
+    }
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         var tag = FormatTag.from_string( it->name );
