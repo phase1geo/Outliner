@@ -822,7 +822,10 @@ public class MainWindow : ApplicationWindow {
       }
       ot.document.filename = fname;
       ot.document.save();
+      _nb.current.label = ot.document.label;
+      _nb.current.tooltip = fname;
       update_title( ot );
+      save_tab_state( _nb.current );
       retval = true;
     }
     dialog.close();
