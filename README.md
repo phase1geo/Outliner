@@ -1,4 +1,4 @@
-# Minder
+# Outliner
 
 <p align="center">
   <a href="https://appcenter.elementary.io/com.github.phase1geo.outliner"><img src="https://appcenter.elementary.io/badge.svg" alt="Get it on AppCenter" /></a>
