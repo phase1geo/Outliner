@@ -24,6 +24,7 @@
           <li>Add notes to any outline text.</li>
           <li>Close/Hide any group within the outline for increased focus.</li>
           <li>Quick search and replace of any text within the document, including notes.</li>
+          <li>View document statistics such as character count, word count and row count.</li>
           <li>Unlimited undo/redo of any change.</li>
           <li>Automatically saves in the background.</li>
           <li>Open multiple outlines with the use of tabs.</li>
@@ -77,6 +78,6 @@
     <custom>
       <value key="x-appcenter-color-primary">#D48E15</value>
       <value key="x-appcenter-color-primary-text">#000000</value>
-      <value key="x-appcenter-suggested-price">0</value>
+      <value key="x-appcenter-suggested-price">10</value>
     </custom>
 </component>

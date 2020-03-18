@@ -15,6 +15,7 @@ Quickly create outlines and export them in a number of useful formats.
 - Add notes to any outline text.
 - Close/Hide any group within the outline for increased focus.
 - Quick search and replace of any text within the document, including notes.
+- View document statistics such as character count, word count and row count.
 - Unlimited undo/redo of any change.
 - Automatically saves in the background.
 - Open multiple outlines with the use of tabs.
