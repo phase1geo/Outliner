@@ -5,7 +5,7 @@ Maintainer: Trevor Williams <phase1geo@gmail.com>
 Build-Depends: meson,
                valac,
                debhelper,
-               libcairo-dev,
+               libcairo2-dev,
                libgranite-dev,
                libgtk-3-dev,
                libxml2-dev,
