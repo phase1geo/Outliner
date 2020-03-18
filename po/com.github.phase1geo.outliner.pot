@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 01:13-0600\n"
+"POT-Creation-Date: 2020-03-17 23:53-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -114,7 +114,7 @@ msgid "Apply"
 msgstr ""
 
 #: src/LinkEditor.vala:62 src/MainWindow.vala:669 src/MainWindow.vala:709
-#: src/MainWindow.vala:812 src/MainWindow.vala:908
+#: src/MainWindow.vala:812 src/MainWindow.vala:911
 msgid "Cancel"
 msgstr ""
 
@@ -166,7 +166,7 @@ msgstr ""
 msgid "Rows"
 msgstr ""
 
-#: src/MainWindow.vala:488 src/MainWindow.vala:908
+#: src/MainWindow.vala:488 src/MainWindow.vala:911
 msgid "Export"
 msgstr ""
 
@@ -226,31 +226,31 @@ msgstr ""
 msgid "Save File"
 msgstr ""
 
-#: src/MainWindow.vala:907
+#: src/MainWindow.vala:910
 msgid "Export As"
 msgstr ""
 
-#: src/MainWindow.vala:912
+#: src/MainWindow.vala:915
 msgid "HTML"
 msgstr ""
 
-#: src/MainWindow.vala:919
+#: src/MainWindow.vala:922
 msgid "Markdown"
 msgstr ""
 
-#: src/MainWindow.vala:926
+#: src/MainWindow.vala:929
 msgid "Minder"
 msgstr ""
 
-#: src/MainWindow.vala:932
+#: src/MainWindow.vala:935
 msgid "OPML"
 msgstr ""
 
-#: src/MainWindow.vala:938
+#: src/MainWindow.vala:941
 msgid "PDF"
 msgstr ""
 
-#: src/MainWindow.vala:944
+#: src/MainWindow.vala:947
 msgid "PlainText"
 msgstr ""
 
