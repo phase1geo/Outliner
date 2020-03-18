@@ -1,20 +1,27 @@
-<div align="center">
-  <span align="center"> <img width="80" height="70" class="center" src="{{ repo-url }}/blob/master/data/images/com.github.phase1geo.outliner.png" alt="Icon"></span>
-  <h1 align="center">Outliner</h1>
-  <h3 align="center">Organize your words</h3>
-</div>
-
-<br/>
+# Minder
 
 <p align="center">
-    <a href="https://appcenter.elementary.io/com.github.phase1geo.outliner">
-        <img src="https://appcenter.elementary.io/badge.svg">
-    </a>
+  <a href="https://appcenter.elementary.io/com.github.phase1geo.outliner"><img src="https://appcenter.elementary.io/badge.svg" alt="Get it on AppCenter" /></a>
 </p>
 
-<p align="center">
-    <img src="https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-light.png" alt="Screenshot"> <br>
-</p>
+![<center><b>Main Window - Dark Solarized Theme</b></center>](https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-dark.png "Outlining application for Elementary OS")
+
+## Overview
+
+Quickly create outlines and export them in a number of useful formats.
+
+- Quickly create and navigate outlines using the keyboard or mouse.
+- Full support for text formatting.
+- Add notes to any outline text.
+- Close/Hide any group within the outline for increased focus.
+- Quick search and replace of any text within the document, including notes.
+- Unlimited undo/redo of any change.
+- Automatically saves in the background.
+- Open multiple outlines with the use of tabs.
+- Built-in themes.
+- Import from Minder and OPML.
+- Export to HTML, Markdown, Minder, OPML, PDF and PlainText.
+- Printer support.
 
 ## Installation
 
@@ -30,8 +37,8 @@ These dependencies must be present before building:
  - `libmarkdown2-dev`
 
 Use the App script to simplify installation by running `./app install-deps`
- 
- ### Building
+
+### Building
 
 ```
 git clone {{ repo-url }}.git com.github.phase1geo.outliner && cd com.github.phase1geo.outliner
