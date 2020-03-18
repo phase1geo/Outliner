@@ -29,7 +29,7 @@ public class UndoNodeDelete : UndoItem {
   public UndoNodeDelete( Node node ) {
     base( _( "delete item" ) );
     _node   = node;
-    _parent = node.parent;
+    _parent = node.parents.index( 0 );
     _index  = node.index();
   }
 

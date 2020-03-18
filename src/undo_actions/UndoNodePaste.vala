@@ -29,7 +29,7 @@ public class UndoNodePaste : UndoItem {
   public UndoNodePaste( Node node ) {
     base( _( "paste item" ) );
     _node   = node;
-    _parent = node.parent;
+    _parent = node.parents.index( 0 );
     _index  = node.index();
   }
 

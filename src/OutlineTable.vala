@@ -420,10 +420,10 @@ public class OutlineTable : DrawingArea {
         /* Otherwise, we are moving the current node */
         } else {
           if( selected.mode == NodeMode.SELECTED ) {
-            _move_parent = selected.parent;
+            _move_parent = selected.parents.index( 0 );
             _move_index  = selected.index();
             selected.mode = NodeMode.MOVETO;
-            selected.parent.remove_child( selected );
+            selected.parents.index( 0 ).remove_child( selected );
           }
           selected.y = e.y;
           var current = node_at_coordinates( e.x, e.y );
@@ -511,11 +511,11 @@ public class OutlineTable : DrawingArea {
               undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
               break;
             case NodeMode.ATTACHABOVE :
-              _active.parent.add_child( selected, _active.index() );
+              _active.parents.index( 0 ).add_child( selected, _active.index() );
               undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
               break;
             case NodeMode.ATTACHBELOW :
-              _active.parent.add_child( selected, (_active.index() + 1) );
+              _active.parents.index( 0 ).add_child( selected, (_active.index() + 1) );
               undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
               break;
           }
@@ -800,10 +800,10 @@ public class OutlineTable : DrawingArea {
       if( selected.children.length > 0 ) {
         insert_node( selected, node, 0 );
       } else {
-        insert_node( selected.parent, node, (selected.index() + 1) );
+        insert_node( selected.parents.index( 0 ), node, (selected.index() + 1) );
       }
     } else {
-      insert_node( selected.parent, node, selected.index() );
+      insert_node( selected.parents.index( 0 ), node, selected.index() );
     }
 
     /* Add an undo item for this operation */
@@ -910,7 +910,7 @@ public class OutlineTable : DrawingArea {
       var tags   = selected.name.text.get_tags_in_range( curpos, endpos );
       var node   = create_node( title, tags );
       selected.name.text.remove_text( curpos, (endpos - curpos ) );
-      insert_node( sel.parent, node, index );
+      insert_node( sel.parents.index( 0 ), node, index );
       set_selected_mode( NodeMode.EDITABLE );
       undo_buffer.add_item( new UndoNodeSplit( selected ) );
     } else if( is_note_editable() ) {
@@ -1342,7 +1342,7 @@ public class OutlineTable : DrawingArea {
         case "h" :  unindent();  break;
         case "k" :  change_selected( selected.get_previous_node() );  break;
         case "l" :  indent();  break;
-        case "a" :  change_selected( selected.parent );  break;
+        case "a" :  change_selected( selected.parents.index( 0 ) );  break;
       }
     }
   }
@@ -1698,7 +1698,7 @@ public class OutlineTable : DrawingArea {
     var index = selected.index() + (below ? 1 : 0);
     var sel   = selected;
     var node  = create_node( title, tags );
-    insert_node( sel.parent, node, index );
+    insert_node( sel.parents.index( 0 ), node, index );
     set_selected_mode( NodeMode.EDITABLE );
     undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
@@ -1718,7 +1718,7 @@ public class OutlineTable : DrawingArea {
   public void delete_node( Node node ) {
     var was_selected = (node == selected);
     var next         = node.get_next_node() ?? node.get_previous_node();
-    node.parent.remove_child( node );
+    node.parents.index( 0 ).remove_child( node );
     if( was_selected ) {
       selected = next;
     }
@@ -1743,7 +1743,7 @@ public class OutlineTable : DrawingArea {
 
   /* Returns true if the currently selected row is unindentable */
   public bool unindentable() {
-    return( (selected != null) && !selected.parent.is_root() );
+    return( (selected != null) && !selected.parents.index( 0 ).is_root() );
   }
 
   /*
@@ -1753,7 +1753,7 @@ public class OutlineTable : DrawingArea {
   public void indent_node( Node node ) {
     var index = node.index();
     if( index == 0 ) return;
-    var parent = node.parent;
+    var parent = node.parents.index( 0 );
     parent.remove_child( node );
     parent.children.index( index - 1 ).add_child( node );
     queue_draw();
@@ -1775,10 +1775,10 @@ public class OutlineTable : DrawingArea {
    parent.
   */
   public void unindent_node( Node node ) {
-    if( node.parent.is_root() ) return;
-    var parent       = node.parent;
+    if( node.parents.index( 0 ).is_root() ) return;
+    var parent       = node.parents.index( 0 );
     var parent_index = parent.index();
-    var grandparent  = parent.parent;
+    var grandparent  = parent.parents.index( 0 );
     parent.remove_child( node );
     grandparent.add_child( node, (parent_index + 1) );
     see( selected );
@@ -1827,7 +1827,7 @@ public class OutlineTable : DrawingArea {
   /* Draws all of the root node trees */
   public void draw_all( Context ctx ) {
     root.draw_tree( ctx, _theme, _draw_options );
-    if( (selected != null) && ((selected.parent == null) || selected.parent.expanded) ) {
+    if( (selected != null) && ((selected.parents.length == 0) || selected.parents.index( 0 ).expanded) ) {
       selected.draw( ctx, _theme, _draw_options );
     }
   }

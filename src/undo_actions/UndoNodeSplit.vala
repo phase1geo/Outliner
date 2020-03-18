@@ -31,7 +31,7 @@ public class UndoNodeSplit : UndoItem {
   public UndoNodeSplit( Node node ) {
     base( _( "split item" ) );
     _node   = node;
-    _parent = node.parent;
+    _parent = node.parents.index( 0 );
     _index  = node.index();
     _cursor = _parent.children.index( _index - 1 ).name.text.text.length;
     _tags   = node.name.text.get_tags_in_range( 0, node.name.text.text.length );

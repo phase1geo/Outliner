@@ -31,7 +31,7 @@ public class UndoNodeMove : UndoItem {
   public UndoNodeMove( Node node, Node? orig_parent, int orig_index ) {
     base( _( "move item" ) );
     _node        = node;
-    _parent      = node.parent;
+    _parent      = node.parents.index( 0 );
     _index       = node.index();
     _orig_parent = orig_parent;
     _orig_index  = orig_index;

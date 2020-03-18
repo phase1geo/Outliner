@@ -29,7 +29,7 @@ public class UndoNodeInsert : UndoItem {
   public UndoNodeInsert( Node node, int? index=null ) {
     base( _( "insert item" ) );
     _node   = node;
-    _parent = node.parent;
+    _parent = node.parents.index( 0 );
     _index  = index ?? _node.index();
   }
 

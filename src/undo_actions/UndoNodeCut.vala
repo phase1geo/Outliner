@@ -29,7 +29,7 @@ public class UndoNodeCut : UndoItem {
   public UndoNodeCut( Node node ) {
     base( _( "cut item" ) );
     _node   = node;
-    _parent = node.parent;
+    _parent = node.parents.index( 0 );
     _index  = node.index();
   }
 

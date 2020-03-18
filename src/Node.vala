@@ -227,7 +227,7 @@ public class Node {
   public double      padx      { get; set; default = 10; }
   public double      pady      { get; set; default = 10; }
   public double      indent    { get; set; default = 25; }
-  public Node?       parent    { get; set; default = null; }
+  public Array<Node> parents   { get; set; default = new Array<Node>(); }
   public Array<Node> children  { get; set; default = new Array<Node>(); }
   public double      last_y    { get { return( _y + _h ); } }
   public bool        over_note_icon { get; set; default = false; }
@@ -467,8 +467,9 @@ public class Node {
       last_y = adjust_descendants( last_y, child_start );
     }
 
-    if( parent != null ) {
-      last_y = parent.adjust_nodes( last_y, false, "adjust_nodes", (index() + 1) );
+    /* TBD - I think that we will need a posx/posy per parent */
+    if( parents.length > 0 ) {
+      last_y = parents.index( 0 ).adjust_nodes( last_y, false, "adjust_nodes", (index() + 1) );
     }
 
     /* If the current node is the last node, update the widget size to match the current height */
@@ -504,11 +505,11 @@ public class Node {
 
   /* Returns the root node of this node */
   public Node get_root_node() {
-    var parent = _parent;
+    var parent = parents.index( 0 );
     var root   = this;;
     while( parent != null ) {
       root = parent;
-      parent = parent.parent;
+      parent = parent.parents.index( 0 );
     }
     return( root );
   }
@@ -526,9 +527,9 @@ public class Node {
   public Node? get_previous_node() {
     var index = index();
     if( index <= 0 ) {
-      return( parent.is_root() ? null : parent );
+      return( parents.index( 0 ).is_root() ? null : parents.index( 0 ) );
     } else {
-      return( parent.children.index( index - 1 ).get_last_node() );
+      return( parents.index( 0 ).children.index( index - 1 ).get_last_node() );
     }
   }
 
@@ -538,12 +539,12 @@ public class Node {
       return( children.index( 0 ) );
     } else {
       var child = this;
-      while( child.parent != null ) {
+      while( child.parents.length > 0 ) {
         var index = child.index();
-        if( (index + 1) < child.parent.children.length ) {
-          return( child.parent.children.index( index + 1 ) );
+        if( (index + 1) < child.parents.index( 0 ).children.length ) {
+          return( child.parents.index( 0 ).children.index( index + 1 ) );
         }
-        child = child.parent;
+        child = child.parents.index( 0 );
       }
       return( null );
     }
@@ -696,9 +697,9 @@ public class Node {
   /* Returns the index of this node within its parent */
   public int index() {
 
-    if( _parent != null ) {
-      for( int i=0; i<_parent.children.length; i++ ) {
-        if( this == _parent.children.index( i ) ) {
+    if( parents.length > 0 ) {
+      for( int i=0; i<parents.index( 0 ).children.length; i++ ) {
+        if( this == parents.index( 0 ).children.index( i ) ) {
           return( i );
         }
       }
@@ -717,7 +718,7 @@ public class Node {
       children.insert_val( index, child );
     }
 
-    child.parent = this;
+    child.parents.append_val( this );
 
     var prev = child.get_previous_node();
 
@@ -741,7 +742,7 @@ public class Node {
 
     node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true, "remove_child" );
     children.remove_index( index );
-    node.parent = null;
+    node.parents.remove_range( 0, node.parents.length );
 
     /* Update the list type values */
     set_list_types( index );
@@ -773,7 +774,7 @@ public class Node {
   /* Returns true if the node is a root node (has no parent) */
   public bool is_root() {
 
-    return( parent == null );
+    return( parents.length == 0 );
 
   }
 
@@ -945,11 +946,11 @@ public class Node {
     if( is_root() ) return( "" );
 
     var value = (index() + 1).to_string();
-    var node  = parent;
+    var node  = parents.index( 0 );
 
     while( !node.is_root() ) {
       value = (node.index() + 1).to_string() + "." + value;
-      node  = node.parent;
+      node  = node.parents.index( 0 );
     }
 
     return( value );
