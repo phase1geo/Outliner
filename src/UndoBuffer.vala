@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,11 +23,11 @@ using GLib;
 
 public class UndoBuffer : Object {
 
-  private OutlineTable    _table;
-  private Array<UndoItem> _undo_buffer;
-  private Array<UndoItem> _redo_buffer;
+  protected OutlineTable    _table;
+  protected Array<UndoItem> _undo_buffer;
+  protected Array<UndoItem> _redo_buffer;
 
-  public signal void buffer_changed();
+  public signal void buffer_changed( UndoBuffer buf );
 
   /* Default constructor */
   public UndoBuffer( OutlineTable table ) {
@@ -37,10 +37,10 @@ public class UndoBuffer : Object {
   }
 
   /* Clear the undo/redo buffers */
-  public void clear() {
+  public virtual void clear() {
     _undo_buffer.remove_range( 0, _undo_buffer.length );
     _redo_buffer.remove_range( 0, _redo_buffer.length );
-    buffer_changed();
+    buffer_changed( this );
   }
 
   /* Returns true if we can perform an undo action */
@@ -54,24 +54,24 @@ public class UndoBuffer : Object {
   }
 
   /* Performs the next undo action in the buffer */
-  public void undo() {
+  public virtual void undo() {
     if( undoable() ) {
       UndoItem item = _undo_buffer.index( _undo_buffer.length - 1 );
       item.undo( _table );
       _undo_buffer.remove_index( _undo_buffer.length - 1 );
       _redo_buffer.append_val( item );
-      buffer_changed();
+      buffer_changed( this );
     }
   }
 
   /* Performs the next redo action in the buffer */
-  public void redo() {
+  public virtual void redo() {
     if( redoable() ) {
       UndoItem item = _redo_buffer.index( _redo_buffer.length - 1 );
       item.redo( _table );
       _redo_buffer.remove_index( _redo_buffer.length - 1 );
       _undo_buffer.append_val( item );
-      buffer_changed();
+      buffer_changed( this );
     }
   }
 
@@ -88,10 +88,10 @@ public class UndoBuffer : Object {
   }
 
   /* Adds a new undo item to the undo buffer.  Clears the redo buffer. */
-  public void add_item( UndoItem item ) {
+  public virtual void add_item( UndoItem item ) {
     _undo_buffer.append_val( item );
     _redo_buffer.remove_range( 0, _redo_buffer.length );
-    buffer_changed();
+    buffer_changed( this );
   }
 
 }

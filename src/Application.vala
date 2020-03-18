@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,10 +24,11 @@ using GLib;
 
 public class Outliner : Granite.Application {
 
-  private static bool          version   = false;
-  private static string?       open_file = null;
-  private static bool          new_file  = false;
-  private static bool          testing   = false;
+  private static bool          show_version = false;
+  private static string?       open_file    = null;
+  private static bool          new_file     = false;
+  private static bool          testing      = false;
+  private static string        version      = "1.0.0";
   public  static GLib.Settings settings;
 
   public Outliner () {
@@ -39,11 +40,14 @@ public class Outliner : Granite.Application {
     /* Initialize the settings */
     settings = new GLib.Settings( "com.github.phase1geo.outliner" );
 
-    var last_file = settings.get_string( "last-file" );
-
     /* Add the application-specific icons */
     weak IconTheme default_theme = IconTheme.get_default();
     default_theme.add_resource_path( "/com/github/phase1geo/outliner" );
+
+    /* Add the application CSS */
+    var provider = new Gtk.CssProvider ();
+    provider.load_from_resource( "/com/github/phase1geo/outliner/css/style.css" );
+    Gtk.StyleContext.add_provider_for_screen( Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION );
 
     /* Create the main window */
     var appwin = new MainWindow( this, settings );
@@ -61,10 +65,10 @@ public class Outliner : Granite.Application {
       }
 
     /*
-     If the user specified that a new file should be created or the
-     saved last-file string is empty, create a new map.
+     If the user specified that a new file should be created or the saved tab state
+     was not loadable, create a new map.
     */
-    } else if( new_file || (last_file == "") || !appwin.open_file( last_file ) ) {
+    } else if( new_file || !appwin.load_tab_state() ) {
       appwin.do_new_file();
     }
 
@@ -93,7 +97,7 @@ public class Outliner : Granite.Application {
     var options = new OptionEntry[5];
 
     /* Create the command-line options */
-    options[0] = {"version", 0, 0, OptionArg.NONE, ref version, "Display version number", null};
+    options[0] = {"version", 0, 0, OptionArg.NONE, ref show_version, "Display version number", null};
     options[1] = {"open", 'o', 0, OptionArg.FILENAME, ref open_file, "Open filename", "FILENAME"};
     options[2] = {"new", 'n', 0, OptionArg.NONE, ref new_file, "Starts Outliner with a new file", null};
     options[3] = {"run-tests", 0, 0, OptionArg.NONE, ref testing, "Run testing", null};
@@ -111,8 +115,8 @@ public class Outliner : Granite.Application {
     }
 
     /* If the version was specified, output it and then exit */
-    if( version ) {
-      stdout.printf( "1.0.0\n" );
+    if( show_version ) {
+      stdout.printf( "%s\n", version );
       Process.exit( 0 );
     }
 

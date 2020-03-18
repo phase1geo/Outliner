@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -46,6 +46,11 @@ public class Document : Object {
       return( _filename );
     }
   }
+  public string label {
+    owned get {
+      return( GLib.Path.get_basename( _filename ) );
+    }
+  }
   public bool save_needed { private set; get; default = false; }
 
   /* Default constructor */
@@ -57,9 +62,11 @@ public class Document : Object {
     /* Create the temporary file */
     var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
     if( DirUtils.create_with_parents( dir, 0775 ) == 0 ) {
-      _filename  = GLib.Path.build_filename( dir, "unnamed.outliner" );
+      int i = 1;
+      do {
+        _filename = GLib.Path.build_filename( dir, "unnamed%d.outliner".printf( i++ ) );
+      } while( GLib.FileUtils.test( _filename, FileTest.EXISTS ) );
       _from_user = false;
-      _settings.set_string( "last-file", _filename );
     }
 
     /* Listen for any changes from the canvas */
@@ -76,6 +83,12 @@ public class Document : Object {
   /* Returns true if the stored filename came from the user */
   public bool is_saved() {
     return( _from_user );
+  }
+
+  /* Called when a document filename is loaded from the tab state file */
+  public void load_filename( string fname, bool saved ) {
+    filename   = fname;
+    _from_user = saved;
   }
 
   /* Opens the given filename */
@@ -106,6 +119,14 @@ public class Document : Object {
     if( save_needed ) {
       save();
     }
+  }
+
+  /* Deletes the given unnamed file when called */
+  public bool remove() {
+    if( !_from_user ) {
+      FileUtils.unlink( _filename );
+    }
+    return( true );
   }
 
 }

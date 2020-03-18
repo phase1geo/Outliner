@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,31 +23,45 @@ using Gtk;
 
 public class ExportPrint : Object {
 
-  private DrawArea _da;
+  private OutlineTable    _table;
+  private PrintOperation  _op;
+  private Array<double?>  _boundaries;
+  private NodeDrawOptions _draw_options;
 
   /* Default constructor */
   public ExportPrint() {}
 
   /* Perform print operation */
-  public void print( DrawArea da, MainWindow main ) {
+  public void print( OutlineTable table, MainWindow main ) {
 
-    _da = da;
+    _table        = table;
+    _op           = new PrintOperation();
+    _boundaries   = new Array<double?>();
+    _draw_options = new NodeDrawOptions();
 
-    var op       = new PrintOperation();
-    // var settings = new PrintSettings().from_file( fname );
+    /* Initialize the draw options */
+    _draw_options.show_modes     = false;
+    _draw_options.show_note_icon = false;
+    _draw_options.show_note_bg   = false;
+    _draw_options.show_note_ol   = true;
+    _draw_options.show_expander  = _table.list_type == NodeListType.NONE;
+    _draw_options.use_theme      = true;
+
     var settings = new PrintSettings();
-    op.set_print_settings( settings );
-    op.set_n_pages( 1 );
-    op.set_unit( Unit.MM );
+
+    _op.set_print_settings( settings );
+    // _op.set_unit( Unit.POINTS );
+    _op.set_unit( Unit.NONE );
 
     /* Connect to the draw_page signal */
-    op.draw_page.connect( draw_page );
+    _op.begin_print.connect( begin_print );
+    _op.draw_page.connect( draw_page );
 
     try {
-      var res = op.run( PrintOperationAction.PRINT_DIALOG, main );
+      var res = _op.run( PrintOperationAction.PRINT_DIALOG, main );
       switch( res ) {
         case PrintOperationResult.APPLY :
-          settings = op.get_print_settings();
+          settings = _op.get_print_settings();
           // Save the settings to a file - settings.to_file( fname );
           break;
         case PrintOperationResult.ERROR :
@@ -63,30 +77,52 @@ public class ExportPrint : Object {
 
   }
 
+  /* Calculates the page breaks in the document */
+  public void begin_print( PrintContext context ) {
+
+    var include_size = 1.0;
+    var sf           = ((7.5 / 8.5) * context.get_width()) / _table.get_allocated_width();
+    var page_size    = (int)(((10.0 / 11.0) * context.get_height()) / sf);
+    var node         = _table.root.get_next_node();
+    var last_node    = node;
+
+    while( node != null ) {
+      if( node.on_page_boundary( page_size, out include_size ) ) {
+        _boundaries.append_val( include_size );
+      }
+      last_node = node;
+      node = node.get_next_node();
+    }
+
+    _boundaries.append_val( last_node.last_y );
+
+    _op.set_n_pages( (int)(_boundaries.length - 1) );
+
+  }
+
   /* Draws the page */
   public void draw_page( PrintOperation op, PrintContext context, int page_nr ) {
 
+    var settings    = op.get_print_settings();
+    var use_color   = settings.get( "cups-ColorModel" ) == "RGB";
+    var alloc_width = _table.get_allocated_width();
     var ctx         = context.get_cairo_context();
-    var page_width  = context.get_width();
-    var page_height = context.get_height();
-    var margin_x    = 0.5 * context.get_dpi_x();
-    var margin_y    = 0.5 * context.get_dpi_y();
-
-    /* Get the rectangle holding the entire document */
-    double x, y, w, h;
-    _da.document_rectangle( out x, out y, out w, out h );
-
-    /* Calculate the required scaling factor to get the document to fit */
-    double width  = (page_width  - (2 * margin_x)) / w;
-    double height = (page_height - (2 * margin_y)) / h;
-    double sf     = (width < height) ? width : height;
+    var sf          = ((7.5 / 8.5) * context.get_width()) / alloc_width;
+    var margin      = (0.5 / 8.5) * context.get_width();
+    var theme       = MainWindow.themes.get_theme( use_color ? "printColor" : "printGrayscale" );
+    var start       = _boundaries.index( page_nr );
+    var end         = _boundaries.index( page_nr + 1 ) - 1;
 
     /* Scale and translate the image */
+    ctx.translate( margin, ((0 - start) * sf) + margin );
     ctx.scale( sf, sf );
-    ctx.translate( ((0 - x) + margin_x), ((0 - y) + margin_y) );
 
-    /* Draw the map */
-    _da.draw_all( ctx );
+    /* Clip the area */
+    ctx.rectangle( 0, start, (alloc_width - (margin * sf)), end );
+    ctx.clip();
+
+    /* Draw all of the nodes */
+    _table.root.draw_tree( ctx, theme, _draw_options );
 
   }
 

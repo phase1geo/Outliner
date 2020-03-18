@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2018 Trevor Williams <phase1geo@gmail.com> -->
+<!-- Copyright 2020 Trevor Williams <phase1geo@gmail.com> -->
 <component type="desktop-application">
     <id>com.github.phase1geo.outliner.desktop</id>
     <metadata_license>CC0-1.0</metadata_license>
@@ -8,18 +8,34 @@
     <summary>Organize your words</summary>
     <developer_name>Trevor Williams</developer_name>
     <provides>
-        <binary>com.github.phase1geo.outliner</binary>
+      <binary>com.github.phase1geo.outliner</binary>
     </provides>
     <screenshots>
-        <screenshot type="default">
-            <image>{{ screenshot-url }}</image>
-        </screenshot>
+      <screenshot type="default">
+        <image>https://github.com/phase1geo/Outliner/blob/master/data/images/screenshot.png</image>
+      </screenshot>
     </screenshots>
     <description>
-        <p>Outlining application which provides exports in many formats.</p>
-    </description>  
+      <p>Quickly create outlines and export them in a number of useful formats.</p>
+      <p>
+        <ul>
+          <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
+          <li>Full support for text formatting.</li>
+          <li>Add notes to any outline text.</li>
+          <li>Close/Hide any group within the outline for increased focus.</li>
+          <li>Quick search and replace of any text within the document, including notes.</li>
+          <li>Unlimited undo/redo of any change.</li>
+          <li>Automatically saves in the background.</li>
+          <li>Open multiple outlines with the use of tabs.</li>
+          <li>Built-in themes.</li>
+          <li>Import from Minder and OPML.</li>
+          <li>Export to HTML, Markdown, Minder, OPML, PDF and PlainText.</li>
+          <li>Printer support.</li>
+        </ul>
+      </p>
+    </description>
     <releases>
-      <release version="1.0.0" date="2018-06-04">
+      <release version="1.0.0" date="2020-03-20">
         <description>
           <p>Initial 1.0.0 release!</p>
         </description>
@@ -53,14 +69,14 @@
       <content_attribute id="social-contacts">none</content_attribute>
       <content_attribute id="money-purchasing">none</content_attribute>
       <content_attribute id="money-gambling">none</content_attribute>
-    </content_rating> 
+    </content_rating>
     <url type="homepage">https://github.com/phase1geo/Outliner</url>
-    <url type="bugtracker">{{ repo-url }}/issues</url>
-    <url type="help">{{ repo-url }}/issues</url>
+    <url type="bugtracker">https://github.com/phase1geo/Outliner/issues</url>
+    <url type="help">https://github.com/phase1geo/Outliner/wiki</url>
     <update_contact>phase1geo@gmail.com</update_contact>
     <custom>
-        <value key="x-appcenter-color-primary">#D48E15</value>
-        <value key="x-appcenter-color-primary-text">#000000</value>
-        <value key="x-appcenter-suggested-price">0</value>
+      <value key="x-appcenter-color-primary">#D48E15</value>
+      <value key="x-appcenter-color-primary-text">#000000</value>
+      <value key="x-appcenter-suggested-price">0</value>
     </custom>
 </component>

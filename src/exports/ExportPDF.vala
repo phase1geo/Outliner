@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,7 +24,7 @@ using Cairo;
 public class ExportPDF : Object {
 
   /* Default constructor */
-  public static void export( string fname, DrawArea da ) {
+  public static void export( string fname, OutlineTable table ) {
 
     /* Get the width and height of the page */
     double page_width  = 8.5 * 72;
@@ -35,21 +35,17 @@ public class ExportPDF : Object {
     var surface = new PdfSurface( fname, page_width, page_height );
     var context = new Context( surface );
 
-    /* Get the rectangle holding the entire document */
-    double x, y, w, h;
-    da.document_rectangle( out x, out y, out w, out h );
-
     /* Calculate the required scaling factor to get the document to fit */
-    double width  = (page_width  - (2 * margin)) / w;
-    double height = (page_height - (2 * margin)) / h;
+    double width  = (page_width  - (2 * margin)) / table.get_allocated_width();
+    double height = (page_height - (2 * margin)) / table.get_allocated_height();
     double sf     = (width < height) ? width : height;
 
     /* Scale and translate the image */
     context.scale( sf, sf );
-    context.translate( ((0 - x) + margin), ((0 - y) + margin) );
+    context.translate( margin, margin );
 
     /* Recreate the image */
-    da.draw_all( context );
+    table.draw_all( context );
 
     /* Draw the page to the PDF file */
     context.show_page();
