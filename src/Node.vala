@@ -21,6 +21,7 @@
 
 using Gtk;
 using Gdk;
+using Gee;
 
 public enum NodeMode {
   NONE = 0,      // Indicates that this node is nothing special
@@ -92,7 +93,8 @@ public class NodeDrawOptions {
 
 public class Node {
 
-  private static int next_id = 0;
+  private static int next_id  = 0;
+  private static int clone_id = 0;
 
   private OutlineTable _ot;
   private int          _id        = next_id++;
@@ -108,6 +110,7 @@ public class Node {
   private Pango.Layout _lt_layout;
   private double       _lt_width  = 0;
   private bool         _hide_note = true;
+  private int          _clone_id  = -1;
   private bool         _debug     = false;
 
   private static Pixbuf? _note_icon = null;
@@ -274,7 +277,7 @@ public class Node {
   public Node.root() {}
 
   /* Copy constructor */
-  public Node.from_node( OutlineTable ot, Node node ) {
+  public Node.copy_from_node( OutlineTable ot, Node node ) {
 
     _ot = ot;
 
@@ -313,9 +316,58 @@ public class Node {
 
   }
 
+  /* Copy constructor */
+  public Node.clone_from_node( OutlineTable ot, Node node ) {
+
+    _ot = ot;
+
+    /* Handle the clone ID */
+    if( node._clone_id == -1 ) {
+      int cid        = clone_id++;
+      node._clone_id = cid;
+      _clone_id      = cid;
+    } else {
+      _clone_id      = node._clone_id;
+    }
+
+    var name_fd = new Pango.FontDescription();
+    name_fd.set_size( 12 * Pango.SCALE );
+
+    var note_fd = new Pango.FontDescription();
+    note_fd.set_size( 10 * Pango.SCALE );
+
+    _lt_layout = ot.create_pango_layout( null );
+    _lt_layout.set_font_description( name_fd );
+
+    _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
+    _name.resized.connect( update_height_from_resize );
+    _name.select_mode.connect( name_select_mode );
+    _name.cursor_changed.connect( name_cursor_changed );
+    _name.set_font( name_fd );
+
+    _note = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.note );
+    _note.resized.connect( update_height_from_resize );
+    _note.select_mode.connect( note_select_mode );
+    _note.cursor_changed.connect( note_cursor_changed );
+    _note.set_font( note_fd );
+
+    pady = ot.condensed ? 2 : 10;
+
+    position_text();
+    update_width();
+
+    /* Detect any size changes by the drawing area */
+    ot.win.configure_event.connect( window_size_changed );
+    ot.zoom_changed.connect( table_zoom_changed );
+    ot.theme_changed.connect( table_theme_changed );
+
+  }
+
   /* Destructor */
   ~Node() {
+    _ot.win.configure_event.disconnect( window_size_changed );
     _ot.zoom_changed.disconnect( table_zoom_changed );
+    _ot.theme_changed.disconnect( table_theme_changed );
   }
 
   /* Create the note icon pixbuf if we need to */
@@ -627,22 +679,29 @@ public class Node {
   /*************************/
 
   /* Saves the current node and its children in XML Outliner format */
-  public Xml.Node* save() {
+  public Xml.Node* save( ref HashMap<int,bool> clone_ids ) {
 
     Xml.Node* n = new Xml.Node( null, "node" );
 
     n->new_prop( "expanded", expanded.to_string() );
     n->new_prop( "hidenote", hide_note.to_string() );
 
-    n->add_child( name.save( "name" ) );
+    /* Only save out the name/note if we are not a clone or if our clone has not been output yet */
+    if( (_clone_id == -1) || !clone_ids.has_key( _clone_id ) ) {
+      n->add_child( name.save( "name" ) );
+      if( note.text.text != "" ) {
+        n->add_child( note.save( "note" ) );
+      }
+    }
 
-    if( note.text.text != "" ) {
-      n->add_child( note.save( "note" ) );
+    if( _clone_id != -1 ) {
+      n->new_prop( "clone_id", _clone_id.to_string() );
+      clone_ids.set( _clone_id, true );
     }
 
     Xml.Node* nodes = new Xml.Node( null, "nodes" );
     for( int i=0; i<children.length; i++ ) {
-      nodes->add_child( children.index( i ).save() );
+      nodes->add_child( children.index( i ).save( ref clone_ids ) );
     }
 
     n->add_child( nodes );
@@ -652,7 +711,7 @@ public class Node {
   }
 
   /* Loads the current node and its children from XML Outliner format */
-  public void load( OutlineTable ot, Xml.Node* n ) {
+  public void load( OutlineTable ot, Xml.Node* n, ref HashMap<int,Node> clone_ids ) {
 
     string? e = n->get_prop( "expanded" );
     if( e != null ) {
@@ -664,12 +723,29 @@ public class Node {
       hide_note = bool.parse( h );
     }
 
+    string? c = n->get_prop( "clone_id" );
+    if( c != null ) {
+      var cid = int.parse( c );
+      if( !clone_ids.has_key( cid ) ) {
+        _clone_id = cid;
+        if( cid >= clone_id ) {
+          clone_id = cid + 1;
+        }
+        clone_ids.set( cid, this );
+      } else {
+        var clone = clone_ids.get( cid );
+        _clone_id = cid;
+        name.clone( clone.name );
+        note.clone( clone.note );
+      }
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
           case "name"  :  name.load( it );  break;
           case "note"  :  note.load( it );  break;
-          case "nodes" :  load_nodes( ot, it );  break;
+          case "nodes" :  load_nodes( ot, it, ref clone_ids );  break;
         }
       }
     }
@@ -677,13 +753,13 @@ public class Node {
   }
 
   /* Loads the given child node information */
-  private void load_nodes( OutlineTable ot, Xml.Node* n ) {
+  private void load_nodes( OutlineTable ot, Xml.Node* n, ref HashMap<int,Node> clone_ids ) {
 
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
         var child = new Node( ot );
         add_child( child );
-        child.load( ot, it );
+        child.load( ot, it, ref clone_ids );
       }
     }
 

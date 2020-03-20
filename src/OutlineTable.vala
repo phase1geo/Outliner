@@ -22,6 +22,7 @@
 using Gtk;
 using Gdk;
 using Cairo;
+using Gee;
 
 public class OutlineTable : DrawingArea {
 
@@ -49,6 +50,7 @@ public class OutlineTable : DrawingArea {
   private bool            _debug         = true;
   private NodeDrawOptions _draw_options;
   private NodeListType    _list_type     = NodeListType.NONE;
+  private Node            _clone         = null;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -673,8 +675,9 @@ public class OutlineTable : DrawingArea {
     string    str;
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* root = new Xml.Node( null, "olnode" );
+    var       clone_ids = new HashMap<int,bool>();
     doc->set_root_element( root );
-    root->add_child( node.save() );
+    root->add_child( node.save( ref clone_ids ) );
     doc->dump_memory( out str );
     delete doc;
     return( str );
@@ -682,11 +685,12 @@ public class OutlineTable : DrawingArea {
 
   /* Takes an XML string as input and populates the passed node with its contents */
   public void deserialize_node_for_paste( string str, Node node ) {
-    Xml.Doc* doc = Xml.Parser.parse_doc( str );
+    Xml.Doc* doc       = Xml.Parser.parse_doc( str );
+    var      clone_ids = new HashMap<int,Node>();
     if( doc == null ) return;
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
-        node.load( this, it );
+        node.load( this, it, ref clone_ids );
       }
     }
     delete doc;
@@ -755,6 +759,11 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Clones the given node and its subtree */
+  public void clone_node( Node node ) {
+    _clone = node;
+  }
+
   /* Copies the given node to the clipboard and then removes it from the document */
   public void cut_node_to_clipboard( Node node ) {
     var text = serialize_node_for_copy( node );
@@ -784,6 +793,19 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Inserts the given node relative to the currently selected row */
+  private void insert_node_from_selected( bool below, Node node ) {
+    if( below ) {
+      if( selected.children.length > 0 ) {
+        insert_node( selected, node, 0 );
+      } else {
+        insert_node( selected.parent, node, (selected.index() + 1) );
+      }
+    } else {
+      insert_node( selected.parent, node, selected.index() );
+    }
+  }
+
   /*
    Pastes the given node into the table after the currently selected node as
    a sibling node.
@@ -796,15 +818,38 @@ public class OutlineTable : DrawingArea {
     deserialize_node_for_paste( text, node );
 
     /* Insert the node into the appropriate position in the table */
-    if( below ) {
-      if( selected.children.length > 0 ) {
-        insert_node( selected, node, 0 );
-      } else {
-        insert_node( selected.parent, node, (selected.index() + 1) );
-      }
-    } else {
-      insert_node( selected.parent, node, selected.index() );
+    insert_node_from_selected( below, node );
+
+    /* Add an undo item for this operation */
+    undo_buffer.add_item( new UndoNodePaste( node ) );
+
+    queue_draw();
+    changed();
+    see( node );
+
+  }
+
+  /* Clones the entire tree */
+  private void clone_tree( Node src_node, out Node cloned_node ) {
+
+    cloned_node = new Node.clone_from_node( this, src_node );
+
+    for( int i=0; i<src_node.children.length; i++ ) {
+      Node child;
+      clone_tree( src_node.children.index( i ), out child );
+      cloned_node.add_child( child );
     }
+
+  }
+
+  public void paste_clone( bool below ) {
+
+    /* Clone the clone node */
+    Node node;
+    clone_tree( _clone, out node );
+
+    /* Insert the node into the appropriate position in the table */
+    insert_node_from_selected( below, node );
 
     /* Add an undo item for this operation */
     undo_buffer.add_item( new UndoNodePaste( node ) );
@@ -1584,12 +1629,13 @@ public class OutlineTable : DrawingArea {
   private void load_nodes( Xml.Node* n ) {
 
     var i = 0;
+    var clone_ids = new HashMap<int,Node>();
 
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
         var node = new Node( this );
         root.add_child( node, i++ );
-        node.load( this, it );
+        node.load( this, it, ref clone_ids );
       }
     }
 
@@ -1622,8 +1668,10 @@ public class OutlineTable : DrawingArea {
 
     Xml.Node* n = new Xml.Node( null, "nodes" );
 
+    var clone_ids = new HashMap<int,bool>();
+
     for( int i=0; i<root.children.length; i++ ) {
-      n->add_child( root.children.index( i ).save() );
+      n->add_child( root.children.index( i ).save( ref clone_ids ) );
     }
 
     return( n );
@@ -1744,6 +1792,11 @@ public class OutlineTable : DrawingArea {
   /* Returns true if the currently selected row is unindentable */
   public bool unindentable() {
     return( (selected != null) && !selected.parent.is_root() );
+  }
+
+  /* Returns true if a node has been cloned that can be pasted */
+  public bool cloneable() {
+    return( _clone != null );
   }
 
   /*

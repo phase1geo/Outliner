@@ -131,6 +131,18 @@ public class CanvasText : Object {
     update_size( false );
   }
 
+  /* Constructor which is cloned from the given FormattedText */
+  public CanvasText.clone_from( OutlineTable table, double max_width, CanvasText ct ) {
+    _text         = ct.text;
+    _text.changed.connect( text_changed );
+    _max_width    = max_width;
+    _line_layout  = table.create_pango_layout( "M" );
+    _pango_layout = table.create_pango_layout( ct.text.text );
+    _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
+    _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    update_size( false );
+  }
+
   /* Copies an existing CanvasText to this CanvasText */
   public void copy( CanvasText ct ) {
     posx       = ct.posx;
@@ -140,6 +152,13 @@ public class CanvasText : Object {
     _line_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    update_size( true );
+  }
+
+  /* Clones an existing CanvasText */
+  public void clone( CanvasText ct ) {
+    _text = ct.text;
+    _text.changed.connect( text_changed );
     update_size( true );
   }
 
