@@ -91,6 +91,13 @@ public class NodeDrawOptions {
   public NodeDrawOptions() {}
 }
 
+public class NodeCloneData {
+  public int           id;
+  public FormattedText name;
+  public FormattedText note;
+  public NodeCloneData() {}
+}
+
 public class Node {
 
   private static int next_id  = 0;
@@ -419,6 +426,38 @@ public class Node {
     cursor_changed( false );
   }
 
+  /* Returns true if this node is a cloned node */
+  public bool is_clone() {
+    return( _clone_id != -1 );
+  }
+
+  /*
+   If this node is cloned, we will unclone the node by making a copy of the name/note from
+   the cloned value.
+  */
+  public void unclone() {
+    if( !is_clone() ) return;
+    _clone_id = -1;
+    name.unclone( _ot );
+    note.unclone( _ot );
+  }
+
+  /* Returns clone data which is used for undoing/redoing uncloning */
+  public NodeCloneData get_clone_data() {
+    var clone_data = new NodeCloneData();
+    clone_data.id   = _clone_id;
+    clone_data.name = name.text;
+    clone_data.note = note.text;
+    return( clone_data );
+  }
+
+  /* Re-clones a node that was previously cloned */
+  public void reclone( NodeCloneData clone_data ) {
+    _clone_id = clone_data.id;
+    name.clone( clone_data.name );
+    note.clone( clone_data.note );
+  }
+
   /* Called whenever the canvas width changes */
   private void update_width() {
 
@@ -735,8 +774,8 @@ public class Node {
       } else {
         var clone = clone_ids.get( cid );
         _clone_id = cid;
-        name.clone( clone.name );
-        note.clone( clone.note );
+        name.clone( clone.name.text );
+        note.clone( clone.note.text );
       }
     }
 

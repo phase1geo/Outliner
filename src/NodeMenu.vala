@@ -25,12 +25,13 @@ public class NodeMenu : Gtk.Menu {
 
   private OutlineTable _ot;
   private Gtk.MenuItem _copy;
-  private Gtk.MenuItem _clone;
   private Gtk.MenuItem _cut;
   private Gtk.MenuItem _paste_above;
   private Gtk.MenuItem _paste_below;
-  private Gtk.MenuItem _paste_clone;
   private Gtk.MenuItem _delete;
+  private Gtk.MenuItem _clone;
+  private Gtk.MenuItem _unclone;
+  private Gtk.MenuItem _paste_clone;
   private Gtk.MenuItem _edit_text;
   private Gtk.MenuItem _edit_note;
   private Gtk.MenuItem _note_display;
@@ -48,9 +49,6 @@ public class NodeMenu : Gtk.Menu {
     _copy.activate.connect( copy );
     Utils.add_accel_label( _copy, 'c', Gdk.ModifierType.CONTROL_MASK );
 
-    _clone = new Gtk.MenuItem.with_label( _( "Clone" ) );
-    _clone.activate.connect( clone );
-
     _cut = new Gtk.MenuItem.with_label( _( "Cut" ) );
     _cut.activate.connect( cut );
     Utils.add_accel_label( _cut, 'x', Gdk.ModifierType.CONTROL_MASK );
@@ -63,12 +61,18 @@ public class NodeMenu : Gtk.Menu {
     _paste_below.activate.connect( paste_below );
     Utils.add_accel_label( _paste_below, 'v', Gdk.ModifierType.CONTROL_MASK );
 
-    _paste_clone = new Gtk.MenuItem.with_label( _( "Paste Clone" ) );
-    _paste_clone.activate.connect( paste_clone );
-
     _delete = new Gtk.MenuItem.with_label( _( "Delete" ) );
     _delete.activate.connect( delete_node );
     Utils.add_accel_label( _delete, 65535, 0 );
+
+    _clone = new Gtk.MenuItem.with_label( _( "Copy As Clone" ) );
+    _clone.activate.connect( clone );
+
+    _unclone = new Gtk.MenuItem.with_label( _( "Unclone" ) );
+    _unclone.activate.connect( unclone );
+
+    _paste_clone = new Gtk.MenuItem.with_label( _( "Paste Clone" ) );
+    _paste_clone.activate.connect( paste_clone );
 
     _edit_text = new Gtk.MenuItem.with_label( _( "Edit Text" ) );
     _edit_text.activate.connect( edit_text );
@@ -102,12 +106,14 @@ public class NodeMenu : Gtk.Menu {
 
     /* Add the menu items to the menu */
     add( _copy );
-    add( _clone );
     add( _cut );
     add( _paste_above );
     add( _paste_below );
-    add( _paste_clone );
     add( _delete );
+    add( new SeparatorMenuItem() );
+    add( _clone );
+    add( _unclone );
+    add( _paste_clone );
     add( new SeparatorMenuItem() );
     add( _edit_text );
     add( _edit_note );
@@ -137,6 +143,7 @@ public class NodeMenu : Gtk.Menu {
     /* Set the menu sensitivity */
     _paste_above.set_sensitive( pasteable );
     _paste_below.set_sensitive( pasteable );
+    _unclone.set_sensitive( _ot.selected.is_clone() );
     _paste_clone.set_sensitive( _ot.cloneable() );
     _indent.set_sensitive( _ot.indentable() );
     _unindent.set_sensitive( _ot.unindentable() );
@@ -162,6 +169,11 @@ public class NodeMenu : Gtk.Menu {
   /* Clones the currently selected node */
   private void clone() {
     _ot.clone_node( _ot.selected );
+  }
+
+  /* Unclones the currently selected node */
+  private void unclone() {
+    _ot.unclone_node( _ot.selected );
   }
 
   /* Cuts the currently selected node */

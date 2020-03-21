@@ -764,6 +764,13 @@ public class OutlineTable : DrawingArea {
     _clone = node;
   }
 
+  /* Converts the given node from a cloned node to an uncloned node */
+  public void unclone_node( Node node ) {
+    var clone_data = node.get_clone_data();
+    node.unclone();
+    undo_buffer.add_item( new UndoNodeUnclone( node, clone_data ) );
+  }
+
   /* Copies the given node to the clipboard and then removes it from the document */
   public void cut_node_to_clipboard( Node node ) {
     var text = serialize_node_for_copy( node );

@@ -156,8 +156,17 @@ public class CanvasText : Object {
   }
 
   /* Clones an existing CanvasText */
-  public void clone( CanvasText ct ) {
-    _text = ct.text;
+  public void clone( FormattedText text ) {
+    _text = text;
+    _text.changed.connect( text_changed );
+    update_size( true );
+  }
+
+  /* Unclones the text */
+  public void unclone( OutlineTable ot ) {
+    var orig_text = _text;
+    _text = new FormattedText( ot );
+    _text.copy( orig_text );
     _text.changed.connect( text_changed );
     update_size( true );
   }
