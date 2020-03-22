@@ -29,6 +29,9 @@ public class NodeMenu : Gtk.Menu {
   private Gtk.MenuItem _paste_above;
   private Gtk.MenuItem _paste_below;
   private Gtk.MenuItem _delete;
+  private Gtk.MenuItem _clone;
+  private Gtk.MenuItem _unclone;
+  private Gtk.MenuItem _paste_clone;
   private Gtk.MenuItem _edit_text;
   private Gtk.MenuItem _edit_note;
   private Gtk.MenuItem _note_display;
@@ -61,6 +64,15 @@ public class NodeMenu : Gtk.Menu {
     _delete = new Gtk.MenuItem.with_label( _( "Delete" ) );
     _delete.activate.connect( delete_node );
     Utils.add_accel_label( _delete, 65535, 0 );
+
+    _clone = new Gtk.MenuItem.with_label( _( "Copy As Clone" ) );
+    _clone.activate.connect( clone );
+
+    _unclone = new Gtk.MenuItem.with_label( _( "Unclone" ) );
+    _unclone.activate.connect( unclone );
+
+    _paste_clone = new Gtk.MenuItem.with_label( _( "Paste Clone" ) );
+    _paste_clone.activate.connect( paste_clone );
 
     _edit_text = new Gtk.MenuItem.with_label( _( "Edit Text" ) );
     _edit_text.activate.connect( edit_text );
@@ -99,6 +111,10 @@ public class NodeMenu : Gtk.Menu {
     add( _paste_below );
     add( _delete );
     add( new SeparatorMenuItem() );
+    add( _clone );
+    add( _unclone );
+    add( _paste_clone );
+    add( new SeparatorMenuItem() );
     add( _edit_text );
     add( _edit_note );
     add( _note_display );
@@ -127,6 +143,8 @@ public class NodeMenu : Gtk.Menu {
     /* Set the menu sensitivity */
     _paste_above.set_sensitive( pasteable );
     _paste_below.set_sensitive( pasteable );
+    _unclone.set_sensitive( _ot.selected.is_clone() );
+    _paste_clone.set_sensitive( _ot.cloneable() );
     _indent.set_sensitive( _ot.indentable() );
     _unindent.set_sensitive( _ot.unindentable() );
 
@@ -148,6 +166,16 @@ public class NodeMenu : Gtk.Menu {
     _ot.copy_node_to_clipboard( _ot.selected );
   }
 
+  /* Clones the currently selected node */
+  private void clone() {
+    _ot.clone_node( _ot.selected );
+  }
+
+  /* Unclones the currently selected node */
+  private void unclone() {
+    _ot.unclone_node( _ot.selected );
+  }
+
   /* Cuts the currently selected node */
   private void cut() {
     _ot.cut_node_to_clipboard( _ot.selected );
@@ -161,6 +189,11 @@ public class NodeMenu : Gtk.Menu {
   /* Pastes the given node as a sibling of the selected node */
   private void paste_below() {
     _ot.paste_node( true );
+  }
+
+  /* Pastes the given clone within the currently selected node */
+  private void paste_clone() {
+    _ot.paste_clone( true );
   }
 
   /* Deletes the currently selected node */
