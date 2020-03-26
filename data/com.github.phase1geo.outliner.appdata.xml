@@ -17,25 +17,26 @@
     </screenshots>
     <description>
       <p>Quickly create outlines and export them in a number of useful formats.</p>
-      <p>
-        <ul>
-          <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
-          <li>Full support for text formatting.</li>
-          <li>Add notes to any outline text.</li>
-          <li>Close/Hide any group within the outline for increased focus.</li>
-          <li>Quick search and replace of any text within the document, including notes.</li>
-          <li>View document statistics such as character count, word count and row count.</li>
-          <li>Unlimited undo/redo of any change.</li>
-          <li>Automatically saves in the background.</li>
-          <li>Open multiple outlines with the use of tabs.</li>
-          <li>Built-in themes.</li>
-          <li>Import from Minder and OPML.</li>
-          <li>Export to HTML, Markdown, Minder, OPML, PDF and PlainText.</li>
-          <li>Printer support.</li>
-        </ul>
-      </p>
+      <ul>
+        <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
+        <li>Full support for text formatting.</li>
+        <li>Add notes to any outline text.</li>
+        <li>Close/Hide any group within the outline for increased focus.</li>
+        <li>Quick search and replace of any text within the document, including notes.</li>
+        <li>View document statistics such as character count, word count and row count.</li>
+        <li>Unlimited undo/redo of any change.</li>
+        <li>Automatically saves in the background.</li>
+        <li>Open multiple outlines with the use of tabs.</li>
+        <li>Built-in themes.</li>
+        <li>Import from Minder and OPML.</li>
+        <li>Export to HTML, Markdown, Minder, OPML, PDF and PlainText.</li>
+        <li>Printer support.</li>
+      </ul>
     </description>
     <releases>
+      <release version="1.0.2" date="2020-03-26">
+        <p>Initial 1.0.2 release!</p>
+      </release>
       <release version="1.0.0" date="2020-03-20">
         <description>
           <p>Initial 1.0.0 release!</p>
