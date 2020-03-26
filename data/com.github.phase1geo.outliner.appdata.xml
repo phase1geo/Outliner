@@ -34,12 +34,9 @@
       </ul>
     </description>
     <releases>
-      <release version="1.0.2" date="2020-03-26">
-        <p>Initial 1.0.2 release!</p>
-      </release>
-      <release version="1.0.0" date="2020-03-20">
+      <release version="1.0.3" date="2020-03-26">
         <description>
-          <p>Initial 1.0.0 release!</p>
+          <p>Initial release!</p>
         </description>
       </release>
     </releases>

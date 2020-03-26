@@ -801,9 +801,9 @@ public class MainWindow : ApplicationWindow {
   */
   public void do_buffer_changed( UndoBuffer buf ) {
     _undo_btn.set_sensitive( buf.undoable() );
-    _undo_btn.set_tooltip_text( buf.undo_tooltip() );
+    _undo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.undo_tooltip(), "<Control>z" ) );
     _redo_btn.set_sensitive( buf.redoable() );
-    _redo_btn.set_tooltip_text( buf.redo_tooltip() );
+    _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.redo_tooltip(), "<Control><Shift>z" ) );
   }
 
   /* Allow the user to select a filename to save the document as */
