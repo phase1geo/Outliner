@@ -56,24 +56,24 @@ public class FormatBar : Gtk.Popover {
 
     _copy = new Button.from_icon_name( "edit-copy-symbolic", IconSize.SMALL_TOOLBAR );
     _copy.relief = ReliefStyle.NONE;
-    _copy.set_tooltip_markup( Utils.tooltip_with_accel( _( "Copy" ), "Ctrl + C" ) );
+    _copy.set_tooltip_markup( Utils.tooltip_with_accel( _( "Copy" ), "<Control>c" ) );
     _copy.clicked.connect( handle_copy );
 
     _cut = new Button.from_icon_name( "edit-cut-symbolic", IconSize.SMALL_TOOLBAR );
     _cut.relief = ReliefStyle.NONE;
-    _cut.set_tooltip_markup( Utils.tooltip_with_accel( _( "Cut" ), "Ctrl + X" ) );
+    _cut.set_tooltip_markup( Utils.tooltip_with_accel( _( "Cut" ), "<Control>x" ) );
     _cut.clicked.connect( handle_cut );
 
     _bold = new ToggleButton();
     _bold.image  = new Image.from_icon_name( "format-text-bold-symbolic", IconSize.SMALL_TOOLBAR );
     _bold.relief = ReliefStyle.NONE;
-    _bold.set_tooltip_markup( Utils.tooltip_with_accel( _( "Bold" ), "Ctrl + B" ) );
+    _bold.set_tooltip_markup( Utils.tooltip_with_accel( _( "Bold" ), "<Control>b" ) );
     _bold.toggled.connect( handle_bold );
 
     _italics = new ToggleButton();
     _italics.image  = new Image.from_icon_name( "format-text-italic-symbolic", IconSize.SMALL_TOOLBAR );
     _italics.relief = ReliefStyle.NONE;
-    _italics.set_tooltip_markup( Utils.tooltip_with_accel( _( "Italic" ), "Ctrl + I" ) );
+    _italics.set_tooltip_markup( Utils.tooltip_with_accel( _( "Italic" ), "<Control>i" ) );
     _italics.toggled.connect( handle_italics );
 
     _underline = new ToggleButton();
