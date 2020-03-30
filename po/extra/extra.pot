@@ -1,0 +1,107 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the extra package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: extra\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-29 20:24+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/com.github.phase1geo.outliner.desktop.in:3
+#: data/com.github.phase1geo.outliner.desktop.in:4
+#: data/com.github.phase1geo.outliner.appdata.xml.in:7
+msgid "Outliner"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.desktop.in:5
+#: data/com.github.phase1geo.outliner.appdata.xml.in:8
+msgid "Organize your words"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.desktop.in:8
+msgid "com.github.phase1geo.outliner"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.desktop.in:14
+msgid "outline;"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.desktop.in:18
+msgid "New Document"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:9
+msgid "Trevor Williams"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:19
+msgid "Quickly create outlines and export them in a number of useful formats."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:21
+msgid "Quickly create and navigate outlines using the keyboard or mouse."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:22
+msgid "Full support for text formatting."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:23
+msgid "Add notes to any outline text."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:24
+msgid "Close/Hide any group within the outline for increased focus."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:25
+msgid ""
+"Quick search and replace of any text within the document, including notes."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:26
+msgid ""
+"View document statistics such as character count, word count and row count."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:27
+msgid "Unlimited undo/redo of any change."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:28
+msgid "Automatically saves in the background."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:29
+msgid "Open multiple outlines with the use of tabs."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:30
+msgid "Built-in themes."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:31
+msgid "Import from Minder and OPML."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:32
+msgid "Export to HTML, Markdown, Minder, OPML, PDF and PlainText."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:33
+msgid "Printer support."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:39
+msgid "Initial release!"
+msgstr ""

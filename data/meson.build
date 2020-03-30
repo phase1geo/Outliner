@@ -1,4 +1,4 @@
-icon_sizes = ['16','24','32', '48', '64', '128']
+icon_sizes = ['16', '24', '32', '48', '64', '128']
 
 foreach i : icon_sizes
     install_data(
@@ -17,13 +17,20 @@ install_data(
     install_dir: join_paths(get_option('datadir'), 'pixmaps')
 )
 
-install_data(
-    meson.project_name() + '.desktop',
+i18n.merge_file(
+    input: meson.project_name() + '.desktop.in',
+    output: meson.project_name() + '.desktop',
+    po_dir: join_paths(meson.source_root(), 'po', 'extra'),
+    type: 'desktop',
+    install: true,
     install_dir: join_paths(get_option('datadir'), 'applications')
 )
 
-install_data(
-    meson.project_name() + '.appdata.xml',
+i18n.merge_file(
+    input: meson.project_name() + '.appdata.xml.in',
+    output: meson.project_name() + '.appdata.xml',
+    po_dir: join_paths(meson.source_root(), 'po', 'extra'),
+    install: true,
     install_dir: join_paths(get_option('datadir'), 'metainfo')
 )
 
