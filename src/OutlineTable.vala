@@ -36,7 +36,7 @@ public class OutlineTable : DrawingArea {
   private EventType       _press_type = EventType.NOTHING;
   private bool            _motion     = false;
   private Theme           _theme;
-  private IMContextSimple _im_context;
+  private IMMulticontext  _im_context;
   private double          _scroll_adjust = -1;
   private string?         _hilite_color  = null;
   private string?         _font_color    = null;
@@ -63,7 +63,7 @@ public class OutlineTable : DrawingArea {
     set {
       if( _selected != value ) {
         if( _selected != null ) {
-          set_selected_mode( NodeMode.NONE );
+          set_node_mode( _selected, NodeMode.NONE );
           _selected.select_mode.disconnect( select_mode_changed );
           _selected.cursor_changed.disconnect( selected_cursor_changed );
         }
@@ -72,7 +72,7 @@ public class OutlineTable : DrawingArea {
         }
         _selected = value;
         if( _selected != null ) {
-          set_selected_mode( NodeMode.SELECTED );
+          set_node_mode( _selected, NodeMode.SELECTED );
           _selected.select_mode.connect( select_mode_changed );
           _selected.cursor_changed.connect( selected_cursor_changed );
         }
@@ -192,12 +192,12 @@ public class OutlineTable : DrawingArea {
     this.can_focus = true;
 
     /* Make sure that we us the IMMulticontext input method */
-    im_context = new IMMulticontext();
-    im_context.set_client_window( this.get_window() );
-    im_context.set_use_preedit( false );
-    im_context.commit.connect( handle_im_commit );
-    im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
-    im_context.delete_surrounding.connect( handle_im_delete_surrounding );
+    _im_context = new IMMulticontext();
+    _im_context.set_client_window( this.get_window() );
+    _im_context.set_use_preedit( false );
+    _im_context.commit.connect( handle_im_commit );
+    _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
+    _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
 
   }
 
@@ -226,27 +226,43 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Called whenever we want to change the current selected node's mode */
-  private void set_selected_mode( NodeMode mode ) {
-    if( selected == null ) return;
-    if( selected.mode != mode ) {
-      if( (selected.mode == NodeMode.EDITABLE) && undo_text.undoable() ) {
-        undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
+  private void set_node_mode( Node node, NodeMode mode ) {
+    if( node == null ) return;
+    if( node.mode != mode ) {
+      if( (node.mode == NodeMode.EDITABLE) && undo_text.undoable() ) {
+        undo_buffer.add_item( new UndoNodeName( this, node, _orig_text ) );
         undo_text.clear();
         undo_text.ct = null;
-      } else if( (selected.mode == NodeMode.NOTEEDIT) && undo_text.undoable() ) {
-        undo_buffer.add_item( new UndoNodeNote( this, selected, _orig_text ) );
+        _im_context.focus_out();
+      } else if( (node.mode == NodeMode.NOTEEDIT) && undo_text.undoable() ) {
+        undo_buffer.add_item( new UndoNodeNote( this, node, _orig_text ) );
         undo_text.clear();
         undo_text.ct = null;
+        _im_context.focus_out();
       }
       if( mode == NodeMode.EDITABLE ) {
-        _orig_text.copy( selected.name );
-        undo_text.ct = selected.name;
+        _orig_text.copy( node.name );
+        undo_text.ct = node.name;
       } else if( mode == NodeMode.NOTEEDIT ) {
-        _orig_text.copy( selected.note );
-        undo_text.ct = selected.note;
+        _orig_text.copy( node.note );
+        undo_text.ct = node.note;
       }
-      selected.mode = mode;
+      if( (mode == NodeMode.EDITABLE) || (mode == NodeMode.NOTEEDIT) ) {
+        if( node.mode != mode ) {
+          update_im_cursor( (mode == NodeMode.EDITABLE) ? node.name : node.note );
+          _im_context.focus_in();
+        }
+      } else if( (node.mode == NodeMode.EDITABLE) || (node.mode == NodeMode.NOTEEDIT) ) {
+        _im_context.focus_out();
+      }
+      node.mode = mode;
     }
+  }
+
+  /* Updates the IM context cursor location based on the canvas text position */
+  private void update_im_cursor( CanvasText ct ) {
+    Gdk.Rectangle rect = {(int)ct.posx, (int)ct.posy, 0, (int)ct.height};
+    _im_context.set_cursor_location( rect );
   }
 
   /* Make sure that the given node is fully in view */
@@ -341,7 +357,7 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Sets the selected mode */
-    set_selected_mode( select_mode );
+    set_node_mode( selected, select_mode );
 
     return( true );
 
@@ -428,25 +444,25 @@ public class OutlineTable : DrawingArea {
           if( selected.mode == NodeMode.SELECTED ) {
             _move_parent = selected.parent;
             _move_index  = selected.index();
-            selected.mode = NodeMode.MOVETO;
+            set_node_mode( selected, NodeMode.MOVETO );
             selected.parent.remove_child( selected );
           }
           selected.y = e.y;
           var current = node_at_coordinates( e.x, e.y );
           if( current != null ) {
             if( current.is_within_attachto( e.x, e.y ) ) {
-              current.mode   = NodeMode.ATTACHTO;
+              set_node_mode( current, NodeMode.ATTACHTO );
               selected.depth = current.depth + 1;
             } else if( current.is_within_attachabove( e.x, e.y ) ) {
-              current.mode   = NodeMode.ATTACHABOVE;
+              set_node_mode( current, NodeMode.ATTACHABOVE );
               selected.depth = current.get_previous_node().depth;
             } else {
-              current.mode   = NodeMode.ATTACHBELOW;
+              set_node_mode( current, NodeMode.ATTACHBELOW );
               selected.depth = current.depth;
             }
             if( current != _active ) {
               if( _active != null ) {
-                _active.mode = NodeMode.NONE;
+                set_node_mode( _active, NodeMode.NONE );
               }
               _active = current;
             }
@@ -487,11 +503,11 @@ public class OutlineTable : DrawingArea {
       if( current != _active ) {
         if( (_active != null) && (_active != selected) ) {
           _active.over_note_icon = false;
-          _active.mode           = NodeMode.NONE;
+          set_node_mode( _active, NodeMode.NONE );
         }
         if( (current != null) && (current != selected) ) {
-          current.mode = NodeMode.HOVER;
-          _active      = current;
+          set_node_mode( current, NodeMode.HOVER );
+          _active = current;
         }
         queue_draw();
       }
@@ -528,14 +544,14 @@ public class OutlineTable : DrawingArea {
           if( selected == null ) {
             selected = _active;
           }
-          set_selected_mode( NodeMode.SELECTED );
-          _active.mode  = NodeMode.NONE;
-          _active       = null;
+          set_node_mode( selected, NodeMode.SELECTED );
+          set_node_mode( _active, NodeMode.NONE );
+          _active = null;
           queue_draw();
           changed();
         } else {
           selected = _active;
-          set_selected_mode( NodeMode.SELECTED );
+          set_node_mode( selected, NodeMode.SELECTED );
           queue_draw();
         }
       }
@@ -668,7 +684,7 @@ public class OutlineTable : DrawingArea {
     node.hide_note = !node.hide_note;
     if( node.note.text.text == "" ) {
       selected = node;
-      set_selected_mode( (node.hide_note || !edit) ? NodeMode.SELECTED : NodeMode.NOTEEDIT );
+      set_node_mode( selected, (node.hide_note || !edit) ? NodeMode.SELECTED : NodeMode.NOTEEDIT );
     }
     queue_draw();
     changed();
@@ -899,20 +915,20 @@ public class OutlineTable : DrawingArea {
         if( prev != null ) {
           delete_current_node();
           selected = prev;
-          set_selected_mode( NodeMode.EDITABLE );
+          set_node_mode( selected, NodeMode.EDITABLE );
           selected.name.move_cursor_to_end();
-          im_context.reset();
+          _im_context.reset();
         }
       } else {
         selected.name.backspace( undo_text );
         see( selected );
-        im_context.reset();
+        _im_context.reset();
         queue_draw();
       }
     } else if( is_note_editable() ) {
       selected.note.backspace( undo_text );
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
       delete_current_node();
@@ -924,12 +940,12 @@ public class OutlineTable : DrawingArea {
     if( is_node_editable() ) {
       selected.name.delete( undo_text );
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.delete( undo_text );
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
       delete_current_node();
@@ -939,8 +955,8 @@ public class OutlineTable : DrawingArea {
   /* Handles an escape keypress */
   private void handle_escape() {
     if( is_node_editable() || is_note_editable() ) {
-      set_selected_mode( NodeMode.SELECTED );
-      im_context.reset();
+      set_node_mode( selected, NodeMode.SELECTED );
+      _im_context.reset();
       queue_draw();
       changed();
     }
@@ -973,8 +989,8 @@ public class OutlineTable : DrawingArea {
       var node   = create_node( title, tags );
       selected.name.text.remove_text( curpos, (endpos - curpos ) );
       insert_node( sel.parent, node, index );
-      set_selected_mode( NodeMode.EDITABLE );
-      im_context.reset();
+      set_node_mode( selected, NodeMode.EDITABLE );
+      _im_context.reset();
       undo_buffer.add_item( new UndoNodeSplit( selected ) );
     } else if( is_note_editable() ) {
       selected.note.insert( "\n", undo_text );
@@ -1023,7 +1039,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1033,7 +1049,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
       if( !selected.is_leaf() && !selected.expanded ) {
@@ -1054,7 +1070,7 @@ public class OutlineTable : DrawingArea {
         selected.name.move_cursor_by_word( 1 );
       }
       undo_text.mergeable = false;
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1063,7 +1079,7 @@ public class OutlineTable : DrawingArea {
         selected.note.move_cursor_by_word( 1 );
       }
       undo_text.mergeable = false;
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1078,7 +1094,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1088,7 +1104,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
       if( !selected.is_leaf() && selected.expanded ) {
@@ -1110,7 +1126,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1120,7 +1136,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1135,7 +1151,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1145,7 +1161,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
       var node = selected.get_previous_node();
@@ -1166,7 +1182,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1176,7 +1192,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1191,7 +1207,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1201,7 +1217,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
       var node = selected.get_next_node();
@@ -1222,7 +1238,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
@@ -1232,7 +1248,7 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1243,13 +1259,13 @@ public class OutlineTable : DrawingArea {
       selected.name.set_cursor_all( false );
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.set_cursor_all( false );
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1260,13 +1276,13 @@ public class OutlineTable : DrawingArea {
       selected.name.clear_selection();
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.clear_selection();
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1285,12 +1301,12 @@ public class OutlineTable : DrawingArea {
     if( is_node_editable() ) {
       selected.name.set_cursor_all( false );
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.set_cursor_all( false );
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1371,13 +1387,13 @@ public class OutlineTable : DrawingArea {
       selected.name.move_cursor_to_start();
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.move_cursor_to_start();
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1388,13 +1404,13 @@ public class OutlineTable : DrawingArea {
       selected.name.move_cursor_to_end();
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
       selected.note.move_cursor_to_end();
       undo_text.mergeable = false;
       see( selected );
-      im_context.reset();
+      _im_context.reset();
       queue_draw();
     }
   }
@@ -1440,7 +1456,7 @@ public class OutlineTable : DrawingArea {
     ct.get_cursor_info( out cursor, out selstart, out selend );
     var startpos = cursor - offset;
     var endpos   = startpos + chars;
-    ct.delete_range( startpos, endpos );
+    ct.delete_range( startpos, endpos, undo_text );
   }
 
   /* Called in IMContext callback of the same name */
@@ -1484,9 +1500,9 @@ public class OutlineTable : DrawingArea {
   public void edit_selected( bool title ) {
     if( selected == null ) return;
     if( title ) {
-      set_selected_mode( NodeMode.EDITABLE );
+      set_node_mode( selected, NodeMode.EDITABLE );
     } else {
-      set_selected_mode( NodeMode.NOTEEDIT );
+      set_node_mode( selected, NodeMode.NOTEEDIT );
       selected.hide_note = false;
     }
     queue_draw();
@@ -1569,7 +1585,7 @@ public class OutlineTable : DrawingArea {
     /* Create the main idea node */
     var node = new Node( this );
     insert_node( root, node, 0 );
-    set_selected_mode( NodeMode.EDITABLE );
+    set_node_mode( selected, NodeMode.EDITABLE );
 
     queue_draw();
 
@@ -1833,7 +1849,7 @@ public class OutlineTable : DrawingArea {
     var sel   = selected;
     var node  = create_node( title, tags );
     insert_node( sel.parent, node, index );
-    set_selected_mode( NodeMode.EDITABLE );
+    set_node_mode( selected, NodeMode.EDITABLE );
     undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
 
@@ -1844,7 +1860,7 @@ public class OutlineTable : DrawingArea {
     var sel   = selected;
     var node  = create_node();
     insert_node( sel, node, (int)index );
-    set_selected_mode( NodeMode.EDITABLE );
+    set_node_mode( selected, NodeMode.EDITABLE );
     undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
 
