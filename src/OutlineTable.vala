@@ -259,21 +259,30 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  private void get_window_ys( out int top, out int bottom ) {
+    var vp = parent.parent as Viewport;
+    var vh = vp.get_allocated_height();
+    var sw = parent.parent.parent as ScrolledWindow;
+    top    = (int)sw.vadjustment.value;
+    bottom = top + vh;
+  }
+
   /* Updates the IM context cursor location based on the canvas text position */
   private void update_im_cursor( CanvasText ct ) {
-    Gdk.Rectangle rect = {(int)ct.posx, (int)ct.posy, 0, (int)ct.height};
+    int top, bottom;
+    get_window_ys( out top, out bottom );
+    Gdk.Rectangle rect = {(int)ct.posx, ((int)ct.posy - top), 0, (int)ct.height};
     _im_context.set_cursor_location( rect );
   }
 
   /* Make sure that the given node is fully in view */
   public void see( Node node ) {
     if( root.children.length == 0 ) return;
+    int y1, y2;
+    int x, ytop, ybot;
     var vp = parent.parent as Viewport;
     var vh = vp.get_allocated_height();
-    var sw = parent.parent.parent as ScrolledWindow;
-    var y1 = sw.vadjustment.value;
-    var y2 = y1 + vh;
-    int x, ytop, ybot;
+    get_window_ys( out y1, out y2 );
     switch( node.mode ) {
       case NodeMode.EDITABLE :
         node.name.get_cursor_pos( out x, out ytop, out ybot );
