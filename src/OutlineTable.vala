@@ -1532,7 +1532,7 @@ public class OutlineTable : DrawingArea {
         case "h" :  unindent();  break;
         case "k" :  change_selected( selected.get_previous_node() );  break;
         case "l" :  indent();  break;
-        case "a" :  change_selected( selected.parent );  break;
+        case "u" :  change_selected( selected.parent );  break;
         case "T" :  change_selected( root.children.index( 0 ) );  break;
         case "B" :  change_selected( root.get_last_node() );  break;
       }
