@@ -591,16 +591,18 @@ public class OutlineTable : DrawingArea {
           case 65362 :  handle_control_up( shift );     break;
           case 65364 :  handle_control_down( shift );   break;
           case 47    :  handle_control_slash();         break;
-          case 92    :  handle_control_backslash();     break;
           case 46    :  handle_control_period();        break;
+          case 66    :  handle_control_b( true );       break;
+          case 84    :  handle_control_t( true );       break;
+          case 92    :  handle_control_backslash();     break;
           case 97    :  handle_control_a();             break;
-          case 98    :  handle_control_b();             break;
+          case 98    :  handle_control_b( false );      break;
           case 100   :  handle_control_d();             break;
           case 104   :  handle_control_h();             break;
           case 105   :  handle_control_i();             break;
           case 106   :  handle_control_j();             break;
           case 107   :  handle_control_k();             break;
-          case 116   :  handle_control_t();             break;
+          case 116   :  handle_control_t( false );      break;
           case 117   :  handle_control_u();             break;
           case 119   :  handle_control_w();             break;
         }
@@ -1134,7 +1136,7 @@ public class OutlineTable : DrawingArea {
       see( selected );
       queue_draw();
     } else if( selected != null ) {
-      var node = selected.get_previous_node();
+      var node = shift ? root.children.index( 0 ) : selected.get_previous_node();
       if( node != null ) {
         selected = node;
         queue_draw();
@@ -1165,7 +1167,7 @@ public class OutlineTable : DrawingArea {
     if( next != null ) {
       var orig_parent = node.parent;
       var orig_index  = node.index();
-      node.parent.remove_child( selected );
+      node.parent.remove_child( node );
       if( next.children.length == 0 ) {
         next.parent.add_child( node, (next.index() + 1) );
       } else {
@@ -1174,7 +1176,40 @@ public class OutlineTable : DrawingArea {
       undo_buffer.add_item( new UndoNodeMove( node, orig_parent, orig_index ) );
       queue_draw();
       changed();
-      see( selected );
+      see( node );
+      return( true );
+    }
+    return( false );
+  }
+
+  /* Moves the selected node to the top of the document.  Returns true if successful. */
+  public bool move_node_to_top( Node node ) {
+    if( node != root.children.index( 0 ) ) {
+      var orig_parent = node.parent;
+      var orig_index  = node.index();
+      node.parent.remove_child( node );
+      root.add_child( node, 0 );
+      undo_buffer.add_item( new UndoNodeMove( node, orig_parent, orig_index ) );
+      queue_draw();
+      changed();
+      see( node );
+      return( true );
+    }
+    return( false );
+  }
+
+  /* Moves the selected node to the bottom of the document.  Returns true if successful. */
+  public bool move_node_to_bottom( Node node ) {
+    var last = root.get_last_node();
+    if( node.get_last_node() != last ) {
+      var orig_parent = node.parent;
+      var orig_index  = node.index();
+      node.parent.remove_child( node );
+      last.parent.add_child( node, (last.index() + 1) );
+      undo_buffer.add_item( new UndoNodeMove( node, orig_parent, orig_index ) );
+      queue_draw();
+      changed();
+      see( node );
       return( true );
     }
     return( false );
@@ -1201,7 +1236,11 @@ public class OutlineTable : DrawingArea {
       see( selected );
       queue_draw();
     } else if( selected != null ) {
-      move_node_up( selected );
+      if( shift ) {
+        // TBD
+      } else {
+        move_node_up( selected );
+      }
     }
   }
 
@@ -1255,7 +1294,11 @@ public class OutlineTable : DrawingArea {
       see( selected );
       queue_draw();
     } else if( selected != null ) {
-      move_node_down( selected );
+      if( shift ) {
+        // TBD
+      } else {
+        move_node_down( selected );
+      }
     }
   }
 
@@ -1312,7 +1355,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Causes selected text to be bolded */
-  private void handle_control_b() {
+  private void handle_control_b( bool shift ) {
     if( is_node_text_selected() ) {
       selected.name.add_tag( FormatTag.BOLD, null, undo_text );
       see( selected );
@@ -1321,6 +1364,8 @@ public class OutlineTable : DrawingArea {
       selected.note.add_tag( FormatTag.BOLD, null, undo_text );
       see( selected );
       queue_draw();
+    } else if( shift && is_node_selected() ) {
+      move_node_to_bottom( selected );
     }
   }
 
@@ -1378,7 +1423,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Causes selected text to be striken */
-  private void handle_control_t() {
+  private void handle_control_t( bool shift ) {
     if( is_node_text_selected() ) {
       selected.name.add_tag( FormatTag.STRIKETHRU, null, undo_text );
       see( selected );
@@ -1387,6 +1432,8 @@ public class OutlineTable : DrawingArea {
       selected.note.add_tag( FormatTag.STRIKETHRU, null, undo_text );
       see( selected );
       queue_draw();
+    } else if( shift && is_node_selected() ) {
+      move_node_to_top( selected );
     }
   }
 
@@ -1458,6 +1505,8 @@ public class OutlineTable : DrawingArea {
         case "k" :  change_selected( selected.get_previous_node() );  break;
         case "l" :  indent();  break;
         case "a" :  change_selected( selected.parent );  break;
+        case "T" :  change_selected( root.children.index( 0 ) );  break;
+        case "B" :  change_selected( root.get_last_node() );  break;
       }
     }
   }

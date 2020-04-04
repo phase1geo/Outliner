@@ -194,6 +194,13 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Edit Note</property>
+                <property name="accelerator">&lt;shift&gt;e</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Expand Subrows</property>
                 <property name="accelerator">Right</property>
                 <property name="visible">1</property>
@@ -223,6 +230,54 @@
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Select Next Row</property>
                 <property name="accelerator">Down</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Top-most Row</property>
+                <property name="accelerator">&lt;shift&gt;t</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Bottom-most Row</property>
+                <property name="accelerator">&lt;shift&gt;b</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Row Movement</property>
+            <property name="visible">1</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move Selected Group Up</property>
+                <property name="accelerator">&lt;ctrl&gt;Up</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move Selected Group Down</property>
+                <property name="accelerator">&lt;ctrl&gt;Down</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move Selected Group To Top</property>
+                <property name="accelerator">&lt;ctrl&gt;&lt;shift&gt;t</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move Selected Group To Bottom</property>
+                <property name="accelerator">&lt;ctrl&gt;&lt;shift&gt;b</property>
                 <property name="visible">1</property>
               </object>
             </child>
