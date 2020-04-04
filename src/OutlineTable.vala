@@ -120,7 +120,7 @@ public class OutlineTable : DrawingArea {
     set {
       if( _list_type != value ) {
         _list_type = value;
-        root.set_all_list_types();
+        root.set_list_types();
         queue_draw();
         changed();
       }
@@ -282,6 +282,11 @@ public class OutlineTable : DrawingArea {
     var sw = parent.parent.parent as ScrolledWindow;
     sw.vadjustment.value = _scroll_adjust;
     _scroll_adjust = -1;
+  }
+
+  /* Returns true if the currently selected node is in the selected state */
+  public bool is_node_selected() {
+    return( (selected != null) && (selected.mode == NodeMode.SELECTED) );
   }
 
   /* Returns true if the currently selected node is editable */
@@ -591,10 +596,12 @@ public class OutlineTable : DrawingArea {
           case 97    :  handle_control_a();             break;
           case 98    :  handle_control_b();             break;
           case 100   :  handle_control_d();             break;
-          case 117   :  handle_control_u();             break;
           case 104   :  handle_control_h();             break;
           case 105   :  handle_control_i();             break;
+          case 106   :  handle_control_j();             break;
+          case 107   :  handle_control_k();             break;
           case 116   :  handle_control_t();             break;
+          case 117   :  handle_control_u();             break;
           case 119   :  handle_control_w();             break;
         }
       } else if( nomod || shift ) {
@@ -1135,6 +1142,44 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Moves the specified node down the document by one row.  Returns true if successful. */
+  public bool move_node_up( Node node ) {
+    var prev = node.get_previous_node();
+    if( prev != null ) {
+      var orig_parent = node.parent;
+      var orig_index  = node.index();
+      node.parent.remove_child( node );
+      prev.parent.add_child( node, prev.index() );
+      undo_buffer.add_item( new UndoNodeMove( node, orig_parent, orig_index ) );
+      queue_draw();
+      changed();
+      see( node );
+      return( true );
+    }
+    return( false );
+  }
+
+  /* Moves the specified node down the document by one row.  Returns true if successful. */
+  public bool move_node_down( Node node ) {
+    var next = node.get_last_node().get_next_node();
+    if( next != null ) {
+      var orig_parent = node.parent;
+      var orig_index  = node.index();
+      node.parent.remove_child( selected );
+      if( next.children.length == 0 ) {
+        next.parent.add_child( node, (next.index() + 1) );
+      } else {
+        next.add_child( node, 0 );
+      }
+      undo_buffer.add_item( new UndoNodeMove( node, orig_parent, orig_index ) );
+      queue_draw();
+      changed();
+      see( selected );
+      return( true );
+    }
+    return( false );
+  }
+
   /* Handles a Control-Up arrow keypress */
   private void handle_control_up( bool shift ) {
     if( is_node_editable() ) {
@@ -1155,6 +1200,8 @@ public class OutlineTable : DrawingArea {
       undo_text.mergeable = false;
       see( selected );
       queue_draw();
+    } else if( selected != null ) {
+      move_node_up( selected );
     }
   }
 
@@ -1207,6 +1254,8 @@ public class OutlineTable : DrawingArea {
       undo_text.mergeable = false;
       see( selected );
       queue_draw();
+    } else if( selected != null ) {
+      move_node_down( selected );
     }
   }
 
@@ -1298,6 +1347,20 @@ public class OutlineTable : DrawingArea {
       selected.note.add_tag( FormatTag.ITALICS, null, undo_text );
       see( selected );
       queue_draw();
+    }
+  }
+
+  /* If the current node is selected, moves the node down */
+  private void handle_control_j() {
+    if( is_node_selected() ) {
+      move_node_down( selected );
+    }
+  }
+
+  /* If the current node is selected, moves the node up */
+  private void handle_control_k() {
+    if( is_node_selected() ) {
+      move_node_up( selected );
     }
   }
 
