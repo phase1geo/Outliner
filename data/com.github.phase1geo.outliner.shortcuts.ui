@@ -221,6 +221,20 @@
             <property name="visible">1</property>
             <child>
               <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Parent Row</property>
+                <property name="accelerator">a</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Root Row</property>
+                <property name="accelerator">m</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Select Previous Row</property>
                 <property name="accelerator">Up</property>
                 <property name="visible">1</property>
@@ -230,6 +244,20 @@
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Select Next Row</property>
                 <property name="accelerator">Down</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Row One Page Up</property>
+                <property name="accelerator">Page_Up</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Row One Page Down</property>
+                <property name="accelerator">Page_Down</property>
                 <property name="visible">1</property>
               </object>
             </child>

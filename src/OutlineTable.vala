@@ -1472,15 +1472,43 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Moves the selection down by a page */
   private void handle_pageup() {
-    if( selected != null ) {
-      /* TBD */
+    if( is_node_selected() ) {
+      var vp   = parent.parent as Viewport;
+      var vh   = vp.get_allocated_height();
+      var sw   = parent.parent.parent as ScrolledWindow;
+      var y1   = sw.vadjustment.value;
+      sw.vadjustment.value = y1 - vh;
+      if( y1 == sw.vadjustment.value ) {
+        change_selected( root.children.index( 0 ) );
+      } else {
+        var node = node_at_coordinates( 0, (sw.vadjustment.value + vh) );
+        if( node != null ) {
+          selected = node;
+          queue_draw();
+        }
+      }
     }
   }
 
+  /* Moves the selection up by a page */
   private void handle_pagedn() {
-    if( selected != null ) {
-      /* TBD */
+    if( is_node_selected() ) {
+      var vp = parent.parent as Viewport;
+      var vh = vp.get_allocated_height();
+      var sw = parent.parent.parent as ScrolledWindow;
+      var y1 = sw.vadjustment.value;
+      sw.vadjustment.value = y1 + vh;
+      if( y1 == sw.vadjustment.value ) {
+        change_selected( root.get_last_node() );
+      } else {
+        var node = node_at_coordinates( 0, sw.vadjustment.value );
+        if( node != null ) {
+          selected = node;
+          queue_draw();
+        }
+      }
     }
   }
 
