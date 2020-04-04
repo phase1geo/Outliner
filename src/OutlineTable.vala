@@ -1435,7 +1435,7 @@ public class OutlineTable : DrawingArea {
       /* TBD */
     }
   }
-  
+
   /* Called by the input method manager when the user has a string to commit */
   private void handle_im_commit( string str ) {
     handle_printable( str );
