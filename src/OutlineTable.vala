@@ -276,6 +276,12 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Positions the scrolled window such that the given node is placed at the top */
+  public void place_at_top( Node node ) {
+    var sw = parent.parent.parent as ScrolledWindow;
+    sw.vadjustment.value = node.y;
+  }
+
   /* Internal see command that is called after this has been resized */
   private void see_internal() {
     if( _scroll_adjust == -1 ) return;
@@ -1530,6 +1536,7 @@ public class OutlineTable : DrawingArea {
         case "m" :  change_selected( selected.get_root_node() );  break;
         case "j" :  change_selected( selected.get_next_node() );  break;
         case "h" :  unindent();  break;
+        case "H" :  place_at_top( selected );  break;
         case "k" :  change_selected( selected.get_previous_node() );  break;
         case "l" :  indent();  break;
         case "u" :  change_selected( selected.parent );  break;
