@@ -1413,7 +1413,7 @@ public class OutlineTable : DrawingArea {
 
   /* Change the selected node to the given node */
   private void change_selected( Node? node ) {
-    if( node == null ) return;
+    if( (node == null) || node.is_root() ) return;
     selected = node;
     queue_draw();
     see( selected );
