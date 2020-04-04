@@ -1389,7 +1389,7 @@ public class OutlineTable : DrawingArea {
       switch( str ) {
         case "e" :  edit_selected( true );  break;
         case "E" :  edit_selected( false );  break;
-        case "m" :  change_selected( selected.get_root_node() );  break;
+        case "m" :  change_selected( selected.get_main_node() );  break;
         case "j" :  change_selected( selected.get_next_node() );  break;
         case "h" :  unindent();  break;
         case "k" :  change_selected( selected.get_previous_node() );  break;

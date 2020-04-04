@@ -596,8 +596,20 @@ public class Node {
   /* Returns the root node of this node */
   public Node get_root_node() {
     var parent = _parent;
-    var root   = this;;
+    var root   = this;
     while( parent != null ) {
+      root = parent;
+      parent = parent.parent;
+    }
+    return( root );
+  }
+
+  /* Returns the main node of this node */
+  public Node? get_main_node() {
+    if( is_root() ) return( null );
+    var parent = _parent;
+    var root   = this;
+    while( (parent != null) && !parent.is_root() ) {
       root = parent;
       parent = parent.parent;
     }
