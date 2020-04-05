@@ -596,12 +596,15 @@ public class OutlineTable : DrawingArea {
           case 65361 :  handle_control_left( shift );   break;
           case 65362 :  handle_control_up( shift );     break;
           case 65364 :  handle_control_down( shift );   break;
+          case 65288 :  handle_control_backspace();     break;
+          case 65535 :  handle_control_delete();        break;
           case 47    :  handle_control_slash();         break;
           case 46    :  handle_control_period();        break;
+          case 65    :  handle_control_a( true );       break;
           case 66    :  handle_control_b( true );       break;
           case 84    :  handle_control_t( true );       break;
           case 92    :  handle_control_backslash();     break;
-          case 97    :  handle_control_a();             break;
+          case 97    :  handle_control_a( false );      break;
           case 98    :  handle_control_b( false );      break;
           case 100   :  handle_control_d();             break;
           case 104   :  handle_control_h();             break;
@@ -927,6 +930,19 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Deletes from the current cursor to the beginning of the current word */
+  private void handle_control_backspace() {
+    if( is_node_editable() ) {
+      selected.name.backspace_word( undo_text );
+      see( selected );
+      queue_draw();
+    } else if( is_note_editable() ) {
+      selected.note.backspace_word( undo_text );
+      see( selected );
+      queue_draw();
+    }
+  }
+
   /* Handles a delete keypress */
   private void handle_delete() {
     if( is_node_editable() ) {
@@ -939,6 +955,19 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( selected != null ) {
       delete_current_node();
+    }
+  }
+
+  /* Deletes from the current cursor to the end of the current word */
+  private void handle_control_delete() {
+    if( is_node_editable() ) {
+      selected.name.delete_word( undo_text );
+      see( selected );
+      queue_draw();
+    } else if( is_note_editable() ) {
+      selected.note.delete_word( undo_text );
+      see( selected );
+      queue_draw();
     }
   }
 
@@ -1221,6 +1250,26 @@ public class OutlineTable : DrawingArea {
     return( false );
   }
 
+  /*
+   Moves the given node as a sibling to its parent.  If shift is true, it will
+   be place above the parent; otherwise, it will be placed below the parent.
+  */
+  public bool move_node_to_parent( Node node, bool shift ) {
+    if( !node.parent.is_root() ) {
+      var parent      = node.parent;
+      var orig_parent = node.parent;
+      var orig_index  = node.index();
+      parent.remove_child( node );
+      parent.parent.add_child( node, (parent.index() + (shift ? 0 : 1)) );
+      undo_buffer.add_item( new UndoNodeMove( node, orig_parent, orig_index ) );
+      queue_draw();
+      changed();
+      see( node );
+      return( true );
+    }
+    return( false );
+  }
+
   /* Handles a Control-Up arrow keypress */
   private void handle_control_up( bool shift ) {
     if( is_node_editable() ) {
@@ -1348,7 +1397,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Selects all text */
-  private void handle_control_a() {
+  private void handle_control_a( bool shift ) {
     if( is_node_editable() ) {
       selected.name.set_cursor_all( false );
       see( selected );
@@ -1357,6 +1406,8 @@ public class OutlineTable : DrawingArea {
       selected.note.set_cursor_all( false );
       see( selected );
       queue_draw();
+    } else if( is_node_selected() ) {
+      move_node_to_parent( selected, shift );
     }
   }
 
@@ -1533,13 +1584,13 @@ public class OutlineTable : DrawingArea {
       switch( str ) {
         case "e" :  edit_selected( true );  break;
         case "E" :  edit_selected( false );  break;
-        case "m" :  change_selected( selected.get_root_node() );  break;
+        // case "m" :  change_selected( selected.get_root_node() );  break;
         case "j" :  change_selected( selected.get_next_node() );  break;
         case "h" :  unindent();  break;
         case "H" :  place_at_top( selected );  break;
         case "k" :  change_selected( selected.get_previous_node() );  break;
         case "l" :  indent();  break;
-        case "u" :  change_selected( selected.parent );  break;
+        case "a" :  change_selected( selected.parent );  break;
         case "T" :  change_selected( root.children.index( 0 ) );  break;
         case "B" :  change_selected( root.get_last_node() );  break;
       }
