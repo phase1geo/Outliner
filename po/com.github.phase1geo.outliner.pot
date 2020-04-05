@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-29 20:24+0200\n"
+"POT-Creation-Date: 2020-04-05 15:08-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,51 +57,59 @@ msgstr ""
 msgid "To right"
 msgstr ""
 
-#: src/FormatBar.vala:59 src/NodeMenu.vala:45
+#: src/FormatBar.vala:61 src/NodeMenu.vala:48
 msgid "Copy"
 msgstr ""
 
-#: src/FormatBar.vala:64 src/NodeMenu.vala:49
+#: src/FormatBar.vala:66 src/NodeMenu.vala:52
 msgid "Cut"
 msgstr ""
 
-#: src/FormatBar.vala:70
+#: src/FormatBar.vala:72
 msgid "Bold"
 msgstr ""
 
-#: src/FormatBar.vala:76
+#: src/FormatBar.vala:78
 msgid "Italic"
 msgstr ""
 
-#: src/FormatBar.vala:82
+#: src/FormatBar.vala:84
 msgid "Underline"
 msgstr ""
 
-#: src/FormatBar.vala:88
+#: src/FormatBar.vala:90
 msgid "Strikethrough"
 msgstr ""
 
-#: src/FormatBar.vala:94
+#: src/FormatBar.vala:96
 msgid "Code Block"
 msgstr ""
 
-#: src/FormatBar.vala:103
+#: src/FormatBar.vala:102
+msgid "Superscript"
+msgstr ""
+
+#: src/FormatBar.vala:108
+msgid "Subscript"
+msgstr ""
+
+#: src/FormatBar.vala:117
 msgid "None"
 msgstr ""
 
-#: src/FormatBar.vala:118
+#: src/FormatBar.vala:132
 msgid "Apply Highlight Color"
 msgstr ""
 
-#: src/FormatBar.vala:125
+#: src/FormatBar.vala:139
 msgid "Change Highlight Color"
 msgstr ""
 
-#: src/FormatBar.vala:139
+#: src/FormatBar.vala:153
 msgid "Change Font Color"
 msgstr ""
 
-#: src/FormatBar.vala:146
+#: src/FormatBar.vala:160
 msgid "Link"
 msgstr ""
 
@@ -254,67 +262,79 @@ msgstr ""
 msgid "PlainText"
 msgstr ""
 
-#: src/NodeMenu.vala:53
+#: src/NodeMenu.vala:56
 msgid "Paste Above"
 msgstr ""
 
-#: src/NodeMenu.vala:57
+#: src/NodeMenu.vala:60
 msgid "Paste Below"
 msgstr ""
 
-#: src/NodeMenu.vala:61
+#: src/NodeMenu.vala:64
 msgid "Delete"
 msgstr ""
 
-#: src/NodeMenu.vala:65
+#: src/NodeMenu.vala:68
+msgid "Copy As Clone"
+msgstr ""
+
+#: src/NodeMenu.vala:71
+msgid "Unclone"
+msgstr ""
+
+#: src/NodeMenu.vala:74
+msgid "Paste Clone"
+msgstr ""
+
+#: src/NodeMenu.vala:77
 msgid "Edit Text"
 msgstr ""
 
-#: src/NodeMenu.vala:69
+#: src/NodeMenu.vala:81
 msgid "Edit Note"
 msgstr ""
 
-#: src/NodeMenu.vala:73 src/NodeMenu.vala:134
+#: src/NodeMenu.vala:85 src/NodeMenu.vala:152
 msgid "Show Note"
 msgstr ""
 
-#: src/NodeMenu.vala:76
+#: src/NodeMenu.vala:88
 msgid "Add Row Above"
 msgstr ""
 
-#: src/NodeMenu.vala:80
+#: src/NodeMenu.vala:92
 msgid "Add Row Below"
 msgstr ""
 
-#: src/NodeMenu.vala:84
+#: src/NodeMenu.vala:96
 msgid "Indent"
 msgstr ""
 
-#: src/NodeMenu.vala:88
+#: src/NodeMenu.vala:100
 msgid "Unindent"
 msgstr ""
 
-#: src/NodeMenu.vala:92
+#: src/NodeMenu.vala:104
 msgid "Expand Children"
 msgstr ""
 
-#: src/NodeMenu.vala:137
+#: src/NodeMenu.vala:155
 msgid "Hide Note"
 msgstr ""
 
-#: src/NodeMenu.vala:141
+#: src/NodeMenu.vala:159
 msgid "Hide Children"
 msgstr ""
 
-#: src/NodeMenu.vala:141
+#: src/NodeMenu.vala:159
 msgid "Show Children"
 msgstr ""
 
-#: src/OutlineTable.vala:464
+#: src/OutlineTable.vala:495
 msgid "Show note"
 msgstr ""
 
-#: src/OutlineTable.vala:464
+#: src/OutlineTable.vala:495
 msgid "Hide note"
 msgstr ""
 
