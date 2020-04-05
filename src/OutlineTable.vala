@@ -652,7 +652,7 @@ public class OutlineTable : DrawingArea {
 
   /* Shows or hides all notes within the given node's tree */
   public void toggle_notes( Node node ) {
-    node.set_notes_display( node.hide_note );
+    node.set_notes_display( !node.any_notes_shown() );
     node.adjust_nodes( node.last_y, false, "toggle_notes" );
     see( node );
     queue_draw();
@@ -1285,7 +1285,7 @@ public class OutlineTable : DrawingArea {
 
   /* Toggles the show all notes status given the state of the currently selected node */
   private void handle_control_h() {
-    set_notes_display( (selected == null) ? root.children.index( 0 ).hide_note : selected.hide_note );
+    set_notes_display( !root.any_notes_shown() );
   }
 
   /* Causes selected text to be italicized */
@@ -1653,6 +1653,7 @@ public class OutlineTable : DrawingArea {
 
     n->set_prop( "condensed", _condensed.to_string() );
     n->set_prop( "listtype",  list_type.to_string() );
+    n->set_prop( "version",   Outliner.version );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
@@ -1859,7 +1860,7 @@ public class OutlineTable : DrawingArea {
   /* Set the notes display for all nodes to the given value */
   public void set_notes_display( bool show ) {
     root.set_notes_display( show );
-    // nodes.index( 0 ).adjust_nodes_all( nodes.index( 0 ).last_y, true, "set_notes_display" );
+    root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "set_notes_display" );
     see( selected );
     queue_draw();
     changed();

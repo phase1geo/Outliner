@@ -913,13 +913,24 @@ public class Node {
 
   /* Set the notes display for this node and all descendant nodes */
   public void set_notes_display( bool show ) {
-    _hide_note = !show;
-    if( note.text.text != "" ) {
+    if( !is_root() && (note.text.text != "") ) {
+      _hide_note = !show;
       update_height( false );
     }
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).set_notes_display( show );
     }
+  }
+
+  /* Returns true if any notes are shown in this note or any descendants */
+  public bool any_notes_shown() {
+    if( !_hide_note ) return( true );
+    for( int i=0; i<children.length; i++ ) {
+      if( children.index( i ).any_notes_shown() ) {
+        return( true );
+      }
+    }
+    return( false );
   }
 
   /* Set the node to display in normal or condensed mode */
