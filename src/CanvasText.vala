@@ -597,7 +597,7 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _cursor );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, 1 );
+        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _cursor - 1 );
         undo_buffer.add_delete( spos, str, tags, cur );
       }
@@ -622,10 +622,22 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _cursor + 1 );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, 1 );
+        text.remove_text( spos, (epos - spos) );
         undo_buffer.add_delete( spos, str, tags, cur );
       }
     }
+  }
+
+  /* Deletes all characters in the given range */
+  public void delete_range( int startpos, int endpos, UndoTextBuffer undo_buffer ) {
+    var cur  = _cursor;
+    var spos = text.text.index_of_nth_char( startpos );
+    var epos = text.text.index_of_nth_char( endpos );
+    var str  = text.text.slice( spos, epos );
+    var tags = text.get_tags_in_range( spos, epos );
+    text.remove_text( spos, (epos - spos) );
+    set_cursor_only( startpos );
+    undo_buffer.add_delete( spos, str, tags, cur );
   }
 
   /* Inserts the given string at the current cursor position and adjusts cursor */
