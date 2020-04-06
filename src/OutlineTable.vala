@@ -1493,14 +1493,19 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( selected != null ) {
       switch( str ) {
+        case "a" :  change_selected( selected.parent );  break;
+        case "c" :  change_selected( selected.get_last_child() );  break;
         case "e" :  edit_selected( true );  break;
-        case "E" :  edit_selected( false );  break;
-        case "m" :  change_selected( selected.get_main_node() );  break;
-        case "j" :  change_selected( selected.get_next_node() );  break;
         case "h" :  unindent();  break;
+        case "j" :  change_selected( selected.get_next_node() );  break;
         case "k" :  change_selected( selected.get_previous_node() );  break;
         case "l" :  indent();  break;
-        case "a" :  change_selected( selected.parent );  break;
+        case "m" :  change_selected( selected.get_main_node() );  break;
+        case "n" :  change_selected( selected.get_next_sibling() );  break;
+        case "p" :  change_selected( selected.get_previous_sibling() );  break;
+        case "B" :  change_selected( root.get_last_node() );  break;
+        case "E" :  edit_selected( false );  break;
+        case "T" :  change_selected( root.get_first_node() );  break;
       }
     }
   }
@@ -1518,7 +1523,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Change the selected node to the given node */
-  private void change_selected( Node? node ) {
+  public void change_selected( Node? node ) {
     if( (node == null) || node.is_root() ) return;
     selected = node;
     queue_draw();

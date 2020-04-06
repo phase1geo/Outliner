@@ -616,6 +616,15 @@ public class Node {
     return( root );
   }
 
+  /* Returns the first node in the current node tree */
+  public Node? get_first_node() {
+    if( is_leaf() || !expanded ) {
+      return( this );
+    } else {
+      return( children.index( 0 ) );
+    }
+  }
+
   /* Returns the last node in the current node tree */
   public Node? get_last_node() {
     if( is_leaf() || !expanded ) {
@@ -650,6 +659,36 @@ public class Node {
       }
       return( null );
     }
+  }
+
+  /* Returns the sibling node relative to this node */
+  private Node? get_sibling( int dir ) {
+    var index = index() + dir;
+    if( (index < 0) || (index >= parent.children.length) ) {
+      return( null );
+    } else {
+      return( parent.children.index( index ) );
+    }
+  }
+
+  /* Returns the previous sibling node relative to this node */
+  public Node? get_previous_sibling() {
+    return( get_sibling( -1 ) );
+  }
+
+  /* Returns the previous sibling node relative to this node */
+  public Node? get_next_sibling() {
+    return( get_sibling( 1 ) );
+  }
+
+  /* Returns the first child node, if one exists; otherwise, returns null */
+  public Node? get_first_child() {
+    return( is_leaf() ? null : children.index( 0 ) );
+  }
+
+  /* Returns the last child node, if one exists; otherwise, returns null */
+  public Node? get_last_child() {
+    return( is_leaf() ? null : children.index( children.length - 1 ) );
   }
 
   /* Returns the node within this tree that contains the given coordinates */
