@@ -895,7 +895,7 @@ public class Node {
     child.adjust_nodes( child.last_y, false, "add_child" );
 
     /* Update the list type values */
-    set_list_types( child.index() );
+    set_list_types();
 
   }
 
@@ -910,7 +910,7 @@ public class Node {
     node.parent = null;
 
     /* Update the list type values */
-    set_list_types( index );
+    set_list_types();
 
   }
 
@@ -1046,19 +1046,12 @@ public class Node {
     update_width();
   }
 
-  /* Called whenever nodes are added or removed */
-  private void set_list_types( int index ) {
-    for( int i=index; i<children.length; i++ ) {
-      children.index( i ).set_list_type();
-    }
-  }
-
   /* Used when the associated outline table needs to change the list type of all nodes */
-  public void set_all_list_types() {
+  public void set_list_types() {
     for( int i=0; i<children.length; i++ ) {
       var child = children.index( i );
       child.set_list_type();
-      child.set_all_list_types();
+      child.set_list_types();
     }
   }
 
