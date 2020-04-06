@@ -75,6 +75,34 @@
     <value key="x-appcenter-suggested-price">10</value>
   </custom>
   <releases>
+    <release version="1.1.0" date="2020-04-08">
+      <description>
+        <p>New</p>
+        <ul>
+          <li>Added support for row cloning.</li>
+          <li>Added support for superscript and subscript text formatting.</li>
+          <li>Added support for using input methods to add text to rows and notes.</li>
+          <li>Added selection submenu to contextual menu.</li>
+          <li>Added new row selection commands: top, bottom, first child, previous sibling. next sibling, page up and page down.</li>
+          <li>Added support for moving selected rows via keyboard shortcuts.</li>
+          <li>Added ability to position the selected row at the top of the window.</li>
+          <li>Added ability to delete the previous or next word via Control-Backspace/Delete keyboard shortcut.</li>
+        </ul>
+        <p>Changes</p>
+        <ul>
+          <li>Improved readability of text formatting bar.</li>
+          <li>Removed support for <em>m</em> command in selection traversal.</li>
+          <li>Version number now output to .outliner file.</li>
+        </ul>
+        <p>Bug Fixes</p>
+        <ul>
+          <li>Made metadata translatable (Thanks to Nathan Bonnemains).</li>
+          <li>Fixed screenshot URLs in metadata.</li>
+          <li>Fixed application crash when using the <em>a</em> command when top-level row is selected.</li>
+          <li>Fixed node showing/hiding.</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.0.3" date="2020-03-26">
       <description>
         <p>Initial release!</p>
