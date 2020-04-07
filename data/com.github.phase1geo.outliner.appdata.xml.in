@@ -100,6 +100,7 @@
             <li>Fixed screenshot URLs in metadata.</li>
             <li>Fixed application crash when using the <em>a</em> command when top-level row is selected.</li>
             <li>Fixed node showing/hiding.</li>
+            <li>Fixed issue with <em>New Document</em> plank command to add new tab after application data is loaded.</li>
           </ul>
         </description>
       </release>
