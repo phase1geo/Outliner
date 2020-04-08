@@ -51,6 +51,8 @@ public class OutlineTable : DrawingArea {
   private NodeDrawOptions _draw_options;
   private NodeListType    _list_type     = NodeListType.NONE;
   private Node            _clone         = null;
+  private NodeLabels      _labels;
+  private bool            _set_label     = false;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -150,6 +152,9 @@ public class OutlineTable : DrawingArea {
 
     /* Create the node draw options */
     _draw_options = new NodeDrawOptions();
+
+    /* Create the labels */
+    _labels = new NodeLabels();
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -627,8 +632,17 @@ public class OutlineTable : DrawingArea {
           case 65364 :  handle_control_down( shift );   break;
           case 65288 :  handle_control_backspace();     break;
           case 65535 :  handle_control_delete();        break;
-          case 47    :  handle_control_slash();         break;
           case 46    :  handle_control_period();        break;
+          case 47    :  handle_control_slash();         break;
+          case 49    :  handle_control_number( 0 );     break;
+          case 50    :  handle_control_number( 1 );     break;
+          case 51    :  handle_control_number( 2 );     break;
+          case 52    :  handle_control_number( 3 );     break;
+          case 53    :  handle_control_number( 4 );     break;
+          case 54    :  handle_control_number( 5 );     break;
+          case 55    :  handle_control_number( 6 );     break;
+          case 56    :  handle_control_number( 7 );     break;
+          case 57    :  handle_control_number( 8 );     break;
           case 65    :  handle_control_a( true );       break;
           case 66    :  handle_control_b( true );       break;
           case 84    :  handle_control_t( true );       break;
@@ -1443,6 +1457,26 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /*
+   Handles a Control-number keypress which moves the currently selected
+   row within the labeled row (if one exists)
+  */
+  private void handle_control_number( int label ) {
+    if( is_node_selected() ) {
+      var parent = _labels.get_node( label );
+      if( (parent != null) && (parent != selected) && (parent != selected.parent) ) {
+        var orig_parent = selected.parent;
+        var orig_index  = selected.index();
+        selected.parent.remove_child( selected );
+        parent.add_child( selected );
+        undo_buffer.add_item( new UndoNodeMove( selected, orig_parent, orig_index ) );
+        queue_draw();
+        changed();
+        see( selected );
+      }
+    }
+  }
+
   /* Called whenever the period key is entered with the control key */
   private void handle_control_period() {
     if( is_node_editable() ) {
@@ -1675,6 +1709,25 @@ public class OutlineTable : DrawingArea {
     return( false );
   }
 
+  private void handle_label( int label ) {
+    if( _set_label ) {
+      if( label == -1 ) {
+        _labels.set_label( null, _labels.get_label_for_node( selected ) );
+      } else {
+        _labels.set_label( selected, label );
+      }
+      queue_draw();
+      changed();
+      _set_label = false;
+    } else {
+      var node = _labels.get_node( label );
+      if( node != null ) {
+        selected = node;
+        queue_draw();
+      }
+    }
+  }
+
   /* Handles any printable characters */
   private void handle_printable( string str ) {
     if( !str.get_char( 0 ).isprint() ) return;
@@ -1701,6 +1754,17 @@ public class OutlineTable : DrawingArea {
         case "B" :  change_selected( root.get_last_node() );  break;
         case "E" :  edit_selected( false );  break;
         case "T" :  change_selected( root.get_first_node() );  break;
+        case "#" :  if( selected != null ) _set_label = true;  break;
+        case "0" :  handle_label( -1 );  break;
+        case "1" :  handle_label( 0 );  break;
+        case "2" :  handle_label( 1 );  break;
+        case "3" :  handle_label( 2 );  break;
+        case "4" :  handle_label( 3 );  break;
+        case "5" :  handle_label( 4 );  break;
+        case "6" :  handle_label( 5 );  break;
+        case "7" :  handle_label( 6 );  break;
+        case "8" :  handle_label( 7 );  break;
+        case "9" :  handle_label( 8 );  break;
       }
     }
   }
@@ -1912,8 +1976,9 @@ public class OutlineTable : DrawingArea {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
-          case "theme" :  load_theme( it );  break;
-          case "nodes" :  load_nodes( it );  break;
+          case "theme"  :  load_theme( it );  break;
+          case "nodes"  :  load_nodes( it );  break;
+          case "labels" :  _labels.load( this, it );  break;
         }
       }
     }
@@ -1961,6 +2026,7 @@ public class OutlineTable : DrawingArea {
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
+    n->add_child( _labels.save() );
 
   }
 
@@ -2195,6 +2261,7 @@ public class OutlineTable : DrawingArea {
     if( (selected != null) && ((selected.parent == null) || selected.parent.expanded) ) {
       selected.draw( ctx, _theme, _draw_options );
     }
+    _labels.draw( ctx, _theme );
   }
 
 }

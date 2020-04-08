@@ -593,6 +593,33 @@ public class Node {
     note.posy = y + (pady * 2) + name.height;
   }
 
+  /* Searches the node tree for a node that matches the given ID */
+  public string lookup_id() {
+    var str  = index().to_string();
+    var node = parent;
+    while( !node.is_root() ) {
+      str  = node.index().to_string() + "," + str;
+      node = node.parent;
+    }
+    return( str );
+  }
+
+  private Node? get_node_by_lookup_id_helper( string[] indices, int index ) {
+    if( index < indices.length ) {
+      return( children.index( int.parse( indices[index] ) ).get_node_by_lookup_id_helper( indices, (index + 1) ) );
+    }
+    return( this );
+  }
+
+  /* Returns the node associated with the given lookup ID */
+  public Node? get_node_by_lookup_id( string str ) {
+    if( is_root() ) {
+      string[] indices = str.split( "," );
+      return( get_node_by_lookup_id_helper( indices, 0 ) );
+    }
+    return( null );
+  }
+
   /* Returns the root node of this node */
   public Node get_root_node() {
     var parent = _parent;
