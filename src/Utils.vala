@@ -62,6 +62,17 @@ public class Utils {
 
   }
 
+  /* Adds the an accelerator to the given menu item as a string */
+  public static void add_accel_label_text( Gtk.MenuItem item, string lbl ) {
+
+    var label = item.get_child() as AccelLabel;
+
+    if( label == null ) return;
+
+    label.set_label( lbl );
+
+  }
+
   /*
    Checks the given string to see if it is a match to the given pattern.  If
    it is, the matching portion of the string appended to the list of matches.

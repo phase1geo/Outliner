@@ -128,6 +128,11 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public NodeLabels labels {
+    get {
+      return( _labels );
+    }
+  }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -1464,7 +1469,7 @@ public class OutlineTable : DrawingArea {
   private void handle_control_number( int label ) {
     if( is_node_selected() ) {
       var parent = _labels.get_node( label );
-      if( (parent != null) && (parent != selected) && (parent != selected.parent) ) {
+      if( (parent != null) && (parent != selected) && (parent != selected.parent) && !parent.is_descendant_of( selected ) ) {
         var orig_parent = selected.parent;
         var orig_index  = selected.index();
         selected.parent.remove_child( selected );
@@ -1711,10 +1716,10 @@ public class OutlineTable : DrawingArea {
 
   private void handle_label( int label ) {
     if( _set_label ) {
-      if( label == -1 ) {
-        _labels.set_label( null, _labels.get_label_for_node( selected ) );
-      } else {
-        _labels.set_label( selected, label );
+      switch( label ) {
+        case -2 :  _labels.clear_all();  break;
+        case -1 :  _labels.set_label( null, _labels.get_label_for_node( selected ) );  break;
+        default :  _labels.set_label( selected, label );  break;
       }
       queue_draw();
       changed();
@@ -1755,6 +1760,7 @@ public class OutlineTable : DrawingArea {
         case "E" :  edit_selected( false );  break;
         case "T" :  change_selected( root.get_first_node() );  break;
         case "#" :  if( selected != null ) _set_label = true;  break;
+        case "*" :  handle_label( -2 );  break;
         case "0" :  handle_label( -1 );  break;
         case "1" :  handle_label( 0 );  break;
         case "2" :  handle_label( 1 );  break;

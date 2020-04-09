@@ -734,7 +734,7 @@ public class Node {
   }
 
   /* Returns the area where we will draw the note icon */
-  private void note_bbox( out double x, out double y, out double w, out double h ) {
+  public void note_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 2) + 10;
     y = this.y + pady + ((name.get_line_height() / 2) - 8);
     w = 16;
@@ -975,6 +975,15 @@ public class Node {
 
     return( children.length == 0 );
 
+  }
+
+  /* Returns true if we are a descendant of the given node */
+  public bool is_descendant_of( Node node ) {
+    var current = parent;
+    while( !current.is_root() && (current != node) ) {
+      current = current.parent;
+    }
+    return( current == node );
   }
 
   /* Set the notes display for this node and all descendant nodes */

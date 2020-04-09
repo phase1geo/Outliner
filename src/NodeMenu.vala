@@ -48,6 +48,8 @@ public class NodeMenu : Gtk.Menu {
   private Gtk.MenuItem _select_last_child;
   private Gtk.MenuItem _select_first;
   private Gtk.MenuItem _select_last;
+  private Gtk.MenuItem _clear_label;
+  private Gtk.MenuItem _clear_all_labels;
 
   public NodeMenu( OutlineTable ot ) {
 
@@ -152,6 +154,26 @@ public class NodeMenu : Gtk.Menu {
     _select_last.activate.connect( select_last_node );
     Utils.add_accel_label( _select_last, 98, Gdk.ModifierType.SHIFT_MASK );
 
+    var labels = new Gtk.MenuItem.with_label( _( "Labels" ) );
+    var lblmenu = new Gtk.Menu();
+    labels.set_submenu( lblmenu );
+
+    var add_label = new Gtk.MenuItem.with_label( _( "Add Label" ) );
+    var lbl_addmenu = new Gtk.Menu();
+    add_label.set_submenu( lbl_addmenu );
+
+    var move_to_label = new Gtk.MenuItem.with_label( _( "Move To Label" ) );
+    var lbl_movemenu = new Gtk.Menu();
+    move_to_label.set_submenu( lbl_movemenu );
+
+    _clear_label = new Gtk.MenuItem.with_label( _( "Clear Label" ) );
+    _clear_label.activate.connect( clear_label );
+    Utils.add_accel_label_text( _clear_label, "#0" );
+
+    _clear_all_labels = new Gtk.MenuItem.with_label( _( "Clear All Labels" ) );
+    _clear_all_labels.activate.connect( clear_all_labels );
+    Utils.add_accel_label_text( _clear_all_labels, "#*" );
+
     /* Add the menu items to the menu */
     add( _copy );
     add( _cut );
@@ -172,6 +194,7 @@ public class NodeMenu : Gtk.Menu {
     add( _add_below );
     add( new SeparatorMenuItem() );
     add( select );
+    add( labels );
 
     /* Add the clone menu items */
     clone_menu.add( _clone_copy );
@@ -191,6 +214,37 @@ public class NodeMenu : Gtk.Menu {
     selmenu.add( new SeparatorMenuItem() );
     selmenu.add( _select_first );
     selmenu.add( _select_last );
+
+    /* Add the labels menu items */
+    lblmenu.add( add_label );
+    lblmenu.add( move_to_label );
+    lblmenu.add( new SeparatorMenuItem() );
+    lblmenu.add( _clear_label );
+    lblmenu.add( _clear_all_labels );
+
+    /* Populate the add and move label submenus */
+    for( int i=0; i<9; i++ ) {
+
+      var lbl_value = i + 1;
+      var add_item  = new Gtk.CheckMenuItem.with_label( _( "Label " ) + lbl_value.to_string() );
+      add_item.activate.connect(() => {
+        _ot.labels.set_label( _ot.selected, i );
+        _ot.queue_draw();
+        _ot.changed();
+      });
+      Utils.add_accel_label_text( add_item, ("#" + lbl_value.to_string()) );
+      lbl_addmenu.add( add_item );
+
+      var move_item = new Gtk.CheckMenuItem.with_label( _( "Label" ) + lbl_value.to_string() );
+      move_item.activate.connect(() => {
+        _ot.labels.set_label( null, i );
+        _ot.queue_draw();
+        _ot.changed();
+      });
+      Utils.add_accel_label( move_item, (i + 49), Gdk.ModifierType.CONTROL_MASK );
+      lbl_movemenu.add( move_item );
+
+    }
 
     /* Make the menu visible */
     show_all();
@@ -353,6 +407,20 @@ public class NodeMenu : Gtk.Menu {
   /* Selects the bottom-most node of the document */
   private void select_last_node() {
     _ot.change_selected( _ot.root.get_last_node() );
+  }
+
+  /* Clears the current label */
+  private void clear_label() {
+    _ot.labels.set_label( null, _ot.labels.get_label_for_node( _ot.selected ) );
+    _ot.queue_draw();
+    _ot.changed();
+  }
+
+  /* Clears all of the set labels */
+  private void clear_all_labels() {
+    _ot.labels.clear_all();
+    _ot.queue_draw();
+    _ot.changed();
   }
 
 }

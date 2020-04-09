@@ -43,6 +43,13 @@ public class NodeLabels {
     _nodes.data[label] = node;
   }
 
+  /* Removes all labels */
+  public void clear_all() {
+    for( int i=0; i<_num_nodes; i++ ) {
+      _nodes.data[i] = null;
+    }
+  }
+
   /* Returns the node associated with the label if one exists; otherwise, returns null */
   public Node? get_node( int label ) {
     return( _nodes.index( label ) );
@@ -98,14 +105,29 @@ public class NodeLabels {
 
   private void draw_label( Cairo.Context ctx, int label, Theme theme ) {
 
+    Cairo.TextExtents extents;
+    ctx.set_font_size( 12 );
+	  ctx.text_extents( label.to_string(), out extents );
+	
     var node = _nodes.index( label );
 
-    /* Display the label text */
+    double nx, ny, nw, nh;
+    node.note_bbox( out nx, out ny, out nw, out nh );
+
+    var cx = (nx - node.padx) - (nw / 2);
+    var cy = ny + (nh / 2);
+    var tx = cx - (extents.width / 2) - 1;
+    var ty = ny + ((nh - extents.height) / 2) + extents.height;
+
+    /* Display the label shape */
     Utils.set_context_color_with_alpha( ctx, theme.foreground, node.alpha );
-    ctx.move_to( 3, (node.y + (node.height / 2)) );
-    ctx.set_line_width( 1 );
-    ctx.text_path( (label + 1).to_string() + " >" );
-    ctx.stroke();
+    ctx.arc( cx, cy, (nw / 2), 0, (2 * Math.PI) );
+    ctx.fill();
+
+    /* Display the label text */
+    Utils.set_context_color_with_alpha( ctx, theme.background, node.alpha );
+    ctx.move_to( tx, ty );
+    ctx.show_text( (label + 1).to_string() );
 
   }
 
