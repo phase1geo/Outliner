@@ -1,107 +1,118 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# French translations for extra package.
+# Copyright (C) 2020 THE extra'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the extra package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Nathan Bonnemains (@NathanBnm), 2020.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-10 22:20+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2020-04-10 21:50+0200\n"
+"Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
+"Language-Team: none\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: data/com.github.phase1geo.outliner.desktop.in:3
 #: data/com.github.phase1geo.outliner.desktop.in:4
 #: data/com.github.phase1geo.outliner.appdata.xml.in:7
 msgid "Outliner"
-msgstr ""
+msgstr "Outliner"
 
 #: data/com.github.phase1geo.outliner.desktop.in:5
 #: data/com.github.phase1geo.outliner.appdata.xml.in:8
 msgid "Organize your words"
-msgstr ""
+msgstr "Organisez vos mots"
 
 #: data/com.github.phase1geo.outliner.desktop.in:8
 msgid "com.github.phase1geo.outliner"
-msgstr ""
+msgstr "com.github.phase1geo.outliner"
 
 #: data/com.github.phase1geo.outliner.desktop.in:14
 msgid "outline;"
-msgstr ""
+msgstr "plan;"
 
 #: data/com.github.phase1geo.outliner.desktop.in:18
 msgid "New Document"
-msgstr ""
+msgstr "Nouveau document"
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:9
 msgid "Trevor Williams"
-msgstr ""
+msgstr "Trevor Williams"
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:19
 msgid "Quickly create outlines and export them in a number of useful formats."
 msgstr ""
+"Créez rapidement des plans et exportez les dans un grand nombre de formats "
+"pratiques."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:21
 msgid "Quickly create and navigate outlines using the keyboard or mouse."
 msgstr ""
+"Créez et naviguez rapidement à travers des plans en utilisant le clavier ou "
+"la souris."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:22
 msgid "Full support for text formatting."
-msgstr ""
+msgstr "Prise en charge complète pour le formatage de texte."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:23
 msgid "Add notes to any outline text."
-msgstr ""
+msgstr "Ajoutez des notes à n'importe quel élément de plan."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:24
 msgid "Close/Hide any group within the outline for increased focus."
 msgstr ""
+"Fermez/Masquez un groupe à tout moment depuis le plan pour plus de "
+"concentration."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:25
 msgid ""
 "Quick search and replace of any text within the document, including notes."
 msgstr ""
+"Cherchez et remplacez rapidement n'importe quel texte dans le document, "
+"notes incluses."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:26
 msgid ""
 "View document statistics such as character count, word count and row count."
 msgstr ""
+"Visualisez les statistiques du document telles que le nombre de caractères, "
+"de mots et de lignes."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:27
 msgid "Unlimited undo/redo of any change."
 msgstr ""
+"Nombre d'annulations/rétablissements illimités pour toute modification."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:28
 msgid "Automatically saves in the background."
-msgstr ""
+msgstr "Enregistrement automatique en arrière-plan."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:29
 msgid "Open multiple outlines with the use of tabs."
-msgstr ""
+msgstr "Ouvrez plusieurs plans à la fois à l'aide des onglets."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:30
 msgid "Built-in themes."
-msgstr ""
+msgstr "Thèmes intégrés."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:31
 msgid "Import from Minder and OPML."
-msgstr ""
+msgstr "Importez depuis Minder et OPML."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:32
 msgid "Export to HTML, Markdown, Minder, OPML, PDF and PlainText."
-msgstr ""
+msgstr "Exportez au format HTML, Markdown, OPML, PDF et Texte brut."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:33
 msgid "Printer support."
-msgstr ""
+msgstr "Prise en charge de l'impression."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:39
 msgid "Initial release!"
-msgstr ""
+msgstr "Version initiale !"

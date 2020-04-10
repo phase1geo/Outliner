@@ -444,13 +444,13 @@ public class MainWindow : ApplicationWindow {
     grid.column_homogeneous = true;
     grid.column_spacing     = 10;
 
-    var lbl_chars = new Label( _( "Characters" ) + ":" );
+    var lbl_chars = new Label( _( "Characters :") );
     _stats_chars  = new Label( "0" );
 
-    var lbl_words = new Label( _( "Words" ) + ":" );
+    var lbl_words = new Label( _( "Words:" ) );
     _stats_words  = new Label( "0" );
 
-    var lbl_rows = new Label( _( "Rows" ) + ":" );
+    var lbl_rows = new Label( _( "Rows:") );
     _stats_rows  = new Label( "0" );
 
     grid.attach( lbl_chars, 0, 0 );
@@ -492,7 +492,7 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 5 );
 
     var export = new ModelButton();
-    export.text = _( "Export..." );
+    export.text = _( "Export…" );
     export.action_name = "win.action_export";
 
     var print = new ModelButton();
@@ -526,7 +526,7 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 0 );
 
     var zoom_box = new Box( Orientation.HORIZONTAL, 0 );
-    var zoom_lbl = new Label( _( "Zoom" ) + " %:" );
+    var zoom_lbl = new Label( _( "Zoom (%):" ) );
 
     _zoom = new SpinButton.with_range( 25, 200, 25 );
     _zoom.set_value( 100 );
