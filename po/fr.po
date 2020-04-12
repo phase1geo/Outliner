@@ -99,11 +99,11 @@ msgstr "Aucun"
 
 #: src/FormatBar.vala:132
 msgid "Apply Highlight Color"
-msgstr "Appliquer la couleur d'accentuation"
+msgstr "Appliquer la couleur de surlignage"
 
 #: src/FormatBar.vala:139
 msgid "Change Highlight Color"
-msgstr "Modifier la couleur d'accentuation"
+msgstr "Modifier la couleur de surlignage"
 
 #: src/FormatBar.vala:153
 msgid "Change Font Color"
@@ -222,7 +222,7 @@ msgstr ""
 
 #: src/MainWindow.vala:668
 msgid "Discard Changes"
-msgstr "Abandonner ls modifications"
+msgstr "Abandonner les modifications"
 
 #: src/MainWindow.vala:674 src/MainWindow.vala:814
 msgid "Save"

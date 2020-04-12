@@ -58,7 +58,7 @@ msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:25
 msgid "Full support for text formatting."
-msgstr "Prise en charge complète pour le formatage de texte."
+msgstr "Prise en charge complète de la mise en forme du texte."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:26
 msgid "Add notes to any outline text."
@@ -87,7 +87,7 @@ msgstr ""
 #: data/com.github.phase1geo.outliner.appdata.xml.in:30
 msgid "Unlimited undo/redo of any change."
 msgstr ""
-"Nombre d'annulations/rétablissements illimités pour toute modification."
+"Nombre d'actions annuler/rétablir illimités pour toute modification."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:31
 msgid "Automatically saves in the background."
@@ -103,7 +103,7 @@ msgstr "Thèmes intégrés."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:34
 msgid "Import from Minder and OPML."
-msgstr "Importez depuis Minder et OPML."
+msgstr "Importez des fichiers au format Minder ou OPML."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:35
 msgid "Export to HTML, Markdown, Minder, OPML, PDF and PlainText."
@@ -128,7 +128,7 @@ msgstr "Ajout de la prise en charge des exposants et des indices."
 #: data/com.github.phase1geo.outliner.appdata.xml.in:84
 msgid "Added support for using input methods to add text to rows and notes."
 msgstr ""
-"Ajout de la prise en charge pour utiliser des méthodes de sasie pour ajouter "
+"Ajout de la prise en charge pour utiliser des méthodes de saisie afin d'ajouter "
 "du texte aux lignes et aux notes."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:85
@@ -141,12 +141,12 @@ msgid ""
 "sibling. next sibling, page up and page down."
 msgstr ""
 "Ajout de nouvelles commandes de sélection de ligne : au dessus, en dessous, "
-"premier enfant, précédent, suivant, haut de page, bas de page."
+"premier enfant, précédente, suivante, haut de page, bas de page."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:87
 msgid "Added support for moving selected rows via keyboard shortcuts."
 msgstr ""
-"Ajout de la prise en charge du déplacement de la ligne sélectionnée par "
+"Ajout de la prise en charge du déplacement de la ligne sélectionnée à l'aide des "
 "raccourcis claviers."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:88
@@ -169,7 +169,7 @@ msgstr "Modifications"
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:93
 msgid "Improved readability of text formatting bar."
-msgstr "Amélioration de la lisibilité pour la barre de formatage de texte."
+msgstr "Amélioration de la lisibilité pour la barre de mise en forme du texte."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:94
 msgid "Removed support for <em>m</em> command in selection traversal."
@@ -212,7 +212,7 @@ msgid ""
 "Fixed issue with <em>New Document</em> plank command to add new tab after "
 "application data is loaded."
 msgstr ""
-"Correction d'un problème avec la commande plank <em>Nouveau document</em> "
+"Correction d'un problème avec la commande <em>Nouveau document</em> dans plank "
 "afin d'ajouter un nouvel onglet lorsque l'application est chargée."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:109
