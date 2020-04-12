@@ -209,6 +209,9 @@ public class OutlineTable : DrawingArea {
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
 
+    /* Grab keyboard focus */
+    grab_focus();
+
   }
 
   /* Called whenever the selection mode changed of the current node */
@@ -683,6 +686,13 @@ public class OutlineTable : DrawingArea {
             default    :  handle_printable( e.str );  break;
           }
         }
+      }
+    } else {
+      switch( e.keyval ) {
+        case 106   :  handle_down( shift );  break;
+        case 107   :  handle_up( shift );    break;
+        case 65362 :  handle_up( shift );    break;
+        case 65364 :  handle_down( shift );  break;
       }
     }
 
@@ -1241,6 +1251,16 @@ public class OutlineTable : DrawingArea {
         selected = node;
         queue_draw();
       }
+    } else {
+      int y1, y2;
+      get_window_ys( out y1, out y2 );
+      var node = node_at_coordinates( 0, y2 );
+      if( node != null ) {
+        selected = node;
+      } else {
+        selected = root.get_last_node();
+      }
+      queue_draw();
     }
   }
 
@@ -1390,6 +1410,14 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( selected != null ) {
       var node = selected.get_next_node();
+      if( node != null ) {
+        selected = node;
+        queue_draw();
+      }
+    } else {
+      int y1, y2;
+      get_window_ys( out y1, out y2 );
+      var node = node_at_coordinates( 0, y1 );
       if( node != null ) {
         selected = node;
         queue_draw();

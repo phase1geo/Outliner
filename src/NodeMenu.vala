@@ -48,8 +48,10 @@ public class NodeMenu : Gtk.Menu {
   private Gtk.MenuItem _select_last_child;
   private Gtk.MenuItem _select_first;
   private Gtk.MenuItem _select_last;
+  private Gtk.MenuItem _select_label;
   private Gtk.MenuItem _clear_label;
   private Gtk.MenuItem _clear_all_labels;
+  private Array<Gtk.MenuItem> _select_labels;
 
   public NodeMenu( OutlineTable ot ) {
 
@@ -154,6 +156,10 @@ public class NodeMenu : Gtk.Menu {
     _select_last.activate.connect( select_last_node );
     Utils.add_accel_label( _select_last, 98, Gdk.ModifierType.SHIFT_MASK );
 
+    _select_label = new Gtk.MenuItem.with_label( _( "Select Labeled Row" ) );
+    var lbl_selmenu = new Gtk.Menu();
+    _select_label.set_submenu( lbl_selmenu );
+
     var labels = new Gtk.MenuItem.with_label( _( "Labels" ) );
     var lblmenu = new Gtk.Menu();
     labels.set_submenu( lblmenu );
@@ -168,11 +174,9 @@ public class NodeMenu : Gtk.Menu {
 
     _clear_label = new Gtk.MenuItem.with_label( _( "Clear Label" ) );
     _clear_label.activate.connect( clear_label );
-    Utils.add_accel_label_text( _clear_label, "#0" );
 
     _clear_all_labels = new Gtk.MenuItem.with_label( _( "Clear All Labels" ) );
     _clear_all_labels.activate.connect( clear_all_labels );
-    Utils.add_accel_label_text( _clear_all_labels, "#*" );
 
     /* Add the menu items to the menu */
     add( _copy );
@@ -214,6 +218,8 @@ public class NodeMenu : Gtk.Menu {
     selmenu.add( new SeparatorMenuItem() );
     selmenu.add( _select_first );
     selmenu.add( _select_last );
+    selmenu.add( new SeparatorMenuItem() );
+    selmenu.add( _select_label );
 
     /* Add the labels menu items */
     lblmenu.add( add_label );
@@ -222,20 +228,21 @@ public class NodeMenu : Gtk.Menu {
     lblmenu.add( _clear_label );
     lblmenu.add( _clear_all_labels );
 
+    _select_labels = new Array<Gtk.MenuItem>();
+
     /* Populate the add and move label submenus */
     for( int i=0; i<9; i++ ) {
 
       var lbl_value = i + 1;
-      var add_item  = new Gtk.CheckMenuItem.with_label( _( "Label " ) + lbl_value.to_string() );
+      var add_item  = new Gtk.CheckMenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
       add_item.activate.connect(() => {
         _ot.labels.set_label( _ot.selected, i );
         _ot.queue_draw();
         _ot.changed();
       });
-      Utils.add_accel_label_text( add_item, ("#" + lbl_value.to_string()) );
       lbl_addmenu.add( add_item );
 
-      var move_item = new Gtk.CheckMenuItem.with_label( _( "Label" ) + lbl_value.to_string() );
+      var move_item = new Gtk.CheckMenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
       move_item.activate.connect(() => {
         _ot.labels.set_label( null, i );
         _ot.queue_draw();
@@ -243,6 +250,14 @@ public class NodeMenu : Gtk.Menu {
       });
       Utils.add_accel_label( move_item, (i + 49), Gdk.ModifierType.CONTROL_MASK );
       lbl_movemenu.add( move_item );
+
+      var sel_item = new Gtk.MenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
+      sel_item.activate.connect(() => {
+        select_label( i );
+      });
+      Utils.add_accel_label( sel_item, (i + 49), 0 );
+      lbl_selmenu.add( sel_item );
+      _select_labels.append_val( sel_item );
 
     }
 
@@ -275,6 +290,15 @@ public class NodeMenu : Gtk.Menu {
     _select_last_child.set_sensitive( !_ot.selected.is_leaf() );
     _select_first.set_sensitive( (first_node != _ot.selected) && !first_node.is_root() );
     _select_last.set_sensitive( (_ot.root.get_last_node() != _ot.selected) && !first_node.is_root() );
+    _select_label.set_sensitive( false );
+
+    for( int i=0; i<9; i++ ) {
+      var node = _ot.labels.get_node( i );
+      _select_labels.index( i ).set_sensitive( node != null );
+      if( node != null ) {
+        _select_label.set_sensitive( true );
+      }
+    }
 
     if( _ot.selected.hide_note ) {
       _note_display.label = _( "Show Note" );
@@ -407,6 +431,16 @@ public class NodeMenu : Gtk.Menu {
   /* Selects the bottom-most node of the document */
   private void select_last_node() {
     _ot.change_selected( _ot.root.get_last_node() );
+  }
+
+  /* Selects the given label index */
+  private void select_label( int index ) {
+    stdout.printf( "Select %d\n", index );
+    var node = _ot.labels.get_node( index );
+    if( node != null ) {
+      _ot.selected = node;
+      _ot.queue_draw();
+    }
   }
 
   /* Clears the current label */
