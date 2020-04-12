@@ -151,6 +151,9 @@ public class OutlineTable : DrawingArea {
     /* Create the node draw options */
     _draw_options = new NodeDrawOptions();
 
+    /* Set the style context */
+    get_style_context().add_class( "canvas" );
+
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
     _hilite_color = Utils.color_from_rgba( init_theme.hilite );
@@ -162,9 +165,6 @@ public class OutlineTable : DrawingArea {
     /* Allocate memory for the undo buffer */
     undo_buffer = new UndoBuffer( this );
     undo_text   = new UndoTextBuffer( this );
-
-    /* Set the style context */
-    get_style_context().add_class( "canvas" );
 
     /* Add event listeners */
     this.draw.connect( on_draw );
@@ -1752,16 +1752,6 @@ public class OutlineTable : DrawingArea {
     return( _theme );
   }
 
-  private void update_css() {
-
-    StyleContext.add_provider_for_screen(
-      Screen.get_default(),
-      _theme.get_css_provider( _hilite_color, _font_color ),
-      STYLE_PROVIDER_PRIORITY_APPLICATION
-    );
-
-  }
-
   /* Sets the theme to the given value */
   public void set_theme( Theme theme, bool save = true ) {
 
@@ -1773,6 +1763,17 @@ public class OutlineTable : DrawingArea {
     if( save ) {
       changed();
     }
+
+  }
+
+  /* Updates the CSS for the current outline table */
+  private void update_css() {
+
+    StyleContext.add_provider_for_screen(
+      Screen.get_default(),
+      _theme.get_css_provider( _hilite_color, _font_color ),
+      STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
 
   }
 
