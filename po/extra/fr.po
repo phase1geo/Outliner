@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-10 22:20+0200\n"
+"POT-Creation-Date: 2020-04-12 10:46+0200\n"
 "PO-Revision-Date: 2020-04-10 21:50+0200\n"
 "Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
 "Language-Team: none\n"
@@ -44,75 +44,177 @@ msgstr "Nouveau document"
 msgid "Trevor Williams"
 msgstr "Trevor Williams"
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:19
+#: data/com.github.phase1geo.outliner.appdata.xml.in:22
 msgid "Quickly create outlines and export them in a number of useful formats."
 msgstr ""
 "Créez rapidement des plans et exportez les dans un grand nombre de formats "
 "pratiques."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:21
+#: data/com.github.phase1geo.outliner.appdata.xml.in:24
 msgid "Quickly create and navigate outlines using the keyboard or mouse."
 msgstr ""
 "Créez et naviguez rapidement à travers des plans en utilisant le clavier ou "
 "la souris."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:22
+#: data/com.github.phase1geo.outliner.appdata.xml.in:25
 msgid "Full support for text formatting."
 msgstr "Prise en charge complète pour le formatage de texte."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:23
+#: data/com.github.phase1geo.outliner.appdata.xml.in:26
 msgid "Add notes to any outline text."
 msgstr "Ajoutez des notes à n'importe quel élément de plan."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:24
+#: data/com.github.phase1geo.outliner.appdata.xml.in:27
 msgid "Close/Hide any group within the outline for increased focus."
 msgstr ""
 "Fermez/Masquez un groupe à tout moment depuis le plan pour plus de "
 "concentration."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:25
+#: data/com.github.phase1geo.outliner.appdata.xml.in:28
 msgid ""
 "Quick search and replace of any text within the document, including notes."
 msgstr ""
 "Cherchez et remplacez rapidement n'importe quel texte dans le document, "
 "notes incluses."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:26
+#: data/com.github.phase1geo.outliner.appdata.xml.in:29
 msgid ""
 "View document statistics such as character count, word count and row count."
 msgstr ""
 "Visualisez les statistiques du document telles que le nombre de caractères, "
 "de mots et de lignes."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:27
+#: data/com.github.phase1geo.outliner.appdata.xml.in:30
 msgid "Unlimited undo/redo of any change."
 msgstr ""
 "Nombre d'annulations/rétablissements illimités pour toute modification."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:28
+#: data/com.github.phase1geo.outliner.appdata.xml.in:31
 msgid "Automatically saves in the background."
 msgstr "Enregistrement automatique en arrière-plan."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:29
+#: data/com.github.phase1geo.outliner.appdata.xml.in:32
 msgid "Open multiple outlines with the use of tabs."
 msgstr "Ouvrez plusieurs plans à la fois à l'aide des onglets."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:30
+#: data/com.github.phase1geo.outliner.appdata.xml.in:33
 msgid "Built-in themes."
 msgstr "Thèmes intégrés."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:31
+#: data/com.github.phase1geo.outliner.appdata.xml.in:34
 msgid "Import from Minder and OPML."
 msgstr "Importez depuis Minder et OPML."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:32
+#: data/com.github.phase1geo.outliner.appdata.xml.in:35
 msgid "Export to HTML, Markdown, Minder, OPML, PDF and PlainText."
 msgstr "Exportez au format HTML, Markdown, OPML, PDF et Texte brut."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:33
+#: data/com.github.phase1geo.outliner.appdata.xml.in:36
 msgid "Printer support."
 msgstr "Prise en charge de l'impression."
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:39
+#: data/com.github.phase1geo.outliner.appdata.xml.in:80
+msgid "New"
+msgstr "Nouveau"
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:82
+msgid "Added support for row cloning."
+msgstr "Ajout de la prise en charge du clonage de lignes."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:83
+msgid "Added support for superscript and subscript text formatting."
+msgstr "Ajout de la prise en charge des exposants et des indices."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:84
+msgid "Added support for using input methods to add text to rows and notes."
+msgstr ""
+"Ajout de la prise en charge pour utiliser des méthodes de sasie pour ajouter "
+"du texte aux lignes et aux notes."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:85
+msgid "Added selection submenu to contextual menu."
+msgstr "Ajout d'un sous-menu de sélection au menu contextuel."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:86
+msgid ""
+"Added new row selection commands: top, bottom, first child, previous "
+"sibling. next sibling, page up and page down."
+msgstr ""
+"Ajout de nouvelles commandes de sélection de ligne : au dessus, en dessous, "
+"premier enfant, précédent, suivant, haut de page, bas de page."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:87
+msgid "Added support for moving selected rows via keyboard shortcuts."
+msgstr ""
+"Ajout de la prise en charge du déplacement de la ligne sélectionnée par "
+"raccourcis claviers."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:88
+msgid "Added ability to position the selected row at the top of the window."
+msgstr ""
+"Ajout de la possibilité de positionner la ligne sélectionnée en haut de la "
+"fenêtre."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:89
+msgid ""
+"Added ability to delete the previous or next word via Control-Backspace/"
+"Delete keyboard shortcut."
+msgstr ""
+"Ajout de la possibilité de supprimer les mots précédent et suivant avec le "
+"raccourci clavier Ctrl-Effacer/Suppr."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:91
+msgid "Changes"
+msgstr "Modifications"
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:93
+msgid "Improved readability of text formatting bar."
+msgstr "Amélioration de la lisibilité pour la barre de formatage de texte."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:94
+msgid "Removed support for <em>m</em> command in selection traversal."
+msgstr ""
+"Suppression de la prise en charge de la commande <em>m</em> dans la zone de "
+"sélection."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:95
+msgid "Version number now output to .outliner file."
+msgstr ""
+"Le numéro de version est désormais enregistré dans le fichier .outliner."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:97
+msgid "Bug Fixes"
+msgstr "Corrections de bugs"
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:99
+msgid "Made metadata translatable (Thanks to Nathan Bonnemains)."
+msgstr ""
+"Les métadonnées sont désormais traduisibles (grâce à Nathan Bonnemains)."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:100
+msgid "Fixed screenshot URLs in metadata."
+msgstr "Correction des liens vers les captures d'écran dans les métadonnées."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:101
+msgid ""
+"Fixed application crash when using the <em>a</em> command when top-level row "
+"is selected."
+msgstr ""
+"Correction d'un plantage de l'application lors de l'utilisation de la "
+"commande <em>a</em> alors que la première ligne est sélectionnée."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:102
+msgid "Fixed node showing/hiding."
+msgstr "Correction de l'action d'afficher/masquer un nœud."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:103
+msgid ""
+"Fixed issue with <em>New Document</em> plank command to add new tab after "
+"application data is loaded."
+msgstr ""
+"Correction d'un problème avec la commande plank <em>Nouveau document</em> "
+"afin d'ajouter un nouvel onglet lorsque l'application est chargée."
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:109
 msgid "Initial release!"
 msgstr "Version initiale !"
