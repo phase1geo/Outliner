@@ -72,6 +72,7 @@ public class Theme : Object {
       var css_data = "@define-color colorPrimary @ORANGE_700; " +
                      "@define-color textColorPrimary @SILVER_100; " +
                      "@define-color colorAccent @ORANGE_700; " +
+                     "@define-color tab_base_color " + background.to_string() + ";" +
                      ".canvas { background: " + background.to_string() + "; } " +
                      ".hilite { background: " + hcolor + "; } " +
                      ".fcolor { background: " + fcolor + "; } " +
