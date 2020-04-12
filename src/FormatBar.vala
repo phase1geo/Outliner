@@ -32,6 +32,8 @@ public class FormatBar : Gtk.Popover {
   private ToggleButton _underline;
   private ToggleButton _strike;
   private ToggleButton _code;
+  private ToggleButton _super;
+  private ToggleButton _sub;
   private MenuButton   _header;
   private ToggleButton _hilite;
   private ColorButton  _hilite_chooser;
@@ -94,6 +96,18 @@ public class FormatBar : Gtk.Popover {
     _code.set_tooltip_text( _( "Code Block" ) );
     _code.toggled.connect( handle_code );
 
+    _super = new ToggleButton();
+    _super.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/superscript-symbolic" );
+    _super.relief = ReliefStyle.NONE;
+    _super.set_tooltip_text( _( "Superscript" ) );
+    _super.toggled.connect( handle_superscript );
+
+    _sub = new ToggleButton();
+    _sub.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/subscript-symbolic" );
+    _sub.relief = ReliefStyle.NONE;
+    _sub.set_tooltip_text( _( "Subscript" ) );
+    _sub.toggled.connect( handle_subscript );
+
     _header = new MenuButton();
     _header.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/header-symbolic" );
     _header.relief = ReliefStyle.NONE;
@@ -150,20 +164,25 @@ public class FormatBar : Gtk.Popover {
 
     box.pack_start( _copy,               false, false, 0 );
     box.pack_start( _cut,                false, false, 0 );
-    box.pack_start( new Label( spacer ), false, false, 0 );
+    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _bold,               false, false, 0 );
     box.pack_start( _italics,            false, false, 0 );
     box.pack_start( _underline,          false, false, 0 );
     box.pack_start( _strike,             false, false, 0 );
+    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _code,               false, false, 0 );
     box.pack_start( _header,             false, false, 0 );
+    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
+    box.pack_start( _super,              false, false, 0 );
+    box.pack_start( _sub,                false, false, 0 );
+    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _hilite,             false, false, 0 );
     box.pack_start( _hilite_chooser,     false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _color,              false, false, 0 );
     box.pack_start( _color_chooser,      false, false, 0 );
-    box.pack_start( new Label( spacer ), false, false, 0 );
+    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _link,               false, false, 0 );
 
     add( box );
@@ -291,6 +310,28 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Toggles the superscript status of the currently selected text */
+  private void handle_superscript() {
+    if( !_ignore_active ) {
+      if( _super.active ) {
+        format_text( FormatTag.SUPER );
+      } else {
+        unformat_text( FormatTag.SUPER );
+      }
+    }
+  }
+
+  /* Toggles the superscript status of the currently selected text */
+  private void handle_subscript() {
+    if( !_ignore_active ) {
+      if( _sub.active ) {
+        format_text( FormatTag.SUB );
+      } else {
+        unformat_text( FormatTag.SUB );
+      }
+    }
+  }
+
   /* Toggles the header status of the currently selected text */
   private void handle_header( int level ) {
     if( !_ignore_active ) {
@@ -392,6 +433,8 @@ public class FormatBar : Gtk.Popover {
     set_toggle_button( text, FormatTag.UNDERLINE,  _underline );
     set_toggle_button( text, FormatTag.STRIKETHRU, _strike );
     set_toggle_button( text, FormatTag.CODE,       _code );
+    set_toggle_button( text, FormatTag.SUPER,      _super );
+    set_toggle_button( text, FormatTag.SUB,        _sub );
     set_toggle_button( text, FormatTag.HILITE,     _hilite );
     set_toggle_button( text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );

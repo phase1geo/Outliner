@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2020 Trevor Williams <phase1geo@gmail.com> -->
+<component type="desktop-application">
+  <id>com.github.phase1geo.outliner</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <name>Outliner</name>
+  <summary>Organize your words</summary>
+  <developer_name>Trevor Williams</developer_name>
+  <provides>
+    <binary>com.github.phase1geo.outliner</binary>
+  </provides>
+  <screenshots>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-light.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-dark.png</image>
+    </screenshot>
+  </screenshots>
+  <description>
+    <p>Quickly create outlines and export them in a number of useful formats.</p>
+    <ul>
+      <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
+      <li>Full support for text formatting.</li>
+      <li>Add notes to any outline text.</li>
+      <li>Close/Hide any group within the outline for increased focus.</li>
+      <li>Quick search and replace of any text within the document, including notes.</li>
+      <li>View document statistics such as character count, word count and row count.</li>
+      <li>Unlimited undo/redo of any change.</li>
+      <li>Automatically saves in the background.</li>
+      <li>Open multiple outlines with the use of tabs.</li>
+      <li>Built-in themes.</li>
+      <li>Import from Minder and OPML.</li>
+      <li>Export to HTML, Markdown, Minder, OPML, PDF and PlainText.</li>
+      <li>Printer support.</li>
+    </ul>
+  </description>
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="violence-desecration">none</content_attribute>
+    <content_attribute id="violence-slavery">none</content_attribute>
+    <content_attribute id="violence-worship">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="sex-homosexuality">none</content_attribute>
+    <content_attribute id="sex-prostitution">none</content_attribute>
+    <content_attribute id="sex-adultery">none</content_attribute>
+    <content_attribute id="sex-appearance">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">none</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+  </content_rating>
+  <url type="homepage">https://github.com/phase1geo/Outliner</url>
+  <url type="bugtracker">https://github.com/phase1geo/Outliner/issues</url>
+  <url type="help">https://github.com/phase1geo/Outliner/wiki</url>
+  <update_contact>phase1geo@gmail.com</update_contact>
+  <custom>
+    <value key="x-appcenter-color-primary">#D48E15</value>
+    <value key="x-appcenter-color-primary-text">#000000</value>
+    <value key="x-appcenter-suggested-price">10</value>
+  </custom>
+  <releases>
+    <release version="1.1.0" date="2020-04-08">
+      <description>
+        <p>New</p>
+        <ul>
+          <li>Added support for row cloning.</li>
+          <li>Added support for superscript and subscript text formatting.</li>
+          <li>Added support for using input methods to add text to rows and notes.</li>
+          <li>Added selection submenu to contextual menu.</li>
+          <li>Added new row selection commands: top, bottom, first child, previous sibling. next sibling, page up and page down.</li>
+          <li>Added support for moving selected rows via keyboard shortcuts.</li>
+          <li>Added ability to position the selected row at the top of the window.</li>
+          <li>Added ability to delete the previous or next word via Control-Backspace/Delete keyboard shortcut.</li>
+        </ul>
+        <p>Changes</p>
+        <ul>
+          <li>Improved readability of text formatting bar.</li>
+          <li>Removed support for <em>m</em> command in selection traversal.</li>
+          <li>Version number now output to .outliner file.</li>
+        </ul>
+        <p>Bug Fixes</p>
+        <ul>
+          <li>Made metadata translatable (Thanks to Nathan Bonnemains).</li>
+          <li>Fixed screenshot URLs in metadata.</li>
+          <li>Fixed application crash when using the <em>a</em> command when top-level row is selected.</li>
+          <li>Fixed node showing/hiding.</li>
+          <li>Fixed issue with <em>New Document</em> plank command to add new tab after application data is loaded.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.3" date="2020-03-26">
+      <description>
+        <p>Initial release!</p>
+      </description>
+    </release>
+  </releases>
+</component>

@@ -11,8 +11,11 @@
       <binary>com.github.phase1geo.outliner</binary>
     </provides>
     <screenshots>
-      <screenshot type="default">
-        <image>https://github.com/phase1geo/Outliner/blob/master/data/images/screenshot.png</image>
+      <screenshot>
+        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-light.png</image>
+      </screenshot>
+      <screenshot>
+        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-dark.png</image>
       </screenshot>
     </screenshots>
     <description>
@@ -33,13 +36,6 @@
         <li>Printer support.</li>
       </ul>
     </description>
-    <releases>
-      <release version="1.0.3" date="2020-03-26">
-        <description>
-          <p>Initial release!</p>
-        </description>
-      </release>
-    </releases>
     <content_rating type="oars-1.1">
       <content_attribute id="violence-cartoon">none</content_attribute>
       <content_attribute id="violence-fantasy">none</content_attribute>
@@ -78,4 +74,40 @@
       <value key="x-appcenter-color-primary-text">#000000</value>
       <value key="x-appcenter-suggested-price">10</value>
     </custom>
+    <releases>
+      <release version="1.1.0" date="2020-04-08">
+        <description>
+          <p>New</p>
+          <ul>
+            <li>Added support for row cloning.</li>
+            <li>Added support for superscript and subscript text formatting.</li>
+            <li>Added support for using input methods to add text to rows and notes.</li>
+            <li>Added selection submenu to contextual menu.</li>
+            <li>Added new row selection commands: top, bottom, first child, previous sibling. next sibling, page up and page down.</li>
+            <li>Added support for moving selected rows via keyboard shortcuts.</li>
+            <li>Added ability to position the selected row at the top of the window.</li>
+            <li>Added ability to delete the previous or next word via Control-Backspace/Delete keyboard shortcut.</li>
+          </ul>
+          <p>Changes</p>
+          <ul>
+            <li>Improved readability of text formatting bar.</li>
+            <li>Removed support for <em>m</em> command in selection traversal.</li>
+            <li>Version number now output to .outliner file.</li>
+          </ul>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Made metadata translatable (Thanks to Nathan Bonnemains).</li>
+            <li>Fixed screenshot URLs in metadata.</li>
+            <li>Fixed application crash when using the <em>a</em> command when top-level row is selected.</li>
+            <li>Fixed node showing/hiding.</li>
+            <li>Fixed issue with <em>New Document</em> plank command to add new tab after application data is loaded.</li>
+          </ul>
+        </description>
+      </release>
+      <release version="1.0.3" date="2020-03-26">
+        <description>
+          <p>Initial release!</p>
+        </description>
+      </release>
+    </releases>
 </component>

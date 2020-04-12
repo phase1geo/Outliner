@@ -85,7 +85,7 @@ public class Utils {
 
   /* Returns true if the given coordinates are within the specified bounds */
   public static bool is_within_bounds( double x, double y, double bx, double by, double bw, double bh ) {
-    return( (bx < x) && (x < (bx + bw)) && (by < y) && (y < (by + bh)) );
+    return( (bx <= x) && (x < (bx + bw)) && (by <= y) && (y < (by + bh)) );
   }
 
   /* Returns a string that is suitable to use as an inspector title */
@@ -129,6 +129,21 @@ public class Utils {
       height = log_rect.height;
     }
     return( height / Pango.SCALE );
+  }
+
+  /* Searches for the beginning or ending word */
+  public static int find_word( string str, int cursor, bool wordstart ) {
+    try {
+      MatchInfo match_info;
+      var substr = wordstart ? str.substring( 0, cursor ) : str.substring( cursor );
+      var re = new Regex( wordstart ? ".*(\\W\\w|[\\w\\s][^\\w\\s])" : "(\\w\\W|[^\\w\\s][\\w\\s])" );
+      if( re.match( substr, 0, out match_info ) ) {
+        int start_pos, end_pos;
+        match_info.fetch_pos( 1, out start_pos, out end_pos );
+        return( wordstart ? (start_pos + 1) : (cursor + start_pos + 1) );
+      }
+    } catch( RegexError e ) {}
+    return( -1 );
   }
 
 }

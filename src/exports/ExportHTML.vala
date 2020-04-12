@@ -66,6 +66,8 @@ public class ExportHTML : Object {
         case FormatTag.UNDERLINE  :  return( "<u>" );
         case FormatTag.STRIKETHRU :  return( "<del>" );
         case FormatTag.CODE       :  return( "<code>" );
+        case FormatTag.SUB        :  return( "<sub>" );
+        case FormatTag.SUPER      :  return( "<sup>" );
         case FormatTag.HEADER     :  return( "<h%s>".printf( extra ) );
         case FormatTag.COLOR      :  return( "<span style=\"color:%s;\">".printf( extra ) );
         case FormatTag.HILITE     :  return( "<span style=\"background-color:%s;\">".printf( extra ) );
@@ -80,6 +82,8 @@ public class ExportHTML : Object {
         case FormatTag.UNDERLINE  :  return( "</u>" );
         case FormatTag.STRIKETHRU :  return( "</del>" );
         case FormatTag.CODE       :  return( "</code>" );
+        case FormatTag.SUB        :  return( "</sub>" );
+        case FormatTag.SUPER      :  return( "</sup>" );
         case FormatTag.HEADER     :  return( "</h%s>".printf( extra ) );
         case FormatTag.COLOR      :  return( "</span>" );
         case FormatTag.HILITE     :  return( "</span>" );
@@ -88,7 +92,7 @@ public class ExportHTML : Object {
       return( "" );
     };
     FormattedText.ExportEncodeFunc encode_func = (str) => {
-      return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ) );
+      return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).replace( "\n", "<br />" ) );
     };
     return( text.export( start, end, start_func, end_func, encode_func ) );
   }
@@ -165,6 +169,16 @@ public class ExportHTML : Object {
               text.add_tag( FormatTag.CODE, start, end );
             }
             break;
+          case "rise" :
+            {
+              int rise = int.parse( key_value[1] );
+              if( rise < 0 ) {
+                text.add_tag( FormatTag.SUB, start, end );
+              } else {
+                text.add_tag( FormatTag.SUPER, start, end );
+              }
+            }
+            break;
         }
       }
     }
@@ -200,6 +214,8 @@ public class ExportHTML : Object {
       case "del"    :  text.add_tag( FormatTag.STRIKETHRU, start, end );  break;
       case "tt"     :
       case "code"   :  text.add_tag( FormatTag.CODE,       start, end );  break;
+      case "sub"    :  text.add_tag( FormatTag.SUB,        start, end );  break;
+      case "sup"    :  text.add_tag( FormatTag.SUPER,      start, end );  break;
       case "li"     :  text.insert_text( start, "- " );  break;
     }
   }
