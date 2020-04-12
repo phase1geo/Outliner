@@ -229,6 +229,7 @@ public class MainWindow : ApplicationWindow {
     do_buffer_changed( ot.undo_buffer );
     update_title( ot );
     canvas_changed( ot );
+    ot.update_theme();
     save_tab_state( tab );
   }
 
@@ -270,6 +271,7 @@ public class MainWindow : ApplicationWindow {
     ot.map_event.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
+    ot.theme_changed.connect( theme_changed );
 
     if( fname != null ) {
       ot.document.filename = fname;

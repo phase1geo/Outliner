@@ -403,7 +403,7 @@ public class Node {
    If the theme has changed, all we need to do is alert the CanvasText to
    rerender the text.
   */
-  private void table_theme_changed( Theme theme ) {
+  private void table_theme_changed() {
     _name.update_size( false );
     _note.update_size( false );
   }

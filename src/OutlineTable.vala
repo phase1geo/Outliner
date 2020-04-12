@@ -130,7 +130,7 @@ public class OutlineTable : DrawingArea {
   /* Called by this class when a change is made to the table */
   public signal void changed();
   public signal void zoom_changed( int name_size, int note_size, int pady );
-  public signal void theme_changed( Theme theme );
+  public signal void theme_changed();
   public signal void selected_changed();
   public signal void cursor_changed();
 
@@ -1767,21 +1767,29 @@ public class OutlineTable : DrawingArea {
 
     _theme = theme;
 
-    /* Update the CSS */
-    update_css();
-
-    /* Change the theme of the formatted text */
-    FormattedText.set_theme( theme );
-
-    /* Indicate that the theme has changed to anyone listening */
-    theme_changed( theme );
-
-    /* Update all nodes */
-    queue_draw();
+    /* Update the theme */
+    update_theme();
 
     if( save ) {
       changed();
     }
+
+  }
+
+  /* Updates the current them in the UI */
+  public void update_theme() {
+
+    /* Update the CSS */
+    update_css();
+
+    /* Change the theme of the formatted text */
+    FormattedText.set_theme( _theme );
+
+    /* Indicate that the theme has changed to anyone listening */
+    theme_changed();
+
+    /* Update all nodes */
+    queue_draw();
 
   }
 
