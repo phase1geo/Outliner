@@ -111,6 +111,7 @@ public class FormatBar : Gtk.Popover {
     _header = new MenuButton();
     _header.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/header-symbolic" );
     _header.relief = ReliefStyle.NONE;
+    _header.set_tooltip_text( _( "Header" ) );
     _header.popup = new Gtk.Menu();
     unowned SList<RadioMenuItem>? group = null;
     for( int i=0; i<7; i++ ) {
