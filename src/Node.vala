@@ -260,12 +260,13 @@ public class Node {
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
-    _name.set_font( name_fd );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
     _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
+
+    _name.set_font( name_fd );
     _note.set_font( note_fd );
 
     pady = ot.condensed ? 2 : 10;
@@ -301,14 +302,16 @@ public class Node {
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
-    _name.set_font( name_fd );
-    _name.copy( node.name );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
     _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
+
+    _name.set_font( name_fd );
     _note.set_font( note_fd );
+
+    _name.copy( node.name );
     _note.copy( node.note );
 
     pady = ot.condensed ? 2 : 10;
@@ -350,12 +353,13 @@ public class Node {
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
-    _name.set_font( name_fd );
 
     _note = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.note );
     _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
+
+    _name.set_font( name_fd );
     _note.set_font( note_fd );
 
     pady = ot.condensed ? 2 : 10;
@@ -495,6 +499,7 @@ public class Node {
    resized.
   */
   private void update_height_from_resize() {
+    position_text();
     update_height( true );
   }
 
