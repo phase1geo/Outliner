@@ -3,6 +3,7 @@ src/exports/ExportMinder.vala
 src/FormatBar.vala
 src/LinkEditor.vala
 src/MainWindow.vala
+src/Node.vala
 src/NodeMenu.vala
 src/OutlineTable.vala
 src/SearchBar.vala
