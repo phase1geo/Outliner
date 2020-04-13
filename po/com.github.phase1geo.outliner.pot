@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 11:04+0200\n"
+"POT-Creation-Date: 2020-04-13 11:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,7 @@ msgstr ""
 msgid "Subscript"
 msgstr ""
 
-#: src/FormatBar.vala:117
+#: src/FormatBar.vala:117 src/Node.vala:56
 msgid "None"
 msgstr ""
 
@@ -121,145 +121,165 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/LinkEditor.vala:62 src/MainWindow.vala:671 src/MainWindow.vala:711
-#: src/MainWindow.vala:814 src/MainWindow.vala:913
+#: src/LinkEditor.vala:62 src/MainWindow.vala:672 src/MainWindow.vala:712
+#: src/MainWindow.vala:815 src/MainWindow.vala:914
 msgid "Cancel"
 msgstr ""
 
-#: src/MainWindow.vala:104 src/MainWindow.vala:817
+#: src/MainWindow.vala:104 src/MainWindow.vala:818
 msgid "Outliner"
 msgstr ""
 
-#: src/MainWindow.vala:133
+#: src/MainWindow.vala:134
 msgid "New File"
 msgstr ""
 
-#: src/MainWindow.vala:138 src/MainWindow.vala:711
+#: src/MainWindow.vala:139 src/MainWindow.vala:712
 msgid "Open File"
 msgstr ""
 
-#: src/MainWindow.vala:143
+#: src/MainWindow.vala:144
 msgid "Save File As"
 msgstr ""
 
-#: src/MainWindow.vala:148 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:149 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr ""
 
-#: src/MainWindow.vala:154 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:155 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr ""
 
-#: src/MainWindow.vala:220
+#: src/MainWindow.vala:221
 msgid "Unnamed Document"
 msgstr ""
 
-#: src/MainWindow.vala:429
+#: src/MainWindow.vala:430
 msgid "Search"
 msgstr ""
 
-#: src/MainWindow.vala:440
+#: src/MainWindow.vala:441
 msgid "Statistics"
 msgstr ""
 
-#: src/MainWindow.vala:449
+#: src/MainWindow.vala:450
 msgid "Characters :"
 msgstr ""
 
-#: src/MainWindow.vala:452
+#: src/MainWindow.vala:453
 msgid "Words:"
 msgstr ""
 
-#: src/MainWindow.vala:455
+#: src/MainWindow.vala:456
 msgid "Rows:"
 msgstr ""
 
-#: src/MainWindow.vala:490 src/MainWindow.vala:913
+#: src/MainWindow.vala:491 src/MainWindow.vala:914
 msgid "Export"
 msgstr ""
 
-#: src/MainWindow.vala:497
+#: src/MainWindow.vala:498
 msgid "Export…"
 msgstr ""
 
-#: src/MainWindow.vala:501
+#: src/MainWindow.vala:502
 msgid "Print"
 msgstr ""
 
-#: src/MainWindow.vala:524
+#: src/MainWindow.vala:525
 msgid "Properties"
 msgstr ""
 
-#: src/MainWindow.vala:531
+#: src/MainWindow.vala:532
 msgid "Zoom (%):"
 msgstr ""
 
-#: src/MainWindow.vala:545
+#: src/MainWindow.vala:546
 msgid "Theme:"
 msgstr ""
 
-#: src/MainWindow.vala:571
+#: src/MainWindow.vala:572
 msgid "Enumeration Style:"
 msgstr ""
 
-#: src/MainWindow.vala:587
+#: src/MainWindow.vala:588
 msgid "Condensed Mode"
 msgstr ""
 
-#: src/MainWindow.vala:603
+#: src/MainWindow.vala:604
 msgid "Shortcuts Cheatsheet"
 msgstr ""
 
-#: src/MainWindow.vala:662
+#: src/MainWindow.vala:663
 msgid "Save current unnamed document?"
 msgstr ""
 
-#: src/MainWindow.vala:663
+#: src/MainWindow.vala:664
 msgid "Changes will be permanently lost if not saved."
 msgstr ""
 
-#: src/MainWindow.vala:668
+#: src/MainWindow.vala:669
 msgid "Discard Changes"
 msgstr ""
 
-#: src/MainWindow.vala:674 src/MainWindow.vala:814
+#: src/MainWindow.vala:675 src/MainWindow.vala:815
 msgid "Save"
 msgstr ""
 
-#: src/MainWindow.vala:711
+#: src/MainWindow.vala:712
 msgid "Open"
 msgstr ""
 
-#: src/MainWindow.vala:813
+#: src/MainWindow.vala:814
 msgid "Save File"
 msgstr ""
 
-#: src/MainWindow.vala:912
+#: src/MainWindow.vala:913
 msgid "Export As"
 msgstr ""
 
-#: src/MainWindow.vala:917
+#: src/MainWindow.vala:918
 msgid "HTML"
 msgstr ""
 
-#: src/MainWindow.vala:924
+#: src/MainWindow.vala:925
 msgid "Markdown"
 msgstr ""
 
-#: src/MainWindow.vala:931
+#: src/MainWindow.vala:932
 msgid "Minder"
 msgstr ""
 
-#: src/MainWindow.vala:937
+#: src/MainWindow.vala:938
 msgid "OPML"
 msgstr ""
 
-#: src/MainWindow.vala:943
+#: src/MainWindow.vala:944
 msgid "PDF"
 msgstr ""
 
-#: src/MainWindow.vala:949
+#: src/MainWindow.vala:950
 msgid "PlainText"
+msgstr ""
+
+#: src/Node.vala:57
+msgid "Outline"
+msgstr ""
+
+#: src/Node.vala:58
+msgid "Section"
+msgstr ""
+
+#: src/Node.vala:76
+msgid "No enumeration will be displayed"
+msgstr ""
+
+#: src/Node.vala:77
+msgid "Shows outline-like enumeration (ex., I., A., 1.)"
+msgstr ""
+
+#: src/Node.vala:78
+msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr ""
 
 #: src/NodeMenu.vala:64
