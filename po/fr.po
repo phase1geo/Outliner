@@ -93,7 +93,7 @@ msgstr "Exposant"
 msgid "Subscript"
 msgstr "Indice"
 
-#: src/FormatBar.vala:117
+#: src/FormatBar.vala:117 src/Node.vala:56
 msgid "None"
 msgstr "Aucun"
 
@@ -266,6 +266,26 @@ msgstr "PDF"
 #: src/MainWindow.vala:950
 msgid "PlainText"
 msgstr "Texte brut"
+
+#: src/Node.vala:57
+msgid "Outline"
+msgstr "Plan"
+
+#: src/Node.vala:58
+msgid "Section"
+msgstr "Section"
+
+#: src/Node.vala:76
+msgid "No enumeration will be displayed"
+msgstr "Aucune énumération ne sera affichée"
+
+#: src/Node.vala:77
+msgid "Shows outline-like enumeration (ex., I., A., 1.)"
+msgstr "Affiche une énumération de type plan (par ex. I., A., 1.)"
+
+#: src/Node.vala:78
+msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
+msgstr "Affiche une énumération de type section (par ex. 2., 2.1., 2.1.3.)"
 
 #: src/NodeMenu.vala:64
 msgid "Paste Above"

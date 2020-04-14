@@ -93,7 +93,7 @@ msgstr ""
 msgid "Subscript"
 msgstr ""
 
-#: src/FormatBar.vala:117
+#: src/FormatBar.vala:117 src/Node.vala:56
 msgid "None"
 msgstr ""
 
@@ -263,6 +263,26 @@ msgstr ""
 
 #: src/MainWindow.vala:950
 msgid "PlainText"
+msgstr ""
+
+#: src/Node.vala:57
+msgid "Outline"
+msgstr ""
+
+#: src/Node.vala:58
+msgid "Section"
+msgstr ""
+
+#: src/Node.vala:76
+msgid "No enumeration will be displayed"
+msgstr ""
+
+#: src/Node.vala:77
+msgid "Shows outline-like enumeration (ex., I., A., 1.)"
+msgstr ""
+
+#: src/Node.vala:78
+msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr ""
 
 #: src/NodeMenu.vala:64
