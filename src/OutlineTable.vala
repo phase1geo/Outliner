@@ -475,7 +475,8 @@ public class OutlineTable : DrawingArea {
               selected.depth = current.depth + 1;
             } else if( current.is_within_attachabove( e.x, e.y ) ) {
               set_node_mode( current, NodeMode.ATTACHABOVE );
-              selected.depth = current.get_previous_node().depth;
+              var prev_node = current.get_previous_node();
+              selected.depth = (prev_node != null) ? prev_node.depth : 0;
             } else {
               set_node_mode( current, NodeMode.ATTACHBELOW );
               selected.depth = current.depth;
