@@ -3,7 +3,7 @@
   <object class="GtkShortcutsWindow" id="shortcuts">
     <property name="modal">0</property>
     <property name="resizable">0</property>
-    <property name="title" translatable="yes">Minder Shortcuts</property>
+    <property name="title" translatable="yes">Outliner Shortcuts</property>
     <property name="section-name">global</property>
     <property name="view-name">file</property>
     <child>
