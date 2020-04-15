@@ -1,4 +1,5 @@
 src/DynamicNotebook.vala
+src/Document.vala
 src/exports/ExportMinder.vala
 src/FormatBar.vala
 src/LinkEditor.vala
