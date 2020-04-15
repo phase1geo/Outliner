@@ -33,3 +33,4 @@ src/undo_actions/UndoNodeSplit.vala
 
 src/UndoBuffer.vala
 
+data/com.github.phase1geo.outliner.shortcuts.ui

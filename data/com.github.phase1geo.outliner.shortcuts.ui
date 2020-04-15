@@ -319,7 +319,7 @@
         <property name="title" translatable="yes">Text Editing</property>
         <property name="visible">1</property>
         <child>
-          <object class="gtkShortcutsGroup">
+          <object class="GtkShortcutsGroup">
             <property name="title" translatable="yes">Miscellaneous</property>
             <property name="visible">1</property>
             <child>
