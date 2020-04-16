@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-15 04:16-0500\n"
+"POT-Creation-Date: 2020-04-15 17:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,6 +51,10 @@ msgstr ""
 
 #: src/DynamicNotebook.vala:810
 msgid "Closed Tabs"
+msgstr ""
+
+#: src/Document.vala:67
+msgid "unnamed"
 msgstr ""
 
 #: src/exports/ExportMinder.vala:110

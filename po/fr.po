@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-15 04:16-0500\n"
+"POT-Creation-Date: 2020-04-15 17:46+0200\n"
 "PO-Revision-Date: 2020-04-10 21:50+0200\n"
 "Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
 "Language-Team: none\n"
@@ -52,6 +52,10 @@ msgstr "Annuler la fermeture de l'onglet"
 #: src/DynamicNotebook.vala:810
 msgid "Closed Tabs"
 msgstr "Onglets fermés"
+
+#: src/Document.vala:67
+msgid "unnamed"
+msgstr "sans nom"
 
 #: src/exports/ExportMinder.vala:110
 msgid "To right"
@@ -439,71 +443,71 @@ msgstr "Solarized Dark"
 
 #: src/undo_actions/UndoTextTagRemove.vala:31
 msgid "format tag remove"
-msgstr ""
+msgstr "retrait de style"
 
 #: src/undo_actions/UndoTextDelete.vala:30
 msgid "text deletion"
-msgstr ""
+msgstr "suppression de texte"
 
 #: src/undo_actions/UndoNodeExpander.vala:29
 msgid "expander change"
-msgstr ""
+msgstr "extension/réduction de ligne"
 
 #: src/undo_actions/UndoNodeInsert.vala:30
 msgid "insert item"
-msgstr ""
+msgstr "insertion de texte"
 
 #: src/undo_actions/UndoNodeName.vala:30
 msgid "title change"
-msgstr ""
+msgstr "modification de titre"
 
 #: src/undo_actions/UndoTextReplace.vala:31
 msgid "text replacement"
-msgstr ""
+msgstr "remplacement de texte"
 
 #: src/undo_actions/UndoNodeNote.vala:30
 msgid "note change"
-msgstr ""
+msgstr "modification de note"
 
 #: src/undo_actions/UndoNodeMove.vala:32
 msgid "move item"
-msgstr ""
+msgstr "déplacement d'élément"
 
 #: src/undo_actions/UndoNodeIndent.vala:28
 msgid "indent item"
-msgstr ""
+msgstr "indentation d'élément"
 
 #: src/undo_actions/UndoTextTagAdd.vala:31
 msgid "format tag add"
-msgstr ""
+msgstr "ajout de style"
 
 #: src/undo_actions/UndoTextInsert.vala:29
 msgid "text insertion"
-msgstr ""
+msgstr "insertion de texte"
 
 #: src/undo_actions/UndoReplaceAll.vala:47
 msgid "replace all"
-msgstr ""
+msgstr "tout remplacer"
 
 #: src/undo_actions/UndoNodePaste.vala:30
 msgid "paste item"
-msgstr ""
+msgstr "coller l'élément"
 
 #: src/undo_actions/UndoNodeDelete.vala:30
 msgid "delete item"
-msgstr ""
+msgstr "supprimer l'élément"
 
 #: src/undo_actions/UndoNodeUnindent.vala:28
 msgid "unindent item"
-msgstr ""
+msgstr "désindenter l'élément"
 
 #: src/undo_actions/UndoNodeCut.vala:30
 msgid "cut item"
-msgstr ""
+msgstr "couper l'élément"
 
 #: src/undo_actions/UndoNodeSplit.vala:32
 msgid "split item"
-msgstr ""
+msgstr "diviser l'élément"
 
 #: src/UndoBuffer.vala:81
 msgid "Undo "
