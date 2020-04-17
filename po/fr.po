@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-16 23:51-0500\n"
+"POT-Creation-Date: 2020-04-17 09:36+0200\n"
 "PO-Revision-Date: 2020-04-10 21:50+0200\n"
 "Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
 "Language-Team: none\n"
@@ -151,11 +151,11 @@ msgstr "Ouvrir un fichier"
 msgid "Save File As"
 msgstr "Enregistrer sous"
 
-#: src/MainWindow.vala:149 src/UndoBuffer.vala:80 src/UndoBuffer.vala:81
+#: src/MainWindow.vala:149 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr "Annuler"
 
-#: src/MainWindow.vala:155 src/UndoBuffer.vala:86 src/UndoBuffer.vala:87
+#: src/MainWindow.vala:155 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr "Rétablir"
 
@@ -508,6 +508,14 @@ msgstr "couper l'élément"
 #: src/undo_actions/UndoNodeSplit.vala:32
 msgid "split item"
 msgstr "diviser l'élément"
+
+#: src/UndoBuffer.vala:81
+msgid "Undo: "
+msgstr "Annuler : "
+
+#: src/UndoBuffer.vala:87
+msgid "Redo: "
+msgstr "Rétablir : "
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:6
 msgid "Outliner Shortcuts"
