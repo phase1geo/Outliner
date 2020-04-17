@@ -30,6 +30,7 @@ public class OutlineTable : DrawingArea {
   private Document        _doc;
   private Node?           _selected = null;
   private Node?           _active   = null;
+  private bool            _active_to_select;
   private double          _press_x;
   private double          _press_y;
   private bool            _pressed    = false;
@@ -172,7 +173,6 @@ public class OutlineTable : DrawingArea {
     this.motion_notify_event.connect( on_motion );
     this.button_release_event.connect( on_release );
     this.key_press_event.connect( on_keypress );
-    // this.scroll_event.connect( on_scroll );
     this.size_allocate.connect( (a) => {
       see_internal();
     });
@@ -388,7 +388,8 @@ public class OutlineTable : DrawingArea {
 
     var clicked = node_at_coordinates( x, y );;
 
-    _active = null;
+    _active           = null;
+    _active_to_select = false;
 
     if( clicked != null ) {
       if( clicked.is_within_expander( x, y ) ) {
@@ -402,7 +403,8 @@ public class OutlineTable : DrawingArea {
       } else if( clicked.is_within_note( x, y ) ) {
         return( clicked_in_text( clicked, clicked.note, e, NodeMode.NOTEEDIT ) );
       } else {
-        _active = clicked;
+        _active           = clicked;
+        _active_to_select = true;
       }
     } else {
       selected = null;
@@ -453,6 +455,17 @@ public class OutlineTable : DrawingArea {
 
     if( _pressed ) {
 
+      /* If we are moving a clicked row for the first time, handle it */
+      if( _active_to_select && (_active != null) ) {
+        selected          = _active;
+        _move_parent      = selected.parent;
+        _move_index       = selected.index();
+        _active           = null;
+        _active_to_select = false;
+        set_node_mode( selected, NodeMode.MOVETO );
+        selected.parent.remove_child( selected );
+      }
+
       if( selected != null ) {
 
         /* If we are dragging out a text selection, handle it here */
@@ -461,17 +474,8 @@ public class OutlineTable : DrawingArea {
 
         /* Otherwise, we are moving the current node */
         } else {
-          if( selected.mode == NodeMode.SELECTED ) {
-            _move_parent = selected.parent;
-            _move_index  = selected.index();
-            set_node_mode( selected, NodeMode.MOVETO );
-            selected.parent.remove_child( selected );
-          }
           selected.y = e.y;
           var current = node_at_coordinates( e.x, e.y );
-          if( (current == null) && !root.is_leaf() ) {
-            current = root.get_last_node();
-          }
           if( current != null ) {
             if( current.is_within_attachto( e.x, e.y ) ) {
               set_node_mode( current, NodeMode.ATTACHTO );
@@ -493,6 +497,7 @@ public class OutlineTable : DrawingArea {
           }
           queue_draw();
         }
+
       }
 
     } else {
@@ -547,10 +552,9 @@ public class OutlineTable : DrawingArea {
 
     if( _pressed ) {
 
-      if( _active != null ) {
-
-        /* Handle a node move */
-        if( _motion ) {
+      /* Handle a node move */
+      if( _motion ) {
+        if( _active != null ) {
           switch( _active.mode ) {
             case NodeMode.ATTACHTO :
               _active.add_child( selected );
@@ -564,23 +568,23 @@ public class OutlineTable : DrawingArea {
               _active.parent.add_child( selected, (_active.index() + 1) );
               undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
               break;
-            default :
-              root.add_child( selected );
-              break;
-          }
-          if( selected == null ) {
-            selected = _active;
           }
           set_node_mode( selected, NodeMode.SELECTED );
           set_node_mode( _active, NodeMode.NONE );
-          _active = null;
+          _active           = null;
+          _active_to_select = false;
           queue_draw();
           changed();
-        } else {
-          selected = _active;
+        } else if( selected.mode == NodeMode.MOVETO ) {
+          _move_parent.add_child( selected, _move_index );
           set_node_mode( selected, NodeMode.SELECTED );
           queue_draw();
+          changed();
         }
+      } else if( _active != null ) {
+        selected = _active;
+        set_node_mode( selected, NodeMode.SELECTED );
+        queue_draw();
       }
 
     } else {
