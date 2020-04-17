@@ -67,49 +67,49 @@ public class FormatBar : Gtk.Popover {
     _cut.clicked.connect( handle_cut );
 
     _bold = new ToggleButton();
-    _bold.image  = new Image.from_icon_name( "format-text-bold-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _bold, "<b>B</b>" );
     _bold.relief = ReliefStyle.NONE;
     _bold.set_tooltip_markup( Utils.tooltip_with_accel( _( "Bold" ), "<Control>b" ) );
     _bold.toggled.connect( handle_bold );
 
     _italics = new ToggleButton();
-    _italics.image  = new Image.from_icon_name( "format-text-italic-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _italics, "<i>I</i>" );
     _italics.relief = ReliefStyle.NONE;
     _italics.set_tooltip_markup( Utils.tooltip_with_accel( _( "Italic" ), "<Control>i" ) );
     _italics.toggled.connect( handle_italics );
 
     _underline = new ToggleButton();
-    _underline.image  = new Image.from_icon_name( "format-text-underline-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _underline, "<u>U</u>" );
     _underline.relief = ReliefStyle.NONE;
     _underline.set_tooltip_text( _( "Underline" ) );
     _underline.toggled.connect( handle_underline );
 
     _strike = new ToggleButton();
-    _strike.image  = new Image.from_icon_name( "format-text-strikethrough-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _strike, "<s>S</s>" );
     _strike.relief = ReliefStyle.NONE;
     _strike.set_tooltip_text( _( "Strikethrough" ) );
     _strike.toggled.connect( handle_strikethru );
 
     _code = new ToggleButton();
-    _code.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/code-symbolic" );
+    add_markup( _code, "{ }" );
     _code.relief = ReliefStyle.NONE;
     _code.set_tooltip_text( _( "Code Block" ) );
     _code.toggled.connect( handle_code );
 
     _super = new ToggleButton();
-    _super.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/superscript-symbolic" );
+    add_markup( _super, "A<sup>x</sup>" );
     _super.relief = ReliefStyle.NONE;
     _super.set_tooltip_text( _( "Superscript" ) );
     _super.toggled.connect( handle_superscript );
 
     _sub = new ToggleButton();
-    _sub.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/subscript-symbolic" );
+    add_markup( _sub, "A<sub>x</sub>" );
     _sub.relief = ReliefStyle.NONE;
     _sub.set_tooltip_text( _( "Subscript" ) );
     _sub.toggled.connect( handle_subscript );
 
     _header = new MenuButton();
-    _header.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/header-symbolic" );
+    add_markup( _header, "H<i>x</i>" );
     _header.relief = ReliefStyle.NONE;
     _header.set_tooltip_text( _( "Header" ) );
     _header.popup = new Gtk.Menu();
@@ -192,6 +192,12 @@ public class FormatBar : Gtk.Popover {
 
     initialize();
 
+  }
+
+  private void add_markup( ToggleButton btn, string markup ) {
+    var lbl = new Label( "<span size=\"large\">" + markup + "</span>" );
+    lbl.use_markup = true;
+    btn.image = lbl;
   }
 
   private RGBA get_hilite_color() {
