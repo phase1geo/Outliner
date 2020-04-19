@@ -35,10 +35,8 @@ public class FormatBar : Gtk.Popover {
   private ToggleButton _super;
   private ToggleButton _sub;
   private MenuButton   _header;
-  private ToggleButton _hilite;
-  private ColorButton  _hilite_chooser;
-  private ToggleButton _color;
-  private ColorButton  _color_chooser;
+  private ColorPicker  _hilite;
+  private ColorPicker  _color;
   private ToggleButton _link;
   private bool         _ignore_active = false;
   private LinkEditor   _link_editor;
@@ -127,33 +125,15 @@ public class FormatBar : Gtk.Popover {
     }
     _header.popup.show_all();
 
-    _hilite        = new ToggleButton();
-    _hilite.label  = " ";
-    _hilite.relief = ReliefStyle.NONE;
-    _hilite.set_tooltip_text( _( "Apply Highlight Color" ) );
-    _hilite.toggled.connect( handle_highlight );
-    _hilite.get_style_context().add_class( "hilite" );
+    _hilite = new ColorPicker( get_hilite_color(), "hilite", "background" );
+    _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
+    _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
+    _hilite.color_changed.connect( handle_hilite );
 
-    _hilite_chooser = new ColorButton.with_rgba( get_hilite_color() );
-    _hilite_chooser.label  = "\u23f7";
-    _hilite_chooser.relief = ReliefStyle.NONE;
-    _hilite_chooser.set_tooltip_text( _( "Change Highlight Color" ) );
-    _hilite_chooser.color_set.connect( handle_highlight_chooser );
-    _hilite_chooser.get_style_context().add_class( "color_chooser" );
-
-    _color        = new ToggleButton();
-    _color.label  = " ";
-    _color.relief = ReliefStyle.NONE;
-    _color.set_tooltip_text( "Apply Font Color" );
-    _color.toggled.connect( handle_color );
-    _color.get_style_context().add_class( "fcolor" );
-
-    _color_chooser = new ColorButton.with_rgba( get_font_color() );
-    _color_chooser.label  = "\u23f7";
-    _color_chooser.relief = ReliefStyle.NONE;
-    _color_chooser.set_tooltip_text( _( "Change Font Color" ) );
-    _color_chooser.color_set.connect( handle_color_chooser );
-    _color_chooser.get_style_context().add_class( "color_chooser" );
+    _color = new ColorPicker( get_font_color(), "fcolor", "color" );
+    _color.set_toggle_tooltip( _( "Apply Font Color" ) );
+    _color.set_select_tooltip( _( "Change Font Color" ) );
+    _color.color_changed.connect( handle_color );
 
     _link = new ToggleButton();
     _link.image = new Image.from_icon_name( "insert-link-symbolic", IconSize.SMALL_TOOLBAR );
@@ -179,10 +159,8 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _hilite,             false, false, 0 );
-    box.pack_start( _hilite_chooser,     false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _color,              false, false, 0 );
-    box.pack_start( _color_chooser,      false, false, 0 );
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _link,               false, false, 0 );
 
@@ -351,9 +329,10 @@ public class FormatBar : Gtk.Popover {
   }
 
   /* Toggles the highlight status of the currently selected text */
-  private void handle_highlight() {
+  private void handle_hilite( RGBA? rgba ) {
     if( !_ignore_active ) {
-      if( _hilite.active ) {
+      if( rgba != null ) {
+        _table.hilite_color = Utils.color_from_rgba( rgba );
         format_text( FormatTag.HILITE, _table.hilite_color );
       } else {
         unformat_text( FormatTag.HILITE );
@@ -361,27 +340,16 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Picks a new color to set the selected text highlighter to */
-  private void handle_highlight_chooser() {
-    _table.hilite_color = Utils.color_from_rgba( _hilite_chooser.rgba );
-    format_text( FormatTag.HILITE, _table.hilite_color );
-  }
-
   /* Toggles the foreground color of the currently selected text */
-  private void handle_color() {
+  private void handle_color( RGBA? rgba ) {
     if( !_ignore_active ) {
-      if( _color.active ) {
+      if( rgba != null ) {
+        _table.font_color = Utils.color_from_rgba( rgba );
         format_text( FormatTag.COLOR, _table.font_color );
       } else {
         unformat_text( FormatTag.COLOR );
       }
     }
-  }
-
-  /* Picks a new color to set the selected foreground color to */
-  private void handle_color_chooser() {
-    _table.font_color = Utils.color_from_rgba( _color_chooser.rgba );
-    format_text( FormatTag.COLOR, _table.font_color );
   }
 
   /* Creates a link out of the currently selected text */
@@ -404,6 +372,11 @@ public class FormatBar : Gtk.Popover {
   /* Sets the active status of the given toggle button */
   private void set_toggle_button( CanvasText text, FormatTag tag, ToggleButton btn ) {
     btn.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
+  }
+
+  /* Sets the active status of the given color picker */
+  private void set_color_picker( CanvasText text, FormatTag tag, ColorPicker cp ) {
+    cp.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
   }
 
   private void activate_header( int index ) {
@@ -442,8 +415,8 @@ public class FormatBar : Gtk.Popover {
     set_toggle_button( text, FormatTag.CODE,       _code );
     set_toggle_button( text, FormatTag.SUPER,      _super );
     set_toggle_button( text, FormatTag.SUB,        _sub );
-    set_toggle_button( text, FormatTag.HILITE,     _hilite );
-    set_toggle_button( text, FormatTag.COLOR,      _color );
+    set_color_picker(  text, FormatTag.HILITE,     _hilite );
+    set_color_picker(  text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );
     set_header( text );
     _ignore_active = false;

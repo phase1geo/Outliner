@@ -36,6 +36,7 @@ sources += files(
 
   'Application.vala',
   'CanvasText.vala',
+  'ColorPicker.vala',
   'Document.vala',
   'DynamicNotebook.vala',
   'FormatBar.vala',

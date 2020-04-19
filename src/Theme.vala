@@ -75,7 +75,7 @@ public class Theme : Object {
                      "@define-color tab_base_color " + background.to_string() + ";" +
                      ".canvas { background: " + background.to_string() + "; } " +
                      ".hilite { background: " + hcolor + "; } " +
-                     ".fcolor { background: " + fcolor + "; } " +
+                     ".fcolor { color: " + fcolor + "; } " +
                      ".color_chooser { padding-right: 0px; padding-left: 0px; margin-right: 0px; margin-left: 0px }";
       provider.load_from_data( css_data );
     } catch( GLib.Error e ) {
