@@ -1782,7 +1782,7 @@ public class OutlineTable : DrawingArea {
 
     StyleContext.add_provider_for_screen(
       Screen.get_default(),
-      _theme.get_css_provider( _hilite_color, _font_color ),
+      _theme.get_css_provider(),
       STYLE_PROVIDER_PRIORITY_APPLICATION
     );
 
@@ -1837,10 +1837,20 @@ public class OutlineTable : DrawingArea {
     text.get_cursor_info( out cursor, out selstart, out selend );
 
     /* Position the popover */
-    double left, top;
-    text.get_char_pos( cursor, out left, out top );
-    Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
-    _format_bar.pointing_to = rect;
+    double left, top, bottom;
+    int    line;
+    text.get_char_pos( cursor, out left, out top, out bottom, out line );
+
+    /* If this is the first line of the first row, change the popover point to the bottom of the text */
+    if( (selected == root.children.index( 0 )) && (line == 0) ) {
+      Gdk.Rectangle rect = {(int)left, (int)bottom, 1, 1};
+      _format_bar.pointing_to = rect;
+      _format_bar.position    = PositionType.BOTTOM;
+    } else {
+      Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
+      _format_bar.pointing_to = rect;
+      _format_bar.position    = PositionType.TOP;
+    }
 
 #if GTK322
     _format_bar.popup();

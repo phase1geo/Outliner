@@ -40,6 +40,7 @@ public class FormatBar : Gtk.Popover {
   private ToggleButton _link;
   private bool         _ignore_active = false;
   private LinkEditor   _link_editor;
+  private Button       _clear;
 
   /* Construct the formatting bar */
   public FormatBar( OutlineTable table ) {
@@ -125,12 +126,12 @@ public class FormatBar : Gtk.Popover {
     }
     _header.popup.show_all();
 
-    _hilite = new ColorPicker( get_hilite_color(), "hilite", "background" );
+    _hilite = new ColorPicker( get_hilite_color(), ColorPickerType.HCOLOR );
     _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
     _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
     _hilite.color_changed.connect( handle_hilite );
 
-    _color = new ColorPicker( get_font_color(), "fcolor", "color" );
+    _color = new ColorPicker( get_font_color(), ColorPickerType.FCOLOR );
     _color.set_toggle_tooltip( _( "Apply Font Color" ) );
     _color.set_select_tooltip( _( "Change Font Color" ) );
     _color.color_changed.connect( handle_color );
@@ -140,6 +141,11 @@ public class FormatBar : Gtk.Popover {
     _link.relief = ReliefStyle.NONE;
     _link.set_tooltip_text( _( "Link" ) );
     _link.toggled.connect( handle_link );
+
+    _clear = new Button.from_icon_name( "edit-clear-symbolic", IconSize.SMALL_TOOLBAR );
+    _clear.relief = ReliefStyle.NONE;
+    _clear.set_tooltip_text( _( "Clear all formatting" ) );
+    _clear.clicked.connect( handle_clear );
 
     var spacer = "    ";
 
@@ -163,6 +169,7 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( _color,              false, false, 0 );
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _link,               false, false, 0 );
+    box.pack_start( _clear,              false, false, 0 );
 
     add( box );
 
@@ -172,7 +179,7 @@ public class FormatBar : Gtk.Popover {
 
   }
 
-  private void add_markup( ToggleButton btn, string markup ) {
+  private void add_markup( Button btn, string markup ) {
     var lbl = new Label( "<span size=\"large\">" + markup + "</span>" );
     lbl.use_markup = true;
     btn.image = lbl;
@@ -367,6 +374,18 @@ public class FormatBar : Gtk.Popover {
         unformat_text( FormatTag.URL );
       }
     }
+  }
+
+  /* Clears all tags from selected text */
+  private void handle_clear() {
+    if( _table.selected.mode == NodeMode.EDITABLE ) {
+      _table.selected.name.remove_all_tags();
+    } else {
+      _table.selected.note.remove_all_tags();
+    }
+    _table.queue_draw();
+    _table.changed();
+    _table.grab_focus();
   }
 
   /* Sets the active status of the given toggle button */

@@ -765,11 +765,14 @@ public class CanvasText : Object {
   }
 
   /* Returns the x and y position of the given character position */
-  public void get_char_pos( int pos, out double x, out double y ) {
+  public void get_char_pos( int pos, out double left, out double top, out double bottom, out int line ) {
     var index = text.text.index_of_nth_char( pos );
     var rect  = _pango_layout.index_to_pos( index );
-    x = posx + (rect.x / Pango.SCALE);
-    y = posy + (rect.y / Pango.SCALE);
+    left   = posx + (rect.x / Pango.SCALE);
+    top    = posy + (rect.y / Pango.SCALE);
+    bottom = top + (rect.height / Pango.SCALE);
+    int x_pos;
+    _pango_layout.index_to_line_x( index, false, out line, out x_pos );
   }
 
   /* Returns a populated FormattedText instance containing the selected text range */

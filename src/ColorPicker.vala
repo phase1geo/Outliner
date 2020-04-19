@@ -22,10 +22,36 @@
 using Gtk;
 using Gdk;
 
+public enum ColorPickerType {
+  HCOLOR,
+  FCOLOR;
+
+  public string get_css_class() {
+    switch( this ) {
+      case HCOLOR :  return( "hcolor" );
+      case FCOLOR :  return( "fcolor" );
+      default     :  assert_not_reached();
+    }
+  }
+
+  public void set_image( ToggleButton btn ) {
+    switch( this ) {
+      case HCOLOR :  btn.image = new Image.from_icon_name( "format-text-highlight", IconSize.SMALL_TOOLBAR );  break;
+      case FCOLOR :  {
+        var lbl = new Label( "<span size=\"large\">A</span>" );
+        lbl.use_markup = true;
+        btn.image      = lbl;
+        break;
+      }
+      default     :  assert_not_reached();
+    }
+  }
+
+}
+
 public class ColorPicker : Box {
 
-  private string             _css_class;
-  private string             _css_property;
+  private ColorPickerType    _type;
   private ToggleButton       _toggle;
   private ColorChooserWidget _chooser;
   private MenuButton         _select;
@@ -33,19 +59,15 @@ public class ColorPicker : Box {
 
   public signal void color_changed( RGBA? color );
 
-  public ColorPicker( RGBA init_color, string css_class, string css_property ) {
+  public ColorPicker( RGBA init_color, ColorPickerType type ) {
 
-    _css_class    = css_class;
-    _css_property = css_property;
+    _type = type;
 
-    var lbl = new Label( "<span size=\"large\">A</span>" );
-    lbl.use_markup = true;
-
-    _toggle        = new ToggleButton();
-    _toggle.image  = lbl;
+    _toggle = new ToggleButton();
     _toggle.relief = ReliefStyle.NONE;
     _toggle.toggled.connect( handle_toggle );
-    _toggle.get_style_context().add_class( css_class );
+    _toggle.get_style_context().add_class( type.get_css_class() );
+    type.set_image( _toggle );
 
     _chooser = new ColorChooserWidget();
     _chooser.rgba = init_color;
@@ -88,7 +110,7 @@ public class ColorPicker : Box {
     var provider = new CssProvider();
     try {
       var color    = Utils.color_from_rgba( rgba );
-      var css_data = ".%s { %s: %s; }".printf( _css_class, _css_property, color );
+      var css_data = ".%s { background: %s; }".printf( _type.get_css_class(), color );
       provider.load_from_data( css_data );
       StyleContext.add_provider_for_screen(
         Screen.get_default(),
@@ -112,9 +134,8 @@ public class ColorPicker : Box {
 
   private bool handle_chooser( EventButton e ) {
     update_css( _chooser.rgba );
-    if( _toggle.active ) {
-      color_changed( _chooser.rgba );
-    }
+    set_active( true );
+    color_changed( _chooser.rgba );
     _select.popover.popdown();
     return( true );
   }
