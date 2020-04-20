@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-17 09:36+0200\n"
+"POT-Creation-Date: 2020-04-19 20:20-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,64 +61,72 @@ msgstr ""
 msgid "To right"
 msgstr ""
 
-#: src/FormatBar.vala:61 src/NodeMenu.vala:56
+#: src/FormatBar.vala:60 src/NodeMenu.vala:56
 msgid "Copy"
 msgstr ""
 
-#: src/FormatBar.vala:66 src/NodeMenu.vala:60
+#: src/FormatBar.vala:65 src/NodeMenu.vala:60
 msgid "Cut"
 msgstr ""
 
-#: src/FormatBar.vala:72
+#: src/FormatBar.vala:71
 msgid "Bold"
 msgstr ""
 
-#: src/FormatBar.vala:78
+#: src/FormatBar.vala:77
 msgid "Italic"
 msgstr ""
 
-#: src/FormatBar.vala:84
+#: src/FormatBar.vala:83
 msgid "Underline"
 msgstr ""
 
-#: src/FormatBar.vala:90
+#: src/FormatBar.vala:89
 msgid "Strikethrough"
 msgstr ""
 
-#: src/FormatBar.vala:96
+#: src/FormatBar.vala:95
 msgid "Code Block"
 msgstr ""
 
-#: src/FormatBar.vala:102
+#: src/FormatBar.vala:101
 msgid "Superscript"
 msgstr ""
 
-#: src/FormatBar.vala:108
+#: src/FormatBar.vala:107
 msgid "Subscript"
 msgstr ""
 
-#: src/FormatBar.vala:114
+#: src/FormatBar.vala:113
 msgid "Header"
 msgstr ""
 
-#: src/FormatBar.vala:118 src/Node.vala:56
+#: src/FormatBar.vala:117 src/Node.vala:56
 msgid "None"
 msgstr ""
 
-#: src/FormatBar.vala:133
+#: src/FormatBar.vala:130
 msgid "Apply Highlight Color"
 msgstr ""
 
-#: src/FormatBar.vala:140
+#: src/FormatBar.vala:131
 msgid "Change Highlight Color"
 msgstr ""
 
-#: src/FormatBar.vala:154
+#: src/FormatBar.vala:135
+msgid "Apply Font Color"
+msgstr ""
+
+#: src/FormatBar.vala:136
 msgid "Change Font Color"
 msgstr ""
 
-#: src/FormatBar.vala:161
+#: src/FormatBar.vala:142
 msgid "Link"
+msgstr ""
+
+#: src/FormatBar.vala:147
+msgid "Clear all formatting"
 msgstr ""
 
 #: src/LinkEditor.vala:43

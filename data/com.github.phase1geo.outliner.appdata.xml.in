@@ -75,32 +75,43 @@
       <value key="x-appcenter-suggested-price">10</value>
     </custom>
     <releases>
-      <release version="1.1.0" date="2020-04-08">
+      <release version="1.1.0" date="2020-04-20">
         <description>
           <p>New</p>
           <ul>
             <li>Added support for row cloning.</li>
-            <li>Added support for superscript and subscript text formatting.</li>
-            <li>Added support for using input methods to add text to rows and notes.</li>
-            <li>Added selection submenu to contextual menu.</li>
-            <li>Added new row selection commands: top, bottom, first child, previous sibling. next sibling, page up and page down.</li>
-            <li>Added support for moving selected rows via keyboard shortcuts.</li>
-            <li>Added ability to position the selected row at the top of the window.</li>
-            <li>Added ability to delete the previous or next word via Control-Backspace/Delete keyboard shortcut.</li>
+            <li>Added French translation (thanks to Nathan Bonnemains).</li>
+            <li>Added Dutch translation (thanks to Heimen Stoffels).</li>
+            <li>Added support for subscript and superscript text formatting.</li>
+            <li>Added support for using input methods.</li>
+            <li>Added new keyboard shortcuts for selecting and moving rows.</li>
+            <li>Added new <em>H</em> keyboard shortcut for positioning currently selected row at the top of the window.</li>
+            <li>Added keyboard shortcuts for deleting the next or previous word.</li>
+            <li>Added new selection submenu to contextual menu.</li>
+            <li>Added clear formatting button to format bar.</li>
           </ul>
           <p>Changes</p>
           <ul>
-            <li>Improved readability of text formatting bar.</li>
-            <li>Removed support for <em>m</em> command in selection traversal.</li>
-            <li>Version number now output to .outliner file.</li>
+            <li>Removed support for the <em>m</em> command.</li>
+            <li>Improved look of format bar, especially for dark themes.</li>
+            <li>Changed tab bar coloring to match the background color of the current tab.</li>
+            <li>Changed default filename from <em>unnamed</em> to be the translated name.</li>
+            <li>Improved undo/redo tooltips to look better in non-English translations.</li>
           </ul>
           <p>Bug Fixes</p>
           <ul>
-            <li>Made metadata translatable (Thanks to Nathan Bonnemains).</li>
-            <li>Fixed screenshot URLs in metadata.</li>
-            <li>Fixed application crash when using the <em>a</em> command when top-level row is selected.</li>
-            <li>Fixed node showing/hiding.</li>
-            <li>Fixed issue with <em>New Document</em> plank command to add new tab after application data is loaded.</li>
+            <li>Fixed issue with deleting a single character for multi-byte characters.</li>
+            <li>Fixed application screenshots.</li>
+            <li>Fixed application crash when <em>a</em> command used when selected row is a top-level row.</li>
+            <li>Fixed issues with showing or hiding a note.</li>
+            <li>Fixed <em>New Document</em> plank command to open a new tab after loading application data.</li>
+            <li>Fixed theming issues when two tabs use different themes.</li>
+            <li>Fixed translation string issues (thanks to Nathan Bonnemains).</li>
+            <li>Fixed text positioning issues when tags are added to text.</li>
+            <li>Fixed issues with making shortcut cheatsheet text translatable.</li>
+            <li>Fixed application crash when moving a row to the top of the document.</li>
+            <li>Fixed title of shortcut cheatsheet.</li>
+            <li>Fixed application crashes and incorrectly placed rows when moving them via the mouse.</li>
           </ul>
         </description>
       </release>
