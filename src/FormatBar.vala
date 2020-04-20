@@ -379,9 +379,9 @@ public class FormatBar : Gtk.Popover {
   /* Clears all tags from selected text */
   private void handle_clear() {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
-      _table.selected.name.remove_all_tags();
+      _table.selected.name.remove_all_tags( _table.undo_text );
     } else {
-      _table.selected.note.remove_all_tags();
+      _table.selected.note.remove_all_tags( _table.undo_text );
     }
     _table.queue_draw();
     _table.changed();

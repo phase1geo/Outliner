@@ -79,6 +79,11 @@ public class UndoTextBuffer : UndoBuffer {
     add_item( item );
   }
 
+  public void add_tag_clear( int start, int end, Array<UndoTagInfo> tags, int cursor ) {
+    var item = new UndoTextClearTags( start, end, tags, cursor );
+    add_item( item );
+  }
+
   /* Performs the next undo action in the buffer */
   public override void undo() {
     if( undoable() ) {

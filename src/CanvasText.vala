@@ -803,10 +803,12 @@ public class CanvasText : Object {
   }
 
   /* Removes the specified tag for the selected range */
-  public void remove_all_tags() {
+  public void remove_all_tags( UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
+    var tags = text.get_tags_in_range( spos, epos );
     text.remove_all_tags( spos, epos );
+    undo_buffer.add_tag_clear( spos, epos, tags, _cursor );
   }
 
   /*
