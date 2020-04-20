@@ -723,8 +723,8 @@ public class FormattedText {
 
   /* Removes all formatting from the text */
   public void remove_all_tags( int start, int end ) {
-    foreach( TagInfo f in _formats ) {
-      f.remove_tag( start, end );
+    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+      _formats[i].remove_tag( start, end );
     }
     changed();
   }

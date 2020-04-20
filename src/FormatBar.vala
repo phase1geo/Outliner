@@ -383,6 +383,19 @@ public class FormatBar : Gtk.Popover {
     } else {
       _table.selected.note.remove_all_tags( _table.undo_text );
     }
+    _ignore_active = true;
+    _bold.set_active( false );
+    _italics.set_active( false );
+    _underline.set_active( false );
+    _strike.set_active( false );
+    _code.set_active( false );
+    _super.set_active( false );
+    _sub.set_active( false );
+    _hilite.set_active( false );
+    _color.set_active( false );
+    _link.set_active( false );
+    activate_header( 0 );
+    _ignore_active = false;
     _table.queue_draw();
     _table.changed();
     _table.grab_focus();
@@ -398,6 +411,7 @@ public class FormatBar : Gtk.Popover {
     cp.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
   }
 
+  /* Sets the active status of the header menubutton */
   private void activate_header( int index ) {
     var buttons = _header.popup.get_children();
     var button  = (CheckMenuItem)buttons.nth_data( index );
