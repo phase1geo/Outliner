@@ -159,6 +159,7 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _code,               false, false, 0 );
     box.pack_start( _header,             false, false, 0 );
+    box.pack_start( _link,               false, false, 0 );
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _super,              false, false, 0 );
     box.pack_start( _sub,                false, false, 0 );
@@ -168,7 +169,6 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _color,              false, false, 0 );
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-    box.pack_start( _link,               false, false, 0 );
     box.pack_start( _clear,              false, false, 0 );
 
     add( box );
