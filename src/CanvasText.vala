@@ -131,6 +131,18 @@ public class CanvasText : Object {
     update_size( false );
   }
 
+  /* Constructor which is cloned from the given FormattedText */
+  public CanvasText.clone_from( OutlineTable table, double max_width, CanvasText ct ) {
+    _text         = ct.text;
+    _text.changed.connect( text_changed );
+    _max_width    = max_width;
+    _line_layout  = table.create_pango_layout( "M" );
+    _pango_layout = table.create_pango_layout( ct.text.text );
+    _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
+    _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    update_size( false );
+  }
+
   /* Copies an existing CanvasText to this CanvasText */
   public void copy( CanvasText ct ) {
     posx       = ct.posx;
@@ -140,6 +152,22 @@ public class CanvasText : Object {
     _line_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    update_size( true );
+  }
+
+  /* Clones an existing CanvasText */
+  public void clone( FormattedText text ) {
+    _text = text;
+    _text.changed.connect( text_changed );
+    update_size( true );
+  }
+
+  /* Unclones the text */
+  public void unclone( OutlineTable ot ) {
+    var orig_text = _text;
+    _text = new FormattedText( ot );
+    _text.copy( orig_text );
+    _text.changed.connect( text_changed );
     update_size( true );
   }
 
@@ -569,9 +597,32 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _cursor );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, 1 );
+        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _cursor - 1 );
         undo_buffer.add_delete( spos, str, tags, cur );
+      }
+    }
+  }
+
+  /* Handles a backspace to wordstart key event */
+  public void backspace_word( UndoTextBuffer undo_buffer ) {
+    if( _cursor > 0 ) {
+      var cur  = _cursor;
+      var epos = text.text.index_of_nth_char( _cursor );
+      var wpos = Utils.find_word( text.text, _cursor, true );
+      wpos = (wpos == -1) ? 0 : text.text.char_count( wpos );
+      var spos = text.text.index_of_nth_char( wpos );
+      var str  = text.text.slice( spos, epos );
+      var tags = text.get_tags_in_range( spos, epos );
+      text.remove_text( spos, (epos - spos) );
+      set_cursor_only( spos );
+      undo_buffer.add_delete( spos, str, tags, cur );
+      if( _selstart < wpos ) {
+        change_selection( null, wpos, "backspace_word1" );
+      } else if( _selend > cur ) {
+        change_selection( wpos, (_selend - (cur - wpos)), "backspace_word2" );
+      } else {
+        change_selection( wpos, wpos, "backspace_word3" );
       }
     }
   }
@@ -594,8 +645,41 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _cursor + 1 );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, 1 );
+        text.remove_text( spos, (epos - spos) );
         undo_buffer.add_delete( spos, str, tags, cur );
+      }
+    }
+  }
+
+  /* Deletes all characters in the given range */
+  public void delete_range( int startpos, int endpos, UndoTextBuffer undo_buffer ) {
+    var cur  = _cursor;
+    var spos = text.text.index_of_nth_char( startpos );
+    var epos = text.text.index_of_nth_char( endpos );
+    var str  = text.text.slice( spos, epos );
+    var tags = text.get_tags_in_range( spos, epos );
+    text.remove_text( spos, (epos - spos) );
+    set_cursor_only( startpos );
+    undo_buffer.add_delete( spos, str, tags, cur );
+  }
+
+  /* Handles a delete to end of word key event */
+  public void delete_word( UndoTextBuffer undo_buffer ) {
+    if( _cursor < text.text.length ) {
+      var spos = text.text.index_of_nth_char( _cursor );
+      var wpos = Utils.find_word( text.text, cursor, false );
+      wpos = (wpos == -1) ? text.text.char_count() : text.text.char_count( wpos );
+      var epos = text.text.index_of_nth_char( wpos );
+      var str  = text.text.slice( spos, epos );
+      var tags = text.get_tags_in_range( spos, epos );
+      text.remove_text( spos, (epos - spos) );
+      undo_buffer.add_delete( spos, str, tags, _cursor );
+      if( _selstart < _cursor ) {
+        change_selection( null, _cursor, "delete_word1" );
+      } else if( _selend > wpos ) {
+        change_selection( _cursor, (_selend - (wpos - _cursor)), "delete_word2" );
+      } else {
+        change_selection( _cursor, _cursor, "delete_word3" );
       }
     }
   }
@@ -681,11 +765,14 @@ public class CanvasText : Object {
   }
 
   /* Returns the x and y position of the given character position */
-  public void get_char_pos( int pos, out double x, out double y ) {
+  public void get_char_pos( int pos, out double left, out double top, out double bottom, out int line ) {
     var index = text.text.index_of_nth_char( pos );
     var rect  = _pango_layout.index_to_pos( index );
-    x = posx + (rect.x / Pango.SCALE);
-    y = posy + (rect.y / Pango.SCALE);
+    left   = posx + (rect.x / Pango.SCALE);
+    top    = posy + (rect.y / Pango.SCALE);
+    bottom = top + (rect.height / Pango.SCALE);
+    int x_pos;
+    _pango_layout.index_to_line_x( index, false, out line, out x_pos );
   }
 
   /* Returns a populated FormattedText instance containing the selected text range */
@@ -716,10 +803,12 @@ public class CanvasText : Object {
   }
 
   /* Removes the specified tag for the selected range */
-  public void remove_all_tags() {
+  public void remove_all_tags( UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
+    var tags = text.get_tags_in_range( spos, epos );
     text.remove_all_tags( spos, epos );
+    undo_buffer.add_tag_clear( spos, epos, tags, _cursor );
   }
 
   /*

@@ -29,6 +29,8 @@ public enum FormatTag {
   UNDERLINE,
   STRIKETHRU,
   CODE,
+  SUB,
+  SUPER,
   HEADER,
   COLOR,
   HILITE,
@@ -44,6 +46,8 @@ public enum FormatTag {
       case UNDERLINE  :  return( "underline" );
       case STRIKETHRU :  return( "strikethru" );
       case CODE       :  return( "code" );
+      case SUB        :  return( "subscript" );
+      case SUPER      :  return( "superscript" );
       case HEADER     :  return( "header" );
       case COLOR      :  return( "color" );
       case HILITE     :  return( "hilite" );
@@ -55,16 +59,18 @@ public enum FormatTag {
 
   public static FormatTag from_string( string str ) {
     switch( str ) {
-      case "bold"       :  return( BOLD );
-      case "italics"    :  return( ITALICS );
-      case "underline"  :  return( UNDERLINE );
-      case "strikethru" :  return( STRIKETHRU );
-      case "code"       :  return( CODE );
-      case "header"     :  return( HEADER );
-      case "color"      :  return( COLOR );
-      case "hilite"     :  return( HILITE );
-      case "url"        :  return( URL );
-      case "match"      :  return( MATCH );
+      case "bold"        :  return( BOLD );
+      case "italics"     :  return( ITALICS );
+      case "underline"   :  return( UNDERLINE );
+      case "strikethru"  :  return( STRIKETHRU );
+      case "code"        :  return( CODE );
+      case "subscript"   :  return( SUB );
+      case "superscript" :  return( SUPER );
+      case "header"      :  return( HEADER );
+      case "color"       :  return( COLOR );
+      case "hilite"      :  return( HILITE );
+      case "url"         :  return( URL );
+      case "match"       :  return( MATCH );
     }
     return( LENGTH );
   }
@@ -428,6 +434,30 @@ public class FormattedText {
     }
   }
 
+  private class SubInfo : TagAttr {
+    public SubInfo() {
+      attrs.append_val( attr_rise_new( 0 - (4 * Pango.SCALE) ) );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "subscript" );
+      ttag.rise     = 0 - (4 * Pango.SCALE);
+      ttag.rise_set = true;
+      return( ttag );
+    }
+  }
+
+  private class SuperInfo : TagAttr {
+    public SuperInfo() {
+      attrs.append_val( attr_rise_new( 4 * Pango.SCALE ) );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "superscript" );
+      ttag.rise     = (4 * Pango.SCALE);
+      ttag.rise_set = true;
+      return( ttag );
+    }
+  }
+
   private class HeaderInfo : TagAttr {
     public HeaderInfo() {}
     private double get_scale_factor( string? extra ) {
@@ -595,6 +625,8 @@ public class FormattedText {
       _attr_tags[FormatTag.UNDERLINE]  = new UnderlineInfo();
       _attr_tags[FormatTag.STRIKETHRU] = new StrikeThruInfo();
       _attr_tags[FormatTag.CODE]       = new CodeInfo( table );
+      _attr_tags[FormatTag.SUB]        = new SubInfo();
+      _attr_tags[FormatTag.SUPER]      = new SuperInfo();
       _attr_tags[FormatTag.HEADER]     = new HeaderInfo();
       _attr_tags[FormatTag.COLOR]      = new ColorInfo();
       _attr_tags[FormatTag.HILITE]     = new HighlightInfo();
@@ -691,8 +723,8 @@ public class FormattedText {
 
   /* Removes all formatting from the text */
   public void remove_all_tags( int start, int end ) {
-    foreach( TagInfo f in _formats ) {
-      f.remove_tag( start, end );
+    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+      _formats[i].remove_tag( start, end );
     }
     changed();
   }
@@ -929,3 +961,4 @@ public class FormattedText {
   }
 
 }
+

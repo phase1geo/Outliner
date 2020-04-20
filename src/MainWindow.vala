@@ -127,6 +127,7 @@ public class MainWindow : ApplicationWindow {
     _nb.tab_reordered.connect( tab_reordered );
     _nb.tab_removed.connect( tab_removed );
     _nb.close_tab_requested.connect( close_tab_requested );
+    _nb.get_style_context().add_class( Gtk.STYLE_CLASS_INLINE_TOOLBAR );
 
     /* Create title toolbar */
     var new_btn = new Button.from_icon_name( "document-new", IconSize.LARGE_TOOLBAR );
@@ -229,6 +230,7 @@ public class MainWindow : ApplicationWindow {
     do_buffer_changed( ot.undo_buffer );
     update_title( ot );
     canvas_changed( ot );
+    ot.update_theme();
     save_tab_state( tab );
   }
 
@@ -270,6 +272,7 @@ public class MainWindow : ApplicationWindow {
     ot.map_event.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
+    ot.theme_changed.connect( theme_changed );
 
     if( fname != null ) {
       ot.document.filename = fname;
@@ -444,13 +447,13 @@ public class MainWindow : ApplicationWindow {
     grid.column_homogeneous = true;
     grid.column_spacing     = 10;
 
-    var lbl_chars = new Label( _( "Characters" ) + ":" );
+    var lbl_chars = new Label( _( "Characters :") );
     _stats_chars  = new Label( "0" );
 
-    var lbl_words = new Label( _( "Words" ) + ":" );
+    var lbl_words = new Label( _( "Words:" ) );
     _stats_words  = new Label( "0" );
 
-    var lbl_rows = new Label( _( "Rows" ) + ":" );
+    var lbl_rows = new Label( _( "Rows:") );
     _stats_rows  = new Label( "0" );
 
     grid.attach( lbl_chars, 0, 0 );
@@ -492,7 +495,7 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 5 );
 
     var export = new ModelButton();
-    export.text = _( "Export..." );
+    export.text = _( "Export…" );
     export.action_name = "win.action_export";
 
     var print = new ModelButton();
@@ -526,7 +529,7 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 0 );
 
     var zoom_box = new Box( Orientation.HORIZONTAL, 0 );
-    var zoom_lbl = new Label( _( "Zoom" ) + " %:" );
+    var zoom_lbl = new Label( _( "Zoom (%):" ) );
 
     _zoom = new SpinButton.with_range( 25, 200, 25 );
     _zoom.set_value( 100 );

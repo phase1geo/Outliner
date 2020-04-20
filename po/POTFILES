@@ -1,8 +1,10 @@
 src/DynamicNotebook.vala
+src/Document.vala
 src/exports/ExportMinder.vala
 src/FormatBar.vala
 src/LinkEditor.vala
 src/MainWindow.vala
+src/Node.vala
 src/NodeMenu.vala
 src/OutlineTable.vala
 src/SearchBar.vala
@@ -32,3 +34,4 @@ src/undo_actions/UndoNodeSplit.vala
 
 src/UndoBuffer.vala
 
+data/com.github.phase1geo.outliner.shortcuts.ui
