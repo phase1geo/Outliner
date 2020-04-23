@@ -226,7 +226,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Called whenever we want to change the current selected node's mode */
-  private void set_node_mode( Node node, NodeMode mode ) {
+  public void set_node_mode( Node node, NodeMode mode ) {
     if( node == null ) return;
     if( node.mode != mode ) {
       if( (node.mode == NodeMode.EDITABLE) && undo_text.undoable() ) {
@@ -2120,8 +2120,16 @@ public class OutlineTable : DrawingArea {
   /* Removes the selected node from the table */
   public void delete_current_node() {
     if( selected == null ) return;
-    undo_buffer.add_item( new UndoNodeDelete( selected ) );
-    delete_node( selected );
+    if( (root.children.length == 1) && (selected == root.children.index( 0 )) ) {
+      var node = new Node( this );
+      undo_buffer.add_item( new UndoNodeDelete( selected, node ) );
+      delete_node( selected );
+      insert_node( root, node, 0 );
+      set_node_mode( selected, NodeMode.EDITABLE );
+    } else {
+      undo_buffer.add_item( new UndoNodeDelete( selected, null ) );
+      delete_node( selected );
+    }
     queue_draw();
     changed();
   }
