@@ -469,10 +469,12 @@ public class Node {
     int w, h;
     _ot.win.get_size( out w, out h );
 
+    var rmargin = (padx * 5) + 20;
+
     /* Update our width information */
     _w = w;
-    _name.max_width = _w - (_name.posx * 2);
-    _note.max_width = _w - (_note.posx * 2);
+    _name.max_width = _w - (_name.posx + rmargin);
+    _note.max_width = _w - (_note.posx + rmargin);
 
   }
 
