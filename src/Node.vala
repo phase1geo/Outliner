@@ -1148,6 +1148,7 @@ public class Node {
     switch( tmode ) {
       case NodeMode.SELECTED :  background = theme.nodesel_background;  alpha = 0.5;  break;
       case NodeMode.ATTACHTO :  background = theme.attachable_color;    break;
+      case NodeMode.HOVER    :  background = theme.nodesel_background;  alpha = 0.1;  break;
       case NodeMode.MOVETO   :  alpha      = 0.3;                       break;
     }
 
