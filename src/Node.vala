@@ -266,8 +266,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font( name_fd );
-    _note.set_font( note_fd );
+    _name.set_font_fd( name_fd );
+    _note.set_font_fd( note_fd );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -308,8 +308,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font( name_fd );
-    _note.set_font( note_fd );
+    _name.set_font_fd( name_fd );
+    _note.set_font_fd( note_fd );
 
     _name.copy( node.name );
     _note.copy( node.note );
@@ -359,8 +359,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font( name_fd );
-    _note.set_font( note_fd );
+    _name.set_font_fd( name_fd );
+    _note.set_font_fd( note_fd );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -398,8 +398,8 @@ public class Node {
 
   /* Updates the size of the name and note information */
   private void table_zoom_changed( int name_size, int note_size, int pady ) {
-    _name.set_font_size( name_size );
-    _note.set_font_size( note_size );
+    _name.set_font( null, name_size );
+    _note.set_font( null, note_size );
     this.pady = (double)pady;
   }
 
@@ -769,6 +769,17 @@ public class Node {
   /* Returns true if the given coordinates lie within the attachabove area */
   public bool is_within_attachabove( double x, double y ) {
     return( Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
+  }
+
+  /* Change the font to the given value */
+  public void change_font( string family, int size ) {
+    if( !is_root() ) {
+      _name.set_font( family, size );
+      _note.set_font( family, size );
+    }
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).change_font( family, size );
+    }
   }
 
   /*************************/

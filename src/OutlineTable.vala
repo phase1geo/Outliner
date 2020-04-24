@@ -414,6 +414,12 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Changes the font of the document to the given value */
+  public void change_font( string? family = null, int? size = null ) {
+    root.change_font( family, size );
+    queue_draw();
+  }
+
   /* Changes the text selection for the specified canvas text element */
   private void change_selection( CanvasText ct, double x, double y ) {
     switch( _press_type ) {

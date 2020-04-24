@@ -172,16 +172,21 @@ public class CanvasText : Object {
   }
 
   /* Sets the font description to the given value */
-  public void set_font( FontDescription font ) {
+  public void set_font_fd( FontDescription font ) {
     _line_layout.set_font_description( font );
     _pango_layout.set_font_description( font );
     update_size( true );
   }
 
   /* Sets the font size to the given size */
-  public void set_font_size( int size ) {
+  public void set_font( string? family = null, int? size = null ) {
     var fd = _line_layout.get_font_description();
-    fd.set_size( size * Pango.SCALE );
+    if( family != null ) {
+      fd.set_family( family );
+    }
+    if( size != null ) {
+      fd.set_size( size * Pango.SCALE );
+    }
     _line_layout.set_font_description( fd );
     _pango_layout.set_font_description( fd );
     update_size( true );

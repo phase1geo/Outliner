@@ -43,6 +43,7 @@ public class MainWindow : ApplicationWindow {
   private Button?         _redo_btn       = null;
   private SpinButton      _zoom;
   private Granite.Widgets.ModeButton _list_types;
+  private FontButton      _fonts;
   private Switch          _condensed;
   private Label           _stats_chars;
   private Label           _stats_words;
@@ -582,6 +583,25 @@ public class MainWindow : ApplicationWindow {
     ltbox.pack_start( ltlbl,       false, false, 10 );
     ltbox.pack_end(   _list_types, false, false, 10 );
     box.pack_start( ltbox, false, false, 10 );
+
+    /* Add font selection button */
+    var fbox = new Box( Orientation.HORIZONTAL, 0 );
+    var flbl = new Label( _( "Font" ) );
+    _fonts = new FontButton();
+    _fonts.set_filter_func( (family, face) => {
+      var fd     = face.describe();
+      var weight = fd.get_weight();
+      var style  = fd.get_style();
+      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+    });
+    _fonts.font_set.connect(() => {
+      var table = get_current_table();
+      table.change_font( _fonts.get_font_family().get_name(), (_fonts.get_font_size() / Pango.SCALE) );
+    });
+
+    fbox.pack_start( flbl,   false, false, 10 );
+    fbox.pack_end(   _fonts, false, false, 10 );
+    box.pack_start( fbox, false, false, 10 );
 
     /* Add condensed mode switch */
     var cbox      = new Box( Orientation.HORIZONTAL, 0 );
