@@ -534,10 +534,10 @@ public class OutlineTable : DrawingArea {
           _active.over_note_icon = false;
           set_node_mode( _active, NodeMode.NONE );
         }
-        if( (current != null) && (current != selected) ) {
+        if( (current != selected) && (current != null) ) {
           set_node_mode( current, NodeMode.HOVER );
-          _active = current;
         }
+        _active = current;
         queue_draw();
       }
 
