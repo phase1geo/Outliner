@@ -247,15 +247,6 @@ public class Node {
 
     _ot = ot;
 
-    var name_fd = new Pango.FontDescription();
-    name_fd.set_size( 12 * Pango.SCALE );
-
-    var note_fd = new Pango.FontDescription();
-    note_fd.set_size( 10 * Pango.SCALE );
-
-    _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( name_fd );
-
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
@@ -266,8 +257,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font_fd( name_fd );
-    _note.set_font_fd( note_fd );
+    _lt_layout = ot.create_pango_layout( null );
+    _lt_layout.set_font_description( _name.get_font_fd() );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -289,15 +280,6 @@ public class Node {
 
     _ot = ot;
 
-    var name_fd = new Pango.FontDescription();
-    name_fd.set_size( 12 * Pango.SCALE );
-
-    var note_fd = new Pango.FontDescription();
-    note_fd.set_size( 10 * Pango.SCALE );
-
-    _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( name_fd );
-
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
@@ -308,11 +290,11 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font_fd( name_fd );
-    _note.set_font_fd( note_fd );
-
     _name.copy( node.name );
     _note.copy( node.note );
+
+    _lt_layout = ot.create_pango_layout( null );
+    _lt_layout.set_font_description( _name.get_font_fd() );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -340,15 +322,6 @@ public class Node {
       _clone_id      = node._clone_id;
     }
 
-    var name_fd = new Pango.FontDescription();
-    name_fd.set_size( 12 * Pango.SCALE );
-
-    var note_fd = new Pango.FontDescription();
-    note_fd.set_size( 10 * Pango.SCALE );
-
-    _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( name_fd );
-
     _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
@@ -359,8 +332,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font_fd( name_fd );
-    _note.set_font_fd( note_fd );
+    _lt_layout = ot.create_pango_layout( null );
+    _lt_layout.set_font_description( _name.get_font_fd() );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -397,10 +370,14 @@ public class Node {
   }
 
   /* Updates the size of the name and note information */
-  private void table_zoom_changed( int name_size, int note_size, int pady ) {
-    _name.set_font( null, name_size );
-    _note.set_font( null, note_size );
-    this.pady = (double)pady;
+  private void table_zoom_changed() {
+    int width, height;
+    var zoom_factor = _ot.win.get_zoom_factor();
+    _name.set_font( null, null, zoom_factor );
+    _note.set_font( null, null, zoom_factor );
+    _lt_layout.set_font_description( _name.get_font_fd() );
+    _lt_layout.get_size( out width, out height );
+    _lt_width = width / Pango.SCALE;
   }
 
   /*
@@ -594,7 +571,8 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_text() {
-    var ltx = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + padx);
+    var zoom = _ot.win.get_zoom_factor();
+    var ltx  = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + (padx * zoom));
     name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + ltx;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
@@ -771,14 +749,29 @@ public class Node {
     return( Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
   }
 
-  /* Change the font to the given value */
-  public void change_font( string family, int size ) {
+  /* Change the name font to the given value */
+  public void change_name_font( string family, int size ) {
     if( !is_root() ) {
-      _name.set_font( family, size );
-      _note.set_font( family, size );
+      int width, height;
+      var zoom_factor = _ot.win.get_zoom_factor();
+      _name.set_font( family, size, zoom_factor );
+      _lt_layout.set_font_description( _name.get_font_fd() );
+      _lt_layout.get_size( out width, out height );
+      _lt_width = width / Pango.SCALE;
     }
     for( int i=0; i<children.length; i++ ) {
-      children.index( i ).change_font( family, size );
+      children.index( i ).change_name_font( family, size );
+    }
+  }
+
+  /* Change the note font to the given value */
+  public void change_note_font( string family, int size ) {
+    if( !is_root() ) {
+      var zoom_factor = _ot.win.get_zoom_factor();
+      _note.set_font( family, size, zoom_factor );
+    }
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).change_note_font( family, size );
     }
   }
 

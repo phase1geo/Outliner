@@ -130,7 +130,7 @@ public class OutlineTable : DrawingArea {
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
-  public signal void zoom_changed( int name_size, int note_size, int pady );
+  public signal void zoom_changed();
   public signal void theme_changed();
   public signal void selected_changed();
   public signal void cursor_changed();
@@ -414,9 +414,15 @@ public class OutlineTable : DrawingArea {
 
   }
 
-  /* Changes the font of the document to the given value */
-  public void change_font( string? family = null, int? size = null ) {
-    root.change_font( family, size );
+  /* Changes the name font of the document to the given value */
+  public void change_name_font( string? family = null, int? size = null ) {
+    root.change_name_font( family, size );
+    queue_draw();
+  }
+
+  /* Changes the note font of the document to the given value */
+  public void change_note_font( string? family = null, int? size = null ) {
+    root.change_note_font( family, size );
     queue_draw();
   }
 
