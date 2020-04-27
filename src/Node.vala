@@ -247,6 +247,8 @@ public class Node {
 
     _ot = ot;
 
+    _lt_layout = ot.create_pango_layout( null );
+
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
@@ -257,8 +259,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( _name.get_font_fd() );
+    change_name_font( ot.name_font_family, ot.name_font_size, false );
+    change_note_font( ot.note_font_family, ot.note_font_size, false );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -276,39 +278,6 @@ public class Node {
   public Node.root() {}
 
   /* Copy constructor */
-  public Node.copy_from_node( OutlineTable ot, Node node ) {
-
-    _ot = ot;
-
-    _name = new CanvasText( ot, ot.get_allocated_width() );
-    _name.resized.connect( update_height_from_resize );
-    _name.select_mode.connect( name_select_mode );
-    _name.cursor_changed.connect( name_cursor_changed );
-
-    _note = new CanvasText( ot, ot.get_allocated_width() );
-    _note.resized.connect( update_height_from_resize );
-    _note.select_mode.connect( note_select_mode );
-    _note.cursor_changed.connect( note_cursor_changed );
-
-    _name.copy( node.name );
-    _note.copy( node.note );
-
-    _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( _name.get_font_fd() );
-
-    pady = ot.condensed ? 2 : 10;
-
-    position_text();
-    update_width();
-
-    /* Detect any size changes by the drawing area */
-    ot.win.configure_event.connect( window_size_changed );
-    ot.zoom_changed.connect( table_zoom_changed );
-    ot.theme_changed.connect( table_theme_changed );
-
-  }
-
-  /* Copy constructor */
   public Node.clone_from_node( OutlineTable ot, Node node ) {
 
     _ot = ot;
@@ -322,6 +291,8 @@ public class Node {
       _clone_id      = node._clone_id;
     }
 
+    _lt_layout = ot.create_pango_layout( null );
+
     _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
@@ -332,8 +303,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( _name.get_font_fd() );
+    change_name_font( ot.name_font_family, ot.name_font_size, false );
+    change_note_font( ot.note_font_family, ot.note_font_size, false );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -750,7 +721,7 @@ public class Node {
   }
 
   /* Change the name font to the given value */
-  public void change_name_font( string family, int size ) {
+  public void change_name_font( string family, int size, bool recursive = true ) {
     if( !is_root() ) {
       int width, height;
       var zoom_factor = _ot.win.get_zoom_factor();
@@ -759,19 +730,23 @@ public class Node {
       _lt_layout.get_size( out width, out height );
       _lt_width = width / Pango.SCALE;
     }
-    for( int i=0; i<children.length; i++ ) {
-      children.index( i ).change_name_font( family, size );
+    if( recursive ) {
+      for( int i=0; i<children.length; i++ ) {
+        children.index( i ).change_name_font( family, size );
+      }
     }
   }
 
   /* Change the note font to the given value */
-  public void change_note_font( string family, int size ) {
+  public void change_note_font( string family, int size, bool recursive = true ) {
     if( !is_root() ) {
       var zoom_factor = _ot.win.get_zoom_factor();
       _note.set_font( family, size, zoom_factor );
     }
-    for( int i=0; i<children.length; i++ ) {
-      children.index( i ).change_note_font( family, size );
+    if( recursive ) {
+      for( int i=0; i<children.length; i++ ) {
+        children.index( i ).change_note_font( family, size );
+      }
     }
   }
 

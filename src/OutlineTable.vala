@@ -52,6 +52,10 @@ public class OutlineTable : DrawingArea {
   private NodeDrawOptions _draw_options;
   private NodeListType    _list_type     = NodeListType.NONE;
   private Node            _clone         = null;
+  private string          _name_family;
+  private int             _name_size;
+  private string          _note_family;
+  private int             _note_size;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -127,6 +131,26 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public string? name_font_family {
+    get {
+      return( (_name_family == "") ? null : _name_family );
+    }
+  }
+  public int name_font_size {
+    get {
+      return( _name_size );
+    }
+  }
+  public string? note_font_family {
+    get {
+      return( (_note_family == "") ? null : _note_family );
+    }
+  }
+  public int note_font_size {
+    get {
+      return( _note_size );
+    }
+  }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -154,6 +178,12 @@ public class OutlineTable : DrawingArea {
 
     /* Set the style context */
     get_style_context().add_class( "canvas" );
+
+    /* Initialize font information from gsettings */
+    _name_family = settings.get_string( "default-row-font-family" );
+    _note_family = settings.get_string( "default-note-font-family" );
+    _name_size   = settings.get_int( "default-row-font-size" );
+    _note_size   = settings.get_int( "default-note-font-size" );
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -416,14 +446,28 @@ public class OutlineTable : DrawingArea {
 
   /* Changes the name font of the document to the given value */
   public void change_name_font( string? family = null, int? size = null ) {
+    if( family != null ) {
+      _name_family = family;
+    }
+    if( size != null ) {
+      _name_size = size;
+    }
     root.change_name_font( family, size );
     queue_draw();
+    changed();
   }
 
   /* Changes the note font of the document to the given value */
   public void change_note_font( string? family = null, int? size = null ) {
+    if( family != null ) {
+      _note_family = family;
+    }
+    if( size != null ) {
+      _note_size = size;
+    }
     root.change_note_font( family, size );
     queue_draw();
+    changed();
   }
 
   /* Changes the text selection for the specified canvas text element */
@@ -1941,14 +1985,34 @@ public class OutlineTable : DrawingArea {
   /* Loads the table information from the given XML node */
   public void load( Xml.Node* n ) {
 
-    string? c = n->get_prop( "condensed" );
+    var c = n->get_prop( "condensed" );
     if( c != null ) {
       _condensed = bool.parse( c );
     }
 
-    string? lt = n->get_prop( "listtype" );
+    var lt = n->get_prop( "listtype" );
     if( lt != null ) {
       _list_type = NodeListType.parse( lt );
+    }
+
+    var mff = n->get_prop( "name-font-family" );
+    if( mff != null ) {
+      _name_family = mff;
+    }
+
+    var mfs = n->get_prop( "name-font-size" );
+    if( mfs != null ) {
+      _name_size = int.parse( mfs );
+    }
+
+    var tff = n->get_prop( "note-font-family" );
+    if( tff != null ) {
+      _note_family = tff;
+    }
+
+    var tfs = n->get_prop( "note-font-size" );
+    if( tfs != null ) {
+      _note_size = int.parse( tfs );
     }
 
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
@@ -1997,9 +2061,13 @@ public class OutlineTable : DrawingArea {
   /* Saves the table information to the given XML node */
   public void save( Xml.Node* n ) {
 
-    n->set_prop( "condensed", _condensed.to_string() );
-    n->set_prop( "listtype",  list_type.to_string() );
-    n->set_prop( "version",   Outliner.version );
+    n->set_prop( "condensed",        _condensed.to_string() );
+    n->set_prop( "listtype",         list_type.to_string() );
+    n->set_prop( "version",          Outliner.version );
+    n->set_prop( "name-font-family", _name_family );
+    n->set_prop( "name-font-size",   _name_size.to_string() );
+    n->set_prop( "note-font-family", _note_family );
+    n->set_prop( "note-font-size",   _note_size.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );

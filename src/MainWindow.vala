@@ -68,6 +68,7 @@ public class MainWindow : ApplicationWindow {
     { "action_export",        action_export },
     { "action_print",         action_print },
     { "action_shortcuts",     action_shortcuts },
+    { "action_reset_fonts",   action_reset_fonts },
     { "action_zoom_in1",      action_zoom_in },
     { "action_zoom_in2",      action_zoom_in },
     { "action_zoom_out",      action_zoom_out },
@@ -231,6 +232,7 @@ public class MainWindow : ApplicationWindow {
   private void tab_changed( Tab tab ) {
     var ot = get_table( tab );
     do_buffer_changed( ot.undo_buffer );
+    do_fonts_changed( ot );
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
@@ -590,6 +592,7 @@ public class MainWindow : ApplicationWindow {
     var f1box = new Box( Orientation.HORIZONTAL, 0 );
     var f1lbl = new Label( _( "Row Font:" ) );
     _fonts_name = new FontButton();
+    _fonts_name.show_style = false;
     _fonts_name.set_filter_func( (family, face) => {
       var fd     = face.describe();
       var weight = fd.get_weight();
@@ -609,6 +612,7 @@ public class MainWindow : ApplicationWindow {
     var f2box = new Box( Orientation.HORIZONTAL, 0 );
     var f2lbl = new Label( _( "Note Font:" ) );
     _fonts_note = new FontButton();
+    _fonts_note.show_style = false;
     _fonts_note.set_filter_func( (family, face) => {
       var fd     = face.describe();
       var weight = fd.get_weight();
@@ -640,11 +644,20 @@ public class MainWindow : ApplicationWindow {
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
 
+    var btn_box = new Box( Orientation.VERTICAL, 0 );
+
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
     shortcuts.text = _( "Shortcuts Cheatsheet" );
     shortcuts.action_name = "win.action_shortcuts";
-    box.pack_start( shortcuts, false, false, 10 );
+    btn_box.pack_start( shortcuts, false, false, 5 );
+
+    var reset_fonts = new ModelButton();
+    reset_fonts.text = _( "Reset Fonts to Defaults" );
+    reset_fonts.action_name = "win.action_reset_fonts";
+    btn_box.pack_start( reset_fonts, false, false, 5 );
+
+    box.pack_start( btn_box, false, false, 0 );
 
     box.show_all();
 
@@ -843,6 +856,22 @@ public class MainWindow : ApplicationWindow {
     _undo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.undo_tooltip(), "<Control>z" ) );
     _redo_btn.set_sensitive( buf.redoable() );
     _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.redo_tooltip(), "<Control><Shift>z" ) );
+  }
+
+  /* Called whenever the tab is changed to update the current document's font information */
+  private void do_fonts_changed( OutlineTable ot ) {
+    var name_fd = _fonts_name.get_font_desc();
+    var note_fd = _fonts_note.get_font_desc();
+    if( ot.name_font_family != null ) {
+      name_fd.set_family( ot.name_font_family );
+    }
+    if( ot.note_font_family != null ) {
+      name_fd.set_family( ot.note_font_family );
+    }
+    name_fd.set_size( (int)(ot.name_font_size * Pango.SCALE) );
+    note_fd.set_size( (int)(ot.note_font_size * Pango.SCALE) );
+    _fonts_name.set_font_desc( name_fd );
+    _fonts_note.set_font_desc( note_fd );
   }
 
   /* Allow the user to select a filename to save the document as */
@@ -1067,6 +1096,24 @@ public class MainWindow : ApplicationWindow {
     }
 
     win.show();
+
+  }
+
+  /* Called whenever the user selects the reset fonts button in the properties popover */
+  private void action_reset_fonts() {
+
+    var table       = get_current_table( "action_reset_fonts" );
+    var name_family = _settings.get_string( "default-row-font-family" );
+    var note_family = _settings.get_string( "default-note-font-family" );
+    var name_size   = _settings.get_int( "default-row-font-size" );
+    var note_size   = _settings.get_int( "default-note-font-size" );
+
+    /* Update the table */
+    table.change_name_font( name_family, name_size );
+    table.change_note_font( note_family, note_size );
+
+    /* Update the UI */
+    do_fonts_changed( table );
 
   }
 
