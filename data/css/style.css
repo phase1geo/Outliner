@@ -15,10 +15,9 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@define-color colorPrimary #D48E15;
-/* @define-color textColorPrimary {{ headerbar-text-color }}; */
-/* @define-color textColorPrimaryShadow {{ headerbar-text-shadow-color }}; */
-/* @define-color colorAccent {{ accent-color }}; */
+@define-color colorPrimary           #D48E15;
+@define-color textColorPrimary       @BLACK_500;
+@define-color textColorPrimaryShadow #D48E15;
 
 .color-button radio,
 .color-button radio.checked {
