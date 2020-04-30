@@ -398,6 +398,9 @@ public class OutlineTable : DrawingArea {
       } else if( clicked.is_within_note_icon( x, y ) ) {
         _active = clicked;
         return( false );
+      } else if( clicked.is_within_task( x, y ) ) {
+        _active = clicked;
+        return( false );
       } else if( clicked.is_within_name( x, y ) ) {
         return( clicked_in_text( clicked, clicked.name, e, NodeMode.EDITABLE ) );
       } else if( clicked.is_within_note( x, y ) ) {
@@ -600,6 +603,10 @@ public class OutlineTable : DrawingArea {
           } else {
             toggle_note( _active, true );
           }
+        } else if( _active.is_within_task( e.x, e.y ) ) {
+          _active.task = (_active.task == NodeTaskMode.OPEN) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
+          queue_draw();
+          changed();
         }
       }
 
@@ -1709,6 +1716,7 @@ public class OutlineTable : DrawingArea {
         case "l" :  indent();  break;
         case "n" :  change_selected( selected.get_next_sibling() );  break;
         case "p" :  change_selected( selected.get_previous_sibling() );  break;
+        case "t" :  rotate_task();  break;
         case "B" :  change_selected( root.get_last_node() );  break;
         case "E" :  edit_selected( false );  break;
         case "T" :  change_selected( root.get_first_node() );  break;
@@ -1734,6 +1742,18 @@ public class OutlineTable : DrawingArea {
     selected = node;
     queue_draw();
     see( selected );
+  }
+
+  /* Changes the task status by one */
+  public void rotate_task() {
+    if( selected == null ) return;
+    switch( selected.task ) {
+      case NodeTaskMode.NONE :  selected.task = NodeTaskMode.OPEN;  break;
+      case NodeTaskMode.OPEN :  selected.task = NodeTaskMode.DONE;  break;
+      case NodeTaskMode.DONE :  selected.task = NodeTaskMode.NONE;  break;
+    }
+    queue_draw();
+    changed();
   }
 
   /*************************/

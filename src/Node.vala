@@ -81,6 +81,12 @@ public enum NodeListType {
   }
 }
 
+public enum NodeTaskMode {
+  NONE = 0,  // Indicates that this node does not have a task assigned
+  OPEN,      // Indicates that a task is assigned but is not completed
+  DONE       // Indicates that a task is assigned and is completed
+}
+
 public class NodeDrawOptions {
   public bool show_note_icon { get; set; default = true; }
   public bool show_modes     { get; set; default = true; }
@@ -118,6 +124,7 @@ public class Node {
   private double       _lt_width  = 0;
   private bool         _hide_note = true;
   private int          _clone_id  = -1;
+  private NodeTaskMode _task      = NodeTaskMode.NONE;
   private bool         _debug     = false;
 
   private static Pixbuf? _note_icon = null;
@@ -146,6 +153,17 @@ public class Node {
           hide_note = true;
         }
         update_height( true );
+      }
+    }
+  }
+  public NodeTaskMode task {
+    get {
+      return( _task );
+    }
+    set {
+      if( _task != value ) {
+        _task = value;
+        update_height_from_resize();
       }
     }
   }
@@ -594,8 +612,9 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_text() {
-    var ltx = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + padx);
-    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + ltx;
+    var tx  = (task == NodeTaskMode.NONE) ? 0 : (10 + padx);
+    var ltw = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + padx);
+    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + tx + ltw;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
   }
@@ -721,6 +740,14 @@ public class Node {
     h = 16;
   }
 
+  /* Returns the area where we will draw the task icon */
+  private void task_bbox( out double x, out double y, out double w, out double h ) {
+    x = this.x + (padx * 5) + 20 + (depth * indent);
+    y = this.y + pady + ((name.get_line_height() / 2) - 5);
+    w = 12;
+    h = 12;
+  }
+
   /* Returns the area where the expander will draw the expander icon */
   private void expander_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 4) + 10 + (depth * indent);
@@ -749,6 +776,12 @@ public class Node {
     double nx, ny, nw, nh;
     note_bbox( out nx, out ny, out nw, out nh );
     return( Utils.is_within_bounds( x, y, nx, ny, nw, nh ) );
+  }
+
+  public bool is_within_task( double x, double y ) {
+    double tx, ty, tw, th;
+    task_bbox( out tx, out ty, out tw, out th );
+    return( (task != NodeTaskMode.NONE) && Utils.is_within_bounds( x, y, tx, ty, tw, th ) );
   }
 
   /* Returns true if the given coordinates reside within the name text area */
@@ -782,6 +815,11 @@ public class Node {
 
     n->new_prop( "expanded", expanded.to_string() );
     n->new_prop( "hidenote", hide_note.to_string() );
+
+    /* Save the task done status, if valid */
+    if( task != NodeTaskMode.NONE ) {
+      n->new_prop( "task_done", (task == NodeTaskMode.DONE).to_string() );
+    }
 
     /* Only save out the name/note if we are not a clone or if our clone has not been output yet */
     if( (_clone_id == -1) || !clone_ids.has_key( _clone_id ) ) {
@@ -818,6 +856,11 @@ public class Node {
     string? h = n->get_prop( "hidenote" );
     if( h != null ) {
       hide_note = bool.parse( h );
+    }
+
+    string? t = n->get_prop( "task_done" );
+    if( t != null ) {
+      task = bool.parse( t ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
     }
 
     string? c = n->get_prop( "clone_id" );
@@ -1210,6 +1253,29 @@ public class Node {
 
   }
 
+  /* Draw the task indicator */
+  public void draw_task( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
+
+    if( task == NodeTaskMode.NONE ) return;
+
+    double tx, ty, tw, th;
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
+    var color = ((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.symbol_color;
+
+    task_bbox( out tx, out ty, out tw, out th );
+
+    Utils.set_context_color_with_alpha( ctx, color, alpha );
+
+    ctx.rectangle( tx, ty, tw, th );
+    ctx.stroke();
+
+    if( task == NodeTaskMode.DONE ) {
+      ctx.rectangle( (tx + 3), (ty + 3), (tw - 6), (th - 6) );
+      ctx.fill();
+    }
+
+  }
+
   /* Draw the list type to the right of the expander */
   public void draw_list_type( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
@@ -1306,6 +1372,7 @@ public class Node {
     draw_background( ctx, theme, opts );
     draw_note_icon( ctx, theme, opts );
     draw_expander( ctx, theme, opts );
+    draw_task( ctx, theme, opts );
     draw_list_type( ctx, theme, opts );
     draw_name( ctx, theme, opts );
     draw_note( ctx, theme, opts );
