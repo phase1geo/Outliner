@@ -108,6 +108,10 @@ public class NodeCloneData {
 
 public class Node {
 
+  private const int note_size = 16;
+  private const int task_size = 16;
+  private const int expander_size = 10;
+
   private static int next_id  = 0;
   private static int clone_id = 0;
 
@@ -614,7 +618,7 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_text() {
-    var tx  = (task == NodeTaskMode.NONE) ? 0 : (10 + padx);
+    var tx  = (task == NodeTaskMode.NONE) ? 0 : (task_size + padx);
     var ltw = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + padx);
     name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + tx + ltw;
     name.posy = y + pady;
@@ -737,25 +741,25 @@ public class Node {
   /* Returns the area where we will draw the note icon */
   private void note_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 2) + 10;
-    y = this.y + pady + ((name.get_line_height() / 2) - 8);
-    w = 16;
-    h = 16;
+    y = this.y + pady + ((name.get_line_height() / 2) - (note_size / 2));
+    w = note_size;
+    h = note_size;
   }
 
   /* Returns the area where we will draw the task icon */
   private void task_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 5) + 20 + (depth * indent);
-    y = this.y + pady + ((name.get_line_height() / 2) - 5);
-    w = 14;
-    h = 14;
+    y = this.y + pady + ((name.get_line_height() / 2) - (task_size / 2));
+    w = task_size;
+    h = task_size;
   }
 
   /* Returns the area where the expander will draw the expander icon */
   private void expander_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 4) + 10 + (depth * indent);
-    y = this.y + pady + ((name.get_line_height() / 2) - 5);
-    w = 10;
-    h = 10;
+    y = this.y + pady + ((name.get_line_height() / 2) - (expander_size / 2));
+    w = expander_size;
+    h = expander_size;
   }
 
   /* Returns true if the given coordinates are within this node */
@@ -1271,12 +1275,6 @@ public class Node {
     ctx.set_line_width( 1 );
     Utilities.cairo_rounded_rectangle( ctx, tx, ty, tw, tw, 2 );
     ctx.stroke();
-
-    Utils.set_context_color_with_alpha( ctx, theme.note_background, 1.0 );
-    Utilities.cairo_rounded_rectangle( ctx, tx, ty, tw, tw, 2 );
-    ctx.fill();
-
-    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, alpha );
 
     switch( task ) {
       case NodeTaskMode.DOING :
