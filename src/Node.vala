@@ -167,10 +167,7 @@ public class Node {
       return( _task );
     }
     set {
-      if( _task != value ) {
-        _task = value;
-        update_height_from_resize();
-      }
+      update_task( value, true, true );
     }
   }
   public CanvasText name {
@@ -572,6 +569,52 @@ public class Node {
     name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + tx + ltx;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
+  }
+
+  /* Propagates the current task information to the children */
+  private void propagate_task_down() {
+    if( task != NodeTaskMode.DOING ) {
+      for( int i=0; i<children.length; i++ ) {
+        var child = children.index( i );
+        if( child.task != NodeTaskMode.NONE ) {
+          child.update_task( task, true, false );
+        }
+      }
+    }
+  }
+
+  /* Updates the task of this parent row based on the status of the children */
+  private void update_task_from_children() {
+    var value = NodeTaskMode.NONE;
+    for( int i=0; i<children.length; i++ ) {
+      var child = children.index( i );
+      if( child.task != value ) {
+        if( value == NodeTaskMode.NONE ) {
+          value = child.task;
+        } else if( child.task != NodeTaskMode.NONE ) {
+          update_task( NodeTaskMode.DOING, false, true );
+          return;
+        }
+      }
+    }
+    update_task( value, false, true );
+  }
+
+  /* Propagates the current task information upwards in the tree until we reach the root node */
+  private void propagate_task_up() {
+    if( !parent.is_root() ) {
+      parent.update_task_from_children();
+    }
+  }
+
+  /* Propagates the task information both up and down the node tree */
+  private void update_task( NodeTaskMode value, bool prop_down, bool prop_up ) {
+    if( _task == value ) return;
+    var resize = (task == NodeTaskMode.NONE) || (value == NodeTaskMode.NONE);
+    _task = value;
+    if( resize )    update_height_from_resize();
+    if( prop_down ) propagate_task_down();
+    if( prop_up )   propagate_task_up();
   }
 
   /* Returns the root node of this node */
