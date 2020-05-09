@@ -42,7 +42,10 @@ public class MainWindow : ApplicationWindow {
   private Button?         _undo_btn       = null;
   private Button?         _redo_btn       = null;
   private SpinButton      _zoom;
+  private double          _zoom_factor    = 1.0;
   private Granite.Widgets.ModeButton _list_types;
+  private FontButton      _fonts_name;
+  private FontButton      _fonts_note;
   private Switch          _condensed;
   private Label           _stats_chars;
   private Label           _stats_words;
@@ -65,6 +68,7 @@ public class MainWindow : ApplicationWindow {
     { "action_export",        action_export },
     { "action_print",         action_print },
     { "action_shortcuts",     action_shortcuts },
+    { "action_reset_fonts",   action_reset_fonts },
     { "action_zoom_in1",      action_zoom_in },
     { "action_zoom_in2",      action_zoom_in },
     { "action_zoom_out",      action_zoom_out },
@@ -228,6 +232,7 @@ public class MainWindow : ApplicationWindow {
   private void tab_changed( Tab tab ) {
     var ot = get_table( tab );
     do_buffer_changed( ot.undo_buffer );
+    do_fonts_changed( ot );
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
@@ -447,7 +452,7 @@ public class MainWindow : ApplicationWindow {
     grid.column_homogeneous = true;
     grid.column_spacing     = 10;
 
-    var lbl_chars = new Label( _( "Characters :") );
+    var lbl_chars = new Label( _( "Characters:") );
     _stats_chars  = new Label( "0" );
 
     var lbl_words = new Label( _( "Words:" ) );
@@ -531,7 +536,7 @@ public class MainWindow : ApplicationWindow {
     var zoom_box = new Box( Orientation.HORIZONTAL, 0 );
     var zoom_lbl = new Label( _( "Zoom (%):" ) );
 
-    _zoom = new SpinButton.with_range( 25, 200, 25 );
+    _zoom = new SpinButton.with_range( 100, 225, 25 );
     _zoom.set_value( 100 );
     _zoom.value_changed.connect( zoom_changed );
 
@@ -583,9 +588,49 @@ public class MainWindow : ApplicationWindow {
     ltbox.pack_end(   _list_types, false, false, 10 );
     box.pack_start( ltbox, false, false, 10 );
 
+    /* Add row font selection button */
+    var f1box = new Box( Orientation.HORIZONTAL, 0 );
+    var f1lbl = new Label( _( "Row Font:" ) );
+    _fonts_name = new FontButton();
+    _fonts_name.show_style = false;
+    _fonts_name.set_filter_func( (family, face) => {
+      var fd     = face.describe();
+      var weight = fd.get_weight();
+      var style  = fd.get_style();
+      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+    });
+    _fonts_name.font_set.connect(() => {
+      var table = get_current_table();
+      table.change_name_font( _fonts_name.get_font_family().get_name(), (_fonts_name.get_font_size() / Pango.SCALE) );
+    });
+
+    f1box.pack_start( f1lbl,   false, false, 10 );
+    f1box.pack_end(   _fonts_name, false, false, 10 );
+    box.pack_start( f1box, false, false, 10 );
+
+    /* Add row font selection button */
+    var f2box = new Box( Orientation.HORIZONTAL, 0 );
+    var f2lbl = new Label( _( "Note Font:" ) );
+    _fonts_note = new FontButton();
+    _fonts_note.show_style = false;
+    _fonts_note.set_filter_func( (family, face) => {
+      var fd     = face.describe();
+      var weight = fd.get_weight();
+      var style  = fd.get_style();
+      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+    });
+    _fonts_note.font_set.connect(() => {
+      var table = get_current_table();
+      table.change_note_font( _fonts_note.get_font_family().get_name(), (_fonts_note.get_font_size() / Pango.SCALE) );
+    });
+
+    f2box.pack_start( f2lbl,       false, false, 10 );
+    f2box.pack_end(   _fonts_note, false, false, 10 );
+    box.pack_start( f2box, false, false, 10 );
+
     /* Add condensed mode switch */
     var cbox      = new Box( Orientation.HORIZONTAL, 0 );
-    var clbl      = new Label( _( "Condensed Mode" ) );
+    var clbl      = new Label( _( "Condensed Mode:" ) );
     _condensed = new Switch();
     _condensed.state_set.connect( (state) => {
       var table = get_current_table();
@@ -599,11 +644,20 @@ public class MainWindow : ApplicationWindow {
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
 
+    var btn_box = new Box( Orientation.VERTICAL, 0 );
+
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
     shortcuts.text = _( "Shortcuts Cheatsheet" );
     shortcuts.action_name = "win.action_shortcuts";
-    box.pack_start( shortcuts, false, false, 10 );
+    btn_box.pack_start( shortcuts, false, false, 5 );
+
+    var reset_fonts = new ModelButton();
+    reset_fonts.text = _( "Reset Fonts to Defaults" );
+    reset_fonts.action_name = "win.action_reset_fonts";
+    btn_box.pack_start( reset_fonts, false, false, 5 );
+
+    box.pack_start( btn_box, false, false, 0 );
 
     box.show_all();
 
@@ -614,24 +668,19 @@ public class MainWindow : ApplicationWindow {
 
   }
 
+  /* Returns the current zoom factor */
+  public double get_zoom_factor() {
+    return( _zoom_factor );
+  }
+
   /* Called whenever the user changes the zoom level */
   private void zoom_changed() {
 
     var table = get_current_table( "zoom_changed" );
-    var zoom  = (int)_zoom.get_value();
 
-    switch( zoom ) {
-      case 25  :  table.zoom_changed(  9, 7,  2 );   break;
-      case 50  :  table.zoom_changed( 10, 8,  3 );   break;
-      case 75  :  table.zoom_changed( 11, 9,  4 );   break;
-      case 100 :  table.zoom_changed( 12, 10, 5 );   break;
-      case 125 :  table.zoom_changed( 13, 11, 6 );   break;
-      case 150 :  table.zoom_changed( 14, 12, 7 );   break;
-      case 175 :  table.zoom_changed( 15, 13, 8 );   break;
-      case 200 :  table.zoom_changed( 16, 14, 9 );   break;
-      default  :  table.zoom_changed( 12, 10, 10 );  break;
-    }
+    _zoom_factor = _zoom.get_value() / 100;
 
+    table.zoom_changed();
     queue_draw();
 
   }
@@ -809,6 +858,22 @@ public class MainWindow : ApplicationWindow {
     _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.redo_tooltip(), "<Control><Shift>z" ) );
   }
 
+  /* Called whenever the tab is changed to update the current document's font information */
+  private void do_fonts_changed( OutlineTable ot ) {
+    var name_fd = _fonts_name.get_font_desc();
+    var note_fd = _fonts_note.get_font_desc();
+    if( ot.name_font_family != null ) {
+      name_fd.set_family( ot.name_font_family );
+    }
+    if( ot.note_font_family != null ) {
+      name_fd.set_family( ot.note_font_family );
+    }
+    name_fd.set_size( (int)(ot.name_font_size * Pango.SCALE) );
+    note_fd.set_size( (int)(ot.note_font_size * Pango.SCALE) );
+    _fonts_name.set_font_desc( name_fd );
+    _fonts_note.set_font_desc( note_fd );
+  }
+
   /* Allow the user to select a filename to save the document as */
   public bool save_file( OutlineTable ot ) {
     FileChooserDialog dialog = new FileChooserDialog( _( "Save File" ), this, FileChooserAction.SAVE,
@@ -884,7 +949,7 @@ public class MainWindow : ApplicationWindow {
   /* Called when the user uses the Control-Plus/Equal shortcut */
   private void action_zoom_in() {
     var value = (int)_zoom.get_value();
-    if( value < 200 ) {
+    if( value < 225 ) {
       _zoom.set_value( value + 25 );
     }
   }
@@ -892,7 +957,7 @@ public class MainWindow : ApplicationWindow {
   /* Called when the user uses the Control-Minus shortcut */
   private void action_zoom_out() {
     var value = (int)_zoom.get_value();
-    if( value > 25 ) {
+    if( value > 100 ) {
       _zoom.set_value( value - 25 );
     }
   }
@@ -1031,6 +1096,24 @@ public class MainWindow : ApplicationWindow {
     }
 
     win.show();
+
+  }
+
+  /* Called whenever the user selects the reset fonts button in the properties popover */
+  private void action_reset_fonts() {
+
+    var table       = get_current_table( "action_reset_fonts" );
+    var name_family = _settings.get_string( "default-row-font-family" );
+    var note_family = _settings.get_string( "default-note-font-family" );
+    var name_size   = _settings.get_int( "default-row-font-size" );
+    var note_size   = _settings.get_int( "default-note-font-size" );
+
+    /* Update the table */
+    table.change_name_font( name_family, name_size );
+    table.change_note_font( note_family, note_size );
+
+    /* Update the UI */
+    do_fonts_changed( table );
 
   }
 

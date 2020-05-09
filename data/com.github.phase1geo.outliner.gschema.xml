@@ -61,5 +61,25 @@
       <summary>When exporting to HTML, use ul output styling instead of ol</summary>
       <description>When exporting to HTML, use ul output styling instead of ol</description>
     </key>
+    <key name="default-row-font-family" type="s">
+      <default>"Sans"</default>
+      <summary>Default font family to use for new document rows</summary>
+      <description>Default font family to use for new document rows</description>
+    </key>
+    <key name="default-row-font-size" type="i">
+      <default>12</default>
+      <summary>Default font size to use for new document rows</summary>
+      <description>Default font size to use for new document rows</description>
+    </key>
+    <key name="default-note-font-family" type="s">
+      <default>"Sans"</default>
+      <summary>Default font family to use for new document notes</summary>
+      <description>Default font family to use for new document notes</description>
+    </key>
+    <key name="default-note-font-size" type="i">
+      <default>11</default>
+      <summary>Default font size to use for new document notes</summary>
+      <description>Default font size to use for new document notes</description>
+    </key>
   </schema>
 </schemalist>
