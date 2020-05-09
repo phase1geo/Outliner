@@ -22,6 +22,7 @@
 using Gtk;
 using Gdk;
 using Gee;
+using Granite.Drawing;
 
 public enum NodeMode {
   NONE = 0,      // Indicates that this node is nothing special
@@ -84,6 +85,7 @@ public enum NodeListType {
 public enum NodeTaskMode {
   NONE = 0,  // Indicates that this node does not have a task assigned
   OPEN,      // Indicates that a task is assigned but is not completed
+  DOING,     // Indicates that the task is in the process of being done
   DONE       // Indicates that a task is assigned and is completed
 }
 
@@ -744,8 +746,8 @@ public class Node {
   private void task_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 5) + 20 + (depth * indent);
     y = this.y + pady + ((name.get_line_height() / 2) - 5);
-    w = 12;
-    h = 12;
+    w = 14;
+    h = 14;
   }
 
   /* Returns the area where the expander will draw the expander icon */
@@ -1266,12 +1268,32 @@ public class Node {
 
     Utils.set_context_color_with_alpha( ctx, color, alpha );
 
-    ctx.rectangle( tx, ty, tw, th );
+    ctx.set_line_width( 1 );
+    Utilities.cairo_rounded_rectangle( ctx, tx, ty, tw, tw, 2 );
     ctx.stroke();
 
-    if( task == NodeTaskMode.DONE ) {
-      ctx.rectangle( (tx + 3), (ty + 3), (tw - 6), (th - 6) );
-      ctx.fill();
+    Utils.set_context_color_with_alpha( ctx, theme.note_background, 1.0 );
+    Utilities.cairo_rounded_rectangle( ctx, tx, ty, tw, tw, 2 );
+    ctx.fill();
+
+    Utils.set_context_color_with_alpha( ctx, color, alpha );
+
+    switch( task ) {
+      case NodeTaskMode.DOING :
+        ctx.set_line_width( 3 );
+        ctx.set_line_cap( Cairo.LineCap.ROUND );
+        ctx.move_to( (tx + 4), (ty + (th / 2)) );
+        ctx.line_to( ((tx + tw) - 4), (ty + (th / 2)) );
+        ctx.stroke();
+        break;
+      case NodeTaskMode.DONE :
+        ctx.set_line_width( 3 );
+        ctx.set_line_cap( Cairo.LineCap.ROUND );
+        ctx.move_to( (tx + 3), (ty + (th / 2)) );
+        ctx.line_to( (tx + (tw / 3) + 1), ((ty + th) - 4) );
+        ctx.line_to( ((tx + tw) - 3), (ty + 3) );
+        ctx.stroke();
+        break;
     }
 
   }
@@ -1302,7 +1324,8 @@ public class Node {
     if( tmode == NodeMode.EDITABLE ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
-      ctx.rectangle( (name.posx - (padx / 2)), name.posy, name.max_width, name.height );
+      Utilities.cairo_rounded_rectangle( ctx, (name.posx - (padx / 2)), name.posy, name.max_width, name.height, 4 );
+      // ctx.rectangle( (name.posx - (padx / 2)), name.posy, name.max_width, name.height );
       ctx.stroke();
     }
 
@@ -1347,14 +1370,16 @@ public class Node {
     /* Draw the background color */
     if( opts.show_note_bg ) {
       Utils.set_context_color_with_alpha( ctx, bg_color, alpha );
-      ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      // ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      Utilities.cairo_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
       ctx.fill();
     }
 
     if( (tmode == NodeMode.NOTEEDIT) || opts.show_note_ol ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
-      ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      // ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      Utilities.cairo_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
       ctx.stroke();
     }
 

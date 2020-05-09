@@ -1748,9 +1748,10 @@ public class OutlineTable : DrawingArea {
   public void rotate_task() {
     if( selected == null ) return;
     switch( selected.task ) {
-      case NodeTaskMode.NONE :  selected.task = NodeTaskMode.OPEN;  break;
-      case NodeTaskMode.OPEN :  selected.task = NodeTaskMode.DONE;  break;
-      case NodeTaskMode.DONE :  selected.task = NodeTaskMode.NONE;  break;
+      case NodeTaskMode.NONE  :  selected.task = NodeTaskMode.OPEN;   break;
+      case NodeTaskMode.OPEN  :  selected.task = NodeTaskMode.DOING;  break;
+      case NodeTaskMode.DOING :  selected.task = NodeTaskMode.DONE;   break;
+      case NodeTaskMode.DONE  :  selected.task = NodeTaskMode.NONE;   break;
     }
     queue_draw();
     changed();
