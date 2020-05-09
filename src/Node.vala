@@ -1276,7 +1276,7 @@ public class Node {
     Utilities.cairo_rounded_rectangle( ctx, tx, ty, tw, tw, 2 );
     ctx.fill();
 
-    Utils.set_context_color_with_alpha( ctx, color, alpha );
+    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, alpha );
 
     switch( task ) {
       case NodeTaskMode.DOING :

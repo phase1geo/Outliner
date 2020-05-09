@@ -266,6 +266,11 @@ public class ExportMinder : Object {
       node.expanded = !bool.parse( f );
     }
 
+    var t = n->get_prop( "task" );
+    if( t != null ) {
+      node.task = bool.parse( t ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
+    }
+
     /* Parse any children nodes */
     for( Xml.Node* it=n->children; it!=null; it=it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
