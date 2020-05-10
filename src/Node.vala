@@ -86,7 +86,26 @@ public enum NodeTaskMode {
   NONE = 0,  // Indicates that this node does not have a task assigned
   OPEN,      // Indicates that a task is assigned but is not completed
   DOING,     // Indicates that the task is in the process of being done
-  DONE       // Indicates that a task is assigned and is completed
+  DONE;      // Indicates that a task is assigned and is completed
+
+  public string to_string() {
+    switch( this ) {
+      case OPEN  :  return( "open" );
+      case DOING :  return( "doing" );
+      case DONE  :  return( "done" );
+      default    :  return( "none" );
+    }
+  }
+
+  public static NodeTaskMode from_string( string value ) {
+    switch( value ) {
+      case "open"  :  return( OPEN );
+      case "doing" :  return( DOING );
+      case "done"  :  return( DONE );
+      default      :  return( NONE );
+    }
+  }
+
 }
 
 public class NodeDrawOptions {
@@ -130,7 +149,7 @@ public class Node {
   private double       _lt_width  = 0;
   private bool         _hide_note = true;
   private int          _clone_id  = -1;
-  private NodeTaskMode _task      = NodeTaskMode.NONE;
+  private NodeTaskMode _task      = NodeTaskMode.OPEN;
   private bool         _debug     = false;
 
   private static Pixbuf? _note_icon = null;
@@ -164,10 +183,12 @@ public class Node {
   }
   public NodeTaskMode task {
     get {
-      return( _task );
+      return( _ot.show_tasks ? _task : NodeTaskMode.NONE );
     }
     set {
-      update_task( value, true, true );
+      if( _ot.show_tasks ) {
+        update_task( value, true, true );
+      }
     }
   }
   public CanvasText name {
@@ -292,6 +313,7 @@ public class Node {
     ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
+    ot.show_tasks_changed.connect( update_height_from_resize );
 
   }
 
@@ -576,9 +598,7 @@ public class Node {
     if( task != NodeTaskMode.DOING ) {
       for( int i=0; i<children.length; i++ ) {
         var child = children.index( i );
-        if( child.task != NodeTaskMode.NONE ) {
-          child.update_task( task, true, false );
-        }
+        child.update_task( task, true, false );
       }
     }
   }
@@ -845,8 +865,8 @@ public class Node {
     n->new_prop( "hidenote", hide_note.to_string() );
 
     /* Save the task done status, if valid */
-    if( task != NodeTaskMode.NONE ) {
-      n->new_prop( "task_done", (task == NodeTaskMode.DONE).to_string() );
+    if( _task != NodeTaskMode.NONE ) {
+      n->new_prop( "task", _task.to_string() );
     }
 
     /* Only save out the name/note if we are not a clone or if our clone has not been output yet */
@@ -886,9 +906,11 @@ public class Node {
       hide_note = bool.parse( h );
     }
 
-    string? t = n->get_prop( "task_done" );
+    string? t = n->get_prop( "task" );
     if( t != null ) {
-      task = bool.parse( t ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
+      _task = NodeTaskMode.from_string( t );
+    } else {
+      _task = NodeTaskMode.NONE;
     }
 
     string? c = n->get_prop( "clone_id" );

@@ -47,6 +47,7 @@ public class MainWindow : ApplicationWindow {
   private FontButton      _fonts_name;
   private FontButton      _fonts_note;
   private Switch          _condensed;
+  private Switch          _show_tasks;
   private Label           _stats_chars;
   private Label           _stats_words;
   private Label           _stats_rows;
@@ -501,11 +502,11 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 5 );
 
     var export = new ModelButton();
-    export.text = _( "Export…" );
+    export.text        = _( "Export…" );
     export.action_name = "win.action_export";
 
     var print = new ModelButton();
-    print.text = _( "Print" );
+    print.text        = _( "Print…" );
     print.action_name = "win.action_print";
     print.set_sensitive( false );
 
@@ -630,8 +631,8 @@ public class MainWindow : ApplicationWindow {
     box.pack_start( f2box, false, false, 10 );
 
     /* Add condensed mode switch */
-    var cbox      = new Box( Orientation.HORIZONTAL, 0 );
-    var clbl      = new Label( _( "Condensed Mode:" ) );
+    var cbox = new Box( Orientation.HORIZONTAL, 0 );
+    var clbl = new Label( _( "Condensed Mode:" ) );
     _condensed = new Switch();
     _condensed.state_set.connect( (state) => {
       var table = get_current_table();
@@ -641,6 +642,19 @@ public class MainWindow : ApplicationWindow {
     cbox.pack_start( clbl,       false, true,  10 );
     cbox.pack_end(   _condensed, false, false, 10 );
     box.pack_start( cbox, false, false, 10 );
+
+    /* Add show tasks switch */
+    var tbox = new Box( Orientation.HORIZONTAL, 0 );
+    var tlbl = new Label( _( "Show Checkboxes" ) );
+    _show_tasks = new Switch();
+    _show_tasks.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.show_tasks = state;
+      return( false );
+    });
+    tbox.pack_start( tlbl,        false, true,  10 );
+    tbox.pack_end(   _show_tasks, false, false, 10 );
+    box.pack_start( tbox, false, false, 10 );
 
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
@@ -1068,9 +1082,9 @@ public class MainWindow : ApplicationWindow {
   private void properties_clicked() {
     var table      = get_current_table( "properties_clicked" );
     var theme_name = table.get_theme().name;
-    var condensed  = table.condensed;
     _theme_buttons.get( theme_name ).active = true;
-    _condensed.state     = condensed;
+    _condensed.state     = table.condensed;
+    _show_tasks.state    = table.show_tasks;
     _list_types.selected = table.list_type;
   }
 

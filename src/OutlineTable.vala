@@ -56,6 +56,7 @@ public class OutlineTable : DrawingArea {
   private int             _name_size;
   private string          _note_family;
   private int             _note_size;
+  private bool            _show_tasks = false;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -151,6 +152,19 @@ public class OutlineTable : DrawingArea {
       return( _note_size );
     }
   }
+  public bool show_tasks {
+    get {
+      return( _show_tasks );
+    }
+    set {
+      if( _show_tasks != value ) {
+        _show_tasks = value;
+        show_tasks_changed();
+        queue_draw();
+        changed();
+      }
+    }
+  }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -158,6 +172,7 @@ public class OutlineTable : DrawingArea {
   public signal void theme_changed();
   public signal void selected_changed();
   public signal void cursor_changed();
+  public signal void show_tasks_changed();
 
   /* Default constructor */
   public OutlineTable( MainWindow win, GLib.Settings settings ) {
@@ -2036,6 +2051,11 @@ public class OutlineTable : DrawingArea {
       _note_size = int.parse( tfs );
     }
 
+    var t = n->get_prop( "show-tasks" );
+    if( t != null ) {
+      _show_tasks = bool.parse( t );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -2089,6 +2109,7 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "name-font-size",   _name_size.to_string() );
     n->set_prop( "note-font-family", _note_family );
     n->set_prop( "note-font-size",   _note_size.to_string() );
+    n->set_prop( "show-tasks",       _show_tasks.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
