@@ -105,8 +105,6 @@ public class OutlineTable : DrawingArea {
       update_css();
     }
   }
-  public Clipboard node_clipboard { set; get; default = Clipboard.get_for_display( Display.get_default(), Atom.intern( "org.github.phase1geo.outliner.node", false ) );}
-  public Clipboard text_clipboard { set; get; default = Clipboard.get_for_display( Display.get_default(), Atom.intern( "org.github.phase1geo.outliner.text", false ) );}
   public bool condensed {
     get {
       return( _condensed );
@@ -849,7 +847,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Deserializes the XML string and inserts it into the given canvas text */
-  public void deserialize_text_for_paste( string str, CanvasText ct ) {
+  public void deserialize_text_for_paste( string str, CanvasText ct, bool replace ) {
     Xml.Doc* doc = Xml.Parser.parse_doc( str );
     if( doc == null ) return;
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
@@ -861,11 +859,17 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /* Returns a copy of the currently selected nodes */
+  public void get_nodes_for_clipboard( out Array<Node> nodes ) {
+    nodes = new Array<Node>();
+    if( selected != null ) {
+      nodes.append_val( selected );
+    }
+  }
+
   /* Copies the given node to the designated node clipboard */
-  public void copy_node_to_clipboard( Node node ) {
-    var text = serialize_node_for_copy( node );
-    node_clipboard.set_text( text, -1 );
-    node_clipboard.store();
+  public void copy_selected_node() {
+    OutlinerClipboard.copy_nodes( this );
   }
 
   /*
@@ -875,13 +879,11 @@ public class OutlineTable : DrawingArea {
   private void copy_selected_text( CanvasText ct ) {
 
     /* Store the text for Outliner text copy */
-    var text = serialize_text_for_copy( ct );
-    text_clipboard.set_text( text, -1 );
-    text_clipboard.store();
+    var ftext = serialize_text_for_copy( ct );
+    var text  = ct.get_selected_text();
 
-    /* Store the text for copying outside of Outliner */
-    var clipboard = Clipboard.get_default( get_display() );
-    clipboard.set_text( ct.get_selected_text(), -1 );
+    /* Copy both the formatted text and unformatted text */
+    OutlinerClipboard.copy_text( ftext, text );
 
   }
 
@@ -889,7 +891,7 @@ public class OutlineTable : DrawingArea {
   public void do_copy() {
     if( selected == null ) return;
     switch( selected.mode ) {
-      case NodeMode.SELECTED :  copy_node_to_clipboard( selected );   break;
+      case NodeMode.SELECTED :  copy_selected_node();   break;
       case NodeMode.EDITABLE :  copy_selected_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  copy_selected_text( selected.note );  break;
     }
@@ -908,12 +910,10 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Copies the given node to the clipboard and then removes it from the document */
-  public void cut_node_to_clipboard( Node node ) {
-    var text = serialize_node_for_copy( node );
-    node_clipboard.set_text( text, -1 );
-    node_clipboard.store();
-    undo_buffer.add_item( new UndoNodeCut( node ) );
-    delete_node( node );
+  public void cut_selected_node() {
+    copy_selected_node();
+    undo_buffer.add_item( new UndoNodeCut( selected ) );
+    delete_node( selected );
   }
 
   /*
@@ -930,7 +930,7 @@ public class OutlineTable : DrawingArea {
   public void do_cut() {
     if( selected == null ) return;
     switch( selected.mode ) {
-      case NodeMode.SELECTED :  cut_node_to_clipboard( selected );   break;
+      case NodeMode.SELECTED :  cut_selected_node();  break;
       case NodeMode.EDITABLE :  cut_selected_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  cut_selected_text( selected.note );  break;
     }
@@ -949,28 +949,6 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  /*
-   Pastes the given node into the table after the currently selected node as
-   a sibling node.
-  */
-  public void paste_node( bool below ) {
-
-    /* Create the new node from the clipboard */
-    var node = new Node( this );
-    var text = node_clipboard.wait_for_text();
-    deserialize_node_for_paste( text, node );
-
-    /* Insert the node into the appropriate position in the table */
-    insert_node_from_selected( below, node );
-
-    /* Add an undo item for this operation */
-    undo_buffer.add_item( new UndoNodePaste( node ) );
-
-    queue_draw();
-    changed();
-    see( node );
-
-  }
 
   /* Clones the entire tree */
   private void clone_tree( Node src_node, out Node cloned_node ) {
@@ -1004,23 +982,51 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Pastes the text into the provided CanvasText */
-  private void paste_text( CanvasText ct ) {
-    var text = text_clipboard.wait_for_text();
-    if( text != null ) {
-      deserialize_text_for_paste( text, ct );
+  public void paste_text( string text, bool shift ) {
+    if( selected != null ) {
+      if( shift ) {
+        _orig_text.copy( selected.name );
+        deserialize_text_for_paste( text, selected.name, true );
+        undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
+      } else if( is_node_editable() ) {
+        deserialize_text_for_paste( text, selected.name, false );
+      } else if( is_note_editable() ) {
+        deserialize_text_for_paste( text, selected.note, false );
+      } else {
+        var node = create_node();
+        selected.add_child( node );
+        deserialize_text_for_paste( text, selected.name, true );
+        undo_buffer.add_item( new UndoNodeInsert( node ) );
+        selected = node;
+      }
       queue_draw();
       changed();
     }
   }
 
+  /* Pastes the given string as a tree of nodes */
+  public void paste_node( string text, bool shift ) {
+
+    /* Create the new node from the clipboard */
+    var node = new Node( this );
+    deserialize_node_for_paste( text, node );
+
+    if( shift ) {
+      replace_node( selected, node );
+    } else {
+      insert_node_from_selected( true, node );
+      undo_buffer.add_item( new UndoNodePaste( node ) );
+    }
+
+    queue_draw();
+    changed();
+    see( node );
+
+  }
+
   /* Handles a paste operation of a node or text to the table */
   public void do_paste( bool shift ) {
-    if( selected == null ) return;
-    switch( selected.mode ) {
-      case NodeMode.SELECTED :  paste_node( !shift );         break;
-      case NodeMode.EDITABLE :  paste_text( selected.name );  break;
-      case NodeMode.NOTEEDIT :  paste_text( selected.note );  break;
-    }
+    OutlinerClipboard.paste( this, shift );
   }
 
   /* Handles a backspace keypress */
@@ -2204,6 +2210,23 @@ public class OutlineTable : DrawingArea {
     see( node );
   }
 
+  /* Replaces the current row with the specified row */
+  public void replace_node( Node orig_node, Node new_node ) {
+    var was_selected = (orig_node == selected);
+    var parent       = orig_node.parent;
+    parent.remove_child( orig_node );
+    parent.add_child( new_node );
+    for( int i=0; i<orig_node.children.length; i++ ) {
+      var child = orig_node.children.index( i );
+      orig_node.remove_child( child );
+      new_node.add_child( child );
+    }
+    if( was_selected ) {
+      selected = new_node;
+    }
+    undo_buffer.add_item( new UndoNodeReplace( orig_node, new_node ) );
+  }
+
   /* Adds a sibling node of the currently selected node */
   public void add_sibling_node( bool below, string? title = null, Array<UndoTagInfo>? tags = null ) {
     if( (selected == null) || selected.is_root() ) return;
@@ -2236,7 +2259,7 @@ public class OutlineTable : DrawingArea {
     }
     queue_draw();
     changed();
-
+    see( next );
   }
 
   /* Removes the selected node from the table */

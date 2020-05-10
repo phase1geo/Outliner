@@ -24,6 +24,7 @@ sources += files(
   'undo_actions/UndoNodeName.vala',
   'undo_actions/UndoNodeNote.vala',
   'undo_actions/UndoNodePaste.vala',
+  'undo_actions/UndoNodeReplace.vala',
   'undo_actions/UndoNodeSplit.vala',
   'undo_actions/UndoNodeUnclone.vala',
   'undo_actions/UndoNodeUnindent.vala',
@@ -37,6 +38,7 @@ sources += files(
 
   'Application.vala',
   'CanvasText.vala',
+  'Clipboard.vala',
   'ColorPicker.vala',
   'Document.vala',
   'DynamicNotebook.vala',
