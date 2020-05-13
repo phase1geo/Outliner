@@ -854,7 +854,11 @@ public class OutlineTable : DrawingArea {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         var ft = new FormattedText( this );
         ft.load( it );
-        ct.insert_formatted_text( ft, undo_text );
+        if( replace ) {
+          // TBD - ct.set_text( ft );
+        } else {
+          ct.insert_formatted_text( ft, undo_text );
+        }
       }
     }
   }
@@ -986,6 +990,28 @@ public class OutlineTable : DrawingArea {
     if( selected != null ) {
       if( shift ) {
         _orig_text.copy( selected.name );
+        selected.name.text.set_text( text );
+        undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
+      } else if( is_node_editable() ) {
+        selected.name.insert( text, undo_text );
+      } else if( is_note_editable() ) {
+        selected.note.insert( text, undo_text );
+      } else {
+        var node = create_node( text );
+        selected.add_child( node );
+        undo_buffer.add_item( new UndoNodeInsert( node ) );
+        selected = node;
+      }
+      queue_draw();
+      changed();
+    }
+  }
+
+  /* Pastes the formatted text into the provided CanvasText */
+  public void paste_formatted_text( string text, bool shift ) {
+    if( selected != null ) {
+      if( shift ) {
+        _orig_text.copy( selected.name );
         deserialize_text_for_paste( text, selected.name, true );
         undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
       } else if( is_node_editable() ) {
@@ -993,11 +1019,16 @@ public class OutlineTable : DrawingArea {
       } else if( is_note_editable() ) {
         deserialize_text_for_paste( text, selected.note, false );
       } else {
+        stdout.printf( "HERE\n" );
         var node = create_node();
         selected.add_child( node );
-        deserialize_text_for_paste( text, selected.name, true );
+        stdout.printf( "HERE A\n" );
+        deserialize_text_for_paste( text, node.name, true );
+        stdout.printf( "HERE B\n" );
         undo_buffer.add_item( new UndoNodeInsert( node ) );
+        stdout.printf( "HERE C\n" );
         selected = node;
+        stdout.printf( "HERE D\n" );
       }
       queue_draw();
       changed();

@@ -1,4 +1,3 @@
-
 /*
 * Copyright (c) 2018 (https://github.com/phase1geo/Minder)
 *
@@ -143,10 +142,12 @@ public class OutlinerClipboard {
 
     /* Get the list of targets that we will support */
     foreach( var target in targets ) {
+      stdout.printf( "target: %s\n", target.name() );
       switch( target.name() ) {
         case NODES_TARGET_NAME :  nodes_atom = target;  break;
         case FTEXT_TARGET_NAME :  ftext_atom = target;  break;
-        case "text/plain"      :  text_atom  = target;  break;
+        case "text/plain"      :
+        case "STRING"          :  text_atom  = target;  break;
       }
     }
 
@@ -160,10 +161,10 @@ public class OutlinerClipboard {
 
     /* If we need to handle formatted text, do it here */
     } else if( ftext_atom != null ) {
-      clipboard.request_contents( nodes_atom, (c, raw_data) => {
+      clipboard.request_contents( ftext_atom, (c, raw_data) => {
         var data = (string)raw_data.get_data();
         if( data == null ) return;
-        table.paste_text( data, shift );
+        table.paste_formatted_text( data, shift );
       });
 
     /* If we need to handle pasting text, do it here */
@@ -171,6 +172,7 @@ public class OutlinerClipboard {
       clipboard.request_contents( text_atom, (c, raw_data) => {
         var data = (string)raw_data.get_data();
         if( data == null ) return;
+        stdout.printf( "data: %s, shift: %s\n", data, shift.to_string() );
         table.paste_text( data, shift );
       });
     }
