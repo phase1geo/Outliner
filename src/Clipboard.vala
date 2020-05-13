@@ -142,7 +142,6 @@ public class OutlinerClipboard {
 
     /* Get the list of targets that we will support */
     foreach( var target in targets ) {
-      stdout.printf( "target: %s\n", target.name() );
       switch( target.name() ) {
         case NODES_TARGET_NAME :  nodes_atom = target;  break;
         case FTEXT_TARGET_NAME :  ftext_atom = target;  break;
@@ -172,7 +171,6 @@ public class OutlinerClipboard {
       clipboard.request_contents( text_atom, (c, raw_data) => {
         var data = (string)raw_data.get_data();
         if( data == null ) return;
-        stdout.printf( "data: %s, shift: %s\n", data, shift.to_string() );
         table.paste_text( data, shift );
       });
     }

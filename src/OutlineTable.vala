@@ -855,7 +855,7 @@ public class OutlineTable : DrawingArea {
         var ft = new FormattedText( this );
         ft.load( it );
         if( replace ) {
-          // TBD - ct.set_text( ft );
+          ct.text.copy( ft );
         } else {
           ct.insert_formatted_text( ft, undo_text );
         }
@@ -991,6 +991,7 @@ public class OutlineTable : DrawingArea {
       if( shift ) {
         _orig_text.copy( selected.name );
         selected.name.text.set_text( text );
+        selected.name.text.changed();
         undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
       } else if( is_node_editable() ) {
         selected.name.insert( text, undo_text );
@@ -1019,16 +1020,11 @@ public class OutlineTable : DrawingArea {
       } else if( is_note_editable() ) {
         deserialize_text_for_paste( text, selected.note, false );
       } else {
-        stdout.printf( "HERE\n" );
         var node = create_node();
         selected.add_child( node );
-        stdout.printf( "HERE A\n" );
         deserialize_text_for_paste( text, node.name, true );
-        stdout.printf( "HERE B\n" );
         undo_buffer.add_item( new UndoNodeInsert( node ) );
-        stdout.printf( "HERE C\n" );
         selected = node;
-        stdout.printf( "HERE D\n" );
       }
       queue_draw();
       changed();
