@@ -1039,7 +1039,9 @@ public class OutlineTable : DrawingArea {
     deserialize_node_for_paste( text, node );
 
     if( shift ) {
-      replace_node( selected, node );
+      var orig_node = selected;
+      replace_node( orig_node, node );
+      undo_buffer.add_item( new UndoNodeReplace( orig_node, node ) );
     } else {
       insert_node_from_selected( true, node );
       undo_buffer.add_item( new UndoNodePaste( node ) );
@@ -2241,17 +2243,12 @@ public class OutlineTable : DrawingArea {
   public void replace_node( Node orig_node, Node new_node ) {
     var was_selected = (orig_node == selected);
     var parent       = orig_node.parent;
+    var index        = orig_node.index();
     parent.remove_child( orig_node );
-    parent.add_child( new_node );
-    for( int i=0; i<orig_node.children.length; i++ ) {
-      var child = orig_node.children.index( i );
-      orig_node.remove_child( child );
-      new_node.add_child( child );
-    }
+    parent.add_child( new_node, index );
     if( was_selected ) {
       selected = new_node;
     }
-    undo_buffer.add_item( new UndoNodeReplace( orig_node, new_node ) );
   }
 
   /* Adds a sibling node of the currently selected node */

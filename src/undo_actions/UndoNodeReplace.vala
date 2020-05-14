@@ -31,11 +31,15 @@ public class UndoNodeReplace : UndoItem {
   }
 
   public override void undo( OutlineTable ot ) {
-
+    ot.replace_node( _new_node, _orig_node );
+    ot.queue_draw();
+    ot.changed();
   }
 
   public override void redo( OutlineTable ot ) {
-
+    ot.replace_node( _orig_node, _new_node );
+    ot.queue_draw();
+    ot.changed();
   }
 
 }
