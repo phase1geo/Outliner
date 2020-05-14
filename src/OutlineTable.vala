@@ -600,6 +600,7 @@ public class OutlineTable : DrawingArea {
           string url = "";
           if( control && !is_node_editable() && current.name.is_within_url( e.x, e.y, ref url ) ) {
             set_cursor( url_cursor );
+            set_tooltip_markup( url );
           } else {
             set_cursor( CursorType.XTERM );
           }
@@ -607,6 +608,7 @@ public class OutlineTable : DrawingArea {
           string url = "";
           if( control && !is_note_editable() && current.note.is_within_url( e.x, e.y, ref url ) ) {
             set_cursor( url_cursor );
+            set_tooltip_markup( url );
           } else {
             set_cursor( CursorType.XTERM );
           }
@@ -771,6 +773,12 @@ public class OutlineTable : DrawingArea {
             case 65507 :  handle_control( true );     break;
             default    :  handle_printable( e.str );  break;
           }
+        }
+      }
+    } else {
+      if( !control ) {
+        switch( e.keyval ) {
+          case 65507 :  handle_control( true );  break;
         }
       }
     }
