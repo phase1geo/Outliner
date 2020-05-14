@@ -51,6 +51,10 @@ public class MainWindow : ApplicationWindow {
   private Label           _stats_chars;
   private Label           _stats_words;
   private Label           _stats_rows;
+  private Label           _stats_ttotal;
+  private Label           _stats_topen;
+  private Label           _stats_tip;
+  private Label           _stats_tdone;
   private bool            _debug          = false;
   private bool            _prefer_dark    = false;
   private HashMap<string,RadioButton> _theme_buttons;
@@ -451,24 +455,71 @@ public class MainWindow : ApplicationWindow {
     var grid = new Grid();
     grid.border_width       = 10;
     grid.row_spacing        = 10;
-    grid.column_homogeneous = true;
+    // grid.column_homogeneous = true;
     grid.column_spacing     = 10;
 
-    var lbl_chars = new Label( _( "Characters:") );
+    var lmargin = "    ";
+
+    var group_text = new Label( _( "<b>Text Statistics</b>" ) );
+    group_text.xalign     = 0;
+    group_text.use_markup = true;
+
+    var lbl_chars = new Label( lmargin + _( "Characters:") );
+    lbl_chars.xalign = 0;
     _stats_chars  = new Label( "0" );
+    _stats_chars.xalign = 0;
 
-    var lbl_words = new Label( _( "Words:" ) );
+    var lbl_words = new Label( lmargin + _( "Words:" ) );
+    lbl_words.xalign = 0;
     _stats_words  = new Label( "0" );
+    _stats_words.xalign = 0;
 
-    var lbl_rows = new Label( _( "Rows:") );
+    var lbl_rows = new Label( lmargin + _( "Rows:") );
+    lbl_rows.xalign = 0;
     _stats_rows  = new Label( "0" );
+    _stats_rows.xalign = 0;
 
-    grid.attach( lbl_chars, 0, 0 );
-    grid.attach( _stats_chars, 1, 0 );
-    grid.attach( lbl_words, 0, 1 );
-    grid.attach( _stats_words, 1, 1 );
-    grid.attach( lbl_rows, 0, 2 );
-    grid.attach( _stats_rows, 1, 2 );
+    var group_tasks = new Label( _( "<b>Checkbox Statistics</b>" ) );
+    group_tasks.xalign     = 0;
+    group_tasks.use_markup = true;
+
+    var lbl_ttotal = new Label( lmargin + _( "Total:" ) );
+    lbl_ttotal.xalign = 0;
+    _stats_ttotal  = new Label( "0" );
+    _stats_ttotal.xalign = 0;
+
+    var lbl_topen = new Label( lmargin + _( "Incomplete:" ) );
+    lbl_topen.xalign = 0;
+    _stats_topen  = new Label( "0" );
+    _stats_topen.xalign = 0;
+
+    var lbl_tip   = new Label( lmargin + _( "In Progress:" ) );
+    lbl_tip.xalign = 0;
+    _stats_tip    = new Label( "0" );
+    _stats_tip.xalign = 0;
+
+    var lbl_tdone = new Label( lmargin + _( "Completed:" ) );
+    lbl_tdone.xalign = 0;
+    _stats_tdone  = new Label( "0" );
+    _stats_tdone.xalign = 0;
+
+    grid.attach( group_text,    0, 0, 2 );
+    grid.attach( lbl_chars,     0, 1 );
+    grid.attach( _stats_chars,  1, 1 );
+    grid.attach( lbl_words,     0, 2 );
+    grid.attach( _stats_words,  1, 2 );
+    grid.attach( lbl_rows,      0, 3 );
+    grid.attach( _stats_rows,   1, 3 );
+    grid.attach( new Separator( Orientation.HORIZONTAL ), 0, 4, 2 );
+    grid.attach( group_tasks,   0, 5, 2 );
+    grid.attach( lbl_ttotal,    0, 6 );
+    grid.attach( _stats_ttotal, 1, 6 );
+    grid.attach( lbl_topen,     0, 7 );
+    grid.attach( _stats_topen,  1, 7 );
+    grid.attach( lbl_tip,       0, 8 );
+    grid.attach( _stats_tip,    1, 8 );
+    grid.attach( lbl_tdone,     0, 9 );
+    grid.attach( _stats_tdone,  1, 9 );
     grid.show_all();
 
     /* Create the popover and associate it with the menu button */
@@ -483,10 +534,24 @@ public class MainWindow : ApplicationWindow {
   /* Toggle the statistics bar */
   private void stats_clicked() {
     int char_count, word_count, row_count;
-    get_current_table( "toggle_stats" ).calculate_statistics( out char_count, out word_count, out row_count );
+    int tasks_open, tasks_doing, tasks_done;
+    get_current_table( "toggle_stats" ).calculate_statistics(
+      out char_count, out word_count, out row_count,
+      out tasks_open, out tasks_doing, out tasks_done );
+    var task_total = tasks_open + tasks_doing + tasks_done;
     _stats_chars.label = char_count.to_string();
     _stats_words.label = word_count.to_string();
     _stats_rows.label  = row_count.to_string();
+    _stats_ttotal.label = task_total.to_string();
+    if( task_total > 0 ) {
+      _stats_topen.label = "%d  (%d%%)".printf( tasks_open,  (int)(((tasks_open  * 1.0) / task_total) * 100) );
+      _stats_tip.label   = "%d  (%d%%)".printf( tasks_doing, (int)(((tasks_doing * 1.0) / task_total) * 100) );
+      _stats_tdone.label = "%d  (%d%%)".printf( tasks_done,  (int)(((tasks_done  * 1.0) / task_total) * 100) );
+    } else {
+      _stats_topen.label = "--";
+      _stats_tip.label   = "--";
+      _stats_tdone.label = "--";
+    }
   }
 
   /* Adds the export functionality */
