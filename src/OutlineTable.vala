@@ -1992,25 +1992,43 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Calculates the statistics for the current node */
-  private void update_node_statistics( Node node, ref int char_count, ref int word_count, ref int row_count ) {
+  private void update_node_statistics( Node node,
+    ref int char_count, ref int word_count, ref int row_count,
+    ref int tasks_open, ref int tasks_doing, ref int tasks_done
+  ) {
     var name = node.name.text.text;
     var note = node.note.text.text;
     char_count += (name.char_count() + note.char_count());
     word_count += (name.strip().split_set( " \t\r\n" ).length +
                    note.strip().split_set( " \t\r\n" ).length);
     row_count++;
+    switch( node.task ) {
+      case NodeTaskMode.OPEN  :  tasks_open++;  break;
+      case NodeTaskMode.DOING :  tasks_doing++;  break;
+      case NodeTaskMode.DONE  :  tasks_done++;   break;
+    }
     for( int i=0; i<node.children.length; i++ ) {
-      update_node_statistics( node.children.index( i ), ref char_count, ref word_count, ref row_count );
+      update_node_statistics( node.children.index( i ),
+        ref char_count, ref word_count, ref row_count,
+        ref tasks_open, ref tasks_doing, ref tasks_done );
     }
   }
 
   /* Calculate all of the document statistics and return them */
-  public void calculate_statistics( out int char_count, out int word_count, out int row_count ) {
-    char_count = 0;
-    word_count = 0;
-    row_count  = 0;
+  public void calculate_statistics(
+    out int char_count, out int word_count, out int row_count,
+    out int tasks_open, out int tasks_doing, out int tasks_done
+  ) {
+    char_count  = 0;
+    word_count  = 0;
+    row_count   = 0;
+    tasks_open  = 0;
+    tasks_doing = 0;
+    tasks_done  = 0;
     for( int i=0; i<root.children.length; i++ ) {
-      update_node_statistics( root.children.index( i ), ref char_count, ref word_count, ref row_count );
+      update_node_statistics( root.children.index( i ),
+        ref char_count, ref word_count, ref row_count,
+        ref tasks_open, ref tasks_doing, ref tasks_done );
     }
   }
 
