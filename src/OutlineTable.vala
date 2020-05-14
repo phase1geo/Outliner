@@ -26,6 +26,8 @@ using Gee;
 
 public class OutlineTable : DrawingArea {
 
+  private const CursorType url_cursor = CursorType.HAND2;
+
   private MainWindow      _win;
   private Document        _doc;
   private Node?           _selected = null;
@@ -33,6 +35,8 @@ public class OutlineTable : DrawingArea {
   private bool            _active_to_select;
   private double          _press_x;
   private double          _press_y;
+  private double          _motion_x;
+  private double          _motion_y;
   private bool            _pressed    = false;
   private EventType       _press_type = EventType.NOTHING;
   private bool            _motion     = false;
@@ -218,6 +222,7 @@ public class OutlineTable : DrawingArea {
     this.motion_notify_event.connect( on_motion );
     this.button_release_event.connect( on_release );
     this.key_press_event.connect( on_keypress );
+    this.key_release_event.connect( on_keyrelease );
     this.size_allocate.connect( (a) => {
       see_internal();
     });
@@ -525,7 +530,9 @@ public class OutlineTable : DrawingArea {
   /* Handle mouse motion */
   private bool on_motion( EventMotion e ) {
 
-    _motion = true;
+    _motion   = true;
+    _motion_x = e.x;
+    _motion_y = e.y;
 
     if( _pressed ) {
 
@@ -578,6 +585,7 @@ public class OutlineTable : DrawingArea {
 
       /* Get the current node */
       var current = node_at_coordinates( e.x, e.y );
+      var control = (bool)(e.state & ModifierType.CONTROL_MASK);
 
       /* Check the location of the cursor and update the UI appropriately */
       if( current != null ) {
@@ -589,9 +597,19 @@ public class OutlineTable : DrawingArea {
           set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
           set_cursor( null );
         } else if( current.is_within_name( e.x, e.y ) ) {
-          set_cursor( CursorType.XTERM );
+          string url = "";
+          if( control && !is_node_editable() && current.name.is_within_url( e.x, e.y, ref url ) ) {
+            set_cursor( url_cursor );
+          } else {
+            set_cursor( CursorType.XTERM );
+          }
         } else if( current.is_within_note( e.x, e.y ) ) {
-          set_cursor( CursorType.XTERM );
+          string url = "";
+          if( control && !is_note_editable() && current.note.is_within_url( e.x, e.y, ref url ) ) {
+            set_cursor( url_cursor );
+          } else {
+            set_cursor( CursorType.XTERM );
+          }
         } else {
           set_cursor( null );
         }
@@ -750,6 +768,7 @@ public class OutlineTable : DrawingArea {
             case 65364 :  handle_down( shift );       break;
             case 65365 :  handle_pageup();            break;
             case 65366 :  handle_pagedn();            break;
+            case 65507 :  handle_control( true );     break;
             default    :  handle_printable( e.str );  break;
           }
         }
@@ -761,6 +780,34 @@ public class OutlineTable : DrawingArea {
 
     return( true );
 
+  }
+
+  /* Called whenever a key is released */
+  private bool on_keyrelease( EventKey e ) {
+    if( e.keyval == 65507 ) {
+      handle_control( false );
+    }
+    return( true );
+  }
+
+  private void handle_control( bool pressed ) {
+    string url = "";
+    var current = node_at_coordinates( _motion_x, _motion_y );
+    if( current != null ) {
+      if( !is_node_editable() && current.name.is_within_url( _motion_x, _motion_y, ref url ) ) {
+        if( pressed ) {
+          set_cursor( url_cursor );
+        } else {
+          set_cursor( null );
+        }
+      } else if( !is_note_editable() && current.note.is_within_url( _motion_x, _motion_y, ref url ) ) {
+        if( pressed ) {
+          set_cursor( url_cursor );
+        } else {
+          set_cursor( null );
+        }
+      }
+    }
   }
 
   /* Displays the contextual menu based on what is currently selected */
