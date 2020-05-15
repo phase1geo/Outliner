@@ -331,6 +331,7 @@ public class OutlineTable : DrawingArea {
     var vp = parent.parent as Viewport;
     var vh = vp.get_allocated_height();
     get_window_ys( out y1, out y2 );
+    if( (y2 - y1) <= 1 ) return;
     switch( node.mode ) {
       case NodeMode.EDITABLE :
         node.name.get_cursor_pos( out x, out ytop, out ybot );
