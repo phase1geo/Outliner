@@ -31,9 +31,9 @@ public class ThemeDark : Theme {
     label = _( "Dark" );
 
     /* Generate the non-link colors */
-    even               = get_color( "#000000" );
+    even               = get_color( "#333333" );
     odd                = get_color( "#444444" );
-    background         = get_color( "#000000" );
+    background         = get_color( "#333333" );
     foreground         = get_color( "#e0e0e0" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );

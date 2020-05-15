@@ -42,11 +42,19 @@ public class MainWindow : ApplicationWindow {
   private Button?         _undo_btn       = null;
   private Button?         _redo_btn       = null;
   private SpinButton      _zoom;
+  private double          _zoom_factor    = 1.0;
   private Granite.Widgets.ModeButton _list_types;
+  private FontButton      _fonts_name;
+  private FontButton      _fonts_note;
   private Switch          _condensed;
+  private Switch          _show_tasks;
   private Label           _stats_chars;
   private Label           _stats_words;
   private Label           _stats_rows;
+  private Label           _stats_ttotal;
+  private Label           _stats_topen;
+  private Label           _stats_tip;
+  private Label           _stats_tdone;
   private bool            _debug          = false;
   private bool            _prefer_dark    = false;
   private HashMap<string,RadioButton> _theme_buttons;
@@ -65,6 +73,7 @@ public class MainWindow : ApplicationWindow {
     { "action_export",        action_export },
     { "action_print",         action_print },
     { "action_shortcuts",     action_shortcuts },
+    { "action_reset_fonts",   action_reset_fonts },
     { "action_zoom_in1",      action_zoom_in },
     { "action_zoom_in2",      action_zoom_in },
     { "action_zoom_out",      action_zoom_out },
@@ -127,6 +136,7 @@ public class MainWindow : ApplicationWindow {
     _nb.tab_reordered.connect( tab_reordered );
     _nb.tab_removed.connect( tab_removed );
     _nb.close_tab_requested.connect( close_tab_requested );
+    _nb.get_style_context().add_class( Gtk.STYLE_CLASS_INLINE_TOOLBAR );
 
     /* Create title toolbar */
     var new_btn = new Button.from_icon_name( "document-new", IconSize.LARGE_TOOLBAR );
@@ -227,8 +237,10 @@ public class MainWindow : ApplicationWindow {
   private void tab_changed( Tab tab ) {
     var ot = get_table( tab );
     do_buffer_changed( ot.undo_buffer );
+    do_fonts_changed( ot );
     update_title( ot );
     canvas_changed( ot );
+    ot.update_theme();
     save_tab_state( tab );
   }
 
@@ -270,6 +282,7 @@ public class MainWindow : ApplicationWindow {
     ot.map_event.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
+    ot.theme_changed.connect( theme_changed );
 
     if( fname != null ) {
       ot.document.filename = fname;
@@ -410,6 +423,7 @@ public class MainWindow : ApplicationWindow {
     app.set_accels_for_action( "win.action_redo",        { "<Control><Shift>z" } );
     app.set_accels_for_action( "win.action_search",      { "<Control>f" } );
     app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
+    app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
     app.set_accels_for_action( "win.action_shortcuts",   { "F1" } );
     app.set_accels_for_action( "win.action_zoom_in1",    { "<Control>plus" } );
@@ -441,24 +455,71 @@ public class MainWindow : ApplicationWindow {
     var grid = new Grid();
     grid.border_width       = 10;
     grid.row_spacing        = 10;
-    grid.column_homogeneous = true;
+    // grid.column_homogeneous = true;
     grid.column_spacing     = 10;
 
-    var lbl_chars = new Label( _( "Characters" ) + ":" );
+    var lmargin = "    ";
+
+    var group_text = new Label( _( "<b>Text Statistics</b>" ) );
+    group_text.xalign     = 0;
+    group_text.use_markup = true;
+
+    var lbl_chars = new Label( lmargin + _( "Characters:") );
+    lbl_chars.xalign = 0;
     _stats_chars  = new Label( "0" );
+    _stats_chars.xalign = 0;
 
-    var lbl_words = new Label( _( "Words" ) + ":" );
+    var lbl_words = new Label( lmargin + _( "Words:" ) );
+    lbl_words.xalign = 0;
     _stats_words  = new Label( "0" );
+    _stats_words.xalign = 0;
 
-    var lbl_rows = new Label( _( "Rows" ) + ":" );
+    var lbl_rows = new Label( lmargin + _( "Rows:") );
+    lbl_rows.xalign = 0;
     _stats_rows  = new Label( "0" );
+    _stats_rows.xalign = 0;
 
-    grid.attach( lbl_chars, 0, 0 );
-    grid.attach( _stats_chars, 1, 0 );
-    grid.attach( lbl_words, 0, 1 );
-    grid.attach( _stats_words, 1, 1 );
-    grid.attach( lbl_rows, 0, 2 );
-    grid.attach( _stats_rows, 1, 2 );
+    var group_tasks = new Label( _( "<b>Checkbox Statistics</b>" ) );
+    group_tasks.xalign     = 0;
+    group_tasks.use_markup = true;
+
+    var lbl_ttotal = new Label( lmargin + _( "Total:" ) );
+    lbl_ttotal.xalign = 0;
+    _stats_ttotal  = new Label( "0" );
+    _stats_ttotal.xalign = 0;
+
+    var lbl_topen = new Label( lmargin + _( "Incomplete:" ) );
+    lbl_topen.xalign = 0;
+    _stats_topen  = new Label( "0" );
+    _stats_topen.xalign = 0;
+
+    var lbl_tip   = new Label( lmargin + _( "In Progress:" ) );
+    lbl_tip.xalign = 0;
+    _stats_tip    = new Label( "0" );
+    _stats_tip.xalign = 0;
+
+    var lbl_tdone = new Label( lmargin + _( "Completed:" ) );
+    lbl_tdone.xalign = 0;
+    _stats_tdone  = new Label( "0" );
+    _stats_tdone.xalign = 0;
+
+    grid.attach( group_text,    0, 0, 2 );
+    grid.attach( lbl_chars,     0, 1 );
+    grid.attach( _stats_chars,  1, 1 );
+    grid.attach( lbl_words,     0, 2 );
+    grid.attach( _stats_words,  1, 2 );
+    grid.attach( lbl_rows,      0, 3 );
+    grid.attach( _stats_rows,   1, 3 );
+    grid.attach( new Separator( Orientation.HORIZONTAL ), 0, 4, 2 );
+    grid.attach( group_tasks,   0, 5, 2 );
+    grid.attach( lbl_ttotal,    0, 6 );
+    grid.attach( _stats_ttotal, 1, 6 );
+    grid.attach( lbl_topen,     0, 7 );
+    grid.attach( _stats_topen,  1, 7 );
+    grid.attach( lbl_tip,       0, 8 );
+    grid.attach( _stats_tip,    1, 8 );
+    grid.attach( lbl_tdone,     0, 9 );
+    grid.attach( _stats_tdone,  1, 9 );
     grid.show_all();
 
     /* Create the popover and associate it with the menu button */
@@ -473,10 +534,24 @@ public class MainWindow : ApplicationWindow {
   /* Toggle the statistics bar */
   private void stats_clicked() {
     int char_count, word_count, row_count;
-    get_current_table( "toggle_stats" ).calculate_statistics( out char_count, out word_count, out row_count );
+    int tasks_open, tasks_doing, tasks_done;
+    get_current_table( "toggle_stats" ).calculate_statistics(
+      out char_count, out word_count, out row_count,
+      out tasks_open, out tasks_doing, out tasks_done );
+    var task_total = tasks_open + tasks_doing + tasks_done;
     _stats_chars.label = char_count.to_string();
     _stats_words.label = word_count.to_string();
     _stats_rows.label  = row_count.to_string();
+    _stats_ttotal.label = task_total.to_string();
+    if( task_total > 0 ) {
+      _stats_topen.label = "%d  (%d%%)".printf( tasks_open,  (int)(((tasks_open  * 1.0) / task_total) * 100) );
+      _stats_tip.label   = "%d  (%d%%)".printf( tasks_doing, (int)(((tasks_doing * 1.0) / task_total) * 100) );
+      _stats_tdone.label = "%d  (%d%%)".printf( tasks_done,  (int)(((tasks_done  * 1.0) / task_total) * 100) );
+    } else {
+      _stats_topen.label = "--";
+      _stats_tip.label   = "--";
+      _stats_tdone.label = "--";
+    }
   }
 
   /* Adds the export functionality */
@@ -492,11 +567,11 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 5 );
 
     var export = new ModelButton();
-    export.text = _( "Export..." );
+    export.text        = _( "Export…" );
     export.action_name = "win.action_export";
 
     var print = new ModelButton();
-    print.text = _( "Print" );
+    print.text        = _( "Print…" );
     print.action_name = "win.action_print";
     print.set_sensitive( false );
 
@@ -526,9 +601,9 @@ public class MainWindow : ApplicationWindow {
     var box = new Box( Orientation.VERTICAL, 0 );
 
     var zoom_box = new Box( Orientation.HORIZONTAL, 0 );
-    var zoom_lbl = new Label( _( "Zoom" ) + " %:" );
+    var zoom_lbl = new Label( _( "Zoom (%):" ) );
 
-    _zoom = new SpinButton.with_range( 25, 200, 25 );
+    _zoom = new SpinButton.with_range( 100, 225, 25 );
     _zoom.set_value( 100 );
     _zoom.value_changed.connect( zoom_changed );
 
@@ -580,9 +655,49 @@ public class MainWindow : ApplicationWindow {
     ltbox.pack_end(   _list_types, false, false, 10 );
     box.pack_start( ltbox, false, false, 10 );
 
+    /* Add row font selection button */
+    var f1box = new Box( Orientation.HORIZONTAL, 0 );
+    var f1lbl = new Label( _( "Row Font:" ) );
+    _fonts_name = new FontButton();
+    _fonts_name.show_style = false;
+    _fonts_name.set_filter_func( (family, face) => {
+      var fd     = face.describe();
+      var weight = fd.get_weight();
+      var style  = fd.get_style();
+      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+    });
+    _fonts_name.font_set.connect(() => {
+      var table = get_current_table();
+      table.change_name_font( _fonts_name.get_font_family().get_name(), (_fonts_name.get_font_size() / Pango.SCALE) );
+    });
+
+    f1box.pack_start( f1lbl,   false, false, 10 );
+    f1box.pack_end(   _fonts_name, false, false, 10 );
+    box.pack_start( f1box, false, false, 10 );
+
+    /* Add row font selection button */
+    var f2box = new Box( Orientation.HORIZONTAL, 0 );
+    var f2lbl = new Label( _( "Note Font:" ) );
+    _fonts_note = new FontButton();
+    _fonts_note.show_style = false;
+    _fonts_note.set_filter_func( (family, face) => {
+      var fd     = face.describe();
+      var weight = fd.get_weight();
+      var style  = fd.get_style();
+      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+    });
+    _fonts_note.font_set.connect(() => {
+      var table = get_current_table();
+      table.change_note_font( _fonts_note.get_font_family().get_name(), (_fonts_note.get_font_size() / Pango.SCALE) );
+    });
+
+    f2box.pack_start( f2lbl,       false, false, 10 );
+    f2box.pack_end(   _fonts_note, false, false, 10 );
+    box.pack_start( f2box, false, false, 10 );
+
     /* Add condensed mode switch */
-    var cbox      = new Box( Orientation.HORIZONTAL, 0 );
-    var clbl      = new Label( _( "Condensed Mode" ) );
+    var cbox = new Box( Orientation.HORIZONTAL, 0 );
+    var clbl = new Label( _( "Condensed Mode:" ) );
     _condensed = new Switch();
     _condensed.state_set.connect( (state) => {
       var table = get_current_table();
@@ -593,14 +708,36 @@ public class MainWindow : ApplicationWindow {
     cbox.pack_end(   _condensed, false, false, 10 );
     box.pack_start( cbox, false, false, 10 );
 
+    /* Add show tasks switch */
+    var tbox = new Box( Orientation.HORIZONTAL, 0 );
+    var tlbl = new Label( _( "Show Checkboxes" ) );
+    _show_tasks = new Switch();
+    _show_tasks.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.show_tasks = state;
+      return( false );
+    });
+    tbox.pack_start( tlbl,        false, true,  10 );
+    tbox.pack_end(   _show_tasks, false, false, 10 );
+    box.pack_start( tbox, false, false, 10 );
+
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
+
+    var btn_box = new Box( Orientation.VERTICAL, 0 );
 
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
     shortcuts.text = _( "Shortcuts Cheatsheet" );
     shortcuts.action_name = "win.action_shortcuts";
-    box.pack_start( shortcuts, false, false, 10 );
+    btn_box.pack_start( shortcuts, false, false, 5 );
+
+    var reset_fonts = new ModelButton();
+    reset_fonts.text = _( "Reset Fonts to Defaults" );
+    reset_fonts.action_name = "win.action_reset_fonts";
+    btn_box.pack_start( reset_fonts, false, false, 5 );
+
+    box.pack_start( btn_box, false, false, 0 );
 
     box.show_all();
 
@@ -611,24 +748,19 @@ public class MainWindow : ApplicationWindow {
 
   }
 
+  /* Returns the current zoom factor */
+  public double get_zoom_factor() {
+    return( _zoom_factor );
+  }
+
   /* Called whenever the user changes the zoom level */
   private void zoom_changed() {
 
     var table = get_current_table( "zoom_changed" );
-    var zoom  = (int)_zoom.get_value();
 
-    switch( zoom ) {
-      case 25  :  table.zoom_changed(  9, 7,  2 );   break;
-      case 50  :  table.zoom_changed( 10, 8,  3 );   break;
-      case 75  :  table.zoom_changed( 11, 9,  4 );   break;
-      case 100 :  table.zoom_changed( 12, 10, 5 );   break;
-      case 125 :  table.zoom_changed( 13, 11, 6 );   break;
-      case 150 :  table.zoom_changed( 14, 12, 7 );   break;
-      case 175 :  table.zoom_changed( 15, 13, 8 );   break;
-      case 200 :  table.zoom_changed( 16, 14, 9 );   break;
-      default  :  table.zoom_changed( 12, 10, 10 );  break;
-    }
+    _zoom_factor = _zoom.get_value() / 100;
 
+    table.zoom_changed();
     queue_draw();
 
   }
@@ -806,6 +938,22 @@ public class MainWindow : ApplicationWindow {
     _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.redo_tooltip(), "<Control><Shift>z" ) );
   }
 
+  /* Called whenever the tab is changed to update the current document's font information */
+  private void do_fonts_changed( OutlineTable ot ) {
+    var name_fd = _fonts_name.get_font_desc();
+    var note_fd = _fonts_note.get_font_desc();
+    if( ot.name_font_family != null ) {
+      name_fd.set_family( ot.name_font_family );
+    }
+    if( ot.note_font_family != null ) {
+      name_fd.set_family( ot.note_font_family );
+    }
+    name_fd.set_size( (int)(ot.name_font_size * Pango.SCALE) );
+    note_fd.set_size( (int)(ot.note_font_size * Pango.SCALE) );
+    _fonts_name.set_font_desc( name_fd );
+    _fonts_note.set_font_desc( note_fd );
+  }
+
   /* Allow the user to select a filename to save the document as */
   public bool save_file( OutlineTable ot ) {
     FileChooserDialog dialog = new FileChooserDialog( _( "Save File" ), this, FileChooserAction.SAVE,
@@ -881,7 +1029,7 @@ public class MainWindow : ApplicationWindow {
   /* Called when the user uses the Control-Plus/Equal shortcut */
   private void action_zoom_in() {
     var value = (int)_zoom.get_value();
-    if( value < 200 ) {
+    if( value < 225 ) {
       _zoom.set_value( value + 25 );
     }
   }
@@ -889,7 +1037,7 @@ public class MainWindow : ApplicationWindow {
   /* Called when the user uses the Control-Minus shortcut */
   private void action_zoom_out() {
     var value = (int)_zoom.get_value();
-    if( value > 25 ) {
+    if( value > 100 ) {
       _zoom.set_value( value - 25 );
     }
   }
@@ -999,9 +1147,9 @@ public class MainWindow : ApplicationWindow {
   private void properties_clicked() {
     var table      = get_current_table( "properties_clicked" );
     var theme_name = table.get_theme().name;
-    var condensed  = table.condensed;
     _theme_buttons.get( theme_name ).active = true;
-    _condensed.state     = condensed;
+    _condensed.state     = table.condensed;
+    _show_tasks.state    = table.show_tasks;
     _list_types.selected = table.list_type;
   }
 
@@ -1028,6 +1176,24 @@ public class MainWindow : ApplicationWindow {
     }
 
     win.show();
+
+  }
+
+  /* Called whenever the user selects the reset fonts button in the properties popover */
+  private void action_reset_fonts() {
+
+    var table       = get_current_table( "action_reset_fonts" );
+    var name_family = _settings.get_string( "default-row-font-family" );
+    var note_family = _settings.get_string( "default-note-font-family" );
+    var name_size   = _settings.get_int( "default-row-font-size" );
+    var note_size   = _settings.get_int( "default-note-font-size" );
+
+    /* Update the table */
+    table.change_name_font( name_family, name_size );
+    table.change_note_font( note_family, note_size );
+
+    /* Update the UI */
+    do_fonts_changed( table );
 
   }
 

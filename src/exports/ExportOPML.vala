@@ -76,6 +76,11 @@ public class ExportOPML : Object {
     var name_html = ExportHTML.from_text( node.name.text, 0, node.name.text.text.char_count() );
     n->new_prop( "text", name_html );
 
+    /* Add the task */
+    if( node.task != NodeTaskMode.NONE ) {
+      n->new_prop( "checked", (node.task == NodeTaskMode.DONE).to_string() );
+    }
+
     /* Add the note */
     if( node.note.text.text != "" ) {
       var note_html = ExportHTML.from_text( node.note.text, 0, node.note.text.text.char_count() );
@@ -172,8 +177,13 @@ public class ExportOPML : Object {
     /* Get the node name */
     string? t = n->get_prop( "text" );
     if( t != null ) {
-      stdout.printf( "t: %s\n", t );
       ExportHTML.to_text( "<div>" + t + "</div>", node.name.text );
+    }
+
+    /* Add the task */
+    var c = n->get_prop( "checked" );
+    if( c != null ) {
+      node.task = bool.parse( c ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
     }
 
     /* Get the note information */

@@ -35,13 +35,12 @@ public class FormatBar : Gtk.Popover {
   private ToggleButton _super;
   private ToggleButton _sub;
   private MenuButton   _header;
-  private ToggleButton _hilite;
-  private ColorButton  _hilite_chooser;
-  private ToggleButton _color;
-  private ColorButton  _color_chooser;
+  private ColorPicker  _hilite;
+  private ColorPicker  _color;
   private ToggleButton _link;
   private bool         _ignore_active = false;
   private LinkEditor   _link_editor;
+  private Button       _clear;
 
   /* Construct the formatting bar */
   public FormatBar( OutlineTable table ) {
@@ -67,50 +66,51 @@ public class FormatBar : Gtk.Popover {
     _cut.clicked.connect( handle_cut );
 
     _bold = new ToggleButton();
-    _bold.image  = new Image.from_icon_name( "format-text-bold-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _bold, "<b>B</b>" );
     _bold.relief = ReliefStyle.NONE;
     _bold.set_tooltip_markup( Utils.tooltip_with_accel( _( "Bold" ), "<Control>b" ) );
     _bold.toggled.connect( handle_bold );
 
     _italics = new ToggleButton();
-    _italics.image  = new Image.from_icon_name( "format-text-italic-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _italics, "<i>I</i>" );
     _italics.relief = ReliefStyle.NONE;
     _italics.set_tooltip_markup( Utils.tooltip_with_accel( _( "Italic" ), "<Control>i" ) );
     _italics.toggled.connect( handle_italics );
 
     _underline = new ToggleButton();
-    _underline.image  = new Image.from_icon_name( "format-text-underline-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _underline, "<u>U</u>" );
     _underline.relief = ReliefStyle.NONE;
     _underline.set_tooltip_text( _( "Underline" ) );
     _underline.toggled.connect( handle_underline );
 
     _strike = new ToggleButton();
-    _strike.image  = new Image.from_icon_name( "format-text-strikethrough-symbolic", IconSize.SMALL_TOOLBAR );
+    add_markup( _strike, "<s>S</s>" );
     _strike.relief = ReliefStyle.NONE;
     _strike.set_tooltip_text( _( "Strikethrough" ) );
     _strike.toggled.connect( handle_strikethru );
 
     _code = new ToggleButton();
-    _code.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/code-symbolic" );
+    add_markup( _code, "{ }" );
     _code.relief = ReliefStyle.NONE;
     _code.set_tooltip_text( _( "Code Block" ) );
     _code.toggled.connect( handle_code );
 
     _super = new ToggleButton();
-    _super.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/superscript-symbolic" );
+    add_markup( _super, "A<sup>x</sup>" );
     _super.relief = ReliefStyle.NONE;
     _super.set_tooltip_text( _( "Superscript" ) );
     _super.toggled.connect( handle_superscript );
 
     _sub = new ToggleButton();
-    _sub.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/subscript-symbolic" );
+    add_markup( _sub, "A<sub>x</sub>" );
     _sub.relief = ReliefStyle.NONE;
     _sub.set_tooltip_text( _( "Subscript" ) );
     _sub.toggled.connect( handle_subscript );
 
     _header = new MenuButton();
-    _header.image = new Image.from_resource( "/com/github/phase1geo/outliner/images/header-symbolic" );
+    add_markup( _header, "H<i>x</i>" );
     _header.relief = ReliefStyle.NONE;
+    _header.set_tooltip_text( _( "Header" ) );
     _header.popup = new Gtk.Menu();
     unowned SList<RadioMenuItem>? group = null;
     for( int i=0; i<7; i++ ) {
@@ -126,39 +126,26 @@ public class FormatBar : Gtk.Popover {
     }
     _header.popup.show_all();
 
-    _hilite        = new ToggleButton();
-    _hilite.label  = " ";
-    _hilite.relief = ReliefStyle.NONE;
-    _hilite.set_tooltip_text( _( "Apply Highlight Color" ) );
-    _hilite.toggled.connect( handle_highlight );
-    _hilite.get_style_context().add_class( "hilite" );
+    _hilite = new ColorPicker( get_hilite_color(), ColorPickerType.HCOLOR );
+    _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
+    _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
+    _hilite.color_changed.connect( handle_hilite );
 
-    _hilite_chooser = new ColorButton.with_rgba( get_hilite_color() );
-    _hilite_chooser.label  = "\u23f7";
-    _hilite_chooser.relief = ReliefStyle.NONE;
-    _hilite_chooser.set_tooltip_text( _( "Change Highlight Color" ) );
-    _hilite_chooser.color_set.connect( handle_highlight_chooser );
-    _hilite_chooser.get_style_context().add_class( "color_chooser" );
-
-    _color        = new ToggleButton();
-    _color.label  = " ";
-    _color.relief = ReliefStyle.NONE;
-    _color.set_tooltip_text( "Apply Font Color" );
-    _color.toggled.connect( handle_color );
-    _color.get_style_context().add_class( "fcolor" );
-
-    _color_chooser = new ColorButton.with_rgba( get_font_color() );
-    _color_chooser.label  = "\u23f7";
-    _color_chooser.relief = ReliefStyle.NONE;
-    _color_chooser.set_tooltip_text( _( "Change Font Color" ) );
-    _color_chooser.color_set.connect( handle_color_chooser );
-    _color_chooser.get_style_context().add_class( "color_chooser" );
+    _color = new ColorPicker( get_font_color(), ColorPickerType.FCOLOR );
+    _color.set_toggle_tooltip( _( "Apply Font Color" ) );
+    _color.set_select_tooltip( _( "Change Font Color" ) );
+    _color.color_changed.connect( handle_color );
 
     _link = new ToggleButton();
     _link.image = new Image.from_icon_name( "insert-link-symbolic", IconSize.SMALL_TOOLBAR );
     _link.relief = ReliefStyle.NONE;
     _link.set_tooltip_text( _( "Link" ) );
     _link.toggled.connect( handle_link );
+
+    _clear = new Button.from_icon_name( "edit-clear-symbolic", IconSize.SMALL_TOOLBAR );
+    _clear.relief = ReliefStyle.NONE;
+    _clear.set_tooltip_text( _( "Clear all formatting" ) );
+    _clear.clicked.connect( handle_clear );
 
     var spacer = "    ";
 
@@ -172,18 +159,17 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _code,               false, false, 0 );
     box.pack_start( _header,             false, false, 0 );
+    box.pack_start( _link,               false, false, 0 );
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _super,              false, false, 0 );
     box.pack_start( _sub,                false, false, 0 );
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _hilite,             false, false, 0 );
-    box.pack_start( _hilite_chooser,     false, false, 0 );
     box.pack_start( new Label( spacer ), false, false, 0 );
     box.pack_start( _color,              false, false, 0 );
-    box.pack_start( _color_chooser,      false, false, 0 );
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-    box.pack_start( _link,               false, false, 0 );
+    box.pack_start( _clear,              false, false, 0 );
 
     add( box );
 
@@ -191,6 +177,12 @@ public class FormatBar : Gtk.Popover {
 
     initialize();
 
+  }
+
+  private void add_markup( Button btn, string markup ) {
+    var lbl = new Label( "<span size=\"large\">" + markup + "</span>" );
+    lbl.use_markup = true;
+    btn.image = lbl;
   }
 
   private RGBA get_hilite_color() {
@@ -344,9 +336,10 @@ public class FormatBar : Gtk.Popover {
   }
 
   /* Toggles the highlight status of the currently selected text */
-  private void handle_highlight() {
+  private void handle_hilite( RGBA? rgba ) {
     if( !_ignore_active ) {
-      if( _hilite.active ) {
+      if( rgba != null ) {
+        _table.hilite_color = Utils.color_from_rgba( rgba );
         format_text( FormatTag.HILITE, _table.hilite_color );
       } else {
         unformat_text( FormatTag.HILITE );
@@ -354,27 +347,16 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Picks a new color to set the selected text highlighter to */
-  private void handle_highlight_chooser() {
-    _table.hilite_color = Utils.color_from_rgba( _hilite_chooser.rgba );
-    format_text( FormatTag.HILITE, _table.hilite_color );
-  }
-
   /* Toggles the foreground color of the currently selected text */
-  private void handle_color() {
+  private void handle_color( RGBA? rgba ) {
     if( !_ignore_active ) {
-      if( _color.active ) {
+      if( rgba != null ) {
+        _table.font_color = Utils.color_from_rgba( rgba );
         format_text( FormatTag.COLOR, _table.font_color );
       } else {
         unformat_text( FormatTag.COLOR );
       }
     }
-  }
-
-  /* Picks a new color to set the selected foreground color to */
-  private void handle_color_chooser() {
-    _table.font_color = Utils.color_from_rgba( _color_chooser.rgba );
-    format_text( FormatTag.COLOR, _table.font_color );
   }
 
   /* Creates a link out of the currently selected text */
@@ -394,11 +376,42 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  /* Clears all tags from selected text */
+  private void handle_clear() {
+    if( _table.selected.mode == NodeMode.EDITABLE ) {
+      _table.selected.name.remove_all_tags( _table.undo_text );
+    } else {
+      _table.selected.note.remove_all_tags( _table.undo_text );
+    }
+    _ignore_active = true;
+    _bold.set_active( false );
+    _italics.set_active( false );
+    _underline.set_active( false );
+    _strike.set_active( false );
+    _code.set_active( false );
+    _super.set_active( false );
+    _sub.set_active( false );
+    _hilite.set_active( false );
+    _color.set_active( false );
+    _link.set_active( false );
+    activate_header( 0 );
+    _ignore_active = false;
+    _table.queue_draw();
+    _table.changed();
+    _table.grab_focus();
+  }
+
   /* Sets the active status of the given toggle button */
   private void set_toggle_button( CanvasText text, FormatTag tag, ToggleButton btn ) {
     btn.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
   }
 
+  /* Sets the active status of the given color picker */
+  private void set_color_picker( CanvasText text, FormatTag tag, ColorPicker cp ) {
+    cp.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
+  }
+
+  /* Sets the active status of the header menubutton */
   private void activate_header( int index ) {
     var buttons = _header.popup.get_children();
     var button  = (CheckMenuItem)buttons.nth_data( index );
@@ -435,8 +448,8 @@ public class FormatBar : Gtk.Popover {
     set_toggle_button( text, FormatTag.CODE,       _code );
     set_toggle_button( text, FormatTag.SUPER,      _super );
     set_toggle_button( text, FormatTag.SUB,        _sub );
-    set_toggle_button( text, FormatTag.HILITE,     _hilite );
-    set_toggle_button( text, FormatTag.COLOR,      _color );
+    set_color_picker(  text, FormatTag.HILITE,     _hilite );
+    set_color_picker(  text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );
     set_header( text );
     _ignore_active = false;

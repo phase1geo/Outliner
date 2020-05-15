@@ -5,8 +5,11 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Outliner</name>
+  <name xml:lang="fr">Outliner</name>
   <summary>Organize your words</summary>
+  <summary xml:lang="fr">Organisez vos mots</summary>
   <developer_name>Trevor Williams</developer_name>
+  <developer_name xml:lang="fr">Trevor Williams</developer_name>
   <provides>
     <binary>com.github.phase1geo.outliner</binary>
   </provides>
@@ -20,20 +23,34 @@
   </screenshots>
   <description>
     <p>Quickly create outlines and export them in a number of useful formats.</p>
+    <p xml:lang="fr">Créez rapidement des plans et exportez les dans un grand nombre de formats pratiques.</p>
     <ul>
       <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
+      <li xml:lang="fr">Créez et naviguez rapidement à travers des plans en utilisant le clavier ou la souris.</li>
       <li>Full support for text formatting.</li>
+      <li xml:lang="fr">Prise en charge complète de la mise en forme du texte.</li>
       <li>Add notes to any outline text.</li>
+      <li xml:lang="fr">Ajoutez des notes à n'importe quel élément de plan.</li>
       <li>Close/Hide any group within the outline for increased focus.</li>
+      <li xml:lang="fr">Fermez/Masquez un groupe à tout moment depuis le plan pour plus de concentration.</li>
       <li>Quick search and replace of any text within the document, including notes.</li>
+      <li xml:lang="fr">Cherchez et remplacez rapidement n'importe quel texte dans le document, notes incluses.</li>
       <li>View document statistics such as character count, word count and row count.</li>
+      <li xml:lang="fr">Visualisez les statistiques du document telles que le nombre de caractères, de mots et de lignes.</li>
       <li>Unlimited undo/redo of any change.</li>
+      <li xml:lang="fr">Nombre d'actions annuler/rétablir illimités pour toute modification.</li>
       <li>Automatically saves in the background.</li>
+      <li xml:lang="fr">Enregistrement automatique en arrière-plan.</li>
       <li>Open multiple outlines with the use of tabs.</li>
+      <li xml:lang="fr">Ouvrez plusieurs plans à la fois à l'aide des onglets.</li>
       <li>Built-in themes.</li>
+      <li xml:lang="fr">Thèmes intégrés.</li>
       <li>Import from Minder and OPML.</li>
+      <li xml:lang="fr">Importez des fichiers au format Minder ou OPML.</li>
       <li>Export to HTML, Markdown, Minder, OPML, PDF and PlainText.</li>
+      <li xml:lang="fr">Exportez au format HTML, Markdown, OPML, PDF et Texte brut.</li>
       <li>Printer support.</li>
+      <li xml:lang="fr">Prise en charge de l'impression.</li>
     </ul>
   </description>
   <content_rating type="oars-1.1">
@@ -75,38 +92,54 @@
     <value key="x-appcenter-suggested-price">10</value>
   </custom>
   <releases>
-    <release version="1.1.0" date="2020-04-08">
+    <release version="1.1.0" date="2020-04-20">
       <description>
         <p>New</p>
+        <p xml:lang="fr">Nouveau</p>
         <ul>
           <li>Added support for row cloning.</li>
-          <li>Added support for superscript and subscript text formatting.</li>
-          <li>Added support for using input methods to add text to rows and notes.</li>
-          <li>Added selection submenu to contextual menu.</li>
-          <li>Added new row selection commands: top, bottom, first child, previous sibling. next sibling, page up and page down.</li>
-          <li>Added support for moving selected rows via keyboard shortcuts.</li>
-          <li>Added ability to position the selected row at the top of the window.</li>
-          <li>Added ability to delete the previous or next word via Control-Backspace/Delete keyboard shortcut.</li>
+          <li xml:lang="fr">Ajout de la prise en charge du clonage de lignes.</li>
+          <li>Added French translation (thanks to Nathan Bonnemains).</li>
+          <li>Added Dutch translation (thanks to Heimen Stoffels).</li>
+          <li>Added support for subscript and superscript text formatting.</li>
+          <li>Added support for using input methods.</li>
+          <li>Added new keyboard shortcuts for selecting and moving rows.</li>
+          <li>Added new <em>H</em> keyboard shortcut for positioning currently selected row at the top of the window.</li>
+          <li>Added keyboard shortcuts for deleting the next or previous word.</li>
+          <li>Added new selection submenu to contextual menu.</li>
+          <li>Added clear formatting button to format bar.</li>
         </ul>
         <p>Changes</p>
+        <p xml:lang="fr">Modifications</p>
         <ul>
-          <li>Improved readability of text formatting bar.</li>
-          <li>Removed support for <em>m</em> command in selection traversal.</li>
-          <li>Version number now output to .outliner file.</li>
+          <li>Removed support for the <em>m</em> command.</li>
+          <li>Improved look of format bar, especially for dark themes.</li>
+          <li>Changed tab bar coloring to match the background color of the current tab.</li>
+          <li>Changed default filename from <em>unnamed</em> to be the translated name.</li>
+          <li>Improved undo/redo tooltips to look better in non-English translations.</li>
         </ul>
         <p>Bug Fixes</p>
+        <p xml:lang="fr">Corrections de bugs</p>
         <ul>
-          <li>Made metadata translatable (Thanks to Nathan Bonnemains).</li>
-          <li>Fixed screenshot URLs in metadata.</li>
-          <li>Fixed application crash when using the <em>a</em> command when top-level row is selected.</li>
-          <li>Fixed node showing/hiding.</li>
-          <li>Fixed issue with <em>New Document</em> plank command to add new tab after application data is loaded.</li>
+          <li>Fixed issue with deleting a single character for multi-byte characters.</li>
+          <li>Fixed application screenshots.</li>
+          <li>Fixed application crash when <em>a</em> command used when selected row is a top-level row.</li>
+          <li>Fixed issues with showing or hiding a note.</li>
+          <li>Fixed <em>New Document</em> plank command to open a new tab after loading application data.</li>
+          <li>Fixed theming issues when two tabs use different themes.</li>
+          <li>Fixed translation string issues (thanks to Nathan Bonnemains).</li>
+          <li>Fixed text positioning issues when tags are added to text.</li>
+          <li>Fixed issues with making shortcut cheatsheet text translatable.</li>
+          <li>Fixed application crash when moving a row to the top of the document.</li>
+          <li>Fixed title of shortcut cheatsheet.</li>
+          <li>Fixed application crashes and incorrectly placed rows when moving them via the mouse.</li>
         </ul>
       </description>
     </release>
     <release version="1.0.3" date="2020-03-26">
       <description>
         <p>Initial release!</p>
+        <p xml:lang="fr">Version initiale !</p>
       </description>
     </release>
   </releases>

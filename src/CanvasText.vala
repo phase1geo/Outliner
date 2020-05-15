@@ -41,6 +41,7 @@ public class CanvasText : Object {
   private double         _width        = 0;
   private double         _height       = 0;
   private bool           _debug        = false;
+  private int            _font_size    = 12;
 
   /* Signals */
   public signal void resized();
@@ -116,6 +117,7 @@ public class CanvasText : Object {
     _pango_layout = table.create_pango_layout( null );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    initialize_font_description();
     update_size( false );
   }
 
@@ -128,6 +130,7 @@ public class CanvasText : Object {
     _pango_layout = table.create_pango_layout( txt );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    initialize_font_description();
     update_size( false );
   }
 
@@ -136,11 +139,21 @@ public class CanvasText : Object {
     _text         = ct.text;
     _text.changed.connect( text_changed );
     _max_width    = max_width;
+    _font_size    = ct._font_size;
     _line_layout  = table.create_pango_layout( "M" );
     _pango_layout = table.create_pango_layout( ct.text.text );
     _pango_layout.set_wrap( Pango.WrapMode.WORD_CHAR );
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
+    initialize_font_description();
     update_size( false );
+  }
+
+  /* Allocates and initializes the font description for the layouts */
+  private void initialize_font_description() {
+    var fd = new Pango.FontDescription();
+    fd.set_size( _font_size * Pango.SCALE );
+    _line_layout.set_font_description( fd );
+    _pango_layout.set_font_description( fd );
   }
 
   /* Copies an existing CanvasText to this CanvasText */
@@ -148,6 +161,7 @@ public class CanvasText : Object {
     posx       = ct.posx;
     posy       = ct.posy;
     _max_width = ct._max_width;
+    _font_size = ct._font_size;
     _text.copy( ct.text );
     _line_layout.set_font_description( ct._pango_layout.get_font_description() );
     _pango_layout.set_font_description( ct._pango_layout.get_font_description() );
@@ -171,17 +185,22 @@ public class CanvasText : Object {
     update_size( true );
   }
 
-  /* Sets the font description to the given value */
-  public void set_font( FontDescription font ) {
-    _line_layout.set_font_description( font );
-    _pango_layout.set_font_description( font );
-    update_size( true );
+  /* Returns the font description set for this text */
+  public FontDescription get_font_fd() {
+    return( _line_layout.get_font_description() );
   }
 
   /* Sets the font size to the given size */
-  public void set_font_size( int size ) {
+  public void set_font( string? family = null, int? size = null, double zoom_factor = 1.0 ) {
     var fd = _line_layout.get_font_description();
-    fd.set_size( size * Pango.SCALE );
+    if( family != null ) {
+      fd.set_family( family );
+    }
+    if( size != null ) {
+      _font_size = size;
+    }
+    var fsize = _font_size * zoom_factor;
+    fd.set_size( (int)(fsize * Pango.SCALE) );
     _line_layout.set_font_description( fd );
     _pango_layout.set_font_description( fd );
     update_size( true );
@@ -765,11 +784,14 @@ public class CanvasText : Object {
   }
 
   /* Returns the x and y position of the given character position */
-  public void get_char_pos( int pos, out double x, out double y ) {
+  public void get_char_pos( int pos, out double left, out double top, out double bottom, out int line ) {
     var index = text.text.index_of_nth_char( pos );
     var rect  = _pango_layout.index_to_pos( index );
-    x = posx + (rect.x / Pango.SCALE);
-    y = posy + (rect.y / Pango.SCALE);
+    left   = posx + (rect.x / Pango.SCALE);
+    top    = posy + (rect.y / Pango.SCALE);
+    bottom = top + (rect.height / Pango.SCALE);
+    int x_pos;
+    _pango_layout.index_to_line_x( index, false, out line, out x_pos );
   }
 
   /* Returns a populated FormattedText instance containing the selected text range */
@@ -800,10 +822,12 @@ public class CanvasText : Object {
   }
 
   /* Removes the specified tag for the selected range */
-  public void remove_all_tags() {
+  public void remove_all_tags( UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
+    var tags = text.get_tags_in_range( spos, epos );
     text.remove_all_tags( spos, epos );
+    undo_buffer.add_tag_clear( spos, epos, tags, _cursor );
   }
 
   /*

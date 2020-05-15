@@ -38,7 +38,7 @@ public class ThemeSolarizedLight : Theme {
     root_background    = get_color( "#839496" );
     root_foreground    = get_color( "#FDF6E3" );
     nodesel_background = get_color( "#8cd5ff" );
-    nodesel_foreground = get_color( "#ffffff" );
+    nodesel_foreground = get_color( "#555555" );
     textsel_background = get_color( "#64baff" );
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "#586E75" );

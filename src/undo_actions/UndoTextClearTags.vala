@@ -19,36 +19,35 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public class UndoNodeDelete : UndoItem {
+public class UndoTextClearTags : UndoTextItem {
 
-  private Node  _node;
-  private Node? _parent;
-  private int   _index;
-  private Node? _insert_node;
+  public int                start { private set; get; }
+  public int                end   { private set; get; }
+  public Array<UndoTagInfo> tags  { private set; get; }
 
   /* Default constructor */
-  public UndoNodeDelete( Node node, Node? insert_node ) {
-    base( _( "delete item" ) );
-    _node        = node;
-    _parent      = node.parent;
-    _index       = node.index();
-    _insert_node = insert_node;
+  public UndoTextClearTags( int start, int end, Array<UndoTagInfo> tags, int cursor ) {
+    base( _( "clear formatting" ), UndoTextOp.TAGCLEAR, cursor, cursor );
+    this.start = start;
+    this.end   = end;
+    this.tags  = tags;
   }
 
   /* Causes the stored item to be put into the before state */
-  public override void undo( OutlineTable table ) {
-    if( _insert_node != null ) {
-      table.delete_node( _insert_node );
-    }
-    table.insert_node( _parent, _node, _index );
+  public override void undo_text( OutlineTable table, CanvasText ct ) {
+    ct.text.apply_tags( tags, start );
+    table.queue_draw();
   }
 
   /* Causes the stored item to be put into the after state */
-  public override void redo( OutlineTable table ) {
-    table.delete_node( _node );
-    if( _insert_node != null ) {
-      table.insert_node( table.root, _insert_node, 0 );
-    }
+  public override void redo_text( OutlineTable table, CanvasText ct ) {
+    ct.text.remove_all_tags( start, end );
+    table.queue_draw();
+  }
+
+  /* Merges the given item with the current one */
+  public override bool merge( CanvasText ct, UndoTextItem item ) {
+    return( false );
   }
 
 }

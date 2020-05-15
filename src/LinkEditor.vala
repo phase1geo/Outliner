@@ -40,7 +40,7 @@ public class LinkEditor : Popover {
     box.border_width = 5;
 
     var ebox  = new Box( Orientation.HORIZONTAL, 5 );
-    var lbl   = new Label( _( "URL" ) + ":" );
+    var lbl   = new Label( _( "URL:" ) );
     _entry = new Entry();
     _entry.width_chars = 50;
     _entry.input_purpose = InputPurpose.URL;
@@ -121,8 +121,9 @@ public class LinkEditor : Popover {
     text.get_cursor_info( out cursor, out selstart, out selend );
 
     /* Position the popover */
-    double left, top;
-    text.get_char_pos( selstart, out left, out top );
+    double left, top, bottom;
+    int    line;
+    text.get_char_pos( selstart, out left, out top, out bottom, out line );
     Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
     pointing_to = rect;
 

@@ -19,28 +19,28 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public class UndoNodeCut : UndoItem {
+public class UndoNodeReplace : UndoItem {
 
-  private Node  _node;
-  private Node? _parent;
-  private int   _index;
+  private Node _orig_node;
+  private Node _new_node;
 
-  /* Default constructor */
-  public UndoNodeCut( Node node ) {
-    base( _( "cut item" ) );
-    _node   = node;
-    _parent = node.parent;
-    _index  = node.index();
+  public UndoNodeReplace( Node orig_node, Node new_node ) {
+    base( _( "replace node") );
+    _orig_node = orig_node;
+    _new_node  = new_node;
   }
 
-  /* Causes the stored item to be put into the before state */
-  public override void undo( OutlineTable table ) {
-    table.insert_node( _parent, _node, _index );
+  public override void undo( OutlineTable ot ) {
+    ot.replace_node( _new_node, _orig_node );
+    ot.queue_draw();
+    ot.changed();
   }
 
-  /* Causes the stored item to be put into the after state */
-  public override void redo( OutlineTable table ) {
-    table.delete_node( _node );
+  public override void redo( OutlineTable ot ) {
+    ot.replace_node( _orig_node, _new_node );
+    ot.queue_draw();
+    ot.changed();
   }
 
 }
+

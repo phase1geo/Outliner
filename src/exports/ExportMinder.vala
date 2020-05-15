@@ -73,7 +73,7 @@ public class ExportMinder : Object {
     Xml.Node* root = new Xml.Node( null, "node" );
     Xml.Node* name = new Xml.Node( null, "nodename" );
     name->add_content( table.document.label );
-    export_node_properties( root );
+    export_node_properties( root, null );
     root->add_child( export_node_style() );
     root->add_child( name );
     return( root );
@@ -81,7 +81,7 @@ public class ExportMinder : Object {
 
   private static Xml.Node* export_node( Node node ) {
     Xml.Node* n = new Xml.Node( null, "node" );
-    export_node_properties( n );
+    export_node_properties( n, node );
     n->add_child( export_node_style() );
     n->add_child( export_node_formatting( node ) );
     n->add_child( export_node_name( node ) );
@@ -96,18 +96,16 @@ public class ExportMinder : Object {
     return( n );
   }
 
-  private static void export_node_properties( Xml.Node* node ) {
+  private static void export_node_properties( Xml.Node* n, Node? node ) {
     var next_id = id++;
-    node->set_prop( "id", next_id.to_string() );
-    // node->set_prop( "posx",     "0" );
-    // node->set_prop( "poxy",     "0" );
-    node->set_prop( "maxwidth", "200" );
-    // node->set_prop( "width",    "200" );
-    // node->set_prop( "height",   "50" );
-    node->set_prop( "side",     "right" );
-    node->set_prop( "fold",     "false" );
-    // node->set_prop( "treesize", "500" );
-    node->set_prop( "layout",   _( "To right" ) );
+    n->set_prop( "id", next_id.to_string() );
+    n->set_prop( "maxwidth", "200" );
+    n->set_prop( "side",     "right" );
+    n->set_prop( "fold",     "false" );
+    n->set_prop( "layout",   _( "To right" ) );
+    if( (node != null) && (node.children.length == 0) && (node.task != NodeTaskMode.NONE) ) {
+      n->set_prop( "task", ((node.task == NodeTaskMode.DONE) ? "1" : "0") );
+    }
   }
 
   private static Xml.Node* export_node_style() {
@@ -266,6 +264,11 @@ public class ExportMinder : Object {
     var f = n->get_prop( "fold" );
     if( f != null ) {
       node.expanded = !bool.parse( f );
+    }
+
+    var t = n->get_prop( "task" );
+    if( t != null ) {
+      node.task = bool.parse( t ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
     }
 
     /* Parse any children nodes */

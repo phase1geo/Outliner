@@ -62,19 +62,13 @@ public class Theme : Object {
   }
 
   /* Returns the CSS provider for this theme */
-  public CssProvider get_css_provider( string? hilite_color, string? font_color ) {
+  public CssProvider get_css_provider() {
 
     var provider = new CssProvider();
-    var hcolor   = hilite_color ?? hilite.to_string();
-    var fcolor   = font_color   ?? foreground.to_string();
 
     try {
-      var css_data = "@define-color colorPrimary @ORANGE_700; " +
-                     "@define-color textColorPrimary @SILVER_100; " +
-                     "@define-color colorAccent @ORANGE_700; " +
+      var css_data = "@define-color tab_base_color " + background.to_string() + ";" +
                      ".canvas { background: " + background.to_string() + "; } " +
-                     ".hilite { background: " + hcolor + "; } " +
-                     ".fcolor { background: " + fcolor + "; } " +
                      ".color_chooser { padding-right: 0px; padding-left: 0px; margin-right: 0px; margin-left: 0px }";
       provider.load_from_data( css_data );
     } catch( GLib.Error e ) {
