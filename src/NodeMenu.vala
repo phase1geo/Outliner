@@ -232,12 +232,11 @@ public class NodeMenu : Gtk.Menu {
     for( int i=0; i<9; i++ ) {
 
       var lbl_value = i + 1;
+      var index     = i;
 
       var move_item = new Gtk.CheckMenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
       move_item.activate.connect(() => {
-        _ot.labels.set_label( null, i );
-        _ot.queue_draw();
-        _ot.changed();
+        _ot.handle_control_number( index );
       });
       Utils.add_accel_label( move_item, (i + 49), Gdk.ModifierType.CONTROL_MASK );
       lbl_movemenu.add( move_item );
@@ -245,7 +244,7 @@ public class NodeMenu : Gtk.Menu {
 
       var sel_item = new Gtk.MenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
       sel_item.activate.connect(() => {
-        select_label( i );
+        select_label( index );
       });
       Utils.add_accel_label( sel_item, (i + 49), 0 );
       lbl_selmenu.add( sel_item );

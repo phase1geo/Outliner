@@ -1671,7 +1671,7 @@ public class OutlineTable : DrawingArea {
    Handles a Control-number keypress which moves the currently selected
    row within the labeled row (if one exists)
   */
-  private void handle_control_number( int label ) {
+  public void handle_control_number( int label ) {
     if( is_node_selected() ) {
       var parent = _labels.get_node( label );
       if( (parent != null) && (parent != selected) && (parent != selected.parent) && !parent.is_descendant_of( selected ) ) {
