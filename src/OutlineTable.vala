@@ -26,7 +26,8 @@ using Gee;
 
 public class OutlineTable : DrawingArea {
 
-  private const CursorType url_cursor = CursorType.HAND2;
+  private const CursorType url_cursor  = CursorType.HAND2;
+  private const CursorType text_cursor = CursorType.XTERM;
 
   private MainWindow      _win;
   private Document        _doc;
@@ -614,7 +615,7 @@ public class OutlineTable : DrawingArea {
             set_cursor( url_cursor );
             set_tooltip_markup( url );
           } else {
-            set_cursor( CursorType.XTERM );
+            set_cursor( text_cursor );
           }
         } else if( current.is_within_note( e.x, e.y ) ) {
           string url = "";
@@ -622,7 +623,7 @@ public class OutlineTable : DrawingArea {
             set_cursor( url_cursor );
             set_tooltip_markup( url );
           } else {
-            set_cursor( CursorType.XTERM );
+            set_cursor( text_cursor );
           }
         } else {
           set_cursor( null );
@@ -831,13 +832,13 @@ public class OutlineTable : DrawingArea {
         if( pressed ) {
           set_cursor( url_cursor );
         } else {
-          set_cursor( null );
+          set_cursor( text_cursor );
         }
       } else if( !is_note_editable() && current.note.is_within_url( _motion_x, _motion_y, ref url ) ) {
         if( pressed ) {
           set_cursor( url_cursor );
         } else {
-          set_cursor( null );
+          set_cursor( text_cursor );
         }
       }
     }
