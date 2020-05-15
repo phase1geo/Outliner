@@ -58,7 +58,6 @@ public class OutlineTable : DrawingArea {
   private NodeListType    _list_type     = NodeListType.NONE;
   private Node            _clone         = null;
   private NodeLabels      _labels;
-  private bool            _set_label     = false;
   private string          _name_family;
   private int             _name_size;
   private string          _note_family;
@@ -1920,23 +1919,32 @@ public class OutlineTable : DrawingArea {
     return( false );
   }
 
-  private void handle_label( int label ) {
-    if( _set_label ) {
-      switch( label ) {
-        case -2 :  _labels.clear_all();  break;
-        case -1 :  _labels.set_label( null, _labels.get_label_for_node( selected ) );  break;
-        default :  _labels.set_label( selected, label );  break;
-      }
-      queue_draw();
-      changed();
-      _set_label = false;
+  /* Toggles the label */
+  public void toggle_label() {
+    var label = _labels.get_label_for_node( selected );
+    if( label == -1 ) {
+      _labels.set_next_label( selected );
     } else {
-      var node = _labels.get_node( label );
-      if( node != null ) {
-        selected = node;
-        queue_draw();
-      }
+      _labels.set_label( null, label );
     }
+    queue_draw();
+    changed();
+  }
+
+  /* Jumps to the given label */
+  public void goto_label( int label ) {
+    var node = _labels.get_node( label );
+    if( node != null ) {
+      selected = node;
+      queue_draw();
+    }
+  }
+
+  /* Clears all of the labels */
+  public void clear_all_labels() {
+    _labels.clear_all();
+    queue_draw();
+    changed();
   }
 
   /* Handles any printable characters */
@@ -1966,18 +1974,17 @@ public class OutlineTable : DrawingArea {
         case "B" :  change_selected( root.get_last_node() );  break;
         case "E" :  edit_selected( false );  break;
         case "T" :  change_selected( root.get_first_node() );  break;
-        case "#" :  if( selected != null ) _set_label = true;  break;
-        case "*" :  handle_label( -2 );  break;
-        case "0" :  handle_label( -1 );  break;
-        case "1" :  handle_label( 0 );  break;
-        case "2" :  handle_label( 1 );  break;
-        case "3" :  handle_label( 2 );  break;
-        case "4" :  handle_label( 3 );  break;
-        case "5" :  handle_label( 4 );  break;
-        case "6" :  handle_label( 5 );  break;
-        case "7" :  handle_label( 6 );  break;
-        case "8" :  handle_label( 7 );  break;
-        case "9" :  handle_label( 8 );  break;
+        case "#" :  toggle_label();  break;
+        case "*" :  clear_all_labels();  break;
+        case "1" :  goto_label( 0 );  break;
+        case "2" :  goto_label( 1 );  break;
+        case "3" :  goto_label( 2 );  break;
+        case "4" :  goto_label( 3 );  break;
+        case "5" :  goto_label( 4 );  break;
+        case "6" :  goto_label( 5 );  break;
+        case "7" :  goto_label( 6 );  break;
+        case "8" :  goto_label( 7 );  break;
+        case "9" :  goto_label( 8 );  break;
       }
     }
   }

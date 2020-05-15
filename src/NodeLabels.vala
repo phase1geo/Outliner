@@ -30,6 +30,15 @@ public class NodeLabels {
     _nodes.data = {null, null, null, null, null, null, null, null, null};
   }
 
+  /* Returns true if there is at least one label available */
+  public bool label_available() {
+    var in_use = 0;
+    for( int i=0; i<_num_nodes; i++ ) {
+      in_use += (_nodes.index( i ) != null) ? 1 : 0;
+    }
+    return( in_use < _num_nodes );
+  }
+
   /* Sets the given label to the specified node */
   public void set_label( Node? node, int label ) {
     if( label < 0 ) return;
@@ -41,6 +50,18 @@ public class NodeLabels {
       }
     }
     _nodes.data[label] = node;
+  }
+
+  /* Sets the given node to the next available label */
+  public void set_next_label( Node node ) {
+    var prev_label = get_label_for_node( node );
+    if( prev_label != -1 ) return;
+    for( int i=0; i<_num_nodes; i++ ) {
+      if( _nodes.data[i] == null ) {
+        _nodes.data[i] = node;
+        return;
+      }
+    }
   }
 
   /* Removes all labels */
@@ -103,6 +124,7 @@ public class NodeLabels {
     }
   }
 
+  /* Draws the label on the canvas to the left of its node */
   private void draw_label( Cairo.Context ctx, int label, Theme theme ) {
 
     Cairo.TextExtents extents;
