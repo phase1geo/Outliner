@@ -94,15 +94,11 @@ public class ExportMarkdown : Object {
 
       string title = prefix + "- ";
 
-      /*
-      if( node.is_task() ) {
-        if( node.is_task_done() ) {
-          title += "[x] ";
-        } else {
-          title += "[ ] ";
-        }
+      switch( node.task ) {
+        case NodeTaskMode.DONE  :  title += "[x] ";  break;
+        case NodeTaskMode.OPEN  :
+        case NodeTaskMode.DOING :  title += "[ ] ";  break;
       }
-      */
 
       title += from_text( node.name.text, 0, node.name.text.text.char_count() ) + "\n";
 
