@@ -26,7 +26,8 @@ using Gee;
 
 public class OutlineTable : DrawingArea {
 
-  private const CursorType url_cursor = CursorType.HAND2;
+  private const CursorType url_cursor  = CursorType.HAND2;
+  private const CursorType text_cursor = CursorType.XTERM;
 
   private MainWindow      _win;
   private Document        _doc;
@@ -56,6 +57,7 @@ public class OutlineTable : DrawingArea {
   private NodeDrawOptions _draw_options;
   private NodeListType    _list_type     = NodeListType.NONE;
   private Node            _clone         = null;
+  private NodeLabels      _labels;
   private string          _name_family;
   private int             _name_size;
   private string          _note_family;
@@ -134,6 +136,11 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public NodeLabels labels {
+    get {
+      return( _labels );
+    }
+  }
   public string? name_font_family {
     get {
       return( (_name_family == "") ? null : _name_family );
@@ -193,6 +200,9 @@ public class OutlineTable : DrawingArea {
     /* Create the node draw options */
     _draw_options = new NodeDrawOptions();
 
+    /* Create the labels */
+    _labels = new NodeLabels();
+
     /* Set the style context */
     get_style_context().add_class( "canvas" );
 
@@ -246,6 +256,9 @@ public class OutlineTable : DrawingArea {
     _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
+
+    /* Grab keyboard focus */
+    grab_focus();
 
   }
 
@@ -601,7 +614,7 @@ public class OutlineTable : DrawingArea {
             set_cursor( url_cursor );
             set_tooltip_markup( url );
           } else {
-            set_cursor( CursorType.XTERM );
+            set_cursor( text_cursor );
           }
         } else if( current.is_within_note( e.x, e.y ) ) {
           string url = "";
@@ -609,7 +622,7 @@ public class OutlineTable : DrawingArea {
             set_cursor( url_cursor );
             set_tooltip_markup( url );
           } else {
-            set_cursor( CursorType.XTERM );
+            set_cursor( text_cursor );
           }
         } else {
           set_cursor( null );
@@ -735,8 +748,17 @@ public class OutlineTable : DrawingArea {
           case 65364 :  handle_control_down( shift );   break;
           case 65288 :  handle_control_backspace();     break;
           case 65535 :  handle_control_delete();        break;
-          case 47    :  handle_control_slash();         break;
           case 46    :  handle_control_period();        break;
+          case 47    :  handle_control_slash();         break;
+          case 49    :  handle_control_number( 0 );     break;
+          case 50    :  handle_control_number( 1 );     break;
+          case 51    :  handle_control_number( 2 );     break;
+          case 52    :  handle_control_number( 3 );     break;
+          case 53    :  handle_control_number( 4 );     break;
+          case 54    :  handle_control_number( 5 );     break;
+          case 55    :  handle_control_number( 6 );     break;
+          case 56    :  handle_control_number( 7 );     break;
+          case 57    :  handle_control_number( 8 );     break;
           case 65    :  handle_control_a( true );       break;
           case 66    :  handle_control_b( true );       break;
           case 84    :  handle_control_t( true );       break;
@@ -777,6 +799,10 @@ public class OutlineTable : DrawingArea {
     } else {
       if( !control ) {
         switch( e.keyval ) {
+          case 106   :  handle_down( shift );  break;
+          case 107   :  handle_up( shift );    break;
+          case 65362 :  handle_up( shift );    break;
+          case 65364 :  handle_down( shift );  break;
           case 65507 :  handle_control( true );  break;
         }
       }
@@ -805,13 +831,13 @@ public class OutlineTable : DrawingArea {
         if( pressed ) {
           set_cursor( url_cursor );
         } else {
-          set_cursor( null );
+          set_cursor( text_cursor );
         }
       } else if( !is_note_editable() && current.note.is_within_url( _motion_x, _motion_y, ref url ) ) {
         if( pressed ) {
           set_cursor( url_cursor );
         } else {
-          set_cursor( null );
+          set_cursor( text_cursor );
         }
       }
     }
@@ -1402,6 +1428,16 @@ public class OutlineTable : DrawingArea {
         selected = node;
         queue_draw();
       }
+    } else {
+      int y1, y2;
+      get_window_ys( out y1, out y2 );
+      var node = node_at_coordinates( 0, y2 );
+      if( node != null ) {
+        selected = node;
+      } else {
+        selected = root.get_last_node();
+      }
+      queue_draw();
     }
   }
 
@@ -1555,6 +1591,14 @@ public class OutlineTable : DrawingArea {
         selected = node;
         queue_draw();
       }
+    } else {
+      int y1, y2;
+      get_window_ys( out y1, out y2 );
+      var node = node_at_coordinates( 0, y1 );
+      if( node != null ) {
+        selected = node;
+        queue_draw();
+      }
     }
   }
 
@@ -1620,6 +1664,26 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    }
+  }
+
+  /*
+   Handles a Control-number keypress which moves the currently selected
+   row within the labeled row (if one exists)
+  */
+  public void handle_control_number( int label ) {
+    if( is_node_selected() ) {
+      var parent = _labels.get_node( label );
+      if( (parent != null) && (parent != selected) && (parent != selected.parent) && !parent.is_descendant_of( selected ) ) {
+        var orig_parent = selected.parent;
+        var orig_index  = selected.index();
+        selected.parent.remove_child( selected );
+        parent.add_child( selected );
+        undo_buffer.add_item( new UndoNodeMove( selected, orig_parent, orig_index ) );
+        queue_draw();
+        changed();
+        see( selected );
+      }
     }
   }
 
@@ -1855,6 +1919,34 @@ public class OutlineTable : DrawingArea {
     return( false );
   }
 
+  /* Toggles the label */
+  public void toggle_label() {
+    var label = _labels.get_label_for_node( selected );
+    if( label == -1 ) {
+      _labels.set_next_label( selected );
+    } else {
+      _labels.set_label( null, label );
+    }
+    queue_draw();
+    changed();
+  }
+
+  /* Jumps to the given label */
+  public void goto_label( int label ) {
+    var node = _labels.get_node( label );
+    if( node != null ) {
+      selected = node;
+      queue_draw();
+    }
+  }
+
+  /* Clears all of the labels */
+  public void clear_all_labels() {
+    _labels.clear_all();
+    queue_draw();
+    changed();
+  }
+
   /* Handles any printable characters */
   private void handle_printable( string str ) {
     if( !str.get_char( 0 ).isprint() ) return;
@@ -1882,6 +1974,17 @@ public class OutlineTable : DrawingArea {
         case "B" :  change_selected( root.get_last_node() );  break;
         case "E" :  edit_selected( false );  break;
         case "T" :  change_selected( root.get_first_node() );  break;
+        case "#" :  toggle_label();  break;
+        case "*" :  clear_all_labels();  break;
+        case "1" :  goto_label( 0 );  break;
+        case "2" :  goto_label( 1 );  break;
+        case "3" :  goto_label( 2 );  break;
+        case "4" :  goto_label( 3 );  break;
+        case "5" :  goto_label( 4 );  break;
+        case "6" :  goto_label( 5 );  break;
+        case "7" :  goto_label( 6 );  break;
+        case "8" :  goto_label( 7 );  break;
+        case "9" :  goto_label( 8 );  break;
       }
     }
   }
@@ -2168,8 +2271,9 @@ public class OutlineTable : DrawingArea {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
-          case "theme" :  load_theme( it );  break;
-          case "nodes" :  load_nodes( it );  break;
+          case "theme"  :  load_theme( it );  break;
+          case "nodes"  :  load_nodes( it );  break;
+          case "labels" :  _labels.load( this, it );  break;
         }
       }
     }
@@ -2222,6 +2326,7 @@ public class OutlineTable : DrawingArea {
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
+    n->add_child( _labels.save() );
 
   }
 
@@ -2476,6 +2581,7 @@ public class OutlineTable : DrawingArea {
     if( (selected != null) && ((selected.parent == null) || selected.parent.expanded) ) {
       selected.draw( ctx, _theme, _draw_options );
     }
+    _labels.draw( ctx, _theme );
   }
 
 }
