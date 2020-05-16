@@ -28,7 +28,7 @@ public class ExportText : Object {
     var  file   = File.new_for_path( fname );
     bool retval = true;
     try {
-      var os = file.create( FileCreateFlags.PRIVATE );
+      var os = file.replace( null, false, FileCreateFlags.NONE );
       export_top_nodes( os, table );
     } catch( Error e ) {
       retval = false;

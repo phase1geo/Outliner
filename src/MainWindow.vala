@@ -1084,6 +1084,12 @@ public class MainWindow : ApplicationWindow {
     opml_filter.add_pattern( "*.opml" );
     dialog.add_filter( opml_filter );
 
+    /* Org-Mode */
+    FileFilter org_filter = new FileFilter();
+    org_filter.set_filter_name( _( "Org-Mode" ) );
+    org_filter.add_pattern( "*.org" );
+    dialog.add_filter( org_filter );
+
     /* PDF */
     FileFilter pdf_filter = new FileFilter();
     pdf_filter.set_filter_name( _( "PDF" ) );
@@ -1111,6 +1117,8 @@ public class MainWindow : ApplicationWindow {
         ExportMinder.export( repair_filename( fname, {".minder"} ), table );
       } else if( opml_filter == filter ) {
         ExportOPML.export( repair_filename( fname, {".opml"} ), table );
+      } else if( org_filter == filter ) {
+        ExportOrgMode.export( repair_filename( fname, {".org"} ), table );
       } else if( pdf_filter == filter ) {
         ExportPDF.export( repair_filename( fname, {".pdf"} ), table );
       } else if( txt_filter == filter ) {

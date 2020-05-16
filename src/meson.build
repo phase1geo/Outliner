@@ -3,6 +3,7 @@ sources += files(
   'exports/ExportMarkdown.vala',
   'exports/ExportMinder.vala',
   'exports/ExportOPML.vala',
+  'exports/ExportOrgMode.vala',
   'exports/ExportPDF.vala',
   'exports/ExportPrint.vala',
   'exports/ExportRTF.vala',

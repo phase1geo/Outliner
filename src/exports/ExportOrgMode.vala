@@ -21,7 +21,7 @@
 
 using GLib;
 
-public class ExportMarkdown : Object {
+public class ExportOrgMode : Object {
 
   /* Exports the given drawing area to the file of the given name */
   public static bool export( string fname, OutlineTable table ) {
@@ -47,42 +47,30 @@ public class ExportMarkdown : Object {
   public static string from_text( FormattedText text, int start, int end ) {
     FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
-        case FormatTag.BOLD       :  return( "**");
-        case FormatTag.ITALICS    :  return( "_" );
-        case FormatTag.UNDERLINE  :  return( "__" );
-        case FormatTag.STRIKETHRU :  return( "~~" );
-        case FormatTag.CODE       :  return( "`" );
-        case FormatTag.HEADER     :
-          if( start == 0 ) {
-            switch( extra ) {
-              case "1" :  return( "# " );
-              case "2" :  return( "## " );
-              case "3" :  return( "### " );
-              case "4" :  return( "#### " );
-              case "5" :  return( "##### " );
-              case "6" :  return( "###### " );
-              default  :  return( "" );
-            }
-          }
-          break;
-        case FormatTag.URL :  return( "[" );
-        default            :  return( "" );
+        case FormatTag.BOLD       :  return( "*");
+        case FormatTag.ITALICS    :  return( "/" );
+        case FormatTag.UNDERLINE  :  return( "_" );
+        case FormatTag.STRIKETHRU :  return( "+" );
+        case FormatTag.CODE       :  return( "~" );
+        case FormatTag.HEADER     :  return( "*" );
+        case FormatTag.URL        :  return( "[[%s][".printf( extra ) );
+        default                   :  return( "" );
       }
-      return( "" );
     };
     FormattedText.ExportEndFunc end_func = (tag, start, extra) => {
       switch( tag ) {
-        case FormatTag.BOLD       :  return( "**" );
-        case FormatTag.ITALICS    :  return( "_" );
-        case FormatTag.UNDERLINE  :  return( "__" );
-        case FormatTag.STRIKETHRU :  return( "~~" );
-        case FormatTag.CODE       :  return( "`" );
-        case FormatTag.URL        :  return( "](%s)".printf( extra ) );
+        case FormatTag.BOLD       :  return( "*" );
+        case FormatTag.ITALICS    :  return( "/" );
+        case FormatTag.UNDERLINE  :  return( "_" );
+        case FormatTag.STRIKETHRU :  return( "+" );
+        case FormatTag.CODE       :  return( "~" );
+        case FormatTag.HEADER     :  return( "*" );
+        case FormatTag.URL        :  return( "]]" );
         default                   :  return( "" );
       }
     };
     FormattedText.ExportEncodeFunc encode_func = (str) => {
-      return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "#", "\\#" ).replace( "`", "\\`" ) );
+      return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "+", "\\+" ) );
     };
     return( text.export( start, end, start_func, end_func, encode_func ) );
   }
@@ -92,12 +80,12 @@ public class ExportMarkdown : Object {
 
     try {
 
-      string title = prefix + "- ";
+      string title = prefix + "* ";
 
       switch( node.task ) {
         case NodeTaskMode.DONE  :  title += "[x] ";  break;
-        case NodeTaskMode.OPEN  :
-        case NodeTaskMode.DOING :  title += "[ ] ";  break;
+        case NodeTaskMode.OPEN  :  title += "[ ] ";  break;
+        case NodeTaskMode.DOING :  title += "[-] ";  break;
       }
 
       title += from_text( node.name.text, 0, node.name.text.text.char_count() ) + "\n";
@@ -105,7 +93,8 @@ public class ExportMarkdown : Object {
       os.write( title.data );
 
       if( node.note.text.text != "" ) {
-        string note = prefix + "  " + from_text( node.note.text, 0, node.note.text.text.char_count() ) + "\n";
+        var note = "\n" + from_text( node.note.text, 0, node.note.text.text.char_count() );
+        note = note.replace( "\n", "\n%s  ".printf( prefix ) ) + "\n";
         os.write( note.data );
       }
 
@@ -119,6 +108,13 @@ public class ExportMarkdown : Object {
     } catch( Error e ) {
       // Handle error
     }
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  /* Imports an Org-Mode file and display it in the given outline table */
+  public static void import( string fname, OutlineTable table ) {
 
   }
 

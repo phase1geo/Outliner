@@ -336,6 +336,171 @@
     </child>
     <child>
       <object class="GtkShortcutsSection">
+        <property name="section-name">label</property>
+        <property name="title" translatable="yes">Label Commands</property>
+        <property name="visible">1</property>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Creation/Deletion</property>
+            <property name="visible">1</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Add/Remove Label</property>
+                <property name="accelerator">numbersign</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Remove All Labels</property>
+                <property name="accelerator">asterisk</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Selection</property>
+            <property name="visible">1</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-1 Row</property>
+                <property name="accelerator">1</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-2 Row</property>
+                <property name="accelerator">2</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-3 Row</property>
+                <property name="accelerator">3</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-4 Row</property>
+                <property name="accelerator">4</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-5 Row</property>
+                <property name="accelerator">5</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-6 Row</property>
+                <property name="accelerator">6</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-7 Row</property>
+                <property name="accelerator">7</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-8 Row</property>
+                <property name="accelerator">8</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select Label-9 Row</property>
+                <property name="accelerator">9</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Move Row Into Labeled Row</property>
+            <property name="visible">1</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-1 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;1</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-2 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;2</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-3 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;3</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-4 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;4</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-5 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;5</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-6 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;6</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-7 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;7</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-8 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;8</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Move To Label-9 Row</property>
+                <property name="accelerator">&lt;ctrl&gt;9</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkShortcutsSection">
         <property name="section-name">text</property>
         <property name="title" translatable="yes">Text Editing</property>
         <property name="visible">1</property>
