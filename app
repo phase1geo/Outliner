@@ -49,6 +49,8 @@ case $1 in
     initialize
     ninja com.github.phase1geo.outliner-pot
     ninja com.github.phase1geo.outliner-update-po
+    ninja extra-pot
+    ninja extra-update-po
     ;;
 "install")
     initialize
