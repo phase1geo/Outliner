@@ -24,23 +24,31 @@ public class UndoNodeDelete : UndoItem {
   private Node  _node;
   private Node? _parent;
   private int   _index;
+  private Node? _insert_node;
 
   /* Default constructor */
-  public UndoNodeDelete( Node node ) {
+  public UndoNodeDelete( Node node, Node? insert_node ) {
     base( _( "delete item" ) );
-    _node   = node;
-    _parent = node.parent;
-    _index  = node.index();
+    _node        = node;
+    _parent      = node.parent;
+    _index       = node.index();
+    _insert_node = insert_node;
   }
 
   /* Causes the stored item to be put into the before state */
   public override void undo( OutlineTable table ) {
+    if( _insert_node != null ) {
+      table.delete_node( _insert_node );
+    }
     table.insert_node( _parent, _node, _index );
   }
 
   /* Causes the stored item to be put into the after state */
   public override void redo( OutlineTable table ) {
     table.delete_node( _node );
+    if( _insert_node != null ) {
+      table.insert_node( table.root, _insert_node, 0 );
+    }
   }
 
 }

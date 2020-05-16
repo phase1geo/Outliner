@@ -1,15 +1,8 @@
-src/DynamicNotebook.vala
-src/Document.vala
 src/exports/ExportMinder.vala
-src/FormatBar.vala
-src/LinkEditor.vala
-src/MainWindow.vala
-src/Node.vala
-src/NodeMenu.vala
-src/OutlineTable.vala
-src/SearchBar.vala
 
 src/themes/ThemeDefault.vala
+src/themes/ThemePrintColor.vala
+src/themes/ThemePrintGrayscale.vala
 src/themes/ThemeSolarizedLight.vala
 src/themes/ThemeDark.vala
 src/themes/ThemeSolarizedDark.vala
@@ -19,19 +12,32 @@ src/undo_actions/UndoTextDelete.vala
 src/undo_actions/UndoNodeExpander.vala
 src/undo_actions/UndoNodeInsert.vala
 src/undo_actions/UndoNodeName.vala
+src/undo_actions/UndoNodeUnclone.vala
 src/undo_actions/UndoTextReplace.vala
+src/undo_actions/UndoNodeUnclone.vala
 src/undo_actions/UndoNodeNote.vala
 src/undo_actions/UndoNodeMove.vala
 src/undo_actions/UndoNodeIndent.vala
 src/undo_actions/UndoTextTagAdd.vala
 src/undo_actions/UndoTextInsert.vala
+src/undo_actions/UndoTextClearTags.vala
 src/undo_actions/UndoReplaceAll.vala
 src/undo_actions/UndoNodePaste.vala
+src/undo_actions/UndoNodeReplace.vala
 src/undo_actions/UndoNodeDelete.vala
 src/undo_actions/UndoNodeUnindent.vala
 src/undo_actions/UndoNodeCut.vala
 src/undo_actions/UndoNodeSplit.vala
 
+src/Document.vala
+src/DynamicNotebook.vala
+src/FormatBar.vala
+src/LinkEditor.vala
+src/MainWindow.vala
+src/NodeMenu.vala
+src/Node.vala
+src/OutlineTable.vala
+src/SearchBar.vala
 src/UndoBuffer.vala
 
 data/com.github.phase1geo.outliner.shortcuts.ui

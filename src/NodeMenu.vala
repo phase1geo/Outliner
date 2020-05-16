@@ -26,8 +26,8 @@ public class NodeMenu : Gtk.Menu {
   private OutlineTable _ot;
   private Gtk.MenuItem _copy;
   private Gtk.MenuItem _cut;
-  private Gtk.MenuItem _paste_above;
-  private Gtk.MenuItem _paste_below;
+  private Gtk.MenuItem _paste;
+  private Gtk.MenuItem _paste_replace;
   private Gtk.MenuItem _delete;
   private Gtk.MenuItem _clone_copy;
   private Gtk.MenuItem _clone_paste;
@@ -48,6 +48,11 @@ public class NodeMenu : Gtk.Menu {
   private Gtk.MenuItem _select_last_child;
   private Gtk.MenuItem _select_first;
   private Gtk.MenuItem _select_last;
+  private Gtk.MenuItem _select_label;
+  private Gtk.MenuItem _add_label;
+  private Gtk.MenuItem _clear_all_labels;
+  private Array<Gtk.MenuItem> _move_labels;
+  private Array<Gtk.MenuItem> _select_labels;
 
   public NodeMenu( OutlineTable ot ) {
 
@@ -61,13 +66,13 @@ public class NodeMenu : Gtk.Menu {
     _cut.activate.connect( cut );
     Utils.add_accel_label( _cut, 'x', Gdk.ModifierType.CONTROL_MASK );
 
-    _paste_above = new Gtk.MenuItem.with_label( _( "Paste Above" ) );
-    _paste_above.activate.connect( paste_above );
-    Utils.add_accel_label( _paste_above, 'v', (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK) );
+    _paste = new Gtk.MenuItem.with_label( _( "Paste" ) );
+    _paste.activate.connect( paste );
+    Utils.add_accel_label( _paste, 'v', Gdk.ModifierType.CONTROL_MASK );
 
-    _paste_below = new Gtk.MenuItem.with_label( _( "Paste Below" ) );
-    _paste_below.activate.connect( paste_below );
-    Utils.add_accel_label( _paste_below, 'v', Gdk.ModifierType.CONTROL_MASK );
+    _paste_replace = new Gtk.MenuItem.with_label( _( "Paste and Replace" ) );
+    _paste_replace.activate.connect( paste_replace );
+    Utils.add_accel_label( _paste_replace, 'v', (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK) );
 
     _delete = new Gtk.MenuItem.with_label( _( "Delete" ) );
     _delete.activate.connect( delete_node );
@@ -152,11 +157,30 @@ public class NodeMenu : Gtk.Menu {
     _select_last.activate.connect( select_last_node );
     Utils.add_accel_label( _select_last, 98, Gdk.ModifierType.SHIFT_MASK );
 
+    _select_label = new Gtk.MenuItem.with_label( _( "Select Labeled Row" ) );
+    var lbl_selmenu = new Gtk.Menu();
+    _select_label.set_submenu( lbl_selmenu );
+
+    var labels = new Gtk.MenuItem.with_label( _( "Labels" ) );
+    var lblmenu = new Gtk.Menu();
+    labels.set_submenu( lblmenu );
+
+    _add_label = new Gtk.MenuItem.with_label( _( "Add Label" ) );
+    Utils.add_accel_label( _add_label, 35, 0 );
+    _add_label.activate.connect( toggle_label );
+
+    var move_to_label = new Gtk.MenuItem.with_label( _( "Move To Label" ) );
+    var lbl_movemenu = new Gtk.Menu();
+    move_to_label.set_submenu( lbl_movemenu );
+
+    _clear_all_labels = new Gtk.MenuItem.with_label( _( "Clear All Labels" ) );
+    _clear_all_labels.activate.connect( clear_all_labels );
+
     /* Add the menu items to the menu */
     add( _copy );
     add( _cut );
-    add( _paste_above );
-    add( _paste_below );
+    add( _paste );
+    add( _paste_replace );
     add( clone );
     add( _delete );
     add( new SeparatorMenuItem() );
@@ -172,6 +196,7 @@ public class NodeMenu : Gtk.Menu {
     add( _add_below );
     add( new SeparatorMenuItem() );
     add( select );
+    add( labels );
 
     /* Add the clone menu items */
     clone_menu.add( _clone_copy );
@@ -191,6 +216,41 @@ public class NodeMenu : Gtk.Menu {
     selmenu.add( new SeparatorMenuItem() );
     selmenu.add( _select_first );
     selmenu.add( _select_last );
+    selmenu.add( new SeparatorMenuItem() );
+    selmenu.add( _select_label );
+
+    /* Add the labels menu items */
+    lblmenu.add( _add_label );
+    lblmenu.add( move_to_label );
+    lblmenu.add( new SeparatorMenuItem() );
+    lblmenu.add( _clear_all_labels );
+
+    _move_labels   = new Array<Gtk.MenuItem>();
+    _select_labels = new Array<Gtk.MenuItem>();
+
+    /* Populate the add and move label submenus */
+    for( int i=0; i<9; i++ ) {
+
+      var lbl_value = i + 1;
+      var index     = i;
+
+      var move_item = new Gtk.CheckMenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
+      move_item.activate.connect(() => {
+        _ot.handle_control_number( index );
+      });
+      Utils.add_accel_label( move_item, (i + 49), Gdk.ModifierType.CONTROL_MASK );
+      lbl_movemenu.add( move_item );
+      _move_labels.append_val( move_item );
+
+      var sel_item = new Gtk.MenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
+      sel_item.activate.connect(() => {
+        select_label( index );
+      });
+      Utils.add_accel_label( sel_item, (i + 49), 0 );
+      lbl_selmenu.add( sel_item );
+      _select_labels.append_val( sel_item );
+
+    }
 
     /* Make the menu visible */
     show_all();
@@ -203,12 +263,12 @@ public class NodeMenu : Gtk.Menu {
   /* Called when the menu is popped up */
   private void on_popup() {
 
-    var pasteable  = _ot.node_clipboard.wait_is_text_available();
+    var pasteable  = OutlinerClipboard.node_pasteable();
     var first_node = _ot.root.get_first_node();
 
     /* Set the menu sensitivity */
-    _paste_above.set_sensitive( pasteable );
-    _paste_below.set_sensitive( pasteable );
+    _paste.set_sensitive( pasteable );
+    _paste_replace.set_sensitive( pasteable );
     _unclone.set_sensitive( _ot.selected.is_clone() );
     _clone_paste.set_sensitive( _ot.cloneable() );
     _indent.set_sensitive( _ot.indentable() );
@@ -221,6 +281,24 @@ public class NodeMenu : Gtk.Menu {
     _select_last_child.set_sensitive( !_ot.selected.is_leaf() );
     _select_first.set_sensitive( (first_node != _ot.selected) && !first_node.is_root() );
     _select_last.set_sensitive( (_ot.root.get_last_node() != _ot.selected) && !first_node.is_root() );
+    _select_label.set_sensitive( false );
+
+    if( _ot.labels.get_label_for_node( _ot.selected ) == -1 ) {
+      _add_label.label = _( "Add Label" );
+      _add_label.set_sensitive( _ot.labels.label_available() );
+    } else {
+      _add_label.label = _( "Remove Label" );
+      _add_label.set_sensitive( true );
+    }
+
+    for( int i=0; i<9; i++ ) {
+      var node = _ot.labels.get_node( i );
+      _move_labels.index( i ).set_sensitive( node != null );
+      _select_labels.index( i ).set_sensitive( node != null );
+      if( node != null ) {
+        _select_label.set_sensitive( true );
+      }
+    }
 
     if( _ot.selected.hide_note ) {
       _note_display.label = _( "Show Note" );
@@ -237,22 +315,22 @@ public class NodeMenu : Gtk.Menu {
 
   /* Copies the currently selected node */
   private void copy() {
-    _ot.copy_node_to_clipboard( _ot.selected );
+    _ot.copy_selected_node();
   }
 
   /* Cuts the currently selected node */
   private void cut() {
-    _ot.cut_node_to_clipboard( _ot.selected );
+    _ot.cut_selected_node();
   }
 
   /* Pastes the given node as a sibling of the selected node */
-  private void paste_above() {
-    _ot.paste_node( false );
+  private void paste() {
+    OutlinerClipboard.paste( _ot, false );
   }
 
   /* Pastes the given node as a sibling of the selected node */
-  private void paste_below() {
-    _ot.paste_node( true );
+  private void paste_replace() {
+    OutlinerClipboard.paste( _ot, true );
   }
 
   /* Clones the currently selected node */
@@ -353,6 +431,21 @@ public class NodeMenu : Gtk.Menu {
   /* Selects the bottom-most node of the document */
   private void select_last_node() {
     _ot.change_selected( _ot.root.get_last_node() );
+  }
+
+  /* Adds a label to the currently selected node */
+  private void toggle_label() {
+    _ot.toggle_label();
+  }
+
+  /* Selects the given label index */
+  private void select_label( int index ) {
+    _ot.goto_label( index );
+  }
+
+  /* Clears all of the set labels */
+  private void clear_all_labels() {
+    _ot.clear_all_labels();
   }
 
 }

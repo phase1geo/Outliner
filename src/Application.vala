@@ -28,7 +28,7 @@ public class Outliner : Granite.Application {
   private static string?       open_file    = null;
   private static bool          new_file     = false;
   private static bool          testing      = false;
-  public  static string        version      = "1.1.0";
+  public  static string        version      = "1.2.0";
   public  static GLib.Settings settings;
 
   public Outliner () {

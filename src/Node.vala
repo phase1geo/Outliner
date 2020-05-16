@@ -22,6 +22,7 @@
 using Gtk;
 using Gdk;
 using Gee;
+using Granite.Drawing;
 
 public enum NodeMode {
   NONE = 0,      // Indicates that this node is nothing special
@@ -81,6 +82,32 @@ public enum NodeListType {
   }
 }
 
+public enum NodeTaskMode {
+  NONE = 0,  // Indicates that this node does not have a task assigned
+  OPEN,      // Indicates that a task is assigned but is not completed
+  DOING,     // Indicates that the task is in the process of being done
+  DONE;      // Indicates that a task is assigned and is completed
+
+  public string to_string() {
+    switch( this ) {
+      case OPEN  :  return( "open" );
+      case DOING :  return( "doing" );
+      case DONE  :  return( "done" );
+      default    :  return( "none" );
+    }
+  }
+
+  public static NodeTaskMode from_string( string value ) {
+    switch( value ) {
+      case "open"  :  return( OPEN );
+      case "doing" :  return( DOING );
+      case "done"  :  return( DONE );
+      default      :  return( NONE );
+    }
+  }
+
+}
+
 public class NodeDrawOptions {
   public bool show_note_icon { get; set; default = true; }
   public bool show_modes     { get; set; default = true; }
@@ -100,6 +127,10 @@ public class NodeCloneData {
 
 public class Node {
 
+  private const int note_size = 16;
+  private const int task_size = 16;
+  private const int expander_size = 10;
+
   private static int next_id  = 0;
   private static int clone_id = 0;
 
@@ -118,6 +149,7 @@ public class Node {
   private double       _lt_width  = 0;
   private bool         _hide_note = true;
   private int          _clone_id  = -1;
+  private NodeTaskMode _task      = NodeTaskMode.OPEN;
   private bool         _debug     = false;
 
   private static Pixbuf? _note_icon = null;
@@ -146,6 +178,16 @@ public class Node {
           hide_note = true;
         }
         update_height( true );
+      }
+    }
+  }
+  public NodeTaskMode task {
+    get {
+      return( _ot.show_tasks ? _task : NodeTaskMode.NONE );
+    }
+    set {
+      if( _ot.show_tasks ) {
+        update_task( value, true, true );
       }
     }
   }
@@ -247,14 +289,7 @@ public class Node {
 
     _ot = ot;
 
-    var name_fd = new Pango.FontDescription();
-    name_fd.set_size( 12 * Pango.SCALE );
-
-    var note_fd = new Pango.FontDescription();
-    note_fd.set_size( 10 * Pango.SCALE );
-
     _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( name_fd );
 
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.resized.connect( update_height_from_resize );
@@ -266,8 +301,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font( name_fd );
-    _note.set_font( note_fd );
+    change_name_font( ot.name_font_family, ot.name_font_size, false );
+    change_note_font( ot.note_font_family, ot.note_font_size, false );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -278,53 +313,12 @@ public class Node {
     ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
+    ot.show_tasks_changed.connect( update_height_from_resize );
 
   }
 
   /* Constructor of root node */
   public Node.root() {}
-
-  /* Copy constructor */
-  public Node.copy_from_node( OutlineTable ot, Node node ) {
-
-    _ot = ot;
-
-    var name_fd = new Pango.FontDescription();
-    name_fd.set_size( 12 * Pango.SCALE );
-
-    var note_fd = new Pango.FontDescription();
-    note_fd.set_size( 10 * Pango.SCALE );
-
-    _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( name_fd );
-
-    _name = new CanvasText( ot, ot.get_allocated_width() );
-    _name.resized.connect( update_height_from_resize );
-    _name.select_mode.connect( name_select_mode );
-    _name.cursor_changed.connect( name_cursor_changed );
-
-    _note = new CanvasText( ot, ot.get_allocated_width() );
-    _note.resized.connect( update_height_from_resize );
-    _note.select_mode.connect( note_select_mode );
-    _note.cursor_changed.connect( note_cursor_changed );
-
-    _name.set_font( name_fd );
-    _note.set_font( note_fd );
-
-    _name.copy( node.name );
-    _note.copy( node.note );
-
-    pady = ot.condensed ? 2 : 10;
-
-    position_text();
-    update_width();
-
-    /* Detect any size changes by the drawing area */
-    ot.win.configure_event.connect( window_size_changed );
-    ot.zoom_changed.connect( table_zoom_changed );
-    ot.theme_changed.connect( table_theme_changed );
-
-  }
 
   /* Copy constructor */
   public Node.clone_from_node( OutlineTable ot, Node node ) {
@@ -340,14 +334,7 @@ public class Node {
       _clone_id      = node._clone_id;
     }
 
-    var name_fd = new Pango.FontDescription();
-    name_fd.set_size( 12 * Pango.SCALE );
-
-    var note_fd = new Pango.FontDescription();
-    note_fd.set_size( 10 * Pango.SCALE );
-
     _lt_layout = ot.create_pango_layout( null );
-    _lt_layout.set_font_description( name_fd );
 
     _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
     _name.resized.connect( update_height_from_resize );
@@ -359,8 +346,8 @@ public class Node {
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
 
-    _name.set_font( name_fd );
-    _note.set_font( note_fd );
+    change_name_font( ot.name_font_family, ot.name_font_size, false );
+    change_note_font( ot.note_font_family, ot.note_font_size, false );
 
     pady = ot.condensed ? 2 : 10;
 
@@ -397,10 +384,14 @@ public class Node {
   }
 
   /* Updates the size of the name and note information */
-  private void table_zoom_changed( int name_size, int note_size, int pady ) {
-    _name.set_font_size( name_size );
-    _note.set_font_size( note_size );
-    this.pady = (double)pady;
+  private void table_zoom_changed() {
+    int width, height;
+    var zoom_factor = _ot.win.get_zoom_factor();
+    _name.set_font( null, null, zoom_factor );
+    _note.set_font( null, null, zoom_factor );
+    _lt_layout.set_font_description( _name.get_font_fd() );
+    _lt_layout.get_size( out width, out height );
+    _lt_width = width / Pango.SCALE;
   }
 
   /*
@@ -469,10 +460,12 @@ public class Node {
     int w, h;
     _ot.win.get_size( out w, out h );
 
+    var rmargin = (padx * 5) + 20;
+
     /* Update our width information */
     _w = w;
-    _name.max_width = _w - (_name.posx * 2);
-    _note.max_width = _w - (_note.posx * 2);
+    _name.max_width = _w - (_name.posx + rmargin);
+    _note.max_width = _w - (_note.posx + rmargin);
 
   }
 
@@ -592,10 +585,83 @@ public class Node {
 
   /* Adjusts the position of the text object */
   private void position_text() {
-    var ltx = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + padx);
-    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + ltx;
+    var zoom = _ot.win.get_zoom_factor();
+    var tx   = (task == NodeTaskMode.NONE) ? 0 : (task_size + padx);
+    var ltx  = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + (padx * zoom));
+    name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + tx + ltx;
     name.posy = y + pady;
     note.posy = y + (pady * 2) + name.height;
+  }
+
+  /* Searches the node tree for a node that matches the given ID */
+  public string lookup_id() {
+    var str  = index().to_string();
+    var node = parent;
+    while( !node.is_root() ) {
+      str  = node.index().to_string() + "," + str;
+      node = node.parent;
+    }
+    return( str );
+  }
+
+  private Node? get_node_by_lookup_id_helper( string[] indices, int index ) {
+    if( index < indices.length ) {
+      return( children.index( int.parse( indices[index] ) ).get_node_by_lookup_id_helper( indices, (index + 1) ) );
+    }
+    return( this );
+  }
+
+  /* Returns the node associated with the given lookup ID */
+  public Node? get_node_by_lookup_id( string str ) {
+    if( is_root() ) {
+      string[] indices = str.split( "," );
+      return( get_node_by_lookup_id_helper( indices, 0 ) );
+    }
+    return( null );
+  }
+
+  /* Propagates the current task information to the children */
+  private void propagate_task_down() {
+    if( task != NodeTaskMode.DOING ) {
+      for( int i=0; i<children.length; i++ ) {
+        var child = children.index( i );
+        child.update_task( task, true, false );
+      }
+    }
+  }
+
+  /* Updates the task of this parent row based on the status of the children */
+  private void update_task_from_children() {
+    var value = NodeTaskMode.NONE;
+    for( int i=0; i<children.length; i++ ) {
+      var child = children.index( i );
+      if( child.task != value ) {
+        if( value == NodeTaskMode.NONE ) {
+          value = child.task;
+        } else if( child.task != NodeTaskMode.NONE ) {
+          update_task( NodeTaskMode.DOING, false, true );
+          return;
+        }
+      }
+    }
+    update_task( value, false, true );
+  }
+
+  /* Propagates the current task information upwards in the tree until we reach the root node */
+  private void propagate_task_up() {
+    if( !parent.is_root() ) {
+      parent.update_task_from_children();
+    }
+  }
+
+  /* Propagates the task information both up and down the node tree */
+  private void update_task( NodeTaskMode value, bool prop_down, bool prop_up ) {
+    if( _task == value ) return;
+    var resize = (task == NodeTaskMode.NONE) || (value == NodeTaskMode.NONE);
+    _task = value;
+    if( resize )    update_height_from_resize();
+    if( prop_down ) propagate_task_down();
+    if( prop_up )   propagate_task_up();
   }
 
   /* Returns the root node of this node */
@@ -712,19 +778,27 @@ public class Node {
   }
 
   /* Returns the area where we will draw the note icon */
-  private void note_bbox( out double x, out double y, out double w, out double h ) {
+  public void note_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 2) + 10;
-    y = this.y + pady + ((name.get_line_height() / 2) - 8);
-    w = 16;
-    h = 16;
+    y = this.y + pady + ((name.get_line_height() / 2) - (note_size / 2));
+    w = note_size;
+    h = note_size;
+  }
+
+  /* Returns the area where we will draw the task icon */
+  private void task_bbox( out double x, out double y, out double w, out double h ) {
+    x = this.x + (padx * 5) + 20 + (depth * indent);
+    y = this.y + pady + ((name.get_line_height() / 2) - (task_size / 2));
+    w = task_size;
+    h = task_size;
   }
 
   /* Returns the area where the expander will draw the expander icon */
   private void expander_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 4) + 10 + (depth * indent);
-    y = this.y + pady + ((name.get_line_height() / 2) - 5);
-    w = 10;
-    h = 10;
+    y = this.y + pady + ((name.get_line_height() / 2) - (expander_size / 2));
+    w = expander_size;
+    h = expander_size;
   }
 
   /* Returns true if the given coordinates are within this node */
@@ -749,6 +823,12 @@ public class Node {
     return( Utils.is_within_bounds( x, y, nx, ny, nw, nh ) );
   }
 
+  public bool is_within_task( double x, double y ) {
+    double tx, ty, tw, th;
+    task_bbox( out tx, out ty, out tw, out th );
+    return( (task != NodeTaskMode.NONE) && Utils.is_within_bounds( x, y, tx, ty, tw, th ) );
+  }
+
   /* Returns true if the given coordinates reside within the name text area */
   public bool is_within_name( double x, double y ) {
     return( Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
@@ -769,6 +849,36 @@ public class Node {
     return( Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
   }
 
+  /* Change the name font to the given value */
+  public void change_name_font( string family, int size, bool recursive = true ) {
+    if( !is_root() ) {
+      int width, height;
+      var zoom_factor = _ot.win.get_zoom_factor();
+      _name.set_font( family, size, zoom_factor );
+      _lt_layout.set_font_description( _name.get_font_fd() );
+      _lt_layout.get_size( out width, out height );
+      _lt_width = width / Pango.SCALE;
+    }
+    if( recursive ) {
+      for( int i=0; i<children.length; i++ ) {
+        children.index( i ).change_name_font( family, size );
+      }
+    }
+  }
+
+  /* Change the note font to the given value */
+  public void change_note_font( string family, int size, bool recursive = true ) {
+    if( !is_root() ) {
+      var zoom_factor = _ot.win.get_zoom_factor();
+      _note.set_font( family, size, zoom_factor );
+    }
+    if( recursive ) {
+      for( int i=0; i<children.length; i++ ) {
+        children.index( i ).change_note_font( family, size );
+      }
+    }
+  }
+
   /*************************/
   /* FILE HANDLING METHODS */
   /*************************/
@@ -780,6 +890,7 @@ public class Node {
 
     n->new_prop( "expanded", expanded.to_string() );
     n->new_prop( "hidenote", hide_note.to_string() );
+    n->new_prop( "task",     _task.to_string() );
 
     /* Only save out the name/note if we are not a clone or if our clone has not been output yet */
     if( (_clone_id == -1) || !clone_ids.has_key( _clone_id ) ) {
@@ -816,6 +927,11 @@ public class Node {
     string? h = n->get_prop( "hidenote" );
     if( h != null ) {
       hide_note = bool.parse( h );
+    }
+
+    string? t = n->get_prop( "task" );
+    if( t != null ) {
+      _task = NodeTaskMode.from_string( t );
     }
 
     string? c = n->get_prop( "clone_id" );
@@ -953,6 +1069,15 @@ public class Node {
 
     return( children.length == 0 );
 
+  }
+
+  /* Returns true if we are a descendant of the given node */
+  public bool is_descendant_of( Node node ) {
+    var current = parent;
+    while( !current.is_root() && (current != node) ) {
+      current = current.parent;
+    }
+    return( current == node );
   }
 
   /* Set the notes display for this node and all descendant nodes */
@@ -1146,6 +1271,7 @@ public class Node {
     switch( tmode ) {
       case NodeMode.SELECTED :  background = theme.nodesel_background;  alpha = 0.5;  break;
       case NodeMode.ATTACHTO :  background = theme.attachable_color;    break;
+      case NodeMode.HOVER    :  background = theme.nodesel_background;  alpha = 0.1;  break;
       case NodeMode.MOVETO   :  alpha      = 0.3;                       break;
     }
 
@@ -1207,6 +1333,43 @@ public class Node {
 
   }
 
+  /* Draw the task indicator */
+  public void draw_task( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
+
+    if( task == NodeTaskMode.NONE ) return;
+
+    double tx, ty, tw, th;
+    var tmode = opts.show_modes ? mode : NodeMode.NONE;
+    var color = ((tmode == NodeMode.SELECTED) || (tmode == NodeMode.ATTACHTO)) ? theme.nodesel_foreground : theme.symbol_color;
+
+    task_bbox( out tx, out ty, out tw, out th );
+
+    Utils.set_context_color_with_alpha( ctx, color, alpha );
+
+    ctx.set_line_width( 1 );
+    Utilities.cairo_rounded_rectangle( ctx, tx, ty, tw, tw, 2 );
+    ctx.stroke();
+
+    switch( task ) {
+      case NodeTaskMode.DOING :
+        ctx.set_line_width( 3 );
+        ctx.set_line_cap( Cairo.LineCap.ROUND );
+        ctx.move_to( (tx + 4), (ty + (th / 2)) );
+        ctx.line_to( ((tx + tw) - 4), (ty + (th / 2)) );
+        ctx.stroke();
+        break;
+      case NodeTaskMode.DONE :
+        ctx.set_line_width( 3 );
+        ctx.set_line_cap( Cairo.LineCap.ROUND );
+        ctx.move_to( (tx + 3), (ty + (th / 2)) );
+        ctx.line_to( (tx + (tw / 3) + 1), ((ty + th) - 4) );
+        ctx.line_to( ((tx + tw) - 3), (ty + 3) );
+        ctx.stroke();
+        break;
+    }
+
+  }
+
   /* Draw the list type to the right of the expander */
   public void draw_list_type( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
@@ -1233,7 +1396,8 @@ public class Node {
     if( tmode == NodeMode.EDITABLE ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
-      ctx.rectangle( (name.posx - (padx / 2)), name.posy, name.max_width, name.height );
+      Utilities.cairo_rounded_rectangle( ctx, (name.posx - (padx / 2)), name.posy, name.max_width, name.height, 4 );
+      // ctx.rectangle( (name.posx - (padx / 2)), name.posy, name.max_width, name.height );
       ctx.stroke();
     }
 
@@ -1278,14 +1442,16 @@ public class Node {
     /* Draw the background color */
     if( opts.show_note_bg ) {
       Utils.set_context_color_with_alpha( ctx, bg_color, alpha );
-      ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      // ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      Utilities.cairo_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
       ctx.fill();
     }
 
     if( (tmode == NodeMode.NOTEEDIT) || opts.show_note_ol ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
-      ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      // ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
+      Utilities.cairo_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
       ctx.stroke();
     }
 
@@ -1303,6 +1469,7 @@ public class Node {
     draw_background( ctx, theme, opts );
     draw_note_icon( ctx, theme, opts );
     draw_expander( ctx, theme, opts );
+    draw_task( ctx, theme, opts );
     draw_list_type( ctx, theme, opts );
     draw_name( ctx, theme, opts );
     draw_note( ctx, theme, opts );

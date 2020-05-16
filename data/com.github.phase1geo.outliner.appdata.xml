@@ -5,10 +5,13 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Outliner</name>
+  <name xml:lang="nl">Outliner</name>
   <name xml:lang="fr">Outliner</name>
   <summary>Organize your words</summary>
+  <summary xml:lang="nl">Orden je teksten</summary>
   <summary xml:lang="fr">Organisez vos mots</summary>
   <developer_name>Trevor Williams</developer_name>
+  <developer_name xml:lang="nl">Trevor Williams</developer_name>
   <developer_name xml:lang="fr">Trevor Williams</developer_name>
   <provides>
     <binary>com.github.phase1geo.outliner</binary>
@@ -23,33 +26,47 @@
   </screenshots>
   <description>
     <p>Quickly create outlines and export them in a number of useful formats.</p>
+    <p xml:lang="nl">Maak snel overzichten en exporteer ze naar een bruikbaar formaat.</p>
     <p xml:lang="fr">Créez rapidement des plans et exportez les dans un grand nombre de formats pratiques.</p>
     <ul>
       <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
+      <li xml:lang="nl">Maak snel overzichten en blader met je toetsenbord of muis.</li>
       <li xml:lang="fr">Créez et naviguez rapidement à travers des plans en utilisant le clavier ou la souris.</li>
       <li>Full support for text formatting.</li>
+      <li xml:lang="nl">Volledige ondersteuning voor tekstopmaak.</li>
       <li xml:lang="fr">Prise en charge complète de la mise en forme du texte.</li>
       <li>Add notes to any outline text.</li>
+      <li xml:lang="nl">Voeg aantekeningen toe.</li>
       <li xml:lang="fr">Ajoutez des notes à n'importe quel élément de plan.</li>
+      <li>Add checkboxes to any or all outline text.</li>
       <li>Close/Hide any group within the outline for increased focus.</li>
+      <li xml:lang="nl">Sluit/Verberg elke groep binnen het overzicht om beter te kunnen focussen.</li>
       <li xml:lang="fr">Fermez/Masquez un groupe à tout moment depuis le plan pour plus de concentration.</li>
       <li>Quick search and replace of any text within the document, including notes.</li>
+      <li xml:lang="nl">Zoek en vervang snel tekst in het document of je aantekeningen.</li>
       <li xml:lang="fr">Cherchez et remplacez rapidement n'importe quel texte dans le document, notes incluses.</li>
       <li>View document statistics such as character count, word count and row count.</li>
+      <li xml:lang="nl">Toon documentstatistieken, zoals het aantal tekens, woorden en rijen.</li>
       <li xml:lang="fr">Visualisez les statistiques du document telles que le nombre de caractères, de mots et de lignes.</li>
       <li>Unlimited undo/redo of any change.</li>
+      <li xml:lang="nl">Onbeperkt ongedaan maken/opnieuw uitvoeren.</li>
       <li xml:lang="fr">Nombre d'actions annuler/rétablir illimités pour toute modification.</li>
       <li>Automatically saves in the background.</li>
+      <li xml:lang="nl">Slaat automatisch op op de achtergrond.</li>
       <li xml:lang="fr">Enregistrement automatique en arrière-plan.</li>
       <li>Open multiple outlines with the use of tabs.</li>
+      <li xml:lang="nl">Open meerdere overzichten op tabbladen.</li>
       <li xml:lang="fr">Ouvrez plusieurs plans à la fois à l'aide des onglets.</li>
       <li>Built-in themes.</li>
+      <li xml:lang="nl">Ingebouwde thema's.</li>
       <li xml:lang="fr">Thèmes intégrés.</li>
+      <li>Support for changing fonts within a document.</li>
       <li>Import from Minder and OPML.</li>
+      <li xml:lang="nl">Importeer uit Minder en OPML.</li>
       <li xml:lang="fr">Importez des fichiers au format Minder ou OPML.</li>
-      <li>Export to HTML, Markdown, Minder, OPML, PDF and PlainText.</li>
-      <li xml:lang="fr">Exportez au format HTML, Markdown, OPML, PDF et Texte brut.</li>
+      <li>Export to HTML, Markdown, Minder, OPML, Org-Mode, PDF and PlainText.</li>
       <li>Printer support.</li>
+      <li xml:lang="nl">Afdrukondersteuning.</li>
       <li xml:lang="fr">Prise en charge de l'impression.</li>
     </ul>
   </description>
@@ -92,6 +109,35 @@
     <value key="x-appcenter-suggested-price">10</value>
   </custom>
   <releases>
+    <release version="1.2.0" date="2020-05-17">
+      <description>
+        <p>New</p>
+        <p xml:lang="fr">Nouveau</p>
+        <ul>
+          <li>Added highlight for row that the mouse cursor is currently over.</li>
+          <li>Added support for row labeling for the purposes of moving and selecting rows.</li>
+          <li>Added support for changing document and application default fonts.</li>
+          <li>Added support for adding checkbox state to rows.</li>
+          <li>Added checkbox statistics to the statistics panel.</li>
+          <li>Added Org-Mode export mode.</li>
+        </ul>
+        <p>Changes</p>
+        <p xml:lang="fr">Modifications</p>
+        <ul>
+          <li>When only row is deleted, a new row will be added and placed into edit mode.</li>
+          <li>Updated keyboard shortcut cheatsheet.</li>
+          <li>Changed cursor and added tooltip when cursor is over URL and Control is held down.</li>
+          <li>Enhanced clipboard functionality.</li>
+          <li>Modified look of statistics panel to improve readability of display groups of information.</li>
+        </ul>
+        <p>Bug Fixes</p>
+        <p xml:lang="fr">Corrections de bugs</p>
+        <ul>
+          <li>Fixed right margin for descendant rows.</li>
+          <li>Fixed exports to allow existing files to be overwritten.</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.1.0" date="2020-04-20">
       <description>
         <p>New</p>
@@ -139,6 +185,7 @@
     <release version="1.0.3" date="2020-03-26">
       <description>
         <p>Initial release!</p>
+        <p xml:lang="nl">Initiële uitgave!</p>
         <p xml:lang="fr">Version initiale !</p>
       </description>
     </release>

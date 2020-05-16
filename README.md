@@ -42,7 +42,7 @@ Use the App script to simplify installation by running `./app install-deps`
 ### Building
 
 ```
-git clone {{ repo-url }}.git com.github.phase1geo.outliner && cd com.github.phase1geo.outliner
+git clone git@github.com:phase1geo/Outliner.git com.github.phase1geo.outliner && cd com.github.phase1geo.outliner
 ./app install-deps && ./app install
 ```
 
