@@ -890,11 +890,7 @@ public class Node {
 
     n->new_prop( "expanded", expanded.to_string() );
     n->new_prop( "hidenote", hide_note.to_string() );
-
-    /* Save the task done status, if valid */
-    if( _task != NodeTaskMode.NONE ) {
-      n->new_prop( "task", _task.to_string() );
-    }
+    n->new_prop( "task",     _task.to_string() );
 
     /* Only save out the name/note if we are not a clone or if our clone has not been output yet */
     if( (_clone_id == -1) || !clone_ids.has_key( _clone_id ) ) {
@@ -936,8 +932,6 @@ public class Node {
     string? t = n->get_prop( "task" );
     if( t != null ) {
       _task = NodeTaskMode.from_string( t );
-    } else {
-      _task = NodeTaskMode.NONE;
     }
 
     string? c = n->get_prop( "clone_id" );

@@ -25,6 +25,18 @@ using Cairo;
 
 public class Utils {
 
+  /* Returns true if the specified version is older than this version */
+  public static bool is_version_older( string other_version ) {
+    var my_parts    = Outliner.version.split( "." );
+    var other_parts = other_version.split( "." );
+    for( int i=0; i<my_parts.length; i++ ) {
+      if( int.parse( other_parts[i] ) < int.parse( my_parts[i] ) ) {
+        return( true );
+      }
+    }
+    return( false );
+  }
+
   /*
    Helper function for converting an RGBA color value to a stringified color
    that can be used by a markup parser.
