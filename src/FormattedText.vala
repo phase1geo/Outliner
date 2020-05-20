@@ -35,6 +35,7 @@ public enum FormatTag {
   COLOR,
   HILITE,
   URL,
+  TAG,
   MATCH,
   SELECT,
   LENGTH;
@@ -52,6 +53,7 @@ public enum FormatTag {
       case COLOR      :  return( "color" );
       case HILITE     :  return( "hilite" );
       case URL        :  return( "url" );
+      case TAG        :  return( "tag" );
       case MATCH      :  return( "match" );
     }
     return( "bold" );
@@ -70,6 +72,7 @@ public enum FormatTag {
       case "color"       :  return( COLOR );
       case "hilite"      :  return( HILITE );
       case "url"         :  return( URL );
+      case "tag"         :  return( TAG );
       case "match"       :  return( MATCH );
     }
     return( LENGTH );
@@ -549,6 +552,25 @@ public class FormattedText {
     }
   }
 
+  private class TaggingInfo : TagAttr {
+    public TaggingInfo( RGBA color ) {
+      set_color( color );
+    }
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+    }
+    public void update_color( RGBA color ) {
+      attrs.remove_range( 0, 1 );
+      set_color( color );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "tag" );
+      ttag.foreground_rgba = get_color( extra );
+      ttag.foreground_set  = true;
+      return( ttag );
+    }
+  }
+
   private class MatchInfo : TagAttr {
     public MatchInfo( RGBA f, RGBA b ) {
       set_color( f, b );
@@ -631,6 +653,7 @@ public class FormattedText {
       _attr_tags[FormatTag.COLOR]      = new ColorInfo();
       _attr_tags[FormatTag.HILITE]     = new HighlightInfo();
       _attr_tags[FormatTag.URL]        = new UrlInfo( theme.url );
+      _attr_tags[FormatTag.TAG]        = new TaggingInfo( theme.tag );
       _attr_tags[FormatTag.MATCH]      = new MatchInfo( theme.match_foreground, theme.match_background );
       _attr_tags[FormatTag.SELECT]     = new SelectInfo( theme.textsel_foreground, theme.textsel_background );
     }
@@ -642,6 +665,7 @@ public class FormattedText {
   public static void set_theme( Theme theme ) {
     if( _attr_tags == null ) return;
     (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
+    (_attr_tags[FormatTag.TAG] as TaggingInfo).update_color( theme.tag );
     (_attr_tags[FormatTag.MATCH] as MatchInfo).update_color( theme.match_foreground, theme.match_background );
     (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
   }
