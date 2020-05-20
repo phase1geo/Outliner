@@ -215,6 +215,13 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Change Task State</property>
+                <property name="accelerator">t</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Edit Note</property>
                 <property name="accelerator">&lt;shift&gt;e</property>
                 <property name="visible">1</property>
