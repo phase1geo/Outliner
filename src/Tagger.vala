@@ -41,20 +41,18 @@ public class Tagger {
    the tags array if it doesn't already exist.
   */
   public void parse_text( FormattedText text ) {
-    try {
-      MatchInfo matches;
-      var       start = 0;
-      while( _re.match( text.text.substring( start ), 0, out matches ) ) {
-        int start_pos, end_pos;
-        matches.fetch_pos( 1, out start_pos, out end_pos );
-        var tag = matches.fetch( 2 );
-        text.add_tag( FormatTag.TAG, start_pos, end_pos, tag );
-        if( !_tags.has_key( tag ) ) {
-          _tags.@set( tag, true );
-        }
-        start = end_pos;
+    MatchInfo matches;
+    var       start = 0;
+    while( _re.match( text.text.substring( start ), 0, out matches ) ) {
+      int start_pos, end_pos;
+      matches.fetch_pos( 1, out start_pos, out end_pos );
+      var tag = matches.fetch( 2 );
+      text.add_tag( FormatTag.TAG, start_pos, end_pos, tag );
+      if( !_tags.has_key( tag ) ) {
+        _tags.@set( tag, true );
       }
-    } catch( RegexError e ) {}
+      start = end_pos;
+    }
   }
 
   /* Called whenever the user clicks on a tag */

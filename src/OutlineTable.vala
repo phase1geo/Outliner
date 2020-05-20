@@ -26,8 +26,8 @@ using Gee;
 
 public class OutlineTable : DrawingArea {
 
-  private const CursorType url_cursor  = CursorType.HAND2;
-  private const CursorType text_cursor = CursorType.XTERM;
+  private const CursorType click_cursor = CursorType.HAND2;
+  private const CursorType text_cursor  = CursorType.XTERM;
 
   private MainWindow      _win;
   private Document        _doc;
@@ -436,9 +436,10 @@ public class OutlineTable : DrawingArea {
   /* Called when the given coordinates are clicked within a CanvasText item. */
   private bool clicked_in_text( Node clicked, CanvasText text, EventButton e, NodeMode select_mode ) {
 
-    bool   shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
-    bool   control = (bool)(e.state & ModifierType.CONTROL_MASK);
-    string extra   = "";
+    var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
+    var control = (bool)(e.state & ModifierType.CONTROL_MASK);
+    var tag     = FormatTag.URL;
+    var extra   = "";
 
     /* Set the selected node to the clicked node */
     selected = clicked;
@@ -447,13 +448,12 @@ public class OutlineTable : DrawingArea {
      If the mouse click was within a URL and the control key was pressed, open
      the URL in an external application.
     */
-    if( control && text.is_within_url( e.x, e.y, ref extra ) ) {
+    if( control && text.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
       _active = clicked;
-      Utils.open_url( extra );
-      return( false );
-    } else if( control && text.is_within_tag( e.x, e.y, ref extra ) ) {
-      _active = clicked;
-      _tagger.tag_clicked( extra );
+      switch( tag ) {
+        case FormatTag.URL :  Utils.open_url( extra );       break;
+        case FormatTag.TAG :  _tagger.tag_clicked( extra );  break;
+      }
       return( false );
     }
 
@@ -621,6 +621,9 @@ public class OutlineTable : DrawingArea {
 
     } else {
 
+      var tag   = FormatTag.URL;
+      var extra = "";
+
       /* Get the current node */
       var current = node_at_coordinates( e.x, e.y );
       var control = (bool)(e.state & ModifierType.CONTROL_MASK);
@@ -635,20 +638,18 @@ public class OutlineTable : DrawingArea {
           set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
           set_cursor( null );
         } else if( current.is_within_name( e.x, e.y ) ) {
-          string extra = "";
-          if( control && !is_node_editable() && current.name.is_within_url( e.x, e.y, ref extra ) ) {
-            set_cursor( url_cursor );
-            set_tooltip_markup( extra );
-          } else if( control && !is_node_editable() && current.name.is_within_tag( e.x, e.y, ref extra ) ) {
-            set_cursor( url_cursor );
+          if( control && !is_node_editable() && current.name.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
+            set_cursor( click_cursor );
+            if( tag == FormatTag.URL ) {
+              set_tooltip_markup( extra );
+            }
           } else {
             set_cursor( text_cursor );
           }
         } else if( current.is_within_note( e.x, e.y ) ) {
-          string url = "";
-          if( control && !is_note_editable() && current.note.is_within_url( e.x, e.y, ref url ) ) {
-            set_cursor( url_cursor );
-            set_tooltip_markup( url );
+          if( control && !is_note_editable() && current.note.is_within_clickable( e.x, e.y, out tag, out extra ) && (tag == FormatTag.URL) ) {
+            set_cursor( click_cursor );
+            set_tooltip_markup( extra );
           } else {
             set_cursor( text_cursor );
           }
@@ -852,19 +853,19 @@ public class OutlineTable : DrawingArea {
   }
 
   private void handle_control( bool pressed ) {
-    string extra = "";
+    var tag   = FormatTag.URL;
+    var extra = "";
     var current = node_at_coordinates( _motion_x, _motion_y );
     if( current != null ) {
-      if( !is_node_editable() && (current.name.is_within_url( _motion_x, _motion_y, ref extra ) ||
-                                  current.name.is_within_tag( _motion_x, _motion_y, ref extra )) ) {
+      if( !is_node_editable() && current.name.is_within_clickable( _motion_x, _motion_y, out tag, out extra ) ) {
         if( pressed ) {
-          set_cursor( url_cursor );
+          set_cursor( click_cursor );
         } else {
           set_cursor( text_cursor );
         }
-      } else if( !is_note_editable() && current.note.is_within_url( _motion_x, _motion_y, ref extra ) ) {
+      } else if( !is_note_editable() && current.note.is_within_clickable( _motion_x, _motion_y, out tag, out extra ) && (tag == FormatTag.URL) ) {
         if( pressed ) {
-          set_cursor( url_cursor );
+          set_cursor( click_cursor );
         } else {
           set_cursor( text_cursor );
         }
