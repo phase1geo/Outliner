@@ -64,6 +64,7 @@ public class OutlineTable : DrawingArea {
   private int             _note_size;
   private bool            _show_tasks = false;
   private bool            _show_depth = true;
+  private Tagger          _tagger;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -216,6 +217,9 @@ public class OutlineTable : DrawingArea {
     /* Create the labels */
     _labels = new NodeLabels();
 
+    /* Create the tags */
+    _tagger = new Tagger( this );
+
     /* Set the style context */
     get_style_context().add_class( "canvas" );
 
@@ -329,6 +333,9 @@ public class OutlineTable : DrawingArea {
           _im_context.focus_in();
         }
       } else if( (node.mode == NodeMode.EDITABLE) || (node.mode == NodeMode.NOTEEDIT) ) {
+        if( node.mode == NodeMode.EDITABLE ) {
+          _tagger.parse_text( node.name.text );
+        }
         _im_context.focus_out();
       }
       node.mode = mode;
@@ -431,7 +438,7 @@ public class OutlineTable : DrawingArea {
 
     bool   shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
     bool   control = (bool)(e.state & ModifierType.CONTROL_MASK);
-    string url     = "";
+    string extra   = "";
 
     /* Set the selected node to the clicked node */
     selected = clicked;
@@ -440,9 +447,13 @@ public class OutlineTable : DrawingArea {
      If the mouse click was within a URL and the control key was pressed, open
      the URL in an external application.
     */
-    if( control && text.is_within_url( e.x, e.y, ref url ) ) {
+    if( control && text.is_within_url( e.x, e.y, ref extra ) ) {
       _active = clicked;
-      Utils.open_url( url );
+      Utils.open_url( extra );
+      return( false );
+    } else if( control && text.is_within_tag( e.x, e.y, ref extra ) ) {
+      _active = clicked;
+      _tagger.tag_clicked( extra );
       return( false );
     }
 
@@ -624,10 +635,12 @@ public class OutlineTable : DrawingArea {
           set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
           set_cursor( null );
         } else if( current.is_within_name( e.x, e.y ) ) {
-          string url = "";
-          if( control && !is_node_editable() && current.name.is_within_url( e.x, e.y, ref url ) ) {
+          string extra = "";
+          if( control && !is_node_editable() && current.name.is_within_url( e.x, e.y, ref extra ) ) {
             set_cursor( url_cursor );
-            set_tooltip_markup( url );
+            set_tooltip_markup( extra );
+          } else if( control && !is_node_editable() && current.name.is_within_tag( e.x, e.y, ref extra ) ) {
+            set_cursor( url_cursor );
           } else {
             set_cursor( text_cursor );
           }
@@ -839,16 +852,17 @@ public class OutlineTable : DrawingArea {
   }
 
   private void handle_control( bool pressed ) {
-    string url = "";
+    string extra = "";
     var current = node_at_coordinates( _motion_x, _motion_y );
     if( current != null ) {
-      if( !is_node_editable() && current.name.is_within_url( _motion_x, _motion_y, ref url ) ) {
+      if( !is_node_editable() && (current.name.is_within_url( _motion_x, _motion_y, ref extra ) ||
+                                  current.name.is_within_tag( _motion_x, _motion_y, ref extra )) ) {
         if( pressed ) {
           set_cursor( url_cursor );
         } else {
           set_cursor( text_cursor );
         }
-      } else if( !is_note_editable() && current.note.is_within_url( _motion_x, _motion_y, ref url ) ) {
+      } else if( !is_note_editable() && current.note.is_within_url( _motion_x, _motion_y, ref extra ) ) {
         if( pressed ) {
           set_cursor( url_cursor );
         } else {
@@ -2294,6 +2308,7 @@ public class OutlineTable : DrawingArea {
           case "theme"  :  load_theme( it );  break;
           case "nodes"  :  load_nodes( it );  break;
           case "labels" :  _labels.load( this, it );  break;
+          case "tags"   :  _tagger.load( it );  break;
         }
       }
     }
@@ -2348,6 +2363,7 @@ public class OutlineTable : DrawingArea {
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
     n->add_child( _labels.save() );
+    n->add_child( _tagger.save() );
 
   }
 

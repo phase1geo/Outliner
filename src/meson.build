@@ -52,6 +52,7 @@ sources += files(
   'NodeMenu.vala',
   'OutlineTable.vala',
   'SearchBar.vala',
+  'Tagger.vala',
   'Theme.vala',
   'Themes.vala',
   'UndoBuffer.vala',

@@ -235,6 +235,22 @@ public class CanvasText : Object {
     return( false );
   }
 
+  /* Returns true if the given coordinates within a tag and returns the matching tag */
+  public bool is_within_tag( double x, double y, ref string tag ) {
+    int adjusted_x = (int)(x - posx) * Pango.SCALE;
+    int adjusted_y = (int)(y - posy) * Pango.SCALE;
+    int cursor, trailing;
+    if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
+      var cindex = text.text.char_count( cursor + trailing );
+      var extra  = text.get_extra( FormatTag.TAG, cindex );
+      if( extra != null ) {
+        tag = extra;
+        return( true );
+      }
+    }
+    return( false );
+  }
+
   /* Returns true if text is currently selected */
   public bool is_selected() {
     return( _selstart != _selend );

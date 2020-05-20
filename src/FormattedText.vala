@@ -544,10 +544,10 @@ public class FormattedText {
     }
     public override TextTag text_tag( string? extra ) {
       var ttag = new TextTag( "url" );
-      ttag.foreground     = "#0000ff";
-      ttag.underline      = Underline.SINGLE;
-      ttag.foreground_set = true;
-      ttag.underline_set  = true;
+      ttag.foreground      = "#0000ff";
+      ttag.underline       = Underline.SINGLE;
+      ttag.foreground_set  = true;
+      ttag.underline_set   = true;
       return( ttag );
     }
   }
@@ -565,8 +565,8 @@ public class FormattedText {
     }
     public override TextTag text_tag( string? extra ) {
       var ttag = new TextTag( "tag" );
-      ttag.foreground_rgba = get_color( extra );
-      ttag.foreground_set  = true;
+      ttag.foreground     = "#00ff00";
+      ttag.foreground_set = true;
       return( ttag );
     }
   }
