@@ -48,6 +48,7 @@ public class MainWindow : ApplicationWindow {
   private FontButton      _fonts_note;
   private Switch          _condensed;
   private Switch          _show_tasks;
+  private Switch          _show_depth;
   private Label           _stats_chars;
   private Label           _stats_words;
   private Label           _stats_rows;
@@ -721,6 +722,19 @@ public class MainWindow : ApplicationWindow {
     tbox.pack_end(   _show_tasks, false, false, 10 );
     box.pack_start( tbox, false, false, 10 );
 
+    /* Add show depth switch */
+    var dbox = new Box( Orientation.HORIZONTAL, 0 );
+    var dlbl = new Label( _( "Show Depth Lines" ) );
+    _show_depth = new Switch();
+    _show_depth.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.show_depth = state;
+      return( false );
+    });
+    dbox.pack_start( dlbl,       false, false, 10 );
+    dbox.pack_end(   _show_depth, false, false, 10 );
+    box.pack_start( dbox, false, false, 10 );
+
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
 
@@ -1158,6 +1172,7 @@ public class MainWindow : ApplicationWindow {
     _theme_buttons.get( theme_name ).active = true;
     _condensed.state     = table.condensed;
     _show_tasks.state    = table.show_tasks;
+    _show_depth.state    = table.show_depth;
     _list_types.selected = table.list_type;
   }
 

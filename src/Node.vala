@@ -114,6 +114,7 @@ public class NodeDrawOptions {
   public bool show_note_bg   { get; set; default = true; }
   public bool show_note_ol   { get; set; default = false; }
   public bool show_expander  { get; set; default = true; }
+  public bool show_depth     { get; set; default = true; }
   public bool use_theme      { get; set; default = false; }
   public NodeDrawOptions() {}
 }
@@ -1333,6 +1334,22 @@ public class Node {
 
   }
 
+  public void draw_depth( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
+
+    if( !opts.show_depth || !_ot.show_depth || _parent.is_root() ) return;
+
+    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, 0.5 );
+    ctx.set_line_width( 1 );
+
+    for( int i=1; i<_depth; i++ ) {
+      var x = (padx * 4) + 10 + (i * indent) + (expander_size / 2);
+      ctx.move_to( x, _y );
+      ctx.line_to( x, (_y + _h) );
+      ctx.stroke();
+    }
+
+  }
+
   /* Draw the task indicator */
   public void draw_task( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
@@ -1469,6 +1486,7 @@ public class Node {
     draw_background( ctx, theme, opts );
     draw_note_icon( ctx, theme, opts );
     draw_expander( ctx, theme, opts );
+    draw_depth( ctx, theme, opts );
     draw_task( ctx, theme, opts );
     draw_list_type( ctx, theme, opts );
     draw_name( ctx, theme, opts );

@@ -63,6 +63,7 @@ public class OutlineTable : DrawingArea {
   private string          _note_family;
   private int             _note_size;
   private bool            _show_tasks = false;
+  private bool            _show_depth = true;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -174,6 +175,18 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool show_depth {
+    get {
+      return( _show_depth );
+    }
+    set {
+      if( _show_depth != value ) {
+        _show_depth = value;
+        queue_draw();
+        changed();
+      }
+    }
+  }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -206,11 +219,13 @@ public class OutlineTable : DrawingArea {
     /* Set the style context */
     get_style_context().add_class( "canvas" );
 
-    /* Initialize font information from gsettings */
+    /* Initialize font and other property information from gsettings */
     _name_family = settings.get_string( "default-row-font-family" );
     _note_family = settings.get_string( "default-note-font-family" );
     _name_size   = settings.get_int( "default-row-font-size" );
     _note_size   = settings.get_int( "default-note-font-size" );
+    _show_tasks  = settings.get_boolean( "default-show-tasks" );
+    _show_depth  = settings.get_boolean( "default-show-depth" );
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -2268,6 +2283,11 @@ public class OutlineTable : DrawingArea {
       _show_tasks = bool.parse( t );
     }
 
+    var d = n->get_prop( "show-depth" );
+    if( d != null ) {
+      _show_depth = bool.parse( d );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -2323,6 +2343,7 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "note-font-family", _note_family );
     n->set_prop( "note-font-size",   _note_size.to_string() );
     n->set_prop( "show-tasks",       _show_tasks.to_string() );
+    n->set_prop( "show-depth",       _show_depth.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
