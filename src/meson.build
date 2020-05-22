@@ -9,6 +9,8 @@ sources += files(
   'exports/ExportRTF.vala',
   'exports/ExportText.vala',
 
+  'parsers/MarkdownParser.vala',
+
   'themes/ThemeDark.vala',
   'themes/ThemeDefault.vala',
   'themes/ThemePrintColor.vala',
@@ -53,6 +55,7 @@ sources += files(
   'OutlineTable.vala',
   'SearchBar.vala',
   'Tagger.vala',
+  'TextParser.vala',
   'Theme.vala',
   'Themes.vala',
   'UndoBuffer.vala',

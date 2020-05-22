@@ -91,5 +91,10 @@
       <summary>Default state of the Show Row Depth property switch</summary>
       <description>Default state of the Show Row Depth property switch</description>
     </key>
+    <key name="default-markdown-enabled" type="b">
+      <default>false</default>
+      <summary>Default state of the markdown indicator for new documents</summary>
+      <description>Default state of the markdown indicator for new documents</description>
+    </key>
   </schema>
 </schemalist>

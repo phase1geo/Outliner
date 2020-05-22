@@ -135,23 +135,23 @@ public class Node {
   private static int next_id  = 0;
   private static int clone_id = 0;
 
-  private OutlineTable _ot;
-  private int          _id        = next_id++;
-  private CanvasText   _name;
-  private CanvasText   _note;
-  private NodeMode     _mode      = NodeMode.NONE;
-  private double       _x         = 0;
-  private double       _y         = 40;
-  private double       _w         = 500;
-  private double       _h         = 80;
-  private int          _depth     = 0;
-  private bool         _expanded  = true;
-  private Pango.Layout _lt_layout;
-  private double       _lt_width  = 0;
-  private bool         _hide_note = true;
-  private int          _clone_id  = -1;
-  private NodeTaskMode _task      = NodeTaskMode.OPEN;
-  private bool         _debug     = false;
+  private OutlineTable  _ot;
+  private int           _id        = next_id++;
+  private CanvasText    _name;
+  private CanvasText    _note;
+  private NodeMode      _mode      = NodeMode.NONE;
+  private double        _x         = 0;
+  private double        _y         = 40;
+  private double        _w         = 500;
+  private double        _h         = 80;
+  private int           _depth     = 0;
+  private bool          _expanded  = true;
+  private Pango.Layout  _lt_layout;
+  private double        _lt_width  = 0;
+  private bool          _hide_note = true;
+  private int           _clone_id  = -1;
+  private NodeTaskMode  _task      = NodeTaskMode.OPEN;
+  private bool          _debug     = false;
 
   private static Pixbuf? _note_icon = null;
 
@@ -309,12 +309,14 @@ public class Node {
 
     position_text();
     update_width();
+    table_markdown_changed();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
+    ot.markdown_changed.connect( table_markdown_changed );
 
   }
 
@@ -354,11 +356,14 @@ public class Node {
 
     position_text();
     update_width();
+    table_markdown_changed();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
+    ot.show_tasks_changed.connect( update_height_from_resize );
+    ot.markdown_changed.connect( table_markdown_changed );
 
   }
 
@@ -367,6 +372,8 @@ public class Node {
     _ot.win.configure_event.disconnect( window_size_changed );
     _ot.zoom_changed.disconnect( table_zoom_changed );
     _ot.theme_changed.disconnect( table_theme_changed );
+    _ot.show_tasks_changed.disconnect( update_height_from_resize );
+    _ot.markdown_changed.disconnect( table_markdown_changed );
   }
 
   /* Create the note icon pixbuf if we need to */
@@ -402,6 +409,17 @@ public class Node {
   private void table_theme_changed() {
     _name.update_size( false );
     _note.update_size( false );
+  }
+
+  /* Handle any changes to the markdown parser */
+  private void table_markdown_changed() {
+    if( _ot.markdown ) {
+      _name.text.add_parser( OutlineTable.markdown_parser );
+      _note.text.add_parser( OutlineTable.markdown_parser );
+    } else {
+      _name.text.remove_parser( OutlineTable.markdown_parser );
+      _note.text.remove_parser( OutlineTable.markdown_parser );
+    }
   }
 
   /* Generates the select mode signal for the name field */

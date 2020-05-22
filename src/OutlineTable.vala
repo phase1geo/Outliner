@@ -65,6 +65,7 @@ public class OutlineTable : DrawingArea {
   private bool            _show_tasks = false;
   private bool            _show_depth = true;
   private Tagger          _tagger;
+  private bool            _markdown;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -188,6 +189,22 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool markdown {
+    get {
+      return( _markdown );
+    }
+    set {
+      if( _markdown != value ) {
+        _markdown = value;
+        markdown_changed();
+        queue_draw();
+        changed();
+      }
+    }
+  }
+
+  /* Allocate static parsers */
+  public static MarkdownParser markdown_parser { get; set; default = new MarkdownParser(); }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -196,6 +213,7 @@ public class OutlineTable : DrawingArea {
   public signal void selected_changed();
   public signal void cursor_changed();
   public signal void show_tasks_changed();
+  public signal void markdown_changed();
 
   /* Default constructor */
   public OutlineTable( MainWindow win, GLib.Settings settings ) {
@@ -230,6 +248,7 @@ public class OutlineTable : DrawingArea {
     _note_size   = settings.get_int( "default-note-font-size" );
     _show_tasks  = settings.get_boolean( "default-show-tasks" );
     _show_depth  = settings.get_boolean( "default-show-depth" );
+    _markdown    = settings.get_boolean( "default-markdown-enabled" );
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -2303,6 +2322,11 @@ public class OutlineTable : DrawingArea {
       _show_depth = bool.parse( d );
     }
 
+    var m = n->get_prop( "markdown" );
+    if( m != null ) {
+      _markdown = bool.parse( m );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -2360,6 +2384,7 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "note-font-size",   _note_size.to_string() );
     n->set_prop( "show-tasks",       _show_tasks.to_string() );
     n->set_prop( "show-depth",       _show_depth.to_string() );
+    n->set_prop( "markdown",         _markdown.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );

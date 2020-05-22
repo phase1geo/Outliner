@@ -599,9 +599,10 @@ public class FormattedText {
     }
   }
 
-  private static TagAttr[] _attr_tags = null;
-  private TagInfo[]        _formats   = new TagInfo[FormatTag.LENGTH];
-  private string           _text      = "";
+  private static TagAttr[]  _attr_tags = null;
+  private TagInfo[]         _formats   = new TagInfo[FormatTag.LENGTH];
+  private string            _text      = "";
+  private Array<TextParser> _parsers   = new Array<TextParser>();
 
   public signal void changed();
 
@@ -662,12 +663,30 @@ public class FormattedText {
     }
   }
 
+  /* Called whenever the theme changes */
   public static void set_theme( Theme theme ) {
     if( _attr_tags == null ) return;
     (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
     (_attr_tags[FormatTag.TAG] as TaggingInfo).update_color( theme.tag );
     (_attr_tags[FormatTag.MATCH] as MatchInfo).update_color( theme.match_foreground, theme.match_background );
     (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
+  }
+
+  /* Adds the given parser */
+  public void add_parser( TextParser parser ) {
+    _parsers.append_val( parser );
+    parse();
+  }
+
+  /* Removes the specified parser */
+  public void remove_parser( TextParser parser ) {
+    for( int i=0; i<_parsers.length; i++ ) {
+      if( _parsers.index( i ) == parser ) {
+        _parsers.remove_index( i );
+        parse();
+        return;
+      }
+    }
   }
 
   /* Copies the specified FormattedText instance to this one */
@@ -690,6 +709,7 @@ public class FormattedText {
     foreach( TagInfo f in _formats) {
       f.adjust( index, str.length );
     }
+    parse();
     changed();
   }
 
@@ -708,6 +728,7 @@ public class FormattedText {
       f.remove_tag( index, (index + chars) );
       f.adjust( index, ((0 - chars) + str.length) );
     }
+    parse();
     changed();
   }
 
@@ -718,6 +739,7 @@ public class FormattedText {
       f.remove_tag( index, (index + chars) );
       f.adjust( index, (0 - chars) );
     }
+    parse();
     changed();
   }
 
@@ -943,6 +965,18 @@ public class FormattedText {
       }
     }
     changed();
+  }
+
+  /* If there are text parsers associated with this text, run them */
+  private void parse() {
+    if( _parsers.length > 0 ) {
+      for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+        _formats[i].remove_tag_all();
+      }
+      for( int i=0; i<_parsers.length; i++ ) {
+        _parsers.index( i ).parse( this );
+      }
+    }
   }
 
   /* Saves the text as the given XML node */

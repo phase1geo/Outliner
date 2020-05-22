@@ -49,6 +49,7 @@ public class MainWindow : ApplicationWindow {
   private Switch          _condensed;
   private Switch          _show_tasks;
   private Switch          _show_depth;
+  private Switch          _markdown;
   private Label           _stats_chars;
   private Label           _stats_words;
   private Label           _stats_rows;
@@ -731,9 +732,22 @@ public class MainWindow : ApplicationWindow {
       table.show_depth = state;
       return( false );
     });
-    dbox.pack_start( dlbl,       false, false, 10 );
+    dbox.pack_start( dlbl,        false, true,  10 );
     dbox.pack_end(   _show_depth, false, false, 10 );
     box.pack_start( dbox, false, false, 10 );
+
+    /* Add the Markdown switch */
+    var mbox = new Box( Orientation.HORIZONTAL, 0 );
+    var mlbl = new Label( _( "Enable Markdown Highlighting" ) );
+    _markdown = new Switch();
+    _markdown.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.markdown = state;
+      return( false );
+    });
+    mbox.pack_start( mlbl,      false, true, 10 );
+    mbox.pack_end(   _markdown, false, false, 10 );
+    box.pack_start( mbox, false, false, 10 );
 
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
