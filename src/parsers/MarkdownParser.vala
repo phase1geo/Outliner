@@ -23,6 +23,7 @@ public class MarkdownParser : TextParser {
 
   /* Default constructor */
   public MarkdownParser() {
+    base( "Markdown" );
 
     /* Header */
     add_regex( new TextParserRegex( "^#[^#].*$",      {{0, FormatTag.HEADER, "1"}} ) );
@@ -39,12 +40,12 @@ public class MarkdownParser : TextParser {
     add_regex( new TextParserRegex( "`[^`]+`", {{0, FormatTag.CODE, ""}} ) );
 
     /* Bold */
-    add_regex( new TextParserRegex( "\\*\\*[^*]+\\*\\*", {{0, FormatTag.BOLD, ""}} ) );
-    add_regex( new TextParserRegex( "__[^_]+__", {{0, FormatTag.BOLD, ""}} ) );
+    add_regex( new TextParserRegex( "\\*\\*[^* \\t].*?(?<!\\\\|\\*| |\\t)\\*\\*", {{0, FormatTag.BOLD, ""}} ) );
+    add_regex( new TextParserRegex( "__[^_ \\t].*?(?<!\\\\|_| |\\t)__", {{0, FormatTag.BOLD, ""}} ) );
 
     /* Italics */
-    add_regex( new TextParserRegex( "(^|[^\\*])(\\*[^\\*]+\\*)($|[^\\*])", {{2, FormatTag.ITALICS, ""}} ) );
-    add_regex( new TextParserRegex( "(^|[^_])(_[^_]+_)($|[^_])", {{2, FormatTag.ITALICS, ""}} ) );
+    add_regex( new TextParserRegex( "(?<!_)_[^_ \t].*?(?<!\\\\|_| |\\t)_(?!_)", {{0, FormatTag.ITALICS, ""}} ) );
+    add_regex( new TextParserRegex( "(?<!\\*)\\*[^* \t].*?(?<!\\\\|\\*| |\\t)\\*(?!\\*)", {{0, FormatTag.ITALICS, ""}} ) );
 
     /* Links */
     add_regex( new TextParserRegex( "(\\[.*?\\]\\s*\\()(\\S+).*(\\))",

@@ -40,7 +40,7 @@ public class TextParserRegex {
 
     /* Make sure that the regular expression parses properly */
     try {
-      _re = new Regex( re );
+      _re = new Regex( re, RegexCompileFlags.MULTILINE );
     } catch( RegexError e ) {
       stdout.printf( "Parser regex error (re: %s, error: %s)\n", re, e.message );
       return;
@@ -68,7 +68,6 @@ public class TextParserRegex {
     var       start = 0;
     try {
       while( _re.match_full( text.text, -1, start, 0, out matches ) ) {
-        stdout.printf( "Matched pattern: %s\n", _re.get_pattern() );
         for( int i=0; i<10; i++ ) {
           if( _tags[i] != null ) {
             int start_pos, end_pos;
@@ -89,12 +88,19 @@ public class TextParserRegex {
 
 public class TextParser {
 
-
+  private string                 _name;
   private Array<TextParserRegex> _res;
 
+  public string name {
+    get {
+      return( _name );
+    }
+  }
+
   /* Default constructor */
-  public TextParser() {
-    _res = new Array<TextParserRegex>();
+  public TextParser( string name ) {
+    _name = name;
+    _res  = new Array<TextParserRegex>();
   }
 
   /* Adds a regular expression to this parser */

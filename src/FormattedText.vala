@@ -676,6 +676,7 @@ public class FormattedText {
   public void add_parser( TextParser parser ) {
     _parsers.append_val( parser );
     parse();
+    changed();
   }
 
   /* Removes the specified parser */
@@ -683,7 +684,8 @@ public class FormattedText {
     for( int i=0; i<_parsers.length; i++ ) {
       if( _parsers.index( i ) == parser ) {
         _parsers.remove_index( i );
-        parse();
+        parse( true );
+        changed();
         return;
       }
     }
@@ -968,14 +970,14 @@ public class FormattedText {
   }
 
   /* If there are text parsers associated with this text, run them */
-  private void parse() {
-    if( _parsers.length > 0 ) {
+  private void parse( bool force_clear = false ) {
+    if( (_parsers.length > 0) || force_clear ) {
       for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
         _formats[i].remove_tag_all();
       }
-      for( int i=0; i<_parsers.length; i++ ) {
-        _parsers.index( i ).parse( this );
-      }
+    }
+    for( int i=0; i<_parsers.length; i++ ) {
+      _parsers.index( i ).parse( this );
     }
   }
 

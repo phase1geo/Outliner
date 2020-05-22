@@ -1187,6 +1187,7 @@ public class MainWindow : ApplicationWindow {
     _condensed.state     = table.condensed;
     _show_tasks.state    = table.show_tasks;
     _show_depth.state    = table.show_depth;
+    _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
   }
 
