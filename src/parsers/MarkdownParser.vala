@@ -26,35 +26,112 @@ public class MarkdownParser : TextParser {
     base( "Markdown" );
 
     /* Header */
-    add_regex( new TextParserRegex( "^#[^#].*$",      {{0, FormatTag.HEADER, "1"}} ) );
-    add_regex( new TextParserRegex( "^##[^#].*$",     {{0, FormatTag.HEADER, "2"}} ) );
-    add_regex( new TextParserRegex( "^###[^#].*$",    {{0, FormatTag.HEADER, "3"}} ) );
-    add_regex( new TextParserRegex( "^####[^#].*$",   {{0, FormatTag.HEADER, "4"}} ) );
-    add_regex( new TextParserRegex( "^#####[^#].*$",  {{0, FormatTag.HEADER, "5"}} ) );
-    add_regex( new TextParserRegex( "^######[^#].*$", {{0, FormatTag.HEADER, "6"}} ) );
+    add_regex( "^(#{1,6})[^#].*$", highlight_header );
 
     /* Lists */
-    add_regex( new TextParserRegex( "^\\s*(\\*|\\+|\\-|[0-9]+\\.)\\s", {{1, FormatTag.COLOR, "red"}} ) );
+    add_regex( "^\\s*(\\*|\\+|\\-|[0-9]+\\.)\\s", (text, match) => {
+      add_tag( text, match, 1, FormatTag.COLOR, "red" );
+    });
 
     /* Code */
-    add_regex( new TextParserRegex( "`[^`]+`", {{0, FormatTag.CODE, ""}} ) );
+    add_regex( "`[^`]+`", (text, match) => {
+      add_tag( text, match, 0, FormatTag.CODE );
+    });
 
     /* Bold */
-    add_regex( new TextParserRegex( "\\*\\*[^* \\t].*?(?<!\\\\|\\*| |\\t)\\*\\*", {{0, FormatTag.BOLD, ""}} ) );
-    add_regex( new TextParserRegex( "__[^_ \\t].*?(?<!\\\\|_| |\\t)__", {{0, FormatTag.BOLD, ""}} ) );
+    add_regex( "\\*\\*[^* \\t].*?(?<!\\\\|\\*| |\\t)\\*\\*", highlight_bold );
+    add_regex( "__[^_ \\t].*?(?<!\\\\|_| |\\t)__", highlight_bold );
 
     /* Italics */
-    add_regex( new TextParserRegex( "(?<!_)_[^_ \t].*?(?<!\\\\|_| |\\t)_(?!_)", {{0, FormatTag.ITALICS, ""}} ) );
-    add_regex( new TextParserRegex( "(?<!\\*)\\*[^* \t].*?(?<!\\\\|\\*| |\\t)\\*(?!\\*)", {{0, FormatTag.ITALICS, ""}} ) );
+    add_regex( "(?<!_)_[^_ \t].*?(?<!\\\\|_| |\\t)_(?!_)", highlight_italics );
+    add_regex( "(?<!\\*)\\*[^* \t].*?(?<!\\\\|\\*| |\\t)\\*(?!\\*)", highlight_italics );
 
     /* Links */
-    add_regex( new TextParserRegex( "(\\[.*?\\]\\s*\\()(\\S+).*(\\))",
-      {{1, FormatTag.COLOR, "grey"}, {2, FormatTag.URL, ""}, {3, FormatTag.COLOR, "grey"}} ) );
-    add_regex( new TextParserRegex( "<((mailto:)?[a-z0-9.-]+@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)>",
-      {{1, FormatTag.URL, ""}} ) );
-    add_regex( new TextParserRegex( "<((https?|ftp):[^'\">\\s]+)>",
-      {{1, FormatTag.URL, ""}} ) );
+    add_regex( "(\\[)(.+?)(\\]\\s*\\((\\S+).*\\))", highlight_url1 );
+    add_regex( "(<)((mailto:)?[a-z0-9.-]+@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)(>)", highlight_url2 );
+    add_regex( "(<)((https?|ftp):[^'\">\\s]+)(>)", highlight_url3 );
 
+  }
+
+  private void make_grey( FormattedText text, MatchInfo match, int paren ) {
+    add_tag( text, match, paren, FormatTag.COLOR, "grey" );
+  }
+
+  private void highlight_header( FormattedText text, MatchInfo match ) {
+    add_tag( text, match, 0, FormatTag.HEADER, get_text( match, 1 ).length.to_string() );
+  }
+
+  private void highlight_bold( FormattedText text, MatchInfo match ) {
+    add_tag( text, match, 0, FormatTag.BOLD );
+  }
+
+  private void highlight_italics( FormattedText text, MatchInfo match ) {
+    add_tag( text, match, 0, FormatTag.ITALICS );
+  }
+
+  private void highlight_url1( FormattedText text, MatchInfo match ) {
+    stdout.printf( "In highlight_url1\n" );
+    make_grey( text, match, 1 );
+    make_grey( text, match, 3 );
+    add_tag( text, match, 2, FormatTag.URL, get_text( match, 4 ) );
+  }
+
+  private void highlight_url2( FormattedText text, MatchInfo match ) {
+    make_grey( text, match, 1 );
+    make_grey( text, match, 5 );
+    add_tag( text, match, 2, FormatTag.URL, get_text( match, 2 ) );
+  }
+
+  private void highlight_url3( FormattedText text, MatchInfo match ) {
+    make_grey( text, match, 1 );
+    make_grey( text, match, 4 );
+    add_tag( text, match, 2, FormatTag.URL, get_text( match, 2 ) );
+  }
+
+  public override bool save_tags() {
+    return( false );
+  }
+
+  /* Returns true if the associated tag should enable the associated FormatBar button */
+  public override bool enable_tag( FormatTag tag ) {
+    switch( tag ) {
+      case FormatTag.HEADER  :
+      case FormatTag.CODE    :
+      case FormatTag.BOLD    :
+      case FormatTag.ITALICS :
+      case FormatTag.URL     :  return( true );
+      default                :  return( false );
+    }
+  }
+
+  /* This is called when the associated FormatBar button is clicked */
+  public override void insert_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos, string extra ) {
+    switch( tag ) {
+      case FormatTag.HEADER  :  insert_header( text, start_pos, extra );  break;
+      case FormatTag.CODE    :  insert_surround( text, "`", start_pos, end_pos );  break;
+      case FormatTag.BOLD    :  insert_surround( text, "**", start_pos, end_pos );  break;
+      case FormatTag.ITALICS :  insert_surround( text, "_", start_pos, end_pos );  break;
+      case FormatTag.URL     :  insert_link( text, start_pos, end_pos, extra );  break;
+    }
+  }
+
+  private void insert_header( FormattedText text, int start_pos, string extra ) {
+    var nl = text.text.slice( 0, start_pos ).last_index_of( "\n" );
+    if( nl == -1 ) {
+      text.insert_text( 0, "%s ".printf( extra ) );
+    } else {
+      text.replace_text( nl, 1, "\n%s ".printf( extra ) );
+    }
+  }
+
+  private void insert_surround( FormattedText text, string surround, int start_pos, int end_pos ) {
+    text.insert_text( end_pos, surround );
+    text.insert_text( start_pos, surround );
+  }
+
+  private void insert_link( FormattedText text, int start_pos, int end_pos, string url ) {
+    text.insert_text( end_pos, "](%s)".printf( url ) );
+    text.insert_text( start_pos, "[" );
   }
 
 }

@@ -19,77 +19,17 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public struct TextParserElem {
-  int       paren;
-  FormatTag tag;
-  string    extra;
-}
-
-public class TextParserRegex {
-
-  struct TextParserTag {
-    FormatTag tag;
-    string    extra;
-  }
-
-  private Regex            _re;
-  private TextParserTag?[] _tags;
-
-  /* Default constructor */
-  public TextParserRegex( string re, TextParserElem[] list ) {
-
-    /* Make sure that the regular expression parses properly */
-    try {
-      _re = new Regex( re, RegexCompileFlags.MULTILINE );
-    } catch( RegexError e ) {
-      stdout.printf( "Parser regex error (re: %s, error: %s)\n", re, e.message );
-      return;
-    }
-
-    /* Allocate memory */
-    _tags = {null, null, null, null, null, null, null, null, null, null};
-
-    /* Add the arguments */
-    foreach( TextParserElem elem in list ) {
-      add_tag( elem.paren, elem.tag, elem.extra );
-    }
-
-  }
-
-  /* Adds the given tag to this parser */
-  private void add_tag( int paren, FormatTag tag, string extra ) {
-    TextParserTag ttag = { tag, extra };
-    _tags[paren] = ttag;
-  }
-
-  /* Parses the given text for this regular expression */
-  public void parse( FormattedText text ) {
-    MatchInfo matches;
-    var       start = 0;
-    try {
-      while( _re.match_full( text.text, -1, start, 0, out matches ) ) {
-        for( int i=0; i<10; i++ ) {
-          if( _tags[i] != null ) {
-            int start_pos, end_pos;
-            matches.fetch_pos( i, out start_pos, out end_pos );
-            if( _tags[i].tag == FormatTag.URL ) {
-              text.add_tag( _tags[i].tag, start_pos, end_pos, matches.fetch( i ) );
-            } else {
-              text.add_tag( _tags[i].tag, start_pos, end_pos, _tags[i].extra );
-            }
-            start = end_pos;
-          }
-        }
-      }
-    } catch( RegexError e ) {}
-  }
-
-}
-
 public class TextParser {
 
-  private string                 _name;
-  private Array<TextParserRegex> _res;
+  public delegate void TextMatchCallback( FormattedText text, MatchInfo match_info );
+
+  private struct ReCallback {
+    Regex             re;
+    TextMatchCallback func;
+  }
+
+  private string             _name;
+  private Array<ReCallback?> _res;
 
   public string name {
     get {
@@ -100,19 +40,65 @@ public class TextParser {
   /* Default constructor */
   public TextParser( string name ) {
     _name = name;
-    _res  = new Array<TextParserRegex>();
+    _res  = new Array<ReCallback?>();
   }
 
   /* Adds a regular expression to this parser */
-  public void add_regex( TextParserRegex re ) {
-    _res.append_val( re );
+  protected void add_regex( string re, TextMatchCallback func ) {
+    try {
+      _res.append_val( { new Regex( re, RegexCompileFlags.MULTILINE ), func } );
+    } catch( RegexError e ) {
+      stdout.printf( "Parser regex error (re: %s, error: %s)\n", re, e.message );
+      return;
+    }
+  }
+
+  /* Helper function that adds the tag for the given parenthesis match */
+  protected void add_tag( FormattedText text, MatchInfo matches, int paren, FormatTag tag, string extra = "" ) {
+    int start, end;
+    matches.fetch_pos( paren, out start, out end );
+    text.add_tag( tag, start, end, extra );
+  }
+
+  /* Helper function that returns the matched string */
+  protected string get_text( MatchInfo matches, int paren ) {
+    return( matches.fetch( paren ) );
   }
 
   /* Called to parse the text within the given FormattedText element */
-  public virtual void parse( FormattedText text ) {
+  public void parse( FormattedText text ) {
     for( int i=0; i<_res.length; i++ ) {
-      _res.index( i ).parse( text );
+      MatchInfo matches;
+      var       start = 0;
+      try {
+        while( _res.index( i ).re.match_full( text.text, -1, start, 0, out matches ) ) {
+          int start_pos, end_pos;
+          matches.fetch_pos( 0, out start_pos, out end_pos );
+          start = end_pos;
+          _res.index( i ).func( text, matches );
+        }
+      } catch( RegexError e ) {}
     }
+  }
+
+  /* Returns true if the associated FormattedText should save its tags to the XML file */
+  public virtual bool save_tags() {
+    return( true );
+  }
+
+  /* Returns true if the associated tag should enable the associated FormatBar button */
+  public virtual bool enable_tag( FormatTag tag ) {
+    return( true );
+  }
+
+  /* This is called when the associated FormatBar button is clicked */
+  public virtual void insert_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos, string extra ) {
+    text.add_tag( tag, start_pos, end_pos, extra );
+  }
+
+  /* This is called when the associated FormatBar button is unclicked */
+  public virtual void remove_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos ) {
+    text.remove_tag( tag, start_pos, end_pos );
   }
 
 }
