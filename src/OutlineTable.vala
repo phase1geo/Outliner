@@ -65,8 +65,8 @@ public class OutlineTable : DrawingArea {
   private bool            _show_tasks = false;
   private bool            _show_depth = true;
   private Tagger          _tagger;
+  private TextCompletion  _completion;
   private bool            _markdown;
-  private Completion      _completion;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -247,7 +247,7 @@ public class OutlineTable : DrawingArea {
     tagger_parser = new TaggerParser( this );
 
     /* Create text completion */
-    _completion = new Completion( this );
+    _completion = new TextCompletion( this );
 
     /* Set the style context */
     get_style_context().add_class( "canvas" );
