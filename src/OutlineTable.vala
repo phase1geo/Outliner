@@ -2484,12 +2484,20 @@ public class OutlineTable : DrawingArea {
   /* AUTO-COMPLETION */
   /*******************/
 
+  /* Displays the auto-completion widget with the given list of values */
   public void show_auto_completion( Array<string> values ) {
-    // TBD
+    if( is_node_editable() ) {
+      _completion.show( selected.name, values );
+    } else if( is_note_editable() ) {
+      _completion.show( selected.note, values );
+    } else {
+      _completion.hide();
+    }
   }
 
+  /* Hides the auto-completion widget from view */
   public void hide_auto_completion() {
-    // TBD
+    _completion.hide();
   }
 
   /************************/

@@ -19,9 +19,12 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
+using Gtk;
+
 public class TextCompletion {
 
   private OutlineTable _ot;
+  private ListBox      _list;
   private bool         _shown = false;
 
   public bool shown {
@@ -33,6 +36,8 @@ public class TextCompletion {
   /* Default constructor */
   public TextCompletion( OutlineTable ot ) {
     _ot = ot;
+    _list = new ListBox();
+    _list.selection_mode = SelectionMode.BROWSE;
   }
 
   /* Displays the auto-completion text with the given list */
@@ -44,12 +49,16 @@ public class TextCompletion {
       return;
     }
 
-    int cursor, selstart, selend, curline;
-    double curleft, curtop, curbot;
-
     /* Get the position of the cursor so that we know where to place the box */
-    ct.get_cursor_info( out cursor, out selstart, out selend );
-    ct.get_char_pos( cursor, out curleft, out curtop, out curbot, out curline );
+    int x, ytop, ybot;
+    ct.get_cursor_pos( out x, out ytop, out ybot );
+
+    /* Set the position of the widget */
+    _list.margin_start = x;
+    _list.margin_top   = ytop + ((ybot - ytop) / 2);
+
+    var overlay = (Overlay)_ot.get_parent();
+    overlay.add_overlay( _list );
 
     _shown = true;
 
