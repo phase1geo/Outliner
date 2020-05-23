@@ -10,6 +10,7 @@ sources += files(
   'exports/ExportText.vala',
 
   'parsers/MarkdownParser.vala',
+  'parsers/TaggerParser.vala',
 
   'themes/ThemeDark.vala',
   'themes/ThemeDefault.vala',
@@ -43,6 +44,7 @@ sources += files(
   'CanvasText.vala',
   'Clipboard.vala',
   'ColorPicker.vala',
+  'Completion.vala',
   'Document.vala',
   'DynamicNotebook.vala',
   'FormatBar.vala',

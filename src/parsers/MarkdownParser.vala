@@ -88,12 +88,8 @@ public class MarkdownParser : TextParser {
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 2 ) );
   }
 
-  public override bool save_tags() {
-    return( false );
-  }
-
   /* Returns true if the associated tag should enable the associated FormatBar button */
-  public override bool enable_tag( FormatTag tag ) {
+  public override bool tag_handled( FormatTag tag ) {
     switch( tag ) {
       case FormatTag.HEADER  :
       case FormatTag.CODE    :

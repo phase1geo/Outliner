@@ -81,14 +81,9 @@ public class TextParser {
     }
   }
 
-  /* Returns true if the associated FormattedText should save its tags to the XML file */
-  public virtual bool save_tags() {
-    return( true );
-  }
-
   /* Returns true if the associated tag should enable the associated FormatBar button */
-  public virtual bool enable_tag( FormatTag tag ) {
-    return( true );
+  public virtual bool tag_handled( FormatTag tag ) {
+    return( false );
   }
 
   /* This is called when the associated FormatBar button is clicked */

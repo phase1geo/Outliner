@@ -26,11 +26,13 @@ public class Tagger {
   private OutlineTable         _ot;
   private HashMap<string,bool> _tags;
   private Regex                _re;
+  private Array<string>        _matches;
 
   /* Default constructor */
   public Tagger( OutlineTable ot ) {
-    _ot   = ot;
-    _tags = new HashMap<string,bool>();
+    _ot      = ot;
+    _tags    = new HashMap<string,bool>();
+    _matches = new Array<string>();
     try {
       _re = new Regex( "\\s(@(\\S+))" );
     } catch( RegexError e ) {}
@@ -47,7 +49,6 @@ public class Tagger {
       int start_pos, end_pos;
       matches.fetch_pos( 1, out start_pos, out end_pos );
       var tag = matches.fetch( 2 );
-      text.add_tag( FormatTag.TAG, start_pos, end_pos, tag );
       if( !_tags.has_key( tag ) ) {
         _tags.@set( tag, true );
       }
@@ -59,6 +60,19 @@ public class Tagger {
   public void tag_clicked( string tag ) {
     // TBD
     stdout.printf( "tag_clicked: %s\n", tag );
+  }
+
+  /* Gets the list of matching keys */
+  public Array<string> get_matches( string partial ) {
+    var it = _tags.map_iterator();
+    _matches.remove_range( 0, _matches.length );
+    while( it.next() ) {
+      var key = (string)it.get_key();
+      if( key.substring( 0, partial.length ) == partial ) {
+        _matches.append_val( key );
+      }
+    }
+    return( _matches );
   }
 
   /* Returns the XML version of this class for saving purposes */

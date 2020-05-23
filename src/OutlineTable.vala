@@ -202,9 +202,15 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public Tagger tagger {
+    get {
+      return( _tagger );
+    }
+  }
 
   /* Allocate static parsers */
-  public static MarkdownParser markdown_parser { get; set; default = new MarkdownParser(); }
+  public MarkdownParser markdown_parser { get; default = new MarkdownParser(); }
+  public TaggerParser   tagger_parser   { get; private set; }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -237,6 +243,7 @@ public class OutlineTable : DrawingArea {
 
     /* Create the tags */
     _tagger = new Tagger( this );
+    tagger_parser = new TaggerParser( this );
 
     /* Set the style context */
     get_style_context().add_class( "canvas" );
@@ -2449,6 +2456,18 @@ public class OutlineTable : DrawingArea {
     undo_buffer.add_item( undo );
     queue_draw();
     changed();
+  }
+
+  /*******************/
+  /* AUTO-COMPLETION */
+  /*******************/
+
+  public void show_auto_completion( Array<string> values ) {
+    // TBD
+  }
+
+  public void hide_auto_completion() {
+    // TBD
   }
 
   /************************/

@@ -981,12 +981,21 @@ public class FormattedText {
     }
   }
 
+  /* Determines if the given tag should be saved */
+  private bool save_tag( FormatTag tag ) {
+    bool save = true;
+    for( int i=0; i<_parsers.length; i++ ) {
+      save &= !_parsers.index( i ).tag_handled( tag );
+    }
+    return( save );
+  }
+
   /* Saves the text as the given XML node */
   public Xml.Node* save() {
     Xml.Node* n = new Xml.Node( null, "text" );
     n->new_prop( "data", text );
     for( int i=0; i<(FormatTag.LENGTH - 2); i++ ) {
-      if( !_formats[i].is_empty() ) {
+      if( !_formats[i].is_empty() && save_tag( (FormatTag)i ) ) {
         var tag = (FormatTag)i;
         n->add_child( _formats[i].save( tag.to_string() ) );
       }
@@ -1012,11 +1021,12 @@ public class FormattedText {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         var tag = FormatTag.from_string( it->name );
-        if( tag != FormatTag.LENGTH ) {
+        if( (tag != FormatTag.LENGTH) && save_tag( tag ) ) {
           _formats[tag].load( it );
         }
       }
     }
+    parse();
     changed();
   }
 

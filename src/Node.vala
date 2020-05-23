@@ -293,6 +293,7 @@ public class Node {
     _lt_layout = ot.create_pango_layout( null );
 
     _name = new CanvasText( ot, ot.get_allocated_width() );
+    _name.text.add_parser( ot.tagger_parser );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
@@ -340,6 +341,7 @@ public class Node {
     _lt_layout = ot.create_pango_layout( null );
 
     _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
+    _name.text.add_parser( ot.tagger_parser );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
@@ -414,11 +416,11 @@ public class Node {
   /* Handle any changes to the markdown parser */
   private void table_markdown_changed() {
     if( _ot.markdown ) {
-      _name.text.add_parser( OutlineTable.markdown_parser );
-      _note.text.add_parser( OutlineTable.markdown_parser );
+      _name.text.add_parser( _ot.markdown_parser );
+      _note.text.add_parser( _ot.markdown_parser );
     } else {
-      _name.text.remove_parser( OutlineTable.markdown_parser );
-      _note.text.remove_parser( OutlineTable.markdown_parser );
+      _name.text.remove_parser( _ot.markdown_parser );
+      _note.text.remove_parser( _ot.markdown_parser );
     }
   }
 
