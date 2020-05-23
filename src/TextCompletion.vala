@@ -75,4 +75,9 @@ public class TextCompletion {
     if( !_shown ) return;
   }
 
+  /* Substitutes the currently selected entry */
+  public void select() {
+    // TBD
+  }
+
 }

@@ -66,6 +66,7 @@ public class OutlineTable : DrawingArea {
   private bool            _show_depth = true;
   private Tagger          _tagger;
   private bool            _markdown;
+  private Completion      _completion;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -244,6 +245,9 @@ public class OutlineTable : DrawingArea {
     /* Create the tags */
     _tagger = new Tagger( this );
     tagger_parser = new TaggerParser( this );
+
+    /* Create text completion */
+    _completion = new Completion( this );
 
     /* Set the style context */
     get_style_context().add_class( "canvas" );
@@ -1270,10 +1274,14 @@ public class OutlineTable : DrawingArea {
   /* Handles an escape keypress */
   private void handle_escape() {
     if( is_node_editable() || is_note_editable() ) {
-      set_node_mode( selected, NodeMode.SELECTED );
-      _im_context.reset();
-      queue_draw();
-      changed();
+      if( _completion.shown ) {
+        _completion.hide();
+      } else {
+        set_node_mode( selected, NodeMode.SELECTED );
+        _im_context.reset();
+        queue_draw();
+        changed();
+      }
     }
   }
 
@@ -1284,9 +1292,13 @@ public class OutlineTable : DrawingArea {
       see( selected );
       queue_draw();
     } else if( is_node_editable() && shift ) {
-      selected.name.insert( "\n", undo_text );
-      see( selected );
-      queue_draw();
+      if( _completion.shown ) {
+        _completion.select();
+      } else {
+        selected.name.insert( "\n", undo_text );
+        see( selected );
+        queue_draw();
+      }
     } else if( selected != null ) {
       add_sibling_node( !shift );
     }
@@ -1315,7 +1327,9 @@ public class OutlineTable : DrawingArea {
 
   /* Handles a tab key hit when a node is selected */
   private void handle_tab() {
-    if( selected != null ) {
+    if( is_node_editable() && _completion.shown ) {
+      _completion.select();
+    } else if( selected != null ) {
       indent();
     }
   }
@@ -1459,15 +1473,19 @@ public class OutlineTable : DrawingArea {
   /* Handles an up arrow keypress */
   private void handle_up( bool shift ) {
     if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_vertically( -1 );
+      if( _completion.shown ) {
+        _completion.up();
       } else {
-        selected.name.move_cursor_vertically( -1 );
+        if( shift ) {
+          selected.name.selection_vertically( -1 );
+        } else {
+          selected.name.move_cursor_vertically( -1 );
+        }
+        undo_text.mergeable = false;
+        see( selected );
+        _im_context.reset();
+        queue_draw();
       }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
         selected.note.selection_vertically( -1 );
@@ -1622,15 +1640,19 @@ public class OutlineTable : DrawingArea {
   /* Handles down arrow keypress */
   private void handle_down( bool shift ) {
     if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_vertically( 1 );
+      if( _completion.shown ) {
+        _completion.down();
       } else {
-        selected.name.move_cursor_vertically( 1 );
+        if( shift ) {
+          selected.name.selection_vertically( 1 );
+        } else {
+          selected.name.move_cursor_vertically( 1 );
+        }
+        undo_text.mergeable = false;
+        see( selected );
+        _im_context.reset();
+        queue_draw();
       }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
         selected.note.selection_vertically( 1 );
