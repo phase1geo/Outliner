@@ -373,10 +373,13 @@ public class OutlineTable : DrawingArea {
         if( node.mode != mode ) {
           update_im_cursor( (mode == NodeMode.EDITABLE) ? node.name : node.note );
           _im_context.focus_in();
+          if( mode == NodeMode.EDITABLE ) {
+            _tagger.preedit_load_tags( node.name.text );
+          }
         }
       } else if( (node.mode == NodeMode.EDITABLE) || (node.mode == NodeMode.NOTEEDIT) ) {
         if( node.mode == NodeMode.EDITABLE ) {
-          _tagger.parse_text( node.name.text );
+          _tagger.postedit_load_tags( node.name.text );
         }
         _im_context.focus_out();
       }

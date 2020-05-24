@@ -24,8 +24,8 @@ using Gee;
 public class Tagger {
 
   private OutlineTable         _ot;
+  private HashMap<string,bool> _pre_tags;
   private HashMap<string,bool> _tags;
-  private Regex                _re;
   private Array<string>        _matches;
 
   /* Default constructor */
@@ -33,26 +33,25 @@ public class Tagger {
     _ot      = ot;
     _tags    = new HashMap<string,bool>();
     _matches = new Array<string>();
-    try {
-      _re = new Regex( "\\s(@(\\S+))" );
-    } catch( RegexError e ) {}
   }
 
-  /*
-   Highlights any tags found in the given formatted text and adds the tags to
-   the tags array if it doesn't already exist.
-  */
-  public void parse_text( FormattedText text ) {
-    MatchInfo matches;
-    var       start = 0;
-    while( _re.match( text.text.substring( start ), 0, out matches ) ) {
-      int start_pos, end_pos;
-      matches.fetch_pos( 1, out start_pos, out end_pos );
-      var tag = matches.fetch( 2 );
-      if( !_tags.has_key( tag ) ) {
-        _tags.@set( tag, true );
+  /* Loads the tags prior to edits being made */
+  public void preedit_load_tags( FormattedText text ) {
+    _pre_tags = text.get_extras_for_tag( FormatTag.TAG );
+  }
+
+  /* Updates the stored list of tags in use. */
+  public void postedit_load_tags( FormattedText text ) {
+    var tags = text.get_extras_for_tag( FormatTag.TAG );
+    var it   = tags.map_iterator();
+    while( it.next() ) {
+      if( !_pre_tags.unset( it.get_key() ) && !_tags.has_key( it.get_key() ) ) {
+        _tags.@set( it.get_key(), true );
       }
-      start = end_pos;
+    }
+    var pid = _pre_tags.map_iterator();
+    while( pid.next() ) {
+      _tags.unset( pid.get_key() );
     }
   }
 

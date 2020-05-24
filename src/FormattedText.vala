@@ -22,6 +22,7 @@
 using Pango;
 using Gdk;
 using Gtk;
+using Gee;
 
 public enum FormatTag {
   BOLD = 0,
@@ -115,7 +116,7 @@ public class UndoTagInfo {
     this.end   = end;
     this.extra = extra;
   }
-  public void append_to_postag_list( ref List<PosTag> tags ) {
+  public void append_to_postag_list( ref GLib.List<PosTag> tags ) {
     tags.append( new PosTag.start( (FormatTag)tag, start, extra ) );
     tags.append( new PosTag.end( (FormatTag)tag, end, extra ) );
   }
@@ -275,6 +276,16 @@ public class FormattedText {
           }
         }
         return( false );
+      }
+    }
+
+    /* Returns all of the extra values for this tag */
+    public void get_extras_for_tag( ref HashMap<string,bool> extras ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var extra = _info.index( i ).extra;
+        if( !extras.has_key( extra ) ) {
+          extras.@set( extra, true );
+        }
       }
     }
 
@@ -823,6 +834,13 @@ public class FormattedText {
     return( _formats[tag].contains_tag( extra ) );
   }
 
+  /* Retrieves the extra values for all items marked with tag */
+  public HashMap<string,bool> get_extras_for_tag( FormatTag tag ) {
+    var extras = new HashMap<string,bool>();
+    _formats[tag].get_extras_for_tag( ref extras );
+    return( extras );
+  }
+
   /* Returns an array containing all tags that are within the specified range */
   public Array<UndoTagInfo> get_tags_in_range( int start, int end ) {
     var tags = new Array<UndoTagInfo>();
@@ -877,7 +895,7 @@ public class FormattedText {
   public string export( int start, int end, ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
     var tags      = get_tags_in_range( start, end );
     var str       = "";
-    var pos_tags  = new List<PosTag>();
+    var pos_tags  = new GLib.List<PosTag>();
     var tag_stack = new Array<PosTag>();
     for( int i=0; i<tags.length; i++ ) {
       tags.index( i ).append_to_postag_list( ref pos_tags );
