@@ -96,5 +96,10 @@
       <summary>Default state of the markdown indicator for new documents</summary>
       <description>Default state of the markdown indicator for new documents</description>
     </key>
+    <key name="enable-tag-auto-completion" type="b">
+      <default>true</default>
+      <summary>Controls the display of the auto-completer when adding tags</summary>
+      <description>Controls the display of the auto-completer when adding tags</description>
+    </key>
   </schema>
 </schemalist>

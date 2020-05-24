@@ -825,27 +825,27 @@ public class Node {
 
   /* Returns true if the given coordinates are within this node */
   public bool is_within( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
+    return( !_hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
   }
 
   /* Returns true if the given coordinates lie within the expander */
   public bool is_within_expander( double x, double y ) {
-    if( !is_leaf() ) {
-      double ex, ey, ew, eh;
-      expander_bbox( out ex, out ey, out ew, out eh );
-      return( Utils.is_within_bounds( x, y, ex, ey, ew, eh ) );
-    }
-    return( false );
+    if( is_leaf() || _hidden ) return( false );
+    double ex, ey, ew, eh;
+    expander_bbox( out ex, out ey, out ew, out eh );
+    return( Utils.is_within_bounds( x, y, ex, ey, ew, eh ) );
   }
 
   /* Returns true if the given coordinates reside within the note icon boundaries */
   public bool is_within_note_icon( double x, double y ) {
+    if( _hidden ) return( false );
     double nx, ny, nw, nh;
     note_bbox( out nx, out ny, out nw, out nh );
     return( Utils.is_within_bounds( x, y, nx, ny, nw, nh ) );
   }
 
   public bool is_within_task( double x, double y ) {
+    if( _hidden ) return( false );
     double tx, ty, tw, th;
     task_bbox( out tx, out ty, out tw, out th );
     return( (task != NodeTaskMode.NONE) && Utils.is_within_bounds( x, y, tx, ty, tw, th ) );
@@ -853,22 +853,22 @@ public class Node {
 
   /* Returns true if the given coordinates reside within the name text area */
   public bool is_within_name( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
+    return( !_hidden && Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
   }
 
   /* Returns true if the given coordinates reside within the note text area */
   public bool is_within_note( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
+    return( !_hidden && Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
   }
 
   /* Returns true if the given coordinates lie within the attachto area */
   public bool is_within_attachto( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
+    return( !_hidden && Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
   }
 
   /* Returns true if the given coordinates lie within the attachabove area */
   public bool is_within_attachabove( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
+    return( !_hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
   }
 
   /* Change the name font to the given value */

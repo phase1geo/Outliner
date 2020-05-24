@@ -57,11 +57,12 @@ public class MainWindow : ApplicationWindow {
   private Label           _stats_topen;
   private Label           _stats_tip;
   private Label           _stats_tdone;
-  private bool            _debug          = false;
-  private bool            _prefer_dark    = false;
+  private bool            _debug                 = false;
+  private bool            _prefer_dark           = false;
   private HashMap<string,RadioButton> _theme_buttons;
 
   public static Themes themes = new Themes();
+  public static bool   enable_tag_completion = true;
 
   private const GLib.ActionEntry[] action_entries = {
     { "action_new",           action_new },
@@ -103,6 +104,8 @@ public class MainWindow : ApplicationWindow {
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
+
+    enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
 
     /* Add the theme CSS */
     themes.add_css();
