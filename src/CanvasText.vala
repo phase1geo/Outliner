@@ -760,6 +760,18 @@ public class CanvasText : Object {
     }
   }
 
+  /* Replaces the given range with the specified string */
+  public void replace( int start, int end, string s, UndoTextBuffer undo_buffer ) {
+    var slen = s.char_count();
+    var cur  = _cursor;
+    var str  = text.text.slice( start, end );
+    var tags = text.get_tags_in_range( start, end );
+    text.replace_text( start, (end - start), s );
+    set_cursor_only( start + slen );
+    change_selection( null, _selstart, "replace" );
+    undo_buffer.add_replace( start, str, s, tags, cur );
+  }
+
   /*
    Returns the currently selected text or, if no text is currently selected,
    returns null.

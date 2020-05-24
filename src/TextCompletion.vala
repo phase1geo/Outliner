@@ -23,9 +23,13 @@ using Gtk;
 
 public class TextCompletion {
 
-  private OutlineTable _ot;
-  private ListBox      _list;
-  private bool         _shown = false;
+  private OutlineTable   _ot;
+  private CanvasText     _ct;
+  private ListBox        _list;
+  private bool           _shown     = false;
+  private int            _size      = 0;
+  private int            _start_pos = 0;
+  private int            _end_pos   = 0;
 
   public bool shown {
     get {
@@ -35,13 +39,14 @@ public class TextCompletion {
 
   /* Default constructor */
   public TextCompletion( OutlineTable ot ) {
-    _ot = ot;
+    _ot      = ot;
     _list = new ListBox();
     _list.selection_mode = SelectionMode.BROWSE;
+    _list.row_activated.connect( activate_row );
   }
 
   /* Displays the auto-completion text with the given list */
-  public void show( CanvasText ct, Array<string> list ) {
+  public void show( CanvasText ct, Array<string> list, int start, int end ) {
 
     /* If there is nothing to show, hide the contents */
     if( list.length == 0 ) {
@@ -49,16 +54,39 @@ public class TextCompletion {
       return;
     }
 
+    /* Remember the text positions that will be replaced */
+    _ct        = ct;
+    _start_pos = start;
+    _end_pos   = end;
+
+    /* Populate the list */
+    _list.foreach( (w) => {
+      _list.remove( w );
+    });
+    for( int i=0; i<list.length; i++ ) {
+      _list.add( new Label( list.index( i ) ) );
+    }
+    _size = (int)list.length;
+
     /* Get the position of the cursor so that we know where to place the box */
     int x, ytop, ybot;
     ct.get_cursor_pos( out x, out ytop, out ybot );
 
     /* Set the position of the widget */
     _list.margin_start = x;
-    _list.margin_top   = ytop + ((ybot - ytop) / 2);
+    _list.margin_top   = ybot + 5;
 
-    var overlay = (Overlay)_ot.get_parent();
-    overlay.add_overlay( _list );
+    /* Select the first row */
+    _list.select_row( _list.get_row_at_index( 0 ) );
+
+    /* Make sure that everything is seen */
+    _list.show_all();
+
+    /* If the list isn't being shown, show it */
+    if( !_shown ) {
+      var overlay = (Overlay)_ot.get_parent();
+      overlay.add_overlay( _list );
+    }
 
     _shown = true;
 
@@ -66,27 +94,44 @@ public class TextCompletion {
 
   /* Hides the auto-completion box */
   public void hide() {
-
-    /* If the completion items are not shown, just return */
     if( !_shown ) return;
-
+    _list.unparent();
     _shown = false;
-
   }
 
   /* Moves the selection down by one row */
   public void down() {
     if( !_shown ) return;
+    var row = _list.get_selected_row();
+    if( (row.get_index() + 1) < _size ) {
+      _list.select_row( _list.get_row_at_index ( row.get_index() + 1 ) );
+    }
   }
 
   /* Moves the selection up by one row */
   public void up() {
     if( !_shown ) return;
+    var row = _list.get_selected_row();
+    if( row.get_index() > 0 ) {
+      _list.select_row( _list.get_row_at_index ( row.get_index() - 1 ) );
+    }
   }
 
   /* Substitutes the currently selected entry */
   public void select() {
-    // TBD
+    if( !_shown ) return;
+    activate_row( _list.get_selected_row() );
+  }
+
+  private void activate_row( ListBoxRow row ) {
+    var label = (Label)row.get_child();
+    var value = label.get_text();
+    if( _start_pos == _end_pos ) {
+      _ct.insert( value, _ot.undo_text );
+    } else {
+      _ct.replace( _start_pos, _end_pos, value, _ot.undo_text );
+    }
+    hide();
   }
 
 }

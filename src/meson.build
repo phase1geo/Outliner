@@ -11,6 +11,7 @@ sources += files(
 
   'parsers/MarkdownParser.vala',
   'parsers/TaggerParser.vala',
+  'parsers/UrlParser.vala',
 
   'themes/ThemeDark.vala',
   'themes/ThemeDefault.vala',

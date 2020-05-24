@@ -51,6 +51,8 @@ public class ThemeDefault : Theme {
     hilite             = get_color( "#3689e6" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
+    markdown_grey      = get_color( "grey" );
+    markdown_listitem  = get_color( "red" );
     prefer_dark        = false;
 
   }

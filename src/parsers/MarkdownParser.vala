@@ -21,16 +21,20 @@
 
 public class MarkdownParser : TextParser {
 
+  private OutlineTable _ot;
+
   /* Default constructor */
-  public MarkdownParser() {
+  public MarkdownParser( OutlineTable ot ) {
     base( "Markdown" );
+
+    _ot = ot;
 
     /* Header */
     add_regex( "^(#{1,6})[^#].*$", highlight_header );
 
     /* Lists */
     add_regex( "^\\s*(\\*|\\+|\\-|[0-9]+\\.)\\s", (text, match) => {
-      add_tag( text, match, 1, FormatTag.COLOR, "red" );
+      add_tag( text, match, 1, FormatTag.COLOR, _ot.get_theme().markdown_listitem.to_string() );
     });
 
     /* Code */
@@ -54,7 +58,7 @@ public class MarkdownParser : TextParser {
   }
 
   private void make_grey( FormattedText text, MatchInfo match, int paren ) {
-    add_tag( text, match, paren, FormatTag.COLOR, "grey" );
+    add_tag( text, match, paren, FormatTag.COLOR, _ot.get_theme().markdown_grey.to_string() );
   }
 
   private void highlight_header( FormattedText text, MatchInfo match ) {
@@ -70,7 +74,6 @@ public class MarkdownParser : TextParser {
   }
 
   private void highlight_url1( FormattedText text, MatchInfo match ) {
-    stdout.printf( "In highlight_url1\n" );
     make_grey( text, match, 1 );
     make_grey( text, match, 3 );
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 4 ) );

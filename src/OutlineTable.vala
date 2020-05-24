@@ -210,8 +210,9 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Allocate static parsers */
-  public MarkdownParser markdown_parser { get; default = new MarkdownParser(); }
+  public MarkdownParser markdown_parser { get; private set; }
   public TaggerParser   tagger_parser   { get; private set; }
+  public UrlParser      url_parser      { get; private set; }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -244,7 +245,11 @@ public class OutlineTable : DrawingArea {
 
     /* Create the tags */
     _tagger = new Tagger( this );
-    tagger_parser = new TaggerParser( this );
+
+    /* Create the parsers */
+    tagger_parser   = new TaggerParser( this );
+    markdown_parser = new MarkdownParser( this );
+    url_parser      = new UrlParser();
 
     /* Create text completion */
     _completion = new TextCompletion( this );
@@ -1291,12 +1296,13 @@ public class OutlineTable : DrawingArea {
       selected.note.insert( "\n", undo_text );
       see( selected );
       queue_draw();
-    } else if( is_node_editable() && shift ) {
-      if( _completion.shown ) {
-        _completion.select();
-      } else {
+    } else if( is_node_editable() ) {
+      if( shift ) {
         selected.name.insert( "\n", undo_text );
         see( selected );
+        queue_draw();
+      } else if( _completion.shown ) {
+        _completion.select();
         queue_draw();
       }
     } else if( selected != null ) {
@@ -1329,6 +1335,7 @@ public class OutlineTable : DrawingArea {
   private void handle_tab() {
     if( is_node_editable() && _completion.shown ) {
       _completion.select();
+      queue_draw();
     } else if( selected != null ) {
       indent();
     }
@@ -2485,11 +2492,11 @@ public class OutlineTable : DrawingArea {
   /*******************/
 
   /* Displays the auto-completion widget with the given list of values */
-  public void show_auto_completion( Array<string> values ) {
+  public void show_auto_completion( Array<string> values, int start_pos, int end_pos ) {
     if( is_node_editable() ) {
-      _completion.show( selected.name, values );
+      _completion.show( selected.name, values, start_pos, end_pos );
     } else if( is_note_editable() ) {
-      _completion.show( selected.note, values );
+      _completion.show( selected.note, values, start_pos, end_pos );
     } else {
       _completion.hide();
     }

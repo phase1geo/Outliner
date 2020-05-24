@@ -51,6 +51,8 @@ public class ThemeSolarizedDark : Theme {
     hilite             = get_color( "Green" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
+    markdown_grey      = get_color( "grey" );
+    markdown_listitem  = get_color( "red" );
     prefer_dark        = true;
 
   }

@@ -25,20 +25,47 @@ public class TaggerParser : TextParser {
 
   /* Default constructor */
   public TaggerParser( OutlineTable ot ) {
+
     base( "Tagger" );
+
     _ot = ot;
+
     add_regex( "\\s(@(\\S*))", handle_tag );
+    add_regex( "\\s", handle_notag );
+
   }
 
+  /* Highlights the given tag */
   private void handle_tag( FormattedText text, MatchInfo match ) {
 
-    var tag = get_text( match, 2 );
-
-    /* Perform a search of matching tags and display them in an auto-completion */
-    _ot.show_auto_completion( _ot.tagger.get_matches( tag ) );
-
+    /* Highlight the tag */
     add_tag( text, match, 1, FormatTag.COLOR, "red" );
 
+    /* If the FormattedText item matches the currently edited */
+    if( (_ot.selected != null) && (_ot.selected.name.text == text) ) {
+
+      int start, end;
+      match.fetch_pos( 2, out start, out end );
+
+      /* If the cursor is at the end of the tag, display the auto-completer */
+      if( _ot.selected.name.cursor == (end - 1) ) {
+        var tag = get_text( match, 2 );
+        _ot.show_auto_completion( _ot.tagger.get_matches( tag ), start, end );
+      }
+
+    }
+
+  }
+
+  /* Handles hiding the auto-completion window */
+  private void handle_notag( FormattedText text, MatchInfo match ) {
+    if( (_ot.selected != null) && (_ot.selected.name.text == text) ) {
+      int start, end;
+      match.fetch_pos( 0, out start, out end );
+      if( _ot.selected.name.cursor == start ) {
+        _ot.hide_auto_completion();
+      }
+    }
   }
 
   public override bool tag_handled( FormatTag tag ) {

@@ -68,7 +68,7 @@ public class Tagger {
     _matches.remove_range( 0, _matches.length );
     while( it.next() ) {
       var key = (string)it.get_key();
-      if( key.substring( 0, partial.length ) == partial ) {
+      if( (key.length >= partial.length) && (key.substring( 0, partial.length ) == partial) ) {
         _matches.append_val( key );
       }
     }

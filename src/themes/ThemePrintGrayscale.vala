@@ -51,6 +51,8 @@ public class ThemePrintGrayscale : Theme {
     hilite             = get_color( "#404040" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
+    markdown_grey      = get_color( "grey" );
+    markdown_listitem  = get_color( "black" );
     prefer_dark        = false;
 
   }
