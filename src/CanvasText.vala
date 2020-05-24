@@ -613,17 +613,17 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _selend );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _selstart );
         change_selection( null, _selstart, "backspace" );
+        text.remove_text( spos, (epos - spos) );
         undo_buffer.add_delete( spos, str, tags, cur );
       } else {
         var spos = text.text.index_of_nth_char( _cursor - 1 );
         var epos = text.text.index_of_nth_char( _cursor );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _cursor - 1 );
+        text.remove_text( spos, (epos - spos) );
         undo_buffer.add_delete( spos, str, tags, cur );
       }
     }
@@ -639,8 +639,8 @@ public class CanvasText : Object {
       var spos = text.text.index_of_nth_char( wpos );
       var str  = text.text.slice( spos, epos );
       var tags = text.get_tags_in_range( spos, epos );
-      text.remove_text( spos, (epos - spos) );
       set_cursor_only( spos );
+      text.remove_text( spos, (epos - spos) );
       undo_buffer.add_delete( spos, str, tags, cur );
       if( _selstart < wpos ) {
         change_selection( null, wpos, "backspace_word1" );
@@ -662,8 +662,6 @@ public class CanvasText : Object {
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
         text.remove_text( spos, (epos - spos) );
-        set_cursor_only( _selstart );
-        change_selection( null, _selstart, "delete" );
         undo_buffer.add_delete( spos, str, tags, cur );
       } else {
         var spos = text.text.index_of_nth_char( _cursor );
@@ -683,8 +681,8 @@ public class CanvasText : Object {
     var epos = text.text.index_of_nth_char( endpos );
     var str  = text.text.slice( spos, epos );
     var tags = text.get_tags_in_range( spos, epos );
-    text.remove_text( spos, (epos - spos) );
     set_cursor_only( startpos );
+    text.remove_text( spos, (epos - spos) );
     undo_buffer.add_delete( spos, str, tags, cur );
   }
 

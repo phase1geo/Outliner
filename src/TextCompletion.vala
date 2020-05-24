@@ -42,6 +42,8 @@ public class TextCompletion {
     _ot      = ot;
     _list = new ListBox();
     _list.selection_mode = SelectionMode.BROWSE;
+    _list.halign         = Align.START;
+    _list.valign         = Align.START;
     _list.row_activated.connect( activate_row );
   }
 
@@ -64,7 +66,12 @@ public class TextCompletion {
       _list.remove( w );
     });
     for( int i=0; i<list.length; i++ ) {
-      _list.add( new Label( list.index( i ) ) );
+      var lbl = new Label( list.index( i ) );
+      lbl.xalign       = 0;
+      lbl.margin       = 5;
+      lbl.margin_start = 10;
+      lbl.margin_end   = 10;
+      _list.add( lbl );
     }
     _size = (int)list.length;
 
