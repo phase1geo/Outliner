@@ -38,8 +38,10 @@ public class TaggerParser : TextParser {
   /* Highlights the given tag */
   private void handle_tag( FormattedText text, MatchInfo match ) {
 
+    var tag = get_text( match, 2 );
+
     /* Highlight the tag */
-    add_tag( text, match, 1, FormatTag.COLOR, "red" );
+    add_tag( text, match, 1, FormatTag.TAG, tag );
 
     /* If the FormattedText item matches the currently edited */
     if( (_ot.selected != null) && (_ot.selected.name.text == text) ) {
@@ -49,7 +51,6 @@ public class TaggerParser : TextParser {
 
       /* If the cursor is at the end of the tag, display the auto-completer */
       if( _ot.selected.name.cursor == (end - 1) ) {
-        var tag = get_text( match, 2 );
         _ot.show_auto_completion( _ot.tagger.get_matches( tag ), start, end );
       }
 

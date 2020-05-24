@@ -1296,12 +1296,12 @@ public class OutlineTable : DrawingArea {
       selected.note.insert( "\n", undo_text );
       see( selected );
       queue_draw();
-    } else if( is_node_editable() ) {
+    } else if( is_node_editable() && (shift || _completion.shown) ) {
       if( shift ) {
         selected.name.insert( "\n", undo_text );
         see( selected );
         queue_draw();
-      } else if( _completion.shown ) {
+      } else {
         _completion.select();
         queue_draw();
       }
