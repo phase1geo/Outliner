@@ -146,6 +146,7 @@ public class Node {
   private double        _h         = 80;
   private int           _depth     = 0;
   private bool          _expanded  = true;
+  private bool          _hidden    = false;
   private Pango.Layout  _lt_layout;
   private double        _lt_width  = 0;
   private bool          _hide_note = true;
@@ -282,7 +283,7 @@ public class Node {
   public double      indent    { get; set; default = 25; }
   public Node?       parent    { get; set; default = null; }
   public Array<Node> children  { get; set; default = new Array<Node>(); }
-  public double      last_y    { get { return( _y + _h ); } }
+  public double      last_y    { get { return( _y + (_hidden ? 0 : _h) ); } }
   public bool        over_note_icon { get; set; default = false; }
 
   /* Constructor */
@@ -1179,6 +1180,17 @@ public class Node {
     }
   }
 
+  /* Changes the filter based on the given filter function */
+  public bool filter( NodeFilterFunc? func ) {
+    var hidden = (func != null) && !func( this );
+    _hidden = hidden;
+    for( int i=0; i<children.length; i++ ) {
+      var child = children.index( i );
+      hidden |= child.filter( func );
+    }
+    return( hidden );
+  }
+
   /*********************/
   /* NUMBERING METHODS */
   /*********************/
@@ -1501,7 +1513,7 @@ public class Node {
 
     var tmode = opts.show_modes ? mode : NodeMode.NONE;
 
-    if( is_root() && (tmode != NodeMode.MOVETO) ) return;
+    if( (is_root() && (tmode != NodeMode.MOVETO)) || _hidden ) return;
 
     draw_background( ctx, theme, opts );
     draw_note_icon( ctx, theme, opts );

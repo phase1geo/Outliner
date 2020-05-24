@@ -58,8 +58,9 @@ public class Tagger {
 
   /* Called whenever the user clicks on a tag */
   public void tag_clicked( string tag ) {
-    // TBD
-    stdout.printf( "tag_clicked: %s\n", tag );
+    _ot.filter_nodes( (node) => {
+      return( node.name.text.contains_tag( FormatTag.TAG, tag ) );
+    });
   }
 
   /* Gets the list of matching keys */

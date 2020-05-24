@@ -260,6 +260,24 @@ public class FormattedText {
       _info.remove_range( 0, _info.length );
     }
 
+    /*
+     Returns true if the text contains a tag that matches the given extra information.
+     If extra is set to the empty string, returns true if there are any tags of this
+     type.
+    */
+    public bool contains_tag( string extra ) {
+      if( extra == "" ) {
+        return( _info.length > 0 );
+      } else {
+        for( int i=0; i<_info.length; i++ ) {
+          if( _info.index( i ).extra == extra ) {
+            return( true );
+          }
+        }
+        return( false );
+      }
+    }
+
     /* Returns all tags found within the given range */
     public void get_tags_in_range( int tag, int start, int end, ref Array<UndoTagInfo> tags ) {
       for( int i=0; i<_info.length; i++ ) {
@@ -795,6 +813,14 @@ public class FormattedText {
       }
     }
     return( false );
+  }
+
+  /*
+   Returns true if the given tag and extra information is found within this
+   text.
+  */
+  public bool contains_tag( FormatTag tag, string extra = "" ) {
+    return( _formats[tag].contains_tag( extra ) );
   }
 
   /* Returns an array containing all tags that are within the specified range */

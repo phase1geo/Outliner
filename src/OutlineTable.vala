@@ -24,6 +24,12 @@ using Gdk;
 using Cairo;
 using Gee;
 
+/*
+ Returns true if the given node meets a condition that should cause it to be
+ displayed; otherwise, the node will be hidden.
+*/
+public delegate bool NodeFilterFunc( Node node );
+
 public class OutlineTable : DrawingArea {
 
   private const CursorType click_cursor = CursorType.HAND2;
@@ -67,6 +73,7 @@ public class OutlineTable : DrawingArea {
   private Tagger          _tagger;
   private TextCompletion  _completion;
   private bool            _markdown;
+  private bool            _filtered   = false;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -1287,6 +1294,8 @@ public class OutlineTable : DrawingArea {
         queue_draw();
         changed();
       }
+    } else if( _filtered ) {
+      filter_nodes( null );
     }
   }
 
@@ -2485,6 +2494,19 @@ public class OutlineTable : DrawingArea {
     undo_buffer.add_item( undo );
     queue_draw();
     changed();
+  }
+
+  /* Filters the rows that match the given NodeFilterFunc */
+  public void filter_nodes( NodeFilterFunc? func ) {
+    _filtered = false;
+    for( int i=0; i<root.children.length; i++ ) {
+      _filtered |= root.children.index( i ).filter( func );
+    }
+    if( _filtered || (func == null) ) {
+      root.adjust_nodes( 0, false, "filter_nodes" );
+      queue_draw();
+      see( selected );
+    }
   }
 
   /*******************/
