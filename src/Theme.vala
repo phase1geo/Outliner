@@ -46,9 +46,9 @@ public class Theme : Object {
   public    RGBA   hilite             { protected set; get; }
   public    RGBA   url                { protected set; get; }
   public    RGBA   tag                { protected set; get; }
+  public    RGBA   syntax             { protected set; get; }
   public    RGBA   match_foreground   { protected set; get; }
   public    RGBA   match_background   { protected set; get; }
-  public    RGBA   markdown_grey      { protected set; get; }
   public    RGBA   markdown_listitem  { protected set; get; }
 
   /* Default constructor */

@@ -49,9 +49,9 @@ public class ThemePrintGrayscale : Theme {
     url                = get_color( "#c0c0c0" );
     tag                = get_color( "#a0a0a0" );
     hilite             = get_color( "#404040" );
+    syntax             = get_color( "grey" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
-    markdown_grey      = get_color( "grey" );
     markdown_listitem  = get_color( "black" );
     prefer_dark        = false;
 

@@ -37,6 +37,7 @@ public enum FormatTag {
   HILITE,
   URL,
   TAG,
+  SYNTAX,
   MATCH,
   SELECT,
   LENGTH;
@@ -55,6 +56,7 @@ public enum FormatTag {
       case HILITE     :  return( "hilite" );
       case URL        :  return( "url" );
       case TAG        :  return( "tag" );
+      case SYNTAX     :  return( "syntax" );
       case MATCH      :  return( "match" );
     }
     return( "bold" );
@@ -74,6 +76,7 @@ public enum FormatTag {
       case "hilite"      :  return( HILITE );
       case "url"         :  return( URL );
       case "tag"         :  return( TAG );
+      case "syntax"      :  return( SYNTAX );
       case "match"       :  return( MATCH );
     }
     return( LENGTH );
@@ -285,6 +288,16 @@ public class FormattedText {
         var extra = _info.index( i ).extra;
         if( !extras.has_key( extra ) ) {
           extras.@set( extra, true );
+        }
+      }
+    }
+
+    /* Returns the full tag ranges which overlap with the given range */
+    public void get_full_tags_in_range( int tag, int start, int end, ref Array<UndoTagInfo> tags ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (start < info.end) && (end > info.start) ) {
+          tags.append_val( new UndoTagInfo( tag, info.start, info.end, info.extra ) );
         }
       }
     }
@@ -582,11 +595,13 @@ public class FormattedText {
   }
 
   private class TaggingInfo : TagAttr {
+    private RGBA _color;
     public TaggingInfo( RGBA color ) {
       set_color( color );
     }
     private void set_color( RGBA color ) {
       attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+      _color = color.copy();
     }
     public void update_color( RGBA color ) {
       attrs.remove_range( 0, 1 );
@@ -594,7 +609,28 @@ public class FormattedText {
     }
     public override TextTag text_tag( string? extra ) {
       var ttag = new TextTag( "tag" );
-      ttag.foreground     = "#00ff00";
+      ttag.foreground     = Utils.color_from_rgba( _color );
+      ttag.foreground_set = true;
+      return( ttag );
+    }
+  }
+
+  private class SyntaxInfo : TagAttr {
+    private RGBA _color;
+    public SyntaxInfo( RGBA color ) {
+      set_color( color );
+    }
+    private void set_color( RGBA color ) {
+      attrs.append_val( attr_foreground_new( (uint16)(color.red * 65535), (uint16)(color.green * 65535), (uint16)(color.blue * 65535) ) );
+      _color = color.copy();
+    }
+    public void update_color( RGBA color ) {
+      attrs.remove_range( 0, 1 );
+      set_color( color );
+    }
+    public override TextTag text_tag( string? extra ) {
+      var ttag = new TextTag( "syntax" );
+      ttag.foreground     = Utils.color_from_rgba( _color );
       ttag.foreground_set = true;
       return( ttag );
     }
@@ -684,6 +720,7 @@ public class FormattedText {
       _attr_tags[FormatTag.HILITE]     = new HighlightInfo();
       _attr_tags[FormatTag.URL]        = new UrlInfo( theme.url );
       _attr_tags[FormatTag.TAG]        = new TaggingInfo( theme.tag );
+      _attr_tags[FormatTag.SYNTAX]     = new SyntaxInfo( theme.syntax );
       _attr_tags[FormatTag.MATCH]      = new MatchInfo( theme.match_foreground, theme.match_background );
       _attr_tags[FormatTag.SELECT]     = new SelectInfo( theme.textsel_foreground, theme.textsel_background );
     }
@@ -697,6 +734,7 @@ public class FormattedText {
     if( _attr_tags == null ) return;
     (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
     (_attr_tags[FormatTag.TAG] as TaggingInfo).update_color( theme.tag );
+    (_attr_tags[FormatTag.SYNTAX] as SyntaxInfo).update_color( theme.syntax );
     (_attr_tags[FormatTag.MATCH] as MatchInfo).update_color( theme.match_foreground, theme.match_background );
     (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
   }
@@ -839,6 +877,13 @@ public class FormattedText {
     var extras = new HashMap<string,bool>();
     _formats[tag].get_extras_for_tag( ref extras );
     return( extras );
+  }
+
+  /* Returns the tag information of the given tag in the specified range */
+  public Array<UndoTagInfo> get_tag_in_range( FormatTag tag, int start, int end ) {
+    var tags = new Array<UndoTagInfo>();
+    _formats[tag].get_full_tags_in_range( tag, start, end, ref tags );
+    return( tags );
   }
 
   /* Returns an array containing all tags that are within the specified range */

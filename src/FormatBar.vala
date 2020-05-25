@@ -221,6 +221,13 @@ public class FormatBar : Gtk.Popover {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
     if( _table.markdown ) {
       _table.markdown_parser.insert_tag( ct.text, tag, ct.selstart, ct.selend, extra );
+      switch( tag ) {
+        case FormatTag.BOLD    :  _bold.set_active( false );     break;
+        case FormatTag.ITALICS :  _italics.set_active( false );  break;
+        case FormatTag.CODE    :  _code.set_active( false );     break;
+        case FormatTag.URL     :  _link.set_active( false );     break;
+        case FormatTag.HEADER  :  activate_header( 0 );          break;
+      }
     } else {
       ct.add_tag( tag, extra, _table.undo_text );
     }
@@ -386,7 +393,7 @@ public class FormatBar : Gtk.Popover {
   private void handle_clear() {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
     if( _table.markdown ) {
-      // TBD
+      _table.markdown_parser.remove_all_tags( ct.text, ct.selstart, ct.selend );
     } else {
       ct.remove_all_tags( _table.undo_text );
     }

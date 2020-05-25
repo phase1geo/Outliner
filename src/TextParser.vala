@@ -92,8 +92,8 @@ public class TextParser {
   }
 
   /* This is called when the associated FormatBar button is unclicked */
-  public virtual void remove_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos ) {
-    text.remove_tag( tag, start_pos, end_pos );
+  public virtual void remove_all_tags( FormattedText text, int start_pos, int end_pos ) {
+    text.remove_all_tags( start_pos, end_pos );
   }
 
 }

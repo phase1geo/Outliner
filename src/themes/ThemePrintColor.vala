@@ -49,9 +49,9 @@ public class ThemePrintColor : Theme {
     url                = get_color( "Blue" );
     tag                = get_color( "Red" );
     hilite             = get_color( "#3689e6" );
+    syntax             = get_color( "grey" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
-    markdown_grey      = get_color( "grey" );
     markdown_listitem  = get_color( "red" );
     prefer_dark        = false;
 

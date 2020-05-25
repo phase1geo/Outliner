@@ -38,17 +38,19 @@ public class MarkdownParser : TextParser {
     });
 
     /* Code */
-    add_regex( "`[^`]+`", (text, match) => {
-      add_tag( text, match, 0, FormatTag.CODE );
+    add_regex( "(`)[^`]+(`)", (text, match) => {
+      make_grey( text, match, 1 );
+      add_tag( text, match, 2, FormatTag.CODE );
+      make_grey( text, match, 3 );
     });
 
     /* Bold */
-    add_regex( "\\*\\*[^* \\t].*?(?<!\\\\|\\*| |\\t)\\*\\*", highlight_bold );
-    add_regex( "__[^_ \\t].*?(?<!\\\\|_| |\\t)__", highlight_bold );
+    add_regex( "(\\*\\*)([^* \\t].*?)(?<!\\\\|\\*| |\\t)(\\*\\*)", highlight_bold );
+    add_regex( "(__)([^_ \\t].*?(?<!\\\\|_| |\\t))(__)", highlight_bold );
 
     /* Italics */
-    add_regex( "(?<!_)_[^_ \t].*?(?<!\\\\|_| |\\t)_(?!_)", highlight_italics );
-    add_regex( "(?<!\\*)\\*[^* \t].*?(?<!\\\\|\\*| |\\t)\\*(?!\\*)", highlight_italics );
+    add_regex( "(?<!_)(_)([^_ \t].*?(?<!\\\\|_| |\\t))(_)(?!_)", highlight_italics );
+    add_regex( "(?<!\\*)(\\*)([^* \t].*?(?<!\\\\|\\*| |\\t))(\\*)(?!\\*)", highlight_italics );
 
     /* Links */
     add_regex( "(\\[)(.+?)(\\]\\s*\\((\\S+).*\\))", highlight_url1 );
@@ -58,37 +60,42 @@ public class MarkdownParser : TextParser {
   }
 
   private void make_grey( FormattedText text, MatchInfo match, int paren ) {
-    add_tag( text, match, paren, FormatTag.COLOR, _ot.get_theme().markdown_grey.to_string() );
+    add_tag( text, match, paren, FormatTag.SYNTAX );
   }
 
   private void highlight_header( FormattedText text, MatchInfo match ) {
+    make_grey( text, match, 1 );
     add_tag( text, match, 0, FormatTag.HEADER, get_text( match, 1 ).length.to_string() );
   }
 
   private void highlight_bold( FormattedText text, MatchInfo match ) {
-    add_tag( text, match, 0, FormatTag.BOLD );
+    make_grey( text, match, 1 );
+    add_tag( text, match, 2, FormatTag.BOLD );
+    make_grey( text, match, 3 );
   }
 
   private void highlight_italics( FormattedText text, MatchInfo match ) {
-    add_tag( text, match, 0, FormatTag.ITALICS );
+    make_grey( text, match, 2 );
+    add_tag( text, match, 3, FormatTag.ITALICS );
+    make_grey( text, match, 5 );
   }
 
   private void highlight_url1( FormattedText text, MatchInfo match ) {
     make_grey( text, match, 1 );
-    make_grey( text, match, 3 );
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 4 ) );
+    make_grey( text, match, 3 );
   }
 
   private void highlight_url2( FormattedText text, MatchInfo match ) {
     make_grey( text, match, 1 );
-    make_grey( text, match, 5 );
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 2 ) );
+    make_grey( text, match, 5 );
   }
 
   private void highlight_url3( FormattedText text, MatchInfo match ) {
     make_grey( text, match, 1 );
-    make_grey( text, match, 4 );
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 2 ) );
+    make_grey( text, match, 4 );
   }
 
   /* Returns true if the associated tag should enable the associated FormatBar button */
@@ -111,6 +118,15 @@ public class MarkdownParser : TextParser {
       case FormatTag.BOLD    :  insert_surround( text, "**", start_pos, end_pos );  break;
       case FormatTag.ITALICS :  insert_surround( text, "_", start_pos, end_pos );  break;
       case FormatTag.URL     :  insert_link( text, start_pos, end_pos, extra );  break;
+    }
+  }
+
+  /* Removes all of the tags in the specified range */
+  public override void remove_all_tags( FormattedText text, int start_pos, int end_pos ) {
+    var tags = text.get_tag_in_range( FormatTag.SYNTAX, ((start_pos == 0) ? 0 : (start_pos - 1)), (end_pos + 1) );
+    for( int i=((int)tags.length - 1); i>=0; i-- ) {
+      var tag = tags.index( i );
+      text.remove_text( tag.start, tag.end );
     }
   }
 
