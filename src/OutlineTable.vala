@@ -203,7 +203,8 @@ public class OutlineTable : DrawingArea {
     }
     set {
       if( _markdown != value ) {
-        _markdown = value;
+        _markdown   = value;
+        _format_bar = null;
         markdown_changed();
         queue_draw();
         changed();

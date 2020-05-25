@@ -108,7 +108,11 @@ public class LinkEditor : Popover {
    popover entry.
   */
   private void set_url() {
-    _text.add_tag( FormatTag.URL, _entry.text, _ot.undo_text );
+    if( _ot.markdown ) {
+      _ot.markdown_parser.insert_tag( _text.text, FormatTag.URL, _text.selstart, _text.selend, _entry.text );
+    } else {
+      _text.add_tag( FormatTag.URL, _entry.text, _ot.undo_text );
+    }
     _ot.changed();
   }
 

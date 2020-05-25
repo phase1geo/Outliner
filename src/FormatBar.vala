@@ -154,20 +154,24 @@ public class FormatBar : Gtk.Popover {
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _bold,               false, false, 0 );
     box.pack_start( _italics,            false, false, 0 );
-    box.pack_start( _underline,          false, false, 0 );
-    box.pack_start( _strike,             false, false, 0 );
+    if( !table.markdown ) {
+      box.pack_start( _underline,          false, false, 0 );
+      box.pack_start( _strike,             false, false, 0 );
+    }
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _code,               false, false, 0 );
     box.pack_start( _header,             false, false, 0 );
     box.pack_start( _link,               false, false, 0 );
-    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-    box.pack_start( _super,              false, false, 0 );
-    box.pack_start( _sub,                false, false, 0 );
-    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-    box.pack_start( new Label( spacer ), false, false, 0 );
-    box.pack_start( _hilite,             false, false, 0 );
-    box.pack_start( new Label( spacer ), false, false, 0 );
-    box.pack_start( _color,              false, false, 0 );
+    if( !table.markdown ) {
+      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
+      box.pack_start( _super,              false, false, 0 );
+      box.pack_start( _sub,                false, false, 0 );
+      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
+      box.pack_start( new Label( spacer ), false, false, 0 );
+      box.pack_start( _hilite,             false, false, 0 );
+      box.pack_start( new Label( spacer ), false, false, 0 );
+      box.pack_start( _color,              false, false, 0 );
+    }
     box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
     box.pack_start( _clear,              false, false, 0 );
 
@@ -214,10 +218,11 @@ public class FormatBar : Gtk.Popover {
   }
 
   private void format_text( FormatTag tag, string? extra=null ) {
-    if( _table.selected.mode == NodeMode.EDITABLE ) {
-      _table.selected.name.add_tag( tag, extra, _table.undo_text );
+    var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
+    if( _table.markdown ) {
+      _table.markdown_parser.insert_tag( ct.text, tag, ct.selstart, ct.selend, extra );
     } else {
-      _table.selected.note.add_tag( tag, extra, _table.undo_text );
+      ct.add_tag( tag, extra, _table.undo_text );
     }
     _table.queue_draw();
     _table.changed();
@@ -225,6 +230,7 @@ public class FormatBar : Gtk.Popover {
   }
 
   private void unformat_text( FormatTag tag ) {
+    if( _table.markdown ) return;
     if( _table.selected.mode == NodeMode.EDITABLE ) {
       _table.selected.name.remove_tag( tag, _table.undo_text );
     } else {
@@ -378,10 +384,11 @@ public class FormatBar : Gtk.Popover {
 
   /* Clears all tags from selected text */
   private void handle_clear() {
-    if( _table.selected.mode == NodeMode.EDITABLE ) {
-      _table.selected.name.remove_all_tags( _table.undo_text );
+    var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
+    if( _table.markdown ) {
+      // TBD
     } else {
-      _table.selected.note.remove_all_tags( _table.undo_text );
+      ct.remove_all_tags( _table.undo_text );
     }
     _ignore_active = true;
     _bold.set_active( false );

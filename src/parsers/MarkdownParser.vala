@@ -104,7 +104,7 @@ public class MarkdownParser : TextParser {
   }
 
   /* This is called when the associated FormatBar button is clicked */
-  public override void insert_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos, string extra ) {
+  public override void insert_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos, string? extra ) {
     switch( tag ) {
       case FormatTag.HEADER  :  insert_header( text, start_pos, extra );  break;
       case FormatTag.CODE    :  insert_surround( text, "`", start_pos, end_pos );  break;
@@ -115,11 +115,16 @@ public class MarkdownParser : TextParser {
   }
 
   private void insert_header( FormattedText text, int start_pos, string extra ) {
-    var nl = text.text.slice( 0, start_pos ).last_index_of( "\n" );
+    var nl     = text.text.slice( 0, start_pos ).last_index_of( "\n" );
+    var num    = int.parse( extra );
+    var hashes = "";
+    for( int i=0; i<num; i++ ) {
+      hashes += "#";
+    }
     if( nl == -1 ) {
-      text.insert_text( 0, "%s ".printf( extra ) );
+      text.insert_text( 0, "%s ".printf( hashes ) );
     } else {
-      text.replace_text( nl, 1, "\n%s ".printf( extra ) );
+      text.replace_text( nl, 1, "\n%s ".printf( hashes ) );
     }
   }
 
