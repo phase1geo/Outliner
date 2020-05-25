@@ -348,17 +348,12 @@ public class CanvasText : Object {
 
   /* Only sets the cursor location to the given value */
   public void set_cursor_only( int cursor ) {
-
     var orig_cursor = _cursor;
-
     _cursor = cursor;
     update_column();
-
-    /* Alert anyone listening that the cursor changed */
     if( orig_cursor != _cursor ) {
       cursor_changed();
     }
-
   }
 
   /* Sets the cursor from the given mouse coordinates */
@@ -756,6 +751,23 @@ public class CanvasText : Object {
       set_cursor_only( _cursor + slen );
       undo_buffer.add_insert( cpos, t.text, cur );
     }
+  }
+
+  /* Inserts a range of text messages */
+  public void insert_ranges( Array<InsertText?> its, UndoTextBuffer undo_buffer ) {
+    var cur = _cursor;
+    for( int i=(int)(its.length - 1); i>=0; i-- ) {
+      var it   = its.index( i );
+      var slen = it.text.char_count();
+      text.insert_text( it.start, it.text );
+      if( it.start < cursor ) {
+        set_cursor_only( _cursor + slen );
+      }
+      if( it.start < selstart ) {
+        change_selection( (_selstart + slen), (_selend + slen), "insert" );
+      }
+    }
+    undo_buffer.add_inserts( its, cur );
   }
 
   /* Replaces the given range with the specified string */

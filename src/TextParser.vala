@@ -87,13 +87,13 @@ public class TextParser {
   }
 
   /* This is called when the associated FormatBar button is clicked */
-  public virtual void insert_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos, string? extra = null ) {
-    text.add_tag( tag, start_pos, end_pos, extra );
+  public virtual void insert_tag( CanvasText ct, FormatTag tag, int start_pos, int end_pos, UndoTextBuffer undo_buffer, string? extra = null ) {
+    ct.text.add_tag( tag, start_pos, end_pos, extra );
   }
 
   /* This is called when the associated FormatBar button is unclicked */
-  public virtual void remove_all_tags( FormattedText text, int start_pos, int end_pos ) {
-    text.remove_all_tags( start_pos, end_pos );
+  public virtual void remove_all_tags( CanvasText ct, int start_pos, int end_pos, UndoTextBuffer undo_buffer ) {
+    ct.text.remove_all_tags( start_pos, end_pos );
   }
 
 }

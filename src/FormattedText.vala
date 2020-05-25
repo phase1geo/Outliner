@@ -880,9 +880,11 @@ public class FormattedText {
   }
 
   /* Returns the tag information of the given tag in the specified range */
-  public Array<UndoTagInfo> get_tag_in_range( FormatTag tag, int start, int end ) {
+  public Array<UndoTagInfo> get_full_tags_in_range( FormatTag tag, int start, int end ) {
     var tags = new Array<UndoTagInfo>();
-    _formats[tag].get_full_tags_in_range( tag, start, end, ref tags );
+    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+      _formats[i].get_full_tags_in_range( i, start, end, ref tags );
+    }
     return( tags );
   }
 

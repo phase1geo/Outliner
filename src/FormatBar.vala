@@ -171,9 +171,9 @@ public class FormatBar : Gtk.Popover {
       box.pack_start( _hilite,             false, false, 0 );
       box.pack_start( new Label( spacer ), false, false, 0 );
       box.pack_start( _color,              false, false, 0 );
+      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
+      box.pack_start( _clear,              false, false, 0 );
     }
-    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-    box.pack_start( _clear,              false, false, 0 );
 
     add( box );
 
@@ -220,7 +220,7 @@ public class FormatBar : Gtk.Popover {
   private void format_text( FormatTag tag, string? extra=null ) {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
     if( _table.markdown ) {
-      _table.markdown_parser.insert_tag( ct.text, tag, ct.selstart, ct.selend, extra );
+      _table.markdown_parser.insert_tag( ct, tag, ct.selstart, ct.selend, _table.undo_text, extra );
       switch( tag ) {
         case FormatTag.BOLD    :  _bold.set_active( false );     break;
         case FormatTag.ITALICS :  _italics.set_active( false );  break;
@@ -393,7 +393,7 @@ public class FormatBar : Gtk.Popover {
   private void handle_clear() {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
     if( _table.markdown ) {
-      _table.markdown_parser.remove_all_tags( ct.text, ct.selstart, ct.selend );
+      _table.markdown_parser.remove_all_tags( ct, ct.selstart, ct.selend, _table.undo_text );
     } else {
       ct.remove_all_tags( _table.undo_text );
     }

@@ -111,47 +111,50 @@ public class MarkdownParser : TextParser {
   }
 
   /* This is called when the associated FormatBar button is clicked */
-  public override void insert_tag( FormattedText text, FormatTag tag, int start_pos, int end_pos, string? extra ) {
+  public override void insert_tag( CanvasText ct, FormatTag tag, int start_pos, int end_pos, UndoTextBuffer undo_buffer, string? extra ) {
     switch( tag ) {
-      case FormatTag.HEADER  :  insert_header( text, start_pos, extra );  break;
-      case FormatTag.CODE    :  insert_surround( text, "`", start_pos, end_pos );  break;
-      case FormatTag.BOLD    :  insert_surround( text, "**", start_pos, end_pos );  break;
-      case FormatTag.ITALICS :  insert_surround( text, "_", start_pos, end_pos );  break;
-      case FormatTag.URL     :  insert_link( text, start_pos, end_pos, extra );  break;
+      case FormatTag.HEADER  :  insert_header( ct, start_pos, extra, undo_buffer );  break;
+      case FormatTag.CODE    :  insert_surround( ct, "`", start_pos, end_pos, undo_buffer );  break;
+      case FormatTag.BOLD    :  insert_surround( ct, "**", start_pos, end_pos, undo_buffer );  break;
+      case FormatTag.ITALICS :  insert_surround( ct, "_", start_pos, end_pos, undo_buffer );  break;
+      case FormatTag.URL     :  insert_link( ct, start_pos, end_pos, extra, undo_buffer );  break;
     }
   }
 
-  /* Removes all of the tags in the specified range */
-  public override void remove_all_tags( FormattedText text, int start_pos, int end_pos ) {
-    var tags = text.get_tag_in_range( FormatTag.SYNTAX, ((start_pos == 0) ? 0 : (start_pos - 1)), (end_pos + 1) );
-    for( int i=((int)tags.length - 1); i>=0; i-- ) {
-      var tag = tags.index( i );
-      text.remove_text( tag.start, tag.end );
-    }
-  }
-
-  private void insert_header( FormattedText text, int start_pos, string extra ) {
-    var nl     = text.text.slice( 0, start_pos ).last_index_of( "\n" );
+  private void insert_header( CanvasText ct, int start_pos, string extra, UndoTextBuffer undo_buffer ) {
+    var nl     = ct.text.text.slice( 0, start_pos ).last_index_of( "\n" );
     var num    = int.parse( extra );
     var hashes = "";
     for( int i=0; i<num; i++ ) {
       hashes += "#";
     }
     if( nl == -1 ) {
-      text.insert_text( 0, "%s ".printf( hashes ) );
+      var inserts = new Array<InsertText?>();
+      inserts.append_val( {0, "%s ".printf( hashes )} );
+      ct.insert_ranges( inserts, undo_buffer );
     } else {
-      text.replace_text( nl, 1, "\n%s ".printf( hashes ) );
+      ct.replace( nl, (nl + "\n".char_count()), "\n%s ".printf( hashes ), undo_buffer );
     }
   }
 
-  private void insert_surround( FormattedText text, string surround, int start_pos, int end_pos ) {
-    text.insert_text( end_pos, surround );
-    text.insert_text( start_pos, surround );
+  private void insert_surround( CanvasText ct, string surround, int start_pos, int end_pos, UndoTextBuffer undo_buffer ) {
+    var inserts = new Array<InsertText?>();
+    inserts.append_val( {start_pos, surround} );
+    inserts.append_val( {end_pos,   surround} );
+    ct.insert_ranges( inserts, undo_buffer );
   }
 
-  private void insert_link( FormattedText text, int start_pos, int end_pos, string url ) {
-    text.insert_text( end_pos, "](%s)".printf( url ) );
-    text.insert_text( start_pos, "[" );
+  private void insert_link( CanvasText ct, int start_pos, int end_pos, string url, UndoTextBuffer undo_buffer ) {
+    var seltext = ct.text.text.slice( start_pos, end_pos );
+    var inserts = new Array<InsertText?>();
+    if( seltext == url ) {
+      inserts.append_val( {start_pos, "<"} );
+      inserts.append_val( {end_pos,   ">"} );
+    } else {
+      inserts.append_val( {start_pos, "["} );
+      inserts.append_val( {end_pos,   "](%s)".printf( url )} );
+    }
+    ct.insert_ranges( inserts, undo_buffer );
   }
 
 }

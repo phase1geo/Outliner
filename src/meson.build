@@ -37,6 +37,7 @@ sources += files(
   'undo_actions/UndoTextClearTags.vala',
   'undo_actions/UndoTextDelete.vala',
   'undo_actions/UndoTextInsert.vala',
+  'undo_actions/UndoTextMultiInsert.vala',
   'undo_actions/UndoTextReplace.vala',
   'undo_actions/UndoTextTagAdd.vala',
   'undo_actions/UndoTextTagRemove.vala',
