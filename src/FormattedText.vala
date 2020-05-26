@@ -105,6 +105,11 @@ public class PosTag {
   public string to_string() {
     return( "(%s %s, %d, %s)".printf( tag.to_string(), (begin ? "start" : "end"), pos, extra ) );
   }
+  public static int compare( void* x, void* y ) {
+    PosTag** x1 = (PosTag**)x;
+   	PosTag** y1 = (PosTag**)y;
+    return( (int)((*x1)->pos > (*y1)->pos) - (int)((*x1)->pos < (*y1)->pos) );
+  }
 }
 
 /* Stores information for undo/redo operation on tags */
@@ -119,9 +124,9 @@ public class UndoTagInfo {
     this.end   = end;
     this.extra = extra;
   }
-  public void append_to_postag_list( ref GLib.List<PosTag> tags ) {
-    tags.append( new PosTag.start( (FormatTag)tag, start, extra ) );
-    tags.append( new PosTag.end( (FormatTag)tag, end, extra ) );
+  public void append_to_postag_list( ref Array<PosTag> tags ) {
+    tags.append_val( new PosTag.start( (FormatTag)tag, start, extra ) );
+    tags.append_val( new PosTag.end( (FormatTag)tag, end, extra ) );
   }
 }
 
@@ -129,7 +134,7 @@ public class FormattedText {
 
   private class TagInfo {
 
-    private class FormattedRange {
+    public class FormattedRange {
       public int     start { get; set; default = 0; }
       public int     end   { get; set; default = 0; }
       public string? extra { get; set; default = null; }
@@ -176,9 +181,20 @@ public class FormattedText {
         }
         extra = n->get_prop( "extra" );
       }
+      public static int compare( void* x, void* y ) {
+     		 FormattedRange** x1 = (FormattedRange**)x;
+       	FormattedRange** y1 = (FormattedRange**)y;
+        return( (int)((*x1)->start > (*y1)->start) - (int)((*x1)->start < (*y1)->start) );
+      }
     }
 
     private Array<FormattedRange> _info;
+
+    public Array<FormattedRange> info {
+      get {
+        return( _info );
+      }
+    }
 
     /* Default constructor */
     public TagInfo() {
@@ -222,6 +238,7 @@ public class FormattedText {
         }
       }
       _info.append_val( new FormattedRange( start, end, extra ) );
+      _info.sort( (CompareFunc)FormattedRange.compare );
     }
 
     /* Adds the given TagInfo contents to the existing list */
@@ -236,6 +253,7 @@ public class FormattedText {
     public void replace_tag( int start, int end, string? extra ) {
       _info.remove_range( 0, _info.length );
       _info.append_val( new FormattedRange( start, end, extra ) );
+      _info.sort( (CompareFunc)FormattedRange.compare );
     }
 
     /* Removes the given range from this format type */
@@ -257,6 +275,7 @@ public class FormattedText {
           }
         }
       }
+      _info.sort( (CompareFunc)FormattedRange.compare );
     }
 
     /* Removes all ranges for this tag */
@@ -703,6 +722,20 @@ public class FormattedText {
     }
   }
 
+  /* Creates a copy of the given text and removes all of the syntax characters */
+  public FormattedText.copy_clean( OutlineTable table, FormattedText other ) {
+    initialize( table );
+    _text = other._text;
+    for( int i=0; i<FormatTag.LENGTH-3; i++ ) {
+      _formats[i].copy( other._formats[i] );
+    }
+    var ranges = other._formats[FormatTag.SYNTAX].info;
+    for( int i=(int)(ranges.length - 1); i>=0; i-- ) {
+      var range = ranges.index( i );
+      remove_text( range.start, (range.end - range.start) );
+    }
+  }
+
   /* Initializes this instance */
   private void initialize( OutlineTable table ) {
     if( _attr_tags == null ) {
@@ -942,36 +975,42 @@ public class FormattedText {
   public string export( int start, int end, ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
     var tags      = get_tags_in_range( start, end );
     var str       = "";
-    var pos_tags  = new GLib.List<PosTag>();
+    var pos_tags  = new Array<PosTag>();
     var tag_stack = new Array<PosTag>();
     for( int i=0; i<tags.length; i++ ) {
       tags.index( i ).append_to_postag_list( ref pos_tags );
     }
-    CompareFunc<PosTag> pt_cmp = (a, b) => {
-      return( (int)(a.pos > b.pos) - (int)(a.pos < b.pos) );
-    };
-    pos_tags.sort( pt_cmp );
-    for( int i=0; i<pos_tags.length(); i++ ) {
-      var pos_tag = pos_tags.nth_data( i );
+    pos_tags.sort( (CompareFunc)PosTag.compare );
+    for( int i=0; i<pos_tags.length; i++ ) {
+      var pos_tag = pos_tags.index( i );
+      stdout.printf( "i: %d, pos_tag: %s, encode_func: (%s)\n", i, pos_tag.to_string(), encode_func( text.slice( start, pos_tag.pos ) ) );
       str += encode_func( text.slice( start, pos_tag.pos ) );
+      stdout.printf( "  str-1: %s\n", str );
       if( pos_tag.begin ) {
         tag_stack.append_val( pos_tag );
         str += start_func( pos_tag.tag, pos_tag.pos, pos_tag.extra );
+        stdout.printf( "  str-2: %s\n", str );
       } else {
         var str2 = "";
         for( int j=(int)(tag_stack.length - 1); j>=0; j-- ) {
           if( tag_stack.index( j ).tag == pos_tag.tag ) {
             str += end_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, pos_tag.extra );
             tag_stack.remove_index( j );
+            str2 = "";
+            stdout.printf( "  str-3: %s\n", str );
             break;
           } else {
+            stdout.printf( "  stack-%d, %s\n", j, tag_stack.index( j ).to_string() );
             str += end_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, pos_tag.extra );
             str2 = start_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, tag_stack.index( j ).extra ) + str2;
+            stdout.printf( "  str-4: %s\n", str );
           }
         }
         str += str2;
+        stdout.printf( "  str-5: %s\n", str );
       }
       start = pos_tag.pos;
+      stdout.printf( "    str: %s\n", str );
     }
     return( str + encode_func( text.slice( start, end ) ) );
   }

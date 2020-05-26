@@ -38,7 +38,7 @@ public class MarkdownParser : TextParser {
     });
 
     /* Code */
-    add_regex( "(`)[^`]+(`)", (text, match) => {
+    add_regex( "(`)([^`]+)(`)", (text, match) => {
       make_grey( text, match, 1 );
       add_tag( text, match, 2, FormatTag.CODE );
       make_grey( text, match, 3 );
@@ -75,9 +75,9 @@ public class MarkdownParser : TextParser {
   }
 
   private void highlight_italics( FormattedText text, MatchInfo match ) {
-    make_grey( text, match, 2 );
-    add_tag( text, match, 3, FormatTag.ITALICS );
-    make_grey( text, match, 5 );
+    make_grey( text, match, 1 );
+    add_tag( text, match, 2, FormatTag.ITALICS );
+    make_grey( text, match, 3 );
   }
 
   private void highlight_url1( FormattedText text, MatchInfo match ) {
