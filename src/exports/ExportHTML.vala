@@ -58,7 +58,7 @@ public class ExportHTML : Object {
     return( body );
   }
 
-  public static string from_text( FormattedText text, int start, int end ) {
+  public static string from_text( FormattedText text ) {
     FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "<b>");
@@ -94,13 +94,13 @@ public class ExportHTML : Object {
     FormattedText.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).replace( "\n", "<br />" ) );
     };
-    return( text.export( start, end, start_func, end_func, encode_func ) );
+    return( text.export( start_func, end_func, encode_func ) );
   }
 
   private static Xml.Node* make_div( string div_class, FormattedText text ) {
     stdout.printf( "make_div, text: %s\n", text.text );
-    stdout.printf( "  from_text: %s\n", from_text( text, 0, text.text.char_count() ) );
-    var      html = "<div class=\"" + div_class + "\">" + from_text( text, 0, text.text.char_count() ) + "</div>";
+    stdout.printf( "  from_text: %s\n", from_text( text ) );
+    var      html = "<div class=\"" + div_class + "\">" + from_text( text ) + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );
     delete doc;

@@ -44,7 +44,7 @@ public class ExportOrgMode : Object {
     }
   }
 
-  public static string from_text( FormattedText text, int start, int end ) {
+  public static string from_text( FormattedText text ) {
     FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "*");
@@ -72,7 +72,7 @@ public class ExportOrgMode : Object {
     FormattedText.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "+", "\\+" ) );
     };
-    return( text.export( start, end, start_func, end_func, encode_func ) );
+    return( text.export( start_func, end_func, encode_func ) );
   }
 
   /* Draws the given node and its children to the output stream */
@@ -88,12 +88,12 @@ public class ExportOrgMode : Object {
         case NodeTaskMode.DOING :  title += "[-] ";  break;
       }
 
-      title += from_text( node.name.text, 0, node.name.text.text.char_count() ) + "\n";
+      title += from_text( node.name.text ) + "\n";
 
       os.write( title.data );
 
       if( node.note.text.text != "" ) {
-        var note = "\n" + from_text( node.note.text, 0, node.note.text.text.char_count() );
+        var note = "\n" + from_text( node.note.text );
         note = note.replace( "\n", "\n%s  ".printf( prefix ) ) + "\n";
         os.write( note.data );
       }

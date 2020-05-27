@@ -44,7 +44,7 @@ public class ExportMarkdown : Object {
     }
   }
 
-  public static string from_text( FormattedText text, int start, int end ) {
+  public static string from_text( FormattedText text ) {
     FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "**");
@@ -84,7 +84,7 @@ public class ExportMarkdown : Object {
     FormattedText.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "#", "\\#" ).replace( "`", "\\`" ) );
     };
-    return( text.export( start, end, start_func, end_func, encode_func ) );
+    return( text.export( start_func, end_func, encode_func ) );
   }
 
   /* Draws the given node and its children to the output stream */
@@ -103,7 +103,7 @@ public class ExportMarkdown : Object {
       if( table.markdown ) {
         title += node.name.text.text;
       } else {
-        title += from_text( node.name.text, 0, node.name.text.text.char_count() );
+        title += from_text( node.name.text );
       }
       title = title.replace( "\n", "\n%s  ".printf( prefix ) ) + "\n";
       os.write( title.data );
@@ -113,7 +113,7 @@ public class ExportMarkdown : Object {
         if( table.markdown ) {
           note = prefix + "  > " + node.note.text.text;
         } else {
-          note = prefix + "  > " + from_text( node.note.text, 0, node.note.text.text.char_count() );
+          note = prefix + "  > " + from_text( node.note.text );
         }
         note = note.replace( "\n", "\n%s  > ".printf( prefix ) ) + "\n";
         os.write( note.data );

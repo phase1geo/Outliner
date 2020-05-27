@@ -105,11 +105,6 @@ public class PosTag {
   public string to_string() {
     return( "(%s %s, %d, %s)".printf( tag.to_string(), (begin ? "start" : "end"), pos, extra ) );
   }
-  public static int compare( void* x, void* y ) {
-    PosTag** x1 = (PosTag**)x;
-   	PosTag** y1 = (PosTag**)y;
-    return( (int)((*x1)->pos > (*y1)->pos) - (int)((*x1)->pos < (*y1)->pos) );
-  }
 }
 
 /* Stores information for undo/redo operation on tags */
@@ -124,9 +119,61 @@ public class UndoTagInfo {
     this.end   = end;
     this.extra = extra;
   }
-  public void append_to_postag_list( ref Array<PosTag> tags ) {
-    tags.append_val( new PosTag.start( (FormatTag)tag, start, extra ) );
-    tags.append_val( new PosTag.end( (FormatTag)tag, end, extra ) );
+  public string to_string() {
+    return( "tag: %s, start: %d, end: %d, extra: %s".printf( tag.to_string(), start, end, extra ) );
+  }
+}
+
+public class TagTreeItem {
+  public UndoTagInfo?       info;
+  public TagTreeItem?       parent;
+  public Array<TagTreeItem> children;
+  public TagTreeItem( UndoTagInfo? info, TagTreeItem? parent = null ) {
+    this.info     = info;
+    this.parent   = parent;
+    this.children = new Array<TagTreeItem>();
+  }
+  private bool is_within( UndoTagInfo item ) {
+    return( (info.start <= item.start) && (item.end <= info.end) );
+  }
+  private bool reparent( UndoTagInfo item ) {
+    return( (item.start <= info.start) && (info.end <= item.end) );
+  }
+  private bool less_than( UndoTagInfo item ) {
+    return( item.end < info.start );
+  }
+  public void insert( UndoTagInfo item ) {
+    for( int i=0; i<children.length; i++ ) {
+      var child = children.index( i );
+      if( child.is_within( item ) ) {
+        child.insert( item );
+        return;
+      } else if( child.reparent( item ) ) {
+        var tti = new TagTreeItem( item, this );
+        children.data[i] = tti;
+        tti.children.append_val( child );
+        child.parent = tti;
+        while( ((i + 1) < children.length) && tti.is_within( children.index( i + 1 ).info ) ) {
+          tti.children.append_val( children.index( i + 1 ) );
+          children.index( i + 1 ).parent = tti;
+          children.remove_index( i + 1 );
+        }
+        return;
+      } else if( child.less_than( item ) ) {
+        children.insert_val( i, new TagTreeItem( item, this ) );
+        return;
+      }
+    }
+    children.append_val( new TagTreeItem( item, this ) );
+  }
+  public void get_array( ref Array<PosTag> tags ) {
+    for( int i=0; i<children.length; i++ ) {
+      var child = children.index( i );
+      var info  = child.info;
+      tags.append_val( new PosTag.start( (FormatTag)info.tag, info.start, info.extra ) );
+      child.get_array( ref tags );
+      tags.append_val( new PosTag.end( (FormatTag)info.tag, info.end, info.extra ) );
+    }
   }
 }
 
@@ -972,47 +1019,34 @@ public class FormattedText {
   */
 
   /* Generates an HTML version of the formatted text */
-  public string export( int start, int end, ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
-    var tags      = get_tags_in_range( start, end );
-    var str       = "";
-    var pos_tags  = new Array<PosTag>();
-    var tag_stack = new Array<PosTag>();
+  public string export( ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
+
+    /* Create the tree version and create an ordered list of tags */
+    var tags     = get_tags_in_range( 0, text.char_count() );
+    var root     = new TagTreeItem( null, null );
+    var pos_tags = new Array<PosTag>();
     for( int i=0; i<tags.length; i++ ) {
-      tags.index( i ).append_to_postag_list( ref pos_tags );
+      root.insert( tags.index( i ) );
     }
-    pos_tags.sort( (CompareFunc)PosTag.compare );
+    root.get_array( ref pos_tags );
+
+    /* Output the text */
+    var str      = "";
+    var start    = 0;
     for( int i=0; i<pos_tags.length; i++ ) {
       var pos_tag = pos_tags.index( i );
-      stdout.printf( "i: %d, pos_tag: %s, encode_func: (%s)\n", i, pos_tag.to_string(), encode_func( text.slice( start, pos_tag.pos ) ) );
+      stdout.printf( "pos_tag %d: %s\n", i, pos_tag.to_string() );
       str += encode_func( text.slice( start, pos_tag.pos ) );
-      stdout.printf( "  str-1: %s\n", str );
       if( pos_tag.begin ) {
-        tag_stack.append_val( pos_tag );
         str += start_func( pos_tag.tag, pos_tag.pos, pos_tag.extra );
-        stdout.printf( "  str-2: %s\n", str );
       } else {
-        var str2 = "";
-        for( int j=(int)(tag_stack.length - 1); j>=0; j-- ) {
-          if( tag_stack.index( j ).tag == pos_tag.tag ) {
-            str += end_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, pos_tag.extra );
-            tag_stack.remove_index( j );
-            str2 = "";
-            stdout.printf( "  str-3: %s\n", str );
-            break;
-          } else {
-            stdout.printf( "  stack-%d, %s\n", j, tag_stack.index( j ).to_string() );
-            str += end_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, pos_tag.extra );
-            str2 = start_func( tag_stack.index( j ).tag, tag_stack.index( j ).pos, tag_stack.index( j ).extra ) + str2;
-            stdout.printf( "  str-4: %s\n", str );
-          }
-        }
-        str += str2;
-        stdout.printf( "  str-5: %s\n", str );
+        str += end_func( pos_tag.tag, pos_tag.pos, pos_tag.extra );
       }
       start = pos_tag.pos;
-      stdout.printf( "    str: %s\n", str );
     }
-    return( str + encode_func( text.slice( start, end ) ) );
+    stdout.printf( "str: %s\n, text: %s, start: %d, end: %d, rest: %s\n", str, text, start, text.char_count(), text.slice( start, text.char_count() ) );
+    return( str + encode_func( text.slice( start, text.char_count() ) ) );
+
   }
 
   /* Populate the given text buffer with the text and formatting tags */

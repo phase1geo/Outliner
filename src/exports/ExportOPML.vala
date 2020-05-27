@@ -74,7 +74,7 @@ public class ExportOPML : Object {
 
     /* Add the node text */
     var name      = new FormattedText.copy_clean( table, node.name.text );
-    var name_html = ExportHTML.from_text( name, 0, name.text.char_count() );
+    var name_html = ExportHTML.from_text( name );
     n->new_prop( "text", name_html );
 
     /* Add the task */
@@ -85,7 +85,7 @@ public class ExportOPML : Object {
     /* Add the note */
     if( node.note.text.text != "" ) {
       var note      = new FormattedText.copy_clean( table, node.note.text );
-      var note_html = ExportHTML.from_text( note, 0, note.text.char_count() );
+      var note_html = ExportHTML.from_text( note );
       n->new_prop( "note", note_html );
     }
 

@@ -89,7 +89,7 @@ public class ExportRTF : Object {
       return( str );
       // return( str.replace( @"\", @"\\" ).replace( "{", @"\{" ).replace( "}", @"\}" );
     };
-    return( text.export( 0, text.text.char_count(), start_func, end_func, encode_func ) );
+    return( text.export( start_func, end_func, encode_func ) );
   }
 
   /* Traverses the node tree exporting XML nodes in OPML format */
