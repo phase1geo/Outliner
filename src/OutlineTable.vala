@@ -230,6 +230,7 @@ public class OutlineTable : DrawingArea {
   public signal void cursor_changed();
   public signal void show_tasks_changed();
   public signal void markdown_changed();
+  public signal void nodes_filtered( string? msg );
 
   /* Default constructor */
   public OutlineTable( MainWindow win, GLib.Settings settings ) {
@@ -1299,7 +1300,7 @@ public class OutlineTable : DrawingArea {
         changed();
       }
     } else if( _filtered ) {
-      filter_nodes( null );
+      filter_nodes( "", null );
     }
   }
 
@@ -2501,7 +2502,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Filters the rows that match the given NodeFilterFunc */
-  public void filter_nodes( NodeFilterFunc? func ) {
+  public void filter_nodes( string msg, NodeFilterFunc? func ) {
     _filtered = false;
     for( int i=0; i<root.children.length; i++ ) {
       _filtered |= root.children.index( i ).filter( func );
@@ -2509,7 +2510,14 @@ public class OutlineTable : DrawingArea {
     if( _filtered || (func == null) ) {
       root.adjust_nodes( 0, false, "filter_nodes" );
       queue_draw();
-      see( selected );
+      if( selected != null ) {
+        see( selected );
+      }
+    }
+    if( _filtered && (func != null) ) {
+      nodes_filtered( msg + " " + _( "Hit the Escape key to exit." ) );
+    } else {
+      nodes_filtered( null );
     }
   }
 

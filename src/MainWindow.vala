@@ -186,7 +186,7 @@ public class MainWindow : ApplicationWindow {
   /* Returns the OutlineTable from the given tab */
   private OutlineTable? get_table( Tab tab ) {
     var box  = tab.page as Gtk.Box;
-    var bin1 = box.get_children().nth_data( 1 ) as Gtk.ScrolledWindow;
+    var bin1 = box.get_children().nth_data( 2 ) as Gtk.ScrolledWindow;
     var bin2 = bin1.get_child() as Gtk.Bin;  // Viewport
     var bin3 = bin2.get_child() as Gtk.Bin;  // Overlay
     return( bin3.get_child() as OutlineTable );
@@ -211,6 +211,23 @@ public class MainWindow : ApplicationWindow {
         var reveal = !revealer.reveal_child;
         revealer.reveal_child = reveal;
         bar.change_display( reveal );
+      }
+    }
+  }
+
+  /* Shows or hides the information bar, setting the message to the given value */
+  private void show_info_bar( string? msg ) {
+    if( _nb.current != null ) {
+      var box  = _nb.current.page as Gtk.Box;
+      var info = box.get_children().nth_data( 1 ) as Gtk.InfoBar;
+      if( info != null ) {
+        if( msg != null ) {
+          var lbl = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Label;
+          lbl.label = msg;
+          info.set_revealed( true );
+        } else {
+          info.set_revealed( false );
+        }
       }
     }
   }
@@ -288,6 +305,7 @@ public class MainWindow : ApplicationWindow {
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
     ot.theme_changed.connect( theme_changed );
+    ot.nodes_filtered.connect( show_info_bar );
 
     if( fname != null ) {
       ot.document.filename = fname;
@@ -305,12 +323,17 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the search bar */
     var search = new SearchBar( ot );
-
-    /* Create the search revealer */
     var search_reveal = new Revealer();
     search_reveal.add( search );
 
+    /* Create the info bar */
+    var info_bar = new InfoBar();
+    info_bar.get_content_area().add( new Label( "" ) );
+    info_bar.set_revealed( false );
+    info_bar.message_type = MessageType.INFO;
+
     box.pack_start( search_reveal, false, true );
+    box.pack_start( info_bar,      false, true );
     box.pack_start( scroll,        true,  true );
 
     /* Create the tab in the notebook */
