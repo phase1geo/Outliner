@@ -98,8 +98,6 @@ public class ExportHTML : Object {
   }
 
   private static Xml.Node* make_div( string div_class, FormattedText text ) {
-    stdout.printf( "make_div, text: %s\n", text.text );
-    stdout.printf( "  from_text: %s\n", from_text( text ) );
     var      html = "<div class=\"" + div_class + "\">" + from_text( text ) + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );

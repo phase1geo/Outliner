@@ -1035,7 +1035,6 @@ public class FormattedText {
     var start    = 0;
     for( int i=0; i<pos_tags.length; i++ ) {
       var pos_tag = pos_tags.index( i );
-      stdout.printf( "pos_tag %d: %s\n", i, pos_tag.to_string() );
       str += encode_func( text.slice( start, pos_tag.pos ) );
       if( pos_tag.begin ) {
         str += start_func( pos_tag.tag, pos_tag.pos, pos_tag.extra );
@@ -1044,7 +1043,6 @@ public class FormattedText {
       }
       start = pos_tag.pos;
     }
-    stdout.printf( "str: %s\n, text: %s, start: %d, end: %d, rest: %s\n", str, text, start, text.char_count(), text.slice( start, text.char_count() ) );
     return( str + encode_func( text.slice( start, text.char_count() ) ) );
 
   }
