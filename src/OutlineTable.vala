@@ -2084,6 +2084,7 @@ public class OutlineTable : DrawingArea {
         case "7" :  goto_label( 6 );  break;
         case "8" :  goto_label( 7 );  break;
         case "9" :  goto_label( 8 );  break;
+        case "@" :  tagger.show_add_ui();  break;
       }
     }
   }
@@ -2118,6 +2119,19 @@ public class OutlineTable : DrawingArea {
       case NodeTaskMode.DONE  :  selected.task = NodeTaskMode.NONE;   break;
     }
     queue_draw();
+    changed();
+  }
+
+  /* Called by the Tagger class to actually add the tag to the currently selected row */
+  public void add_tag( string tag ) {
+    if( selected == null ) return;
+    var name = selected.name;
+    _orig_text.copy( name );
+    tagger.preedit_load_tags( name.text );
+    name.text.insert_text( name.text.text.length, (" @" + tag) );
+    name.text.changed();
+    tagger.postedit_load_tags( name.text );
+    undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
     changed();
   }
 

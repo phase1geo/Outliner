@@ -37,14 +37,18 @@ public class UndoNodeName : UndoItem {
 
   /* Causes the stored item to be put into the before state */
   public override void undo( OutlineTable table ) {
+    table.tagger.preedit_load_tags( _node.name.text );
     _node.name.copy( _orig_text );
+    table.tagger.postedit_load_tags( _node.name.text );
     table.queue_draw();
     table.changed();
   }
 
   /* Causes the stored item to be put into the after state */
   public override void redo( OutlineTable table ) {
+    table.tagger.preedit_load_tags( _node.name.text );
     _node.name.copy( _text );
+    table.tagger.postedit_load_tags( _node.name.text );
     table.queue_draw();
     table.changed();
   }

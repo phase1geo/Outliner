@@ -26,14 +26,14 @@ public class Tagger {
 
   private OutlineTable         _ot;
   private HashMap<string,bool> _pre_tags;
-  private HashMap<string,bool> _tags;
+  private HashMap<string,int>  _tags;
   private Array<string>        _matches;
   private Gtk.SearchEntry      _entry;
 
   /* Default constructor */
   public Tagger( OutlineTable ot ) {
     _ot      = ot;
-    _tags    = new HashMap<string,bool>();
+    _tags    = new HashMap<string,int>();
     _matches = new Array<string>();
   }
 
@@ -47,13 +47,21 @@ public class Tagger {
     var tags = text.get_extras_for_tag( FormatTag.TAG );
     var it   = tags.map_iterator();
     while( it.next() ) {
-      if( !_pre_tags.unset( it.get_key() ) && !_tags.has_key( it.get_key() ) ) {
-        _tags.@set( it.get_key(), true );
+      if( !_pre_tags.unset( it.get_key() ) ) {
+        var count = _tags.has_key( it.get_key() ) ? _tags.@get( it.get_key() ) : 0;
+        _tags.@set( it.get_key(), (count + 1) );
       }
     }
-    var pid = _pre_tags.map_iterator();
-    while( pid.next() ) {
-      _tags.unset( pid.get_key() );
+    var pit = _pre_tags.map_iterator();
+    while( pit.next() ) {
+      if( _tags.has_key( pit.get_key() ) ) {
+        var count = _tags.@get( pit.get_key() );
+        if( count == 1 ) {
+          _tags.unset( pit.get_key() );
+        } else {
+          _tags.@set( pit.get_key(), (count - 1) );
+        }
+      }
     }
   }
 
@@ -77,6 +85,7 @@ public class Tagger {
         _matches.append_val( key );
       }
     }
+    _matches.sort( GLib.strcmp );
     return( _matches );
   }
 
@@ -87,6 +96,7 @@ public class Tagger {
     while( it.next() ) {
       Xml.Node* tag = new Xml.Node( null, "tag" );
       tag->set_prop( "value", (string)it.get_key() );
+      tag->set_prop( "count", ((int)it.get_value()).to_string() );
       tags->add_child( tag );
     }
     return( tags );
@@ -97,8 +107,9 @@ public class Tagger {
     for( Xml.Node* it = tags->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "tag") ) {
         var n = it->get_prop( "value" );
-        if( n != null ) {
-          _tags.@set( n, true );
+        var c = it->get_prop( "count" );
+        if( (n != null) && (c != null) ) {
+          _tags.@set( n, int.parse( c ) );
         }
       }
     }
@@ -125,9 +136,7 @@ public class Tagger {
     listbox.row_activated.connect( (row) => {
       var label = (Label)row.get_child();
       var value = label.get_text();
-      var text  = _ot.selected.name.text;
-      text.insert_text( text.text.length, (" @" + value) );
-      postedit_load_tags( text );
+      _ot.add_tag( value );
       popover.popdown();
     });
 
@@ -136,9 +145,7 @@ public class Tagger {
     _entry.placeholder_text = _( "Enter Tag Name" );
     _entry.activate.connect( () => {
       var value = _entry.text;
-      var text  = _ot.selected.name.text;
-      text.insert_text( text.text.length, (" @" + value) );
-      postedit_load_tags( text );
+      _ot.add_tag( value );
       popover.popdown();
     });
     _entry.insert_text.connect( filter_tag_text );
@@ -154,18 +161,18 @@ public class Tagger {
     popover.popup();
 
     /* Preload the tags */
-    preedit_load_tags( name.text );
     populate_listbox( listbox, get_matches( "" ) );
 
   }
 
   private void filter_tag_text( string str, int slen, ref int pos ) {
-    var filtered = str.replace( " ", "" ).replace( "\t", "" );
-    SignalHandler.block_by_func( (void*)_entry, (void*)filter_tag_text, this );
-    pos -= (slen - filtered.length);
-    _entry.text = filtered;  // ( filtered, filtered.length, ref pos );
-    SignalHandler.unblock_by_func( (void*)_entry, (void*)filter_tag_text, this );
-    Signal.stop_emission_by_name( _entry, "insert_text" );
+    var filtered = str.replace( " ", "" ).replace( "\t", "" ).replace( "@", "" );
+    if( str != filtered ) {
+      SignalHandler.block_by_func( (void*)_entry, (void*)filter_tag_text, this );
+      _entry.insert_text( filtered, filtered.length, ref pos );
+      SignalHandler.unblock_by_func( (void*)_entry, (void*)filter_tag_text, this );
+      Signal.stop_emission_by_name( _entry, "insert_text" );
+    }
   }
 
   private void populate_listbox( ListBox listbox, Array<string> tags ) {
