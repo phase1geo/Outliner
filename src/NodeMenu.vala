@@ -102,6 +102,9 @@ public class NodeMenu : Gtk.Menu {
     _note_display = new Gtk.MenuItem.with_label( _( "Show Note" ) );
     _note_display.activate.connect( toggle_note );
 
+    var tag_add = new Gtk.MenuItem.with_label( _( "Add Tag" ) );
+    tag_add.activate.connect( add_tag );
+
     _add_above = new Gtk.MenuItem.with_label( _( "Add Row Above" ) );
     _add_above.activate.connect( add_row_above );
     Utils.add_accel_label( _add_above, 65293, Gdk.ModifierType.SHIFT_MASK );
@@ -187,6 +190,7 @@ public class NodeMenu : Gtk.Menu {
     add( _edit_text );
     add( _edit_note );
     add( _note_display );
+    add( tag_add );
     add( new SeparatorMenuItem() );
     add( _indent );
     add( _unindent );
@@ -361,6 +365,10 @@ public class NodeMenu : Gtk.Menu {
   /* Edit the current node's note field */
   private void edit_note() {
     _ot.edit_selected( false );
+  }
+
+  private void add_tag() {
+    _ot.tagger.show_add_ui();
   }
 
   /* Toggles the note display status of the currently selected node */
