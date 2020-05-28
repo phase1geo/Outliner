@@ -48,6 +48,7 @@ sources += files(
   'ColorPicker.vala',
   'Document.vala',
   'DynamicNotebook.vala',
+  'ExportUtils.vala',
   'FormatBar.vala',
   'FormattedText.vala',
   'LinkEditor.vala',

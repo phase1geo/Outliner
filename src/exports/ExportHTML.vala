@@ -59,7 +59,7 @@ public class ExportHTML : Object {
   }
 
   public static string from_text( FormattedText text ) {
-    FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
+    ExportUtils.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "<b>");
         case FormatTag.ITALICS    :  return( "<i>" );
@@ -75,7 +75,7 @@ public class ExportHTML : Object {
       }
       return( "" );
     };
-    FormattedText.ExportEndFunc end_func = (tag, start, extra) => {
+    ExportUtils.ExportEndFunc end_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "</b>" );
         case FormatTag.ITALICS    :  return( "</i>" );
@@ -91,10 +91,10 @@ public class ExportHTML : Object {
       }
       return( "" );
     };
-    FormattedText.ExportEncodeFunc encode_func = (str) => {
+    ExportUtils.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).replace( "\n", "<br />" ) );
     };
-    return( text.export( start_func, end_func, encode_func ) );
+    return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
   private static Xml.Node* make_div( string div_class, FormattedText text ) {

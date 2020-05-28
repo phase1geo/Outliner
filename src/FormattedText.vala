@@ -84,29 +84,6 @@ public enum FormatTag {
 
 }
 
-/* Used by the HTMLizer code */
-public class PosTag {
-  public FormatTag tag   { private set; get; }
-  public int       pos   { private set; get; }
-  public bool      begin { private set; get; }
-  public string?   extra { private set; get; }
-  public PosTag.start( FormatTag tag, int pos, string? extra ) {
-    this.tag   = tag;
-    this.pos   = pos;
-    this.begin = true;
-    this.extra = extra;
-  }
-  public PosTag.end( FormatTag tag, int pos, string? extra ) {
-    this.tag   = tag;
-    this.pos   = pos;
-    this.begin = false;
-    this.extra = extra;
-  }
-  public string to_string() {
-    return( "(%s %s, %d, %s)".printf( tag.to_string(), (begin ? "start" : "end"), pos, extra ) );
-  }
-}
-
 /* Stores information for undo/redo operation on tags */
 public class UndoTagInfo {
   public int     start { private set; get; }
@@ -124,58 +101,6 @@ public class UndoTagInfo {
   }
 }
 
-public class TagTreeItem {
-  public UndoTagInfo?       info;
-  public TagTreeItem?       parent;
-  public Array<TagTreeItem> children;
-  public TagTreeItem( UndoTagInfo? info, TagTreeItem? parent = null ) {
-    this.info     = info;
-    this.parent   = parent;
-    this.children = new Array<TagTreeItem>();
-  }
-  private bool is_within( UndoTagInfo item ) {
-    return( (info.start <= item.start) && (item.end <= info.end) );
-  }
-  private bool reparent( UndoTagInfo item ) {
-    return( (item.start <= info.start) && (info.end <= item.end) );
-  }
-  private bool less_than( UndoTagInfo item ) {
-    return( item.end < info.start );
-  }
-  public void insert( UndoTagInfo item ) {
-    for( int i=0; i<children.length; i++ ) {
-      var child = children.index( i );
-      if( child.is_within( item ) ) {
-        child.insert( item );
-        return;
-      } else if( child.reparent( item ) ) {
-        var tti = new TagTreeItem( item, this );
-        children.data[i] = tti;
-        tti.children.append_val( child );
-        child.parent = tti;
-        while( ((i + 1) < children.length) && tti.is_within( children.index( i + 1 ).info ) ) {
-          tti.children.append_val( children.index( i + 1 ) );
-          children.index( i + 1 ).parent = tti;
-          children.remove_index( i + 1 );
-        }
-        return;
-      } else if( child.less_than( item ) ) {
-        children.insert_val( i, new TagTreeItem( item, this ) );
-        return;
-      }
-    }
-    children.append_val( new TagTreeItem( item, this ) );
-  }
-  public void get_array( ref Array<PosTag> tags ) {
-    for( int i=0; i<children.length; i++ ) {
-      var child = children.index( i );
-      var info  = child.info;
-      tags.append_val( new PosTag.start( (FormatTag)info.tag, info.start, info.extra ) );
-      child.get_array( ref tags );
-      tags.append_val( new PosTag.end( (FormatTag)info.tag, info.end, info.extra ) );
-    }
-  }
-}
 
 public class FormattedText {
 
@@ -737,10 +662,6 @@ public class FormattedText {
 
   public signal void changed();
 
-  public delegate string ExportStartFunc( FormatTag tag, int start, string? extra );
-  public delegate string ExportEndFunc( FormatTag tag, int start, string? extra );
-  public delegate string ExportEncodeFunc( string str );
-
   public string text {
     get {
       return( _text );
@@ -1010,41 +931,6 @@ public class FormattedText {
     }
     _formats[FormatTag.URL].get_attributes( new UrlInfo( theme.url ), ref attrs );
     return( attrs );
-  }
-
-  /*
-  private string get_rtf_slice( int start, int end ) {
-    // return( text.slice( start, end ).replace( @"\", @"\\" ).replace( "{", @"\{" ).replace( "}", @"\}" );
-  }
-  */
-
-  /* Generates an HTML version of the formatted text */
-  public string export( ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
-
-    /* Create the tree version and create an ordered list of tags */
-    var tags     = get_tags_in_range( 0, text.char_count() );
-    var root     = new TagTreeItem( null, null );
-    var pos_tags = new Array<PosTag>();
-    for( int i=0; i<tags.length; i++ ) {
-      root.insert( tags.index( i ) );
-    }
-    root.get_array( ref pos_tags );
-
-    /* Output the text */
-    var str      = "";
-    var start    = 0;
-    for( int i=0; i<pos_tags.length; i++ ) {
-      var pos_tag = pos_tags.index( i );
-      str += encode_func( text.slice( start, pos_tag.pos ) );
-      if( pos_tag.begin ) {
-        str += start_func( pos_tag.tag, pos_tag.pos, pos_tag.extra );
-      } else {
-        str += end_func( pos_tag.tag, pos_tag.pos, pos_tag.extra );
-      }
-      start = pos_tag.pos;
-    }
-    return( str + encode_func( text.slice( start, text.char_count() ) ) );
-
   }
 
   /* Populate the given text buffer with the text and formatting tags */
