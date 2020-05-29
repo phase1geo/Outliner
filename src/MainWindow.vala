@@ -61,6 +61,12 @@ public class MainWindow : ApplicationWindow {
   private bool            _prefer_dark           = false;
   private HashMap<string,RadioButton> _theme_buttons;
 
+  public GLib.Settings settings {
+    get {
+      return( _settings );
+    }
+  }
+
   public static Themes themes = new Themes();
   public static bool   enable_tag_completion = true;
 

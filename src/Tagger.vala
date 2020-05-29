@@ -141,6 +141,12 @@ public class Tagger {
       popover.popdown();
     });
 
+    var scroll = new ScrolledWindow( null, null );
+    scroll.vscrollbar_policy  = PolicyType.AUTOMATIC;
+    scroll.hscrollbar_policy  = PolicyType.EXTERNAL;
+    scroll.min_content_height = 200;
+    scroll.add( listbox );
+
     _entry = new SearchEntry();
     _entry.max_width_chars  = 30;
     _entry.activate.connect( () => {
@@ -153,9 +159,9 @@ public class Tagger {
       populate_listbox( listbox, get_matches( _entry.text ) );
     });
 
-    box.pack_start( lbl,     false, true, 5 );
-    box.pack_start( _entry,  false, true, 5 );
-    box.pack_start( listbox, false, true, 5 );
+    box.pack_start( lbl,    false, true, 5 );
+    box.pack_start( _entry, false, true, 5 );
+    box.pack_start( scroll, true,  true, 5 );
     box.show_all();
 
     popover.add( box );
@@ -182,7 +188,6 @@ public class Tagger {
     });
     foreach( string str in tags ) {
       var lbl = new Label( str );
-      lbl.hexpand      = true;
       lbl.xalign       = 0;
       lbl.margin       = 5;
       lbl.margin_start = 10;

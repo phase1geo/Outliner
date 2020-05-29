@@ -389,7 +389,7 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  private void get_window_ys( out int top, out int bottom ) {
+  public void get_window_ys( out int top, out int bottom ) {
     var vp = parent.parent as Viewport;
     var vh = vp.get_allocated_height();
     var sw = parent.parent.parent as ScrolledWindow;

@@ -101,5 +101,10 @@
       <summary>Controls the display of the auto-completer when adding tags</summary>
       <description>Controls the display of the auto-completer when adding tags</description>
     </key>
+    <key name="max-auto-completion-items" type="i">
+      <default>10</default>
+      <summary>Specifies the maximum number of items that will be displayed in the auto-completion drowndown.</summary>
+      <description>Specifies the maximum number of items that will be displayed in the auto-completion drowndown.</description>
+    </key>
   </schema>
 </schemalist>

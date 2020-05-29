@@ -23,13 +23,13 @@ using Gtk;
 
 public class TextCompletion {
 
-  private OutlineTable   _ot;
-  private CanvasText     _ct;
-  private ListBox        _list;
-  private bool           _shown     = false;
-  private int            _size      = 0;
-  private int            _start_pos = 0;
-  private int            _end_pos   = 0;
+  private OutlineTable _ot;
+  private CanvasText   _ct;
+  private ListBox      _list;
+  private bool         _shown     = false;
+  private int          _size      = 0;
+  private int          _start_pos = 0;
+  private int          _end_pos   = 0;
 
   public bool shown {
     get {
@@ -56,10 +56,33 @@ public class TextCompletion {
       return;
     }
 
+    /* Get the maximum number of items that we will display */
+    var max_items = _ot.win.settings.get_int( "max-auto-completion-items" );
+
     /* Remember the text positions that will be replaced */
     _ct        = ct;
     _start_pos = start;
     _end_pos   = end;
+    _size      = (max_items < (int)list.length()) ? max_items : (int)list.length();
+
+    /* Get the position of the cursor so that we know where to place the box */
+    int x, ytop, ybot;
+    ct.get_cursor_pos( out x, out ytop, out ybot );
+
+    /* Calculate the position of the widget */
+    int height = _size * 27;
+    int win_top, win_bottom;
+    _ot.get_window_ys( out win_top, out win_bottom );
+    var below = (ybot + 300) <= win_bottom;
+
+    /* Set the position */
+    _list.margin_start = x;
+    if( below ) {
+      _list.margin_top = ybot + 5;
+    } else {
+      list.reverse();
+      _list.margin_top = (ytop - 5) - height;
+    }
 
     /* Populate the list */
     _list.foreach( (w) => {
@@ -72,19 +95,13 @@ public class TextCompletion {
       lbl.margin_start = 10;
       lbl.margin_end   = 10;
       _list.add( lbl );
+      if( --max_items <= 0 ) {
+        break;
+      }
     }
-    _size = (int)list.length();
-
-    /* Get the position of the cursor so that we know where to place the box */
-    int x, ytop, ybot;
-    ct.get_cursor_pos( out x, out ytop, out ybot );
-
-    /* Set the position of the widget */
-    _list.margin_start = x;
-    _list.margin_top   = ybot + 5;
 
     /* Select the first row */
-    _list.select_row( _list.get_row_at_index( 0 ) );
+    _list.select_row( _list.get_row_at_index( below ? 0 : (_size - 1) ) );
 
     /* Make sure that everything is seen */
     _list.show_all();
