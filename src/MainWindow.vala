@@ -1267,5 +1267,12 @@ public class MainWindow : ApplicationWindow {
 
   }
 
+  /* Returns the height of a single line label */
+  public int get_label_height() {
+    int min_height, nat_height;
+    _stats_chars.get_preferred_height( out min_height, out nat_height );
+    return( nat_height );
+  }
+
 }
 

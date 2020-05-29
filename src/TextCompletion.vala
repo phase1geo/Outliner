@@ -70,10 +70,10 @@ public class TextCompletion {
     ct.get_cursor_pos( out x, out ytop, out ybot );
 
     /* Calculate the position of the widget */
-    int height = _size * 27;
+    int height = _size * (_ot.win.get_label_height() + 10);
     int win_top, win_bottom;
     _ot.get_window_ys( out win_top, out win_bottom );
-    var below = (ybot + 300) <= win_bottom;
+    var below = (ybot + height) <= win_bottom;
 
     /* Set the position */
     _list.margin_start = x;
