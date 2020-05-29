@@ -48,10 +48,10 @@ public class TextCompletion {
   }
 
   /* Displays the auto-completion text with the given list */
-  public void show( CanvasText ct, Array<string> list, int start, int end ) {
+  public void show( CanvasText ct, List<string> list, int start, int end ) {
 
     /* If there is nothing to show, hide the contents */
-    if( list.length == 0 ) {
+    if( list.length() == 0 ) {
       hide();
       return;
     }
@@ -65,15 +65,15 @@ public class TextCompletion {
     _list.foreach( (w) => {
       _list.remove( w );
     });
-    for( int i=0; i<list.length; i++ ) {
-      var lbl = new Label( list.index( i ) );
+    foreach( string str in list ) {
+      var lbl = new Label( str );
       lbl.xalign       = 0;
       lbl.margin       = 5;
       lbl.margin_start = 10;
       lbl.margin_end   = 10;
       _list.add( lbl );
     }
-    _size = (int)list.length;
+    _size = (int)list.length();
 
     /* Get the position of the cursor so that we know where to place the box */
     int x, ytop, ybot;

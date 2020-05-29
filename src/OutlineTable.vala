@@ -2540,7 +2540,7 @@ public class OutlineTable : DrawingArea {
   /*******************/
 
   /* Displays the auto-completion widget with the given list of values */
-  public void show_auto_completion( Array<string> values, int start_pos, int end_pos ) {
+  public void show_auto_completion( GLib.List<string> values, int start_pos, int end_pos ) {
     if( is_node_editable() ) {
       _completion.show( selected.name, values, start_pos, end_pos );
     } else if( is_note_editable() ) {

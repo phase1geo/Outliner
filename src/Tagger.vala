@@ -27,14 +27,12 @@ public class Tagger {
   private OutlineTable         _ot;
   private HashMap<string,bool> _pre_tags;
   private HashMap<string,int>  _tags;
-  private Array<string>        _matches;
   private Gtk.SearchEntry      _entry;
 
   /* Default constructor */
   public Tagger( OutlineTable ot ) {
-    _ot      = ot;
-    _tags    = new HashMap<string,int>();
-    _matches = new Array<string>();
+    _ot   = ot;
+    _tags = new HashMap<string,int>();
   }
 
   /* Loads the tags prior to edits being made */
@@ -76,17 +74,17 @@ public class Tagger {
   }
 
   /* Gets the list of matching keys */
-  public Array<string> get_matches( string partial ) {
+  public GLib.List<string> get_matches( string partial ) {
     var it = _tags.map_iterator();
-    _matches.remove_range( 0, _matches.length );
+    var matches = new GLib.List<string>();
     while( it.next() ) {
       var key = (string)it.get_key();
       if( (key.length >= partial.length) && (key.substring( 0, partial.length ) == partial) ) {
-        _matches.append_val( key );
+        matches.append( key );
       }
     }
-    _matches.sort( GLib.strcmp );
-    return( _matches );
+    matches.sort( GLib.strcmp );
+    return( matches );
   }
 
   /* Returns the XML version of this class for saving purposes */
@@ -118,16 +116,19 @@ public class Tagger {
   /* Creates the UI for selecting/creating tags */
   public void show_add_ui() {
 
-    var           name = _ot.selected.name;
-    var           x    = (int)name.posx;
-    var           y    = (int)(name.posy + name.height);
-    Gdk.Rectangle rect = {x, y, 1, 1};
+    var    name = _ot.selected.name;
+    double left, top, bottom;
+    int    line;
+    name.get_char_pos( name.text.text.char_count(), out left, out top, out bottom, out line );
+    Gdk.Rectangle rect = {(int)left, (int)bottom, 1, 1};
 
     var popover = new Popover( _ot );
     popover.pointing_to = rect;
     popover.position    = PositionType.BOTTOM;
 
     var box = new Box( Orientation.VERTICAL, 0 );
+
+    var lbl = new Label( _( "Add Tag" ) );
 
     var listbox = new ListBox();
     listbox.selection_mode = SelectionMode.BROWSE;
@@ -142,7 +143,6 @@ public class Tagger {
 
     _entry = new SearchEntry();
     _entry.max_width_chars  = 30;
-    _entry.placeholder_text = _( "Enter Tag Name" );
     _entry.activate.connect( () => {
       var value = _entry.text;
       _ot.add_tag( value );
@@ -153,8 +153,9 @@ public class Tagger {
       populate_listbox( listbox, get_matches( _entry.text ) );
     });
 
-    box.pack_start( _entry,  false, true, 10 );
-    box.pack_start( listbox, false, true, 10 );
+    box.pack_start( lbl,     false, true, 5 );
+    box.pack_start( _entry,  false, true, 5 );
+    box.pack_start( listbox, false, true, 5 );
     box.show_all();
 
     popover.add( box );
@@ -175,12 +176,13 @@ public class Tagger {
     }
   }
 
-  private void populate_listbox( ListBox listbox, Array<string> tags ) {
+  private void populate_listbox( ListBox listbox, GLib.List<string> tags ) {
     listbox.foreach( (w) => {
       listbox.remove( w );
     });
-    for( int i=0; i<tags.length; i++ ) {
-      var lbl = new Label( tags.index( i ) );
+    foreach( string str in tags ) {
+      var lbl = new Label( str );
+      lbl.hexpand      = true;
       lbl.xalign       = 0;
       lbl.margin       = 5;
       lbl.margin_start = 10;
