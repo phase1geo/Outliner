@@ -1320,7 +1320,11 @@ public class OutlineTable : DrawingArea {
         queue_draw();
       }
     } else if( selected != null ) {
-      add_sibling_node( !shift );
+      if( selected.children.length > 0 ) {
+        add_child_node( 0 );
+      } else {
+        add_sibling_node( !shift );
+      }
     }
   }
 
@@ -2609,12 +2613,14 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Adds a child node of the currently selected node */
-  public void add_child_node() {
+  public void add_child_node( int index = -1 ) {
     if( selected == null ) return;
-    var index = selected.children.length;
-    var sel   = selected;
-    var node  = create_node();
-    insert_node( sel, node, (int)index );
+    if( index == -1 ) {
+      index = (int)selected.children.length;
+    }
+    var sel  = selected;
+    var node = create_node();
+    insert_node( sel, node, index );
     set_node_mode( selected, NodeMode.EDITABLE );
     undo_buffer.add_item( new UndoNodeInsert( node ) );
   }
