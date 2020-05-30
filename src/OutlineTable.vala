@@ -216,6 +216,7 @@ public class OutlineTable : DrawingArea {
       return( _tagger );
     }
   }
+  public bool tasks_on_right { get; private set; default = true; }
 
   /* Allocate static parsers */
   public MarkdownParser markdown_parser { get; private set; }
@@ -267,13 +268,21 @@ public class OutlineTable : DrawingArea {
     get_style_context().add_class( "canvas" );
 
     /* Initialize font and other property information from gsettings */
-    _name_family = settings.get_string( "default-row-font-family" );
-    _note_family = settings.get_string( "default-note-font-family" );
-    _name_size   = settings.get_int( "default-row-font-size" );
-    _note_size   = settings.get_int( "default-note-font-size" );
-    _show_tasks  = settings.get_boolean( "default-show-tasks" );
-    _show_depth  = settings.get_boolean( "default-show-depth" );
-    _markdown    = settings.get_boolean( "default-markdown-enabled" );
+    _name_family   = settings.get_string( "default-row-font-family" );
+    _note_family   = settings.get_string( "default-note-font-family" );
+    _name_size     = settings.get_int( "default-row-font-size" );
+    _note_size     = settings.get_int( "default-note-font-size" );
+    _show_tasks    = settings.get_boolean( "default-show-tasks" );
+    _show_depth    = settings.get_boolean( "default-show-depth" );
+    _markdown      = settings.get_boolean( "default-markdown-enabled" );
+    tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
+
+    /* Handle any changes made to the settings that we don't want to poll on */
+    settings.changed.connect(() => {
+      tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
+      show_tasks_changed();
+      queue_draw();
+    });
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -688,6 +697,8 @@ public class OutlineTable : DrawingArea {
           if( current.children.length > 0 ) {
             set_tooltip_markup( _( "%u subrows" ).printf( current.children.length ) );
           }
+        } else if( current.is_within_task( e.x, e.y ) ) {
+          set_cursor( click_cursor );
         } else if( current.is_within_name( e.x, e.y ) ) {
           if( control && !is_node_editable() && current.name.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
             set_cursor( click_cursor );

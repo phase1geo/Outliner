@@ -106,5 +106,10 @@
       <summary>Specifies the maximum number of items that will be displayed in the auto-completion drowndown.</summary>
       <description>Specifies the maximum number of items that will be displayed in the auto-completion drowndown.</description>
     </key>
+    <key name="checkboxes-on-right" type="b">
+      <default>true</default>
+      <summary>Specifies if checkboxes are displayed on the right (true) or left (false) side of the row.</summary>
+      <description>Specifies if checkboxes are displayed on the right (true) or left (false) side of the row.</description>
+    </key>
   </schema>
 </schemalist>

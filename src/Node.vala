@@ -515,6 +515,7 @@ public class Node {
   */
   private void update_height_from_resize() {
     position_text();
+    update_width();
     update_height( true );
   }
 
@@ -608,7 +609,7 @@ public class Node {
   /* Adjusts the position of the text object */
   private void position_text() {
     var zoom = _ot.win.get_zoom_factor();
-    var tx   = (task == NodeTaskMode.NONE) ? 0 : (task_size + padx);
+    var tx   = ((task == NodeTaskMode.NONE) || _ot.tasks_on_right) ? 0 : (task_size + padx);
     var ltx  = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + (padx * zoom));
     name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + tx + ltx;
     name.posy = y + pady;
@@ -809,7 +810,13 @@ public class Node {
 
   /* Returns the area where we will draw the task icon */
   private void task_bbox( out double x, out double y, out double w, out double h ) {
-    x = this.x + (padx * 5) + 20 + (depth * indent);
+    if( _ot.tasks_on_right ) {
+      int win_width, win_height;
+      _ot.win.get_size( out win_width, out win_height );
+      x = win_width - ((padx * 4) + 20);
+    } else {
+      x = this.x + (padx * 5) + 20 + (depth * indent);
+    }
     y = this.y + pady + ((name.get_line_height() / 2) - (task_size / 2));
     w = task_size;
     h = task_size;
