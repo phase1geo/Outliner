@@ -148,6 +148,7 @@ public class TextCompletion {
     activate_row( _list.get_selected_row() );
   }
 
+  /* Handle a mouse event on the listbox */
   private void activate_row( ListBoxRow row ) {
     var label = (Label)row.get_child();
     var value = label.get_text();
