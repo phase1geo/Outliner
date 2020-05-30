@@ -2695,10 +2695,17 @@ public class OutlineTable : DrawingArea {
   public void unindent_node( Node node ) {
     if( node.parent.is_root() ) return;
     var parent       = node.parent;
+    var index        = node.index();
     var parent_index = parent.index();
     var grandparent  = parent.parent;
     parent.remove_child( node );
     grandparent.add_child( node, (parent_index + 1) );
+    var num_siblings = parent.children.length;
+    for( int i=index; i<num_siblings; i++ ) {
+      var child = parent.children.index( index );
+      parent.remove_child( child );
+      node.add_child( child, -1 );
+    }
     see( selected );
     queue_draw();
     changed();

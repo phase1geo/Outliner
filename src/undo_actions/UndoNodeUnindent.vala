@@ -22,16 +22,24 @@
 public class UndoNodeUnindent : UndoItem {
 
   private Node _node;
+  private int  _num_children;
 
   /* Default constructor */
   public UndoNodeUnindent( Node node ) {
     base( _( "unindent item" ) );
-    _node = node;
+    _node         = node;
+    _num_children = (int)node.children.length;
   }
 
   /* Causes the stored item to be put into the before state */
   public override void undo( OutlineTable table ) {
     table.indent_node( _node );
+    var children = (int)_node.children.length;
+    for( int i=_num_children; i<children; i++ ) {
+      var child = _node.children.index( _num_children );
+      _node.remove_child( child );
+      _node.parent.add_child( child, -1 );
+    }
   }
 
   /* Causes the stored item to be put into the after state */
