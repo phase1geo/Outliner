@@ -952,8 +952,10 @@ public class OutlineTable : DrawingArea {
 
   /* Expands or collapses the current node's children */
   public void toggle_expand( Node node ) {
+    var nodes = new Array<Node>();
     node.expanded = !node.expanded;
-    undo_buffer.add_item( new UndoNodeExpander( node ) );
+    nodes.append_val( node );
+    undo_buffer.add_item( new UndoNodeExpander( nodes ) );
     queue_draw();
     changed();
   }
@@ -1422,16 +1424,17 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( selected != null ) {
       if( !selected.is_leaf() ) {
+        var nodes = new Array<Node>();
         if( shift ) {
-          selected.expand_all();
+          selected.expand_all( nodes );
         } else {
           if( !selected.expanded ) {
-            selected.collapse_all();
+            selected.collapse_all( nodes );
           }
-          selected.expand_next();
+          selected.expand_next( nodes );
         }
         selected.adjust_nodes( selected.last_y, false, "expand next" );
-        undo_buffer.add_item( new UndoNodeExpander( selected ) );
+        undo_buffer.add_item( new UndoNodeExpander( nodes ) );
         queue_draw();
         changed();
       }
@@ -1485,13 +1488,14 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( selected != null ) {
       if( !selected.is_leaf() && selected.expanded ) {
+        var nodes = new Array<Node>();
         if( shift ) {
-          selected.collapse_all();
+          selected.collapse_all( nodes );
         } else {
-          selected.collapse_next();
+          selected.collapse_next( nodes );
         }
         selected.adjust_nodes( selected.last_y, false, "left key" );
-        undo_buffer.add_item( new UndoNodeExpander( selected ) );
+        undo_buffer.add_item( new UndoNodeExpander( nodes ) );
         queue_draw();
         changed();
       }

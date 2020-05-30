@@ -21,28 +21,30 @@
 
 public class UndoNodeExpander : UndoItem {
 
-  private Node _node;
-  private bool _expanded;
+  private Array<Node> _nodes;
 
   /* Default constructor */
-  public UndoNodeExpander( Node node ) {
+  public UndoNodeExpander( Array<Node> nodes ) {
     base( _( "expander change" ) );
-    _node     = node;
-    _expanded = node.expanded;
+    _nodes = nodes;
+  }
+
+  public void toggle( OutlineTable table ) {
+    for( int i=0; i<_nodes.length; i++ ) {
+      _nodes.index( i ).expanded = !_nodes.index( i ).expanded;
+    }
+    table.queue_draw();
+    table.changed();
   }
 
   /* Causes the stored item to be put into the before state */
   public override void undo( OutlineTable table ) {
-    _node.expanded = !_expanded;
-    table.queue_draw();
-    table.changed();
+    toggle( table );
   }
 
   /* Causes the stored item to be put into the after state */
   public override void redo( OutlineTable table ) {
-    _node.expanded = _expanded;
-    table.queue_draw();
-    table.changed();
+    toggle( table );
   }
 
 }
