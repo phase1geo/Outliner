@@ -1421,8 +1421,16 @@ public class OutlineTable : DrawingArea {
       _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
-      if( !selected.is_leaf() && !selected.expanded ) {
-        selected.expanded = true;
+      if( !selected.is_leaf() ) {
+        if( shift ) {
+          selected.expand_all();
+        } else {
+          if( !selected.expanded ) {
+            selected.collapse_all();
+          }
+          selected.expand_next();
+        }
+        selected.adjust_nodes( selected.last_y, false, "expand next" );
         undo_buffer.add_item( new UndoNodeExpander( selected ) );
         queue_draw();
         changed();
@@ -1477,7 +1485,12 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( selected != null ) {
       if( !selected.is_leaf() && selected.expanded ) {
-        selected.expanded = false;
+        if( shift ) {
+          selected.collapse_all();
+        } else {
+          selected.collapse_next();
+        }
+        selected.adjust_nodes( selected.last_y, false, "left key" );
         undo_buffer.add_item( new UndoNodeExpander( selected ) );
         queue_draw();
         changed();

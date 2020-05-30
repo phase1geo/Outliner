@@ -1064,26 +1064,67 @@ public class Node {
 
   }
 
+  /* Expands the next unexpanded level of hierachy */
+  public void expand_next() {
+    if( !is_leaf() ) {
+      if( !expanded ) {
+        _expanded = true;
+      } else {
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).expand_next();
+        }
+      }
+    }
+  }
+
   /* Expand all of the nodes within this node tree */
   public void expand_all() {
-
-    expanded = true;
-
+    _expanded = true;
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).expand_all();
     }
+  }
 
+  /* Calculate the maximum depth that is not collapsedd */
+  private void get_collapse_next_depth( ref int max_depth ) {
+    if( !is_leaf() ) {
+      if( expanded ) {
+        if( depth > max_depth ) {
+          max_depth = depth;
+        }
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).get_collapse_next_depth( ref max_depth );
+        }
+      }
+    }
+  }
+
+  /* Collapse all nodes that match the maximum depth */
+  private void collapse_at_depth( int max_depth ) {
+    if( !is_leaf() ) {
+      if( depth == max_depth ) {
+        _expanded = false;
+      } else {
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).collapse_at_depth( max_depth );
+        }
+      }
+    }
+  }
+
+  /* Collapses the next level of hierarchy */
+  public void collapse_next() {
+    int max_depth = depth;
+    get_collapse_next_depth( ref max_depth );
+    collapse_at_depth( max_depth );
   }
 
   /* Collapses all nodes within this node tree */
   public void collapse_all() {
-
-    expanded = false;
-
+    _expanded = false;
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).collapse_all();
     }
-
   }
 
   /* Returns true if the node is a root node (has no parent) */
