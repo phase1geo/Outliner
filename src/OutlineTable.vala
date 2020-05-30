@@ -684,6 +684,10 @@ public class OutlineTable : DrawingArea {
           current.over_note_icon = true;
           set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
           set_cursor( null );
+        } else if( current.is_within_expander( e.x, e.y ) ) {
+          if( current.children.length > 0 ) {
+            set_tooltip_markup( _( "%u subrows" ).printf( current.children.length ) );
+          }
         } else if( current.is_within_name( e.x, e.y ) ) {
           if( control && !is_node_editable() && current.name.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
             set_cursor( click_cursor );
