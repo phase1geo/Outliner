@@ -40,6 +40,7 @@ public class NodeMenu : Gtk.Menu {
   private Gtk.MenuItem _indent;
   private Gtk.MenuItem _unindent;
   private Gtk.MenuItem _expander;
+  private Gtk.MenuItem _focus;
   private Gtk.MenuItem _select_above;
   private Gtk.MenuItem _select_below;
   private Gtk.MenuItem _select_prev_sibling;
@@ -124,6 +125,10 @@ public class NodeMenu : Gtk.Menu {
     _expander = new Gtk.MenuItem.with_label( _( "Expand Children" ) );
     _expander.activate.connect( toggle_expand );
 
+    _focus = new Gtk.MenuItem.with_label( _( "Enter Focus Mode" ) );
+    _focus.activate.connect( focus_mode );
+    Utils.add_accel_label( _focus, 'f', 0 );
+
     var select = new Gtk.MenuItem.with_label( _( "Select Row" ) );
     var selmenu = new Gtk.Menu();
     select.set_submenu( selmenu );
@@ -195,6 +200,7 @@ public class NodeMenu : Gtk.Menu {
     add( _indent );
     add( _unindent );
     add( _expander );
+    add( _focus );
     add( new SeparatorMenuItem() );
     add( _add_above );
     add( _add_below );
@@ -399,6 +405,11 @@ public class NodeMenu : Gtk.Menu {
   /* Toggles the expand/collapse property of the node */
   private void toggle_expand() {
     _ot.toggle_expand( _ot.selected );
+  }
+
+  /* Enters focus mode */
+  private void focus_mode() {
+    _ot.enter_focus_mode();
   }
 
   /* Selects the node just above the selected node */

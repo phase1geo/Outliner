@@ -120,6 +120,13 @@
             <property name="visible">1</property>
             <child>
               <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Enter Focus Mode on Selected Row</property>
+                <property name="accelerator">f</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Search Text</property>
                 <property name="accelerator">&lt;ctrl&gt;f</property>
                 <property name="visible">1</property>
@@ -224,6 +231,13 @@
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Edit Note</property>
                 <property name="accelerator">&lt;shift&gt;e</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Add Tag</property>
+                <property name="accelerator">at</property>
                 <property name="visible">1</property>
               </object>
             </child>
