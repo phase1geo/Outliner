@@ -55,7 +55,7 @@ public class ExportOPML : Object {
     Xml.Node*  body    = new Xml.Node( null, "body" );
     Array<int> estate  = new Array<int>();
     for( int i=0; i<table.root.children.length; i++ ) {
-      body->add_child( export_node( table.root.children.index( i ), ref estate ) );
+      body->add_child( export_node( table, table.root.children.index( i ), ref estate ) );
     }
     expand_state = "";
     for( int i=0; i<estate.length; i++ ) {
@@ -68,12 +68,13 @@ public class ExportOPML : Object {
   }
 
   /* Traverses the node tree exporting XML nodes in OPML format */
-  private static Xml.Node* export_node( Node node, ref Array<int> expand_state ) {
+  private static Xml.Node* export_node( OutlineTable table, Node node, ref Array<int> expand_state ) {
 
     Xml.Node* n = new Xml.Node( null, "outline" );
 
     /* Add the node text */
-    var name_html = ExportHTML.from_text( node.name.text, 0, node.name.text.text.char_count() );
+    var name      = new FormattedText.copy_clean( table, node.name.text );
+    var name_html = ExportHTML.from_text( name );
     n->new_prop( "text", name_html );
 
     /* Add the task */
@@ -83,7 +84,8 @@ public class ExportOPML : Object {
 
     /* Add the note */
     if( node.note.text.text != "" ) {
-      var note_html = ExportHTML.from_text( node.note.text, 0, node.note.text.text.char_count() );
+      var note      = new FormattedText.copy_clean( table, node.note.text );
+      var note_html = ExportHTML.from_text( note );
       n->new_prop( "note", note_html );
     }
 
@@ -94,7 +96,7 @@ public class ExportOPML : Object {
 
     /* Include any other child nodes */
     for( int i=0; i<node.children.length; i++ ) {
-      n->add_child( export_node( node.children.index( i ), ref expand_state ) );
+      n->add_child( export_node( table, node.children.index( i ), ref expand_state ) );
     }
 
     return( n );

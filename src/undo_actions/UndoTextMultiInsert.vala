@@ -19,38 +19,39 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public class UndoNodeName : UndoItem {
+public struct InsertText {
+  int    start;
+  string text;
+}
 
-  private Node       _node;
-  private CanvasText _text;
-  private CanvasText _orig_text;
+public class UndoTextMultiInsert : UndoTextItem {
+
+  private Array<InsertText?> _inserts;
 
   /* Default constructor */
-  public UndoNodeName( OutlineTable ot, Node node, CanvasText orig_text ) {
-    base( _( "title change" ) );
-    _node      = node;
-    _text      = new CanvasText( ot, 0 );
-    _orig_text = new CanvasText( ot, 0 );
-    _text.copy( node.name );
-    _orig_text.copy( orig_text );
+  public UndoTextMultiInsert( Array<InsertText?> inserts, int start_cursor, int end_cursor ) {
+    base( _( "text insertion" ), UndoTextOp.INSERT, start_cursor, end_cursor );
+    _inserts = inserts;
   }
 
   /* Causes the stored item to be put into the before state */
-  public override void undo( OutlineTable table ) {
-    table.tagger.preedit_load_tags( _node.name.text );
-    _node.name.copy( _orig_text );
-    table.tagger.postedit_load_tags( _node.name.text );
+  public override void undo_text( OutlineTable table, CanvasText ct ) {
+    for( int i=0; i<_inserts.length; i++ ) {
+      var insert = _inserts.index( i );
+      ct.text.remove_text( insert.start, insert.text.length );
+    }
+    ct.set_cursor_only( start_cursor );
     table.queue_draw();
-    table.changed();
   }
 
   /* Causes the stored item to be put into the after state */
-  public override void redo( OutlineTable table ) {
-    table.tagger.preedit_load_tags( _node.name.text );
-    _node.name.copy( _text );
-    table.tagger.postedit_load_tags( _node.name.text );
+  public override void redo_text( OutlineTable table, CanvasText ct ) {
+    for( int i=(int)(_inserts.length - 1); i>=0; i-- ) {
+      var insert = _inserts.index( i );
+      ct.text.insert_text( insert.start, insert.text );
+    }
+    ct.set_cursor_only( end_cursor );
     table.queue_draw();
-    table.changed();
   }
 
 }

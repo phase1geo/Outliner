@@ -220,16 +220,22 @@ public class CanvasText : Object {
    Returns true if the given coordinates within a URL and returns the matching
    URL.
   */
-  public bool is_within_url( double x, double y, ref string url ) {
+  public bool is_within_clickable( double x, double y, out FormatTag tag, out string extra ) {
     int adjusted_x = (int)(x - posx) * Pango.SCALE;
     int adjusted_y = (int)(y - posy) * Pango.SCALE;
     int cursor, trailing;
+    tag   = FormatTag.URL;
+    extra = "";
     if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
       var cindex = text.text.char_count( cursor + trailing );
-      var extra  = text.get_extra( FormatTag.URL, cindex );
-      if( extra != null ) {
-        url = extra;
-        return( true );
+      FormatTag[] tags = { FormatTag.URL, FormatTag.TAG };
+      foreach( FormatTag t in tags ) {
+        var e = text.get_extra( t, cindex );
+        if( e != null ) {
+          tag   = t;
+          extra = e;
+          return( true );
+        }
       }
     }
     return( false );
@@ -342,17 +348,12 @@ public class CanvasText : Object {
 
   /* Only sets the cursor location to the given value */
   public void set_cursor_only( int cursor ) {
-
     var orig_cursor = _cursor;
-
     _cursor = cursor;
     update_column();
-
-    /* Alert anyone listening that the cursor changed */
     if( orig_cursor != _cursor ) {
       cursor_changed();
     }
-
   }
 
   /* Sets the cursor from the given mouse coordinates */
@@ -607,17 +608,17 @@ public class CanvasText : Object {
         var epos = text.text.index_of_nth_char( _selend );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _selstart );
         change_selection( null, _selstart, "backspace" );
+        text.remove_text( spos, (epos - spos) );
         undo_buffer.add_delete( spos, str, tags, cur );
       } else {
         var spos = text.text.index_of_nth_char( _cursor - 1 );
         var epos = text.text.index_of_nth_char( _cursor );
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, (epos - spos) );
         set_cursor_only( _cursor - 1 );
+        text.remove_text( spos, (epos - spos) );
         undo_buffer.add_delete( spos, str, tags, cur );
       }
     }
@@ -633,8 +634,8 @@ public class CanvasText : Object {
       var spos = text.text.index_of_nth_char( wpos );
       var str  = text.text.slice( spos, epos );
       var tags = text.get_tags_in_range( spos, epos );
-      text.remove_text( spos, (epos - spos) );
       set_cursor_only( spos );
+      text.remove_text( spos, (epos - spos) );
       undo_buffer.add_delete( spos, str, tags, cur );
       if( _selstart < wpos ) {
         change_selection( null, wpos, "backspace_word1" );
@@ -656,8 +657,6 @@ public class CanvasText : Object {
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
         text.remove_text( spos, (epos - spos) );
-        set_cursor_only( _selstart );
-        change_selection( null, _selstart, "delete" );
         undo_buffer.add_delete( spos, str, tags, cur );
       } else {
         var spos = text.text.index_of_nth_char( _cursor );
@@ -677,8 +676,8 @@ public class CanvasText : Object {
     var epos = text.text.index_of_nth_char( endpos );
     var str  = text.text.slice( spos, epos );
     var tags = text.get_tags_in_range( spos, epos );
-    text.remove_text( spos, (epos - spos) );
     set_cursor_only( startpos );
+    text.remove_text( spos, (epos - spos) );
     undo_buffer.add_delete( spos, str, tags, cur );
   }
 
@@ -752,6 +751,35 @@ public class CanvasText : Object {
       set_cursor_only( _cursor + slen );
       undo_buffer.add_insert( cpos, t.text, cur );
     }
+  }
+
+  /* Inserts a range of text messages */
+  public void insert_ranges( Array<InsertText?> its, UndoTextBuffer undo_buffer ) {
+    var cur = _cursor;
+    for( int i=(int)(its.length - 1); i>=0; i-- ) {
+      var it   = its.index( i );
+      var slen = it.text.char_count();
+      text.insert_text( it.start, it.text );
+      if( it.start < cursor ) {
+        set_cursor_only( _cursor + slen );
+      }
+      if( it.start < selstart ) {
+        change_selection( (_selstart + slen), (_selend + slen), "insert" );
+      }
+    }
+    undo_buffer.add_inserts( its, cur );
+  }
+
+  /* Replaces the given range with the specified string */
+  public void replace( int start, int end, string s, UndoTextBuffer undo_buffer ) {
+    var slen = s.char_count();
+    var cur  = _cursor;
+    var str  = text.text.slice( start, end );
+    var tags = text.get_tags_in_range( start, end );
+    text.replace_text( start, (end - start), s );
+    set_cursor_only( start + slen );
+    change_selection( null, _selstart, "replace" );
+    undo_buffer.add_replace( start, str, s, tags, cur );
   }
 
   /*

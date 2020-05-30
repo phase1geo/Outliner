@@ -24,10 +24,16 @@ using Gdk;
 using Cairo;
 using Gee;
 
+/*
+ Returns true if the given node meets a condition that should cause it to be
+ displayed; otherwise, the node will be hidden.
+*/
+public delegate bool NodeFilterFunc( Node node );
+
 public class OutlineTable : DrawingArea {
 
-  private const CursorType url_cursor  = CursorType.HAND2;
-  private const CursorType text_cursor = CursorType.XTERM;
+  private const CursorType click_cursor = CursorType.HAND2;
+  private const CursorType text_cursor  = CursorType.XTERM;
 
   private MainWindow      _win;
   private Document        _doc;
@@ -64,6 +70,10 @@ public class OutlineTable : DrawingArea {
   private int             _note_size;
   private bool            _show_tasks = false;
   private bool            _show_depth = true;
+  private Tagger          _tagger;
+  private TextCompletion  _completion;
+  private bool            _markdown;
+  private bool            _filtered   = false;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -187,6 +197,30 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool markdown {
+    get {
+      return( _markdown );
+    }
+    set {
+      if( _markdown != value ) {
+        _markdown   = value;
+        _format_bar = null;
+        markdown_changed();
+        queue_draw();
+        changed();
+      }
+    }
+  }
+  public Tagger tagger {
+    get {
+      return( _tagger );
+    }
+  }
+
+  /* Allocate static parsers */
+  public MarkdownParser markdown_parser { get; private set; }
+  public TaggerParser   tagger_parser   { get; private set; }
+  public UrlParser      url_parser      { get; private set; }
 
   /* Called by this class when a change is made to the table */
   public signal void changed();
@@ -195,6 +229,8 @@ public class OutlineTable : DrawingArea {
   public signal void selected_changed();
   public signal void cursor_changed();
   public signal void show_tasks_changed();
+  public signal void markdown_changed();
+  public signal void nodes_filtered( string? msg );
 
   /* Default constructor */
   public OutlineTable( MainWindow win, GLib.Settings settings ) {
@@ -216,6 +252,17 @@ public class OutlineTable : DrawingArea {
     /* Create the labels */
     _labels = new NodeLabels();
 
+    /* Create the tags */
+    _tagger = new Tagger( this );
+
+    /* Create the parsers */
+    tagger_parser   = new TaggerParser( this );
+    markdown_parser = new MarkdownParser( this );
+    url_parser      = new UrlParser();
+
+    /* Create text completion */
+    _completion = new TextCompletion( this );
+
     /* Set the style context */
     get_style_context().add_class( "canvas" );
 
@@ -226,6 +273,7 @@ public class OutlineTable : DrawingArea {
     _note_size   = settings.get_int( "default-note-font-size" );
     _show_tasks  = settings.get_boolean( "default-show-tasks" );
     _show_depth  = settings.get_boolean( "default-show-depth" );
+    _markdown    = settings.get_boolean( "default-markdown-enabled" );
 
     /* Set the default theme */
     var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
@@ -327,15 +375,21 @@ public class OutlineTable : DrawingArea {
         if( node.mode != mode ) {
           update_im_cursor( (mode == NodeMode.EDITABLE) ? node.name : node.note );
           _im_context.focus_in();
+          if( mode == NodeMode.EDITABLE ) {
+            _tagger.preedit_load_tags( node.name.text );
+          }
         }
       } else if( (node.mode == NodeMode.EDITABLE) || (node.mode == NodeMode.NOTEEDIT) ) {
+        if( node.mode == NodeMode.EDITABLE ) {
+          _tagger.postedit_load_tags( node.name.text );
+        }
         _im_context.focus_out();
       }
       node.mode = mode;
     }
   }
 
-  private void get_window_ys( out int top, out int bottom ) {
+  public void get_window_ys( out int top, out int bottom ) {
     var vp = parent.parent as Viewport;
     var vh = vp.get_allocated_height();
     var sw = parent.parent.parent as ScrolledWindow;
@@ -429,9 +483,10 @@ public class OutlineTable : DrawingArea {
   /* Called when the given coordinates are clicked within a CanvasText item. */
   private bool clicked_in_text( Node clicked, CanvasText text, EventButton e, NodeMode select_mode ) {
 
-    bool   shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
-    bool   control = (bool)(e.state & ModifierType.CONTROL_MASK);
-    string url     = "";
+    var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
+    var control = (bool)(e.state & ModifierType.CONTROL_MASK);
+    var tag     = FormatTag.URL;
+    var extra   = "";
 
     /* Set the selected node to the clicked node */
     selected = clicked;
@@ -440,9 +495,12 @@ public class OutlineTable : DrawingArea {
      If the mouse click was within a URL and the control key was pressed, open
      the URL in an external application.
     */
-    if( control && text.is_within_url( e.x, e.y, ref url ) ) {
+    if( control && text.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
       _active = clicked;
-      Utils.open_url( url );
+      switch( tag ) {
+        case FormatTag.URL :  Utils.open_url( extra );       break;
+        case FormatTag.TAG :  _tagger.tag_clicked( extra );  break;
+      }
       return( false );
     }
 
@@ -610,6 +668,9 @@ public class OutlineTable : DrawingArea {
 
     } else {
 
+      var tag   = FormatTag.URL;
+      var extra = "";
+
       /* Get the current node */
       var current = node_at_coordinates( e.x, e.y );
       var control = (bool)(e.state & ModifierType.CONTROL_MASK);
@@ -624,18 +685,18 @@ public class OutlineTable : DrawingArea {
           set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
           set_cursor( null );
         } else if( current.is_within_name( e.x, e.y ) ) {
-          string url = "";
-          if( control && !is_node_editable() && current.name.is_within_url( e.x, e.y, ref url ) ) {
-            set_cursor( url_cursor );
-            set_tooltip_markup( url );
+          if( control && !is_node_editable() && current.name.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
+            set_cursor( click_cursor );
+            if( tag == FormatTag.URL ) {
+              set_tooltip_markup( extra );
+            }
           } else {
             set_cursor( text_cursor );
           }
         } else if( current.is_within_note( e.x, e.y ) ) {
-          string url = "";
-          if( control && !is_note_editable() && current.note.is_within_url( e.x, e.y, ref url ) ) {
-            set_cursor( url_cursor );
-            set_tooltip_markup( url );
+          if( control && !is_note_editable() && current.note.is_within_clickable( e.x, e.y, out tag, out extra ) && (tag == FormatTag.URL) ) {
+            set_cursor( click_cursor );
+            set_tooltip_markup( extra );
           } else {
             set_cursor( text_cursor );
           }
@@ -839,18 +900,19 @@ public class OutlineTable : DrawingArea {
   }
 
   private void handle_control( bool pressed ) {
-    string url = "";
+    var tag   = FormatTag.URL;
+    var extra = "";
     var current = node_at_coordinates( _motion_x, _motion_y );
     if( current != null ) {
-      if( !is_node_editable() && current.name.is_within_url( _motion_x, _motion_y, ref url ) ) {
+      if( !is_node_editable() && current.name.is_within_clickable( _motion_x, _motion_y, out tag, out extra ) ) {
         if( pressed ) {
-          set_cursor( url_cursor );
+          set_cursor( click_cursor );
         } else {
           set_cursor( text_cursor );
         }
-      } else if( !is_note_editable() && current.note.is_within_url( _motion_x, _motion_y, ref url ) ) {
+      } else if( !is_note_editable() && current.note.is_within_clickable( _motion_x, _motion_y, out tag, out extra ) && (tag == FormatTag.URL) ) {
         if( pressed ) {
-          set_cursor( url_cursor );
+          set_cursor( click_cursor );
         } else {
           set_cursor( text_cursor );
         }
@@ -1229,10 +1291,16 @@ public class OutlineTable : DrawingArea {
   /* Handles an escape keypress */
   private void handle_escape() {
     if( is_node_editable() || is_note_editable() ) {
-      set_node_mode( selected, NodeMode.SELECTED );
-      _im_context.reset();
-      queue_draw();
-      changed();
+      if( _completion.shown ) {
+        _completion.hide();
+      } else {
+        set_node_mode( selected, NodeMode.SELECTED );
+        _im_context.reset();
+        queue_draw();
+        changed();
+      }
+    } else if( _filtered ) {
+      filter_nodes( "", null );
     }
   }
 
@@ -1242,10 +1310,15 @@ public class OutlineTable : DrawingArea {
       selected.note.insert( "\n", undo_text );
       see( selected );
       queue_draw();
-    } else if( is_node_editable() && shift ) {
-      selected.name.insert( "\n", undo_text );
-      see( selected );
-      queue_draw();
+    } else if( is_node_editable() && (shift || _completion.shown) ) {
+      if( shift ) {
+        selected.name.insert( "\n", undo_text );
+        see( selected );
+        queue_draw();
+      } else {
+        _completion.select();
+        queue_draw();
+      }
     } else if( selected != null ) {
       add_sibling_node( !shift );
     }
@@ -1274,7 +1347,10 @@ public class OutlineTable : DrawingArea {
 
   /* Handles a tab key hit when a node is selected */
   private void handle_tab() {
-    if( selected != null ) {
+    if( is_node_editable() && _completion.shown ) {
+      _completion.select();
+      queue_draw();
+    } else if( selected != null ) {
       indent();
     }
   }
@@ -1418,15 +1494,19 @@ public class OutlineTable : DrawingArea {
   /* Handles an up arrow keypress */
   private void handle_up( bool shift ) {
     if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_vertically( -1 );
+      if( _completion.shown ) {
+        _completion.up();
       } else {
-        selected.name.move_cursor_vertically( -1 );
+        if( shift ) {
+          selected.name.selection_vertically( -1 );
+        } else {
+          selected.name.move_cursor_vertically( -1 );
+        }
+        undo_text.mergeable = false;
+        see( selected );
+        _im_context.reset();
+        queue_draw();
       }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
         selected.note.selection_vertically( -1 );
@@ -1581,15 +1661,19 @@ public class OutlineTable : DrawingArea {
   /* Handles down arrow keypress */
   private void handle_down( bool shift ) {
     if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_vertically( 1 );
+      if( _completion.shown ) {
+        _completion.down();
       } else {
-        selected.name.move_cursor_vertically( 1 );
+        if( shift ) {
+          selected.name.selection_vertically( 1 );
+        } else {
+          selected.name.move_cursor_vertically( 1 );
+        }
+        undo_text.mergeable = false;
+        see( selected );
+        _im_context.reset();
+        queue_draw();
       }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
         selected.note.selection_vertically( 1 );
@@ -2000,6 +2084,7 @@ public class OutlineTable : DrawingArea {
         case "7" :  goto_label( 6 );  break;
         case "8" :  goto_label( 7 );  break;
         case "9" :  goto_label( 8 );  break;
+        case "@" :  tagger.show_add_ui();  break;
       }
     }
   }
@@ -2034,6 +2119,19 @@ public class OutlineTable : DrawingArea {
       case NodeTaskMode.DONE  :  selected.task = NodeTaskMode.NONE;   break;
     }
     queue_draw();
+    changed();
+  }
+
+  /* Called by the Tagger class to actually add the tag to the currently selected row */
+  public void add_tag( string tag ) {
+    if( selected == null ) return;
+    var name = selected.name;
+    _orig_text.copy( name );
+    tagger.preedit_load_tags( name.text );
+    name.text.insert_text( name.text.text.length, (" @" + tag) );
+    name.text.changed();
+    tagger.postedit_load_tags( name.text );
+    undo_buffer.add_item( new UndoNodeName( this, selected, _orig_text ) );
     changed();
   }
 
@@ -2288,12 +2386,18 @@ public class OutlineTable : DrawingArea {
       _show_depth = bool.parse( d );
     }
 
+    var m = n->get_prop( "markdown" );
+    if( m != null ) {
+      _markdown = bool.parse( m );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
           case "theme"  :  load_theme( it );  break;
           case "nodes"  :  load_nodes( it );  break;
           case "labels" :  _labels.load( this, it );  break;
+          case "tags"   :  _tagger.load( it );  break;
         }
       }
     }
@@ -2344,10 +2448,12 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "note-font-size",   _note_size.to_string() );
     n->set_prop( "show-tasks",       _show_tasks.to_string() );
     n->set_prop( "show-depth",       _show_depth.to_string() );
+    n->set_prop( "markdown",         _markdown.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
     n->add_child( _labels.save() );
+    n->add_child( _tagger.save() );
 
   }
 
@@ -2407,6 +2513,46 @@ public class OutlineTable : DrawingArea {
     undo_buffer.add_item( undo );
     queue_draw();
     changed();
+  }
+
+  /* Filters the rows that match the given NodeFilterFunc */
+  public void filter_nodes( string msg, NodeFilterFunc? func ) {
+    _filtered = false;
+    for( int i=0; i<root.children.length; i++ ) {
+      _filtered |= root.children.index( i ).filter( func );
+    }
+    if( _filtered || (func == null) ) {
+      root.adjust_nodes( 0, false, "filter_nodes" );
+      queue_draw();
+      if( selected != null ) {
+        see( selected );
+      }
+    }
+    if( _filtered && (func != null) ) {
+      nodes_filtered( msg + " " + _( "Hit the Escape key to exit." ) );
+    } else {
+      nodes_filtered( null );
+    }
+  }
+
+  /*******************/
+  /* AUTO-COMPLETION */
+  /*******************/
+
+  /* Displays the auto-completion widget with the given list of values */
+  public void show_auto_completion( GLib.List<string> values, int start_pos, int end_pos ) {
+    if( is_node_editable() ) {
+      _completion.show( selected.name, values, start_pos, end_pos );
+    } else if( is_note_editable() ) {
+      _completion.show( selected.note, values, start_pos, end_pos );
+    } else {
+      _completion.hide();
+    }
+  }
+
+  /* Hides the auto-completion widget from view */
+  public void hide_auto_completion() {
+    _completion.hide();
   }
 
   /************************/

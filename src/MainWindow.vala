@@ -49,6 +49,7 @@ public class MainWindow : ApplicationWindow {
   private Switch          _condensed;
   private Switch          _show_tasks;
   private Switch          _show_depth;
+  private Switch          _markdown;
   private Label           _stats_chars;
   private Label           _stats_words;
   private Label           _stats_rows;
@@ -56,11 +57,18 @@ public class MainWindow : ApplicationWindow {
   private Label           _stats_topen;
   private Label           _stats_tip;
   private Label           _stats_tdone;
-  private bool            _debug          = false;
-  private bool            _prefer_dark    = false;
+  private bool            _debug                 = false;
+  private bool            _prefer_dark           = false;
   private HashMap<string,RadioButton> _theme_buttons;
 
+  public GLib.Settings settings {
+    get {
+      return( _settings );
+    }
+  }
+
   public static Themes themes = new Themes();
+  public static bool   enable_tag_completion = true;
 
   private const GLib.ActionEntry[] action_entries = {
     { "action_new",           action_new },
@@ -102,6 +110,8 @@ public class MainWindow : ApplicationWindow {
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
+
+    enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
 
     /* Add the theme CSS */
     themes.add_css();
@@ -182,7 +192,7 @@ public class MainWindow : ApplicationWindow {
   /* Returns the OutlineTable from the given tab */
   private OutlineTable? get_table( Tab tab ) {
     var box  = tab.page as Gtk.Box;
-    var bin1 = box.get_children().nth_data( 1 ) as Gtk.ScrolledWindow;
+    var bin1 = box.get_children().nth_data( 2 ) as Gtk.ScrolledWindow;
     var bin2 = bin1.get_child() as Gtk.Bin;  // Viewport
     var bin3 = bin2.get_child() as Gtk.Bin;  // Overlay
     return( bin3.get_child() as OutlineTable );
@@ -207,6 +217,23 @@ public class MainWindow : ApplicationWindow {
         var reveal = !revealer.reveal_child;
         revealer.reveal_child = reveal;
         bar.change_display( reveal );
+      }
+    }
+  }
+
+  /* Shows or hides the information bar, setting the message to the given value */
+  private void show_info_bar( string? msg ) {
+    if( _nb.current != null ) {
+      var box  = _nb.current.page as Gtk.Box;
+      var info = box.get_children().nth_data( 1 ) as Gtk.InfoBar;
+      if( info != null ) {
+        if( msg != null ) {
+          var lbl = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Label;
+          lbl.label = msg;
+          info.set_revealed( true );
+        } else {
+          info.set_revealed( false );
+        }
       }
     }
   }
@@ -284,6 +311,7 @@ public class MainWindow : ApplicationWindow {
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
     ot.theme_changed.connect( theme_changed );
+    ot.nodes_filtered.connect( show_info_bar );
 
     if( fname != null ) {
       ot.document.filename = fname;
@@ -301,12 +329,17 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the search bar */
     var search = new SearchBar( ot );
-
-    /* Create the search revealer */
     var search_reveal = new Revealer();
     search_reveal.add( search );
 
+    /* Create the info bar */
+    var info_bar = new InfoBar();
+    info_bar.get_content_area().add( new Label( "" ) );
+    info_bar.set_revealed( false );
+    info_bar.message_type = MessageType.INFO;
+
     box.pack_start( search_reveal, false, true );
+    box.pack_start( info_bar,      false, true );
     box.pack_start( scroll,        true,  true );
 
     /* Create the tab in the notebook */
@@ -731,9 +764,22 @@ public class MainWindow : ApplicationWindow {
       table.show_depth = state;
       return( false );
     });
-    dbox.pack_start( dlbl,       false, false, 10 );
+    dbox.pack_start( dlbl,        false, true,  10 );
     dbox.pack_end(   _show_depth, false, false, 10 );
     box.pack_start( dbox, false, false, 10 );
+
+    /* Add the Markdown switch */
+    var mbox = new Box( Orientation.HORIZONTAL, 0 );
+    var mlbl = new Label( _( "Enable Markdown Highlighting" ) );
+    _markdown = new Switch();
+    _markdown.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.markdown = state;
+      return( false );
+    });
+    mbox.pack_start( mlbl,      false, true, 10 );
+    mbox.pack_end(   _markdown, false, false, 10 );
+    box.pack_start( mbox, false, false, 10 );
 
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
@@ -1173,6 +1219,7 @@ public class MainWindow : ApplicationWindow {
     _condensed.state     = table.condensed;
     _show_tasks.state    = table.show_tasks;
     _show_depth.state    = table.show_depth;
+    _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
   }
 
@@ -1218,6 +1265,13 @@ public class MainWindow : ApplicationWindow {
     /* Update the UI */
     do_fonts_changed( table );
 
+  }
+
+  /* Returns the height of a single line label */
+  public int get_label_height() {
+    int min_height, nat_height;
+    _stats_chars.get_preferred_height( out min_height, out nat_height );
+    return( nat_height );
   }
 
 }

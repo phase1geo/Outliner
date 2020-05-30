@@ -40,12 +40,12 @@ public class ExportMarkdown : Object {
   private static void export_top_nodes( FileOutputStream os, OutlineTable table ) {
     var nodes = table.root.children;
     for( int i=0; i<nodes.length; i++ ) {
-      export_node( os, nodes.index( i ), "" );
+      export_node( os, nodes.index( i ), table, "" );
     }
   }
 
-  public static string from_text( FormattedText text, int start, int end ) {
-    FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
+  public static string from_text( FormattedText text ) {
+    ExportUtils.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "**");
         case FormatTag.ITALICS    :  return( "_" );
@@ -70,7 +70,7 @@ public class ExportMarkdown : Object {
       }
       return( "" );
     };
-    FormattedText.ExportEndFunc end_func = (tag, start, extra) => {
+    ExportUtils.ExportEndFunc end_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "**" );
         case FormatTag.ITALICS    :  return( "_" );
@@ -81,14 +81,14 @@ public class ExportMarkdown : Object {
         default                   :  return( "" );
       }
     };
-    FormattedText.ExportEncodeFunc encode_func = (str) => {
+    ExportUtils.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "*", "\\*" ).replace( "_", "\\_" ).replace( "~", "\\~" ).replace( "#", "\\#" ).replace( "`", "\\`" ) );
     };
-    return( text.export( start, end, start_func, end_func, encode_func ) );
+    return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
   /* Draws the given node and its children to the output stream */
-  private static void export_node( FileOutputStream os, Node node, string prefix = "  " ) {
+  private static void export_node( FileOutputStream os, Node node, OutlineTable table, string prefix = "  " ) {
 
     try {
 
@@ -100,12 +100,22 @@ public class ExportMarkdown : Object {
         case NodeTaskMode.DOING :  title += "[ ] ";  break;
       }
 
-      title += from_text( node.name.text, 0, node.name.text.text.char_count() ) + "\n";
-
+      if( table.markdown ) {
+        title += node.name.text.text;
+      } else {
+        title += from_text( node.name.text );
+      }
+      title = title.replace( "\n", "\n%s  ".printf( prefix ) ) + "\n";
       os.write( title.data );
 
       if( node.note.text.text != "" ) {
-        string note = prefix + "  " + from_text( node.note.text, 0, node.note.text.text.char_count() ) + "\n";
+        string note;
+        if( table.markdown ) {
+          note = prefix + "  > " + node.note.text.text;
+        } else {
+          note = prefix + "  > " + from_text( node.note.text );
+        }
+        note = note.replace( "\n", "\n%s  > ".printf( prefix ) ) + "\n";
         os.write( note.data );
       }
 
@@ -113,7 +123,7 @@ public class ExportMarkdown : Object {
 
       var children = node.children;
       for( int i=0; i<children.length; i++ ) {
-        export_node( os, children.index( i ), prefix + "  " );
+        export_node( os, children.index( i ), table, prefix + "  " );
       }
 
     } catch( Error e ) {

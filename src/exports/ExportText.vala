@@ -43,11 +43,12 @@ public class ExportText : Object {
 
       var nodes = table.root.children;
       for( int i=0; i<nodes.length; i++ ) {
-        string title = nodes.index( i ).name.text.text + "\n";
+        var name  = new FormattedText.copy_clean( table, nodes.index( i ).name.text );
+        var title = "- " + name.text.replace( "\n", "\n  " ) + "\n";
         os.write( title.data );
         var children = nodes.index( i ).children;
         for( int j=0; j<children.length; j++ ) {
-          export_node( os, children.index( j ) );
+          export_node( os, table, children.index( j ) );
         }
       }
 
@@ -58,34 +59,26 @@ public class ExportText : Object {
   }
 
   /* Draws the given node and its children to the output stream */
-  private static void export_node( FileOutputStream os, Node node, string prefix = "        " ) {
+  private static void export_node( FileOutputStream os, OutlineTable table, Node node, string prefix = "        " ) {
 
     try {
 
-      string title = prefix;
+      var title = prefix + "- ";
+      var name  = new FormattedText.copy_clean( table, node.name.text );
 
-      /*
-      if( node.is_task() ) {
-        if( node.is_task_done() ) {
-          title += "- [x] ";
-        } else {
-          title += "- [ ] ";
-        }
-      }
-      */
-
-      title += node.name.text.text + "\n";
+      title += name.text.replace( "\n", "\n%s  ".printf( prefix ) ) + "\n";
 
       os.write( title.data );
 
       if( node.note.text.text != "" ) {
-        string note = prefix + "  " + node.note.text.text + "\n";
-        os.write( note.data );
+        var note = new FormattedText.copy_clean( table, node.note.text );
+        var text = prefix + "    " + note.text.replace( "\n", "\n%s    ".printf( prefix ) ) + "\n";
+        os.write( text.data );
       }
 
       var children = node.children;
       for( int i=0; i<children.length; i++ ) {
-        export_node( os, children.index( i ), prefix + "        " );
+        export_node( os, table, children.index( i ), prefix + "        " );
       }
 
     } catch( Error e ) {

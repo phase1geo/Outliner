@@ -52,14 +52,14 @@ public class ExportHTML : Object {
       list->set_prop( "type", "I" );
     }
     for( int i=0; i<table.root.children.length; i++ ) {
-      list->add_child( export_node( table.root.children.index( i ), use_ul ) );
+      list->add_child( export_node( table, table.root.children.index( i ), use_ul ) );
     }
     body->add_child( list );
     return( body );
   }
 
-  public static string from_text( FormattedText text, int start, int end ) {
-    FormattedText.ExportStartFunc start_func = (tag, start, extra) => {
+  public static string from_text( FormattedText text ) {
+    ExportUtils.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "<b>");
         case FormatTag.ITALICS    :  return( "<i>" );
@@ -75,7 +75,7 @@ public class ExportHTML : Object {
       }
       return( "" );
     };
-    FormattedText.ExportEndFunc end_func = (tag, start, extra) => {
+    ExportUtils.ExportEndFunc end_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "</b>" );
         case FormatTag.ITALICS    :  return( "</i>" );
@@ -91,14 +91,14 @@ public class ExportHTML : Object {
       }
       return( "" );
     };
-    FormattedText.ExportEncodeFunc encode_func = (str) => {
+    ExportUtils.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).replace( "\n", "<br />" ) );
     };
-    return( text.export( start, end, start_func, end_func, encode_func ) );
+    return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
   private static Xml.Node* make_div( string div_class, FormattedText text ) {
-    var      html = "<div class=\"" + div_class + "\">" + from_text( text, 0, text.text.char_count() ) + "</div>";
+    var      html = "<div class=\"" + div_class + "\">" + from_text( text ) + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );
     delete doc;
@@ -106,13 +106,15 @@ public class ExportHTML : Object {
   }
 
   /* Traverses the node tree exporting XML nodes in OPML format */
-  private static Xml.Node* export_node( Node node, bool use_ul ) {
+  private static Xml.Node* export_node( OutlineTable table, Node node, bool use_ul ) {
     string    ul_syms[3] = {"disc", "circle", "square"};
     string    ol_syms[5] = {"I", "A", "1", "a", "i"};
     Xml.Node* li         = new Xml.Node( null, "li" );
-    li->add_child( make_div( "text", node.name.text ) );
+    var       name       = new FormattedText.copy_clean( table, node.name.text );
+    li->add_child( make_div( "text", name ) );
     if( node.note.text.text != "" ) {
-      li->add_child( make_div( "note", node.note.text ) );
+      var note = new FormattedText.copy_clean( table, node.note.text );
+      li->add_child( make_div( "note", note ) );
     }
     if( node.children.length > 0 ) {
       Xml.Node* list = new Xml.Node( null, (use_ul ? "ul" : "ol") );
@@ -125,7 +127,7 @@ public class ExportHTML : Object {
       }
       li->add_child( list );
       for( int i=0; i<node.children.length; i++ ) {
-        list->add_child( export_node( node.children.index( i ), use_ul ) );
+        list->add_child( export_node( table, node.children.index( i ), use_ul ) );
       }
     }
     return( li );
