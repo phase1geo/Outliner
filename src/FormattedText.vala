@@ -36,8 +36,8 @@ public enum FormatTag {
   COLOR,
   HILITE,
   URL,
-  TAG,
   SYNTAX,
+  TAG,
   MATCH,
   SELECT,
   LENGTH;
@@ -839,7 +839,7 @@ public class FormattedText {
 
   /* Removes all formatting from the text */
   public void remove_all_tags( int start, int end ) {
-    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+    for( int i=0; i<FormatTag.LENGTH-3; i++ ) {
       _formats[i].remove_tag( start, end );
     }
     changed();
@@ -883,7 +883,7 @@ public class FormattedText {
   /* Returns the tag information of the given tag in the specified range */
   public Array<UndoTagInfo> get_full_tags_in_range( FormatTag tag, int start, int end ) {
     var tags = new Array<UndoTagInfo>();
-    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+    for( int i=0; i<FormatTag.LENGTH-4; i++ ) {
       _formats[i].get_full_tags_in_range( i, start, end, ref tags );
     }
     return( tags );
@@ -892,7 +892,7 @@ public class FormattedText {
   /* Returns an array containing all tags that are within the specified range */
   public Array<UndoTagInfo> get_tags_in_range( int start, int end ) {
     var tags = new Array<UndoTagInfo>();
-    for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
+    for( int i=0; i<FormatTag.LENGTH-4; i++ ) {
       _formats[i].get_tags_in_range( i, start, end, ref tags );
     }
     return( tags );
@@ -926,7 +926,7 @@ public class FormattedText {
   */
   public AttrList get_attributes_from_theme( Theme theme ) {
     var attrs = new AttrList();
-    for( int i=0; i<(FormatTag.LENGTH - 3); i++ ) {
+    for( int i=0; i<(FormatTag.LENGTH-4); i++ ) {
       _formats[i].get_attributes( _attr_tags[i], ref attrs );
     }
     _formats[FormatTag.URL].get_attributes( new UrlInfo( theme.url ), ref attrs );
@@ -1042,7 +1042,7 @@ public class FormattedText {
   public Xml.Node* save() {
     Xml.Node* n = new Xml.Node( null, "text" );
     n->new_prop( "data", text );
-    for( int i=0; i<(FormatTag.LENGTH - 2); i++ ) {
+    for( int i=0; i<(FormatTag.LENGTH-4); i++ ) {
       if( !_formats[i].is_empty() && save_tag( (FormatTag)i ) ) {
         var tag = (FormatTag)i;
         n->add_child( _formats[i].save( tag.to_string() ) );

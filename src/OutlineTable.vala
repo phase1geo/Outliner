@@ -204,7 +204,11 @@ public class OutlineTable : DrawingArea {
     set {
       if( _markdown != value ) {
         _markdown   = value;
-        _format_bar = null;
+        if( _format_bar != null ) {
+          hide_format_bar();
+          _format_bar = null;
+          show_format_bar();
+        }
         markdown_changed();
         queue_draw();
         changed();
