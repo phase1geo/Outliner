@@ -192,7 +192,7 @@ public class MainWindow : ApplicationWindow {
   /* Returns the OutlineTable from the given tab */
   private OutlineTable? get_table( Tab tab ) {
     var box  = tab.page as Gtk.Box;
-    var bin1 = box.get_children().nth_data( 2 ) as Gtk.ScrolledWindow;
+    var bin1 = box.get_children().nth_data( 1 ) as Gtk.ScrolledWindow;
     var bin2 = bin1.get_child() as Gtk.Bin;  // Viewport
     var bin3 = bin2.get_child() as Gtk.Bin;  // Overlay
     return( bin3.get_child() as OutlineTable );
@@ -225,7 +225,7 @@ public class MainWindow : ApplicationWindow {
   private void show_info_bar( string? msg ) {
     if( _nb.current != null ) {
       var box  = _nb.current.page as Gtk.Box;
-      var info = box.get_children().nth_data( 1 ) as Gtk.InfoBar;
+      var info = box.get_children().nth_data( 2 ) as Gtk.InfoBar;
       if( info != null ) {
         if( msg != null ) {
           var lbl = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Label;
@@ -339,8 +339,8 @@ public class MainWindow : ApplicationWindow {
     info_bar.message_type = MessageType.INFO;
 
     box.pack_start( search_reveal, false, true );
-    box.pack_start( info_bar,      false, true );
     box.pack_start( scroll,        true,  true );
+    box.pack_start( info_bar,      false, true );
 
     /* Create the tab in the notebook */
     var tab = new Tab( ot.document.label, null, box );

@@ -2081,6 +2081,7 @@ public class OutlineTable : DrawingArea {
         case "a" :  change_selected( selected.parent );  break;
         case "c" :  change_selected( selected.get_last_child() );  break;
         case "e" :  edit_selected( true );  break;
+        case "f" :  enter_focus_mode();  break;
         case "h" :  unindent();  break;
         case "H" :  place_at_top( selected );  break;
         case "j" :  change_selected( selected.get_next_node() );  break;
@@ -2532,6 +2533,13 @@ public class OutlineTable : DrawingArea {
     undo_buffer.add_item( undo );
     queue_draw();
     changed();
+  }
+
+  /* Enters focus mode for the selected mode */
+  public void enter_focus_mode() {
+    filter_nodes( _( "In Focus Mode." ), (node) => {
+      return( (node == selected) || node.is_descendant_of( selected ) );
+    });
   }
 
   /* Filters the rows that match the given NodeFilterFunc */
