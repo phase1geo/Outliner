@@ -265,6 +265,11 @@ public class Node {
       }
     }
   }
+  public bool expanded_only {
+    set {
+      _expanded = value;
+    }
+  }
   public bool hide_note {
     get {
       return( _hide_note );

@@ -959,7 +959,7 @@ public class OutlineTable : DrawingArea {
     var nodes = new Array<Node>();
     node.expanded = !node.expanded;
     nodes.append_val( node );
-    undo_buffer.add_item( new UndoNodeExpander( nodes ) );
+    undo_buffer.add_item( new UndoNodeExpander( node, nodes ) );
     queue_draw();
     changed();
   }
@@ -1438,7 +1438,7 @@ public class OutlineTable : DrawingArea {
           selected.expand_next( nodes );
         }
         selected.adjust_nodes( selected.last_y, false, "expand next" );
-        undo_buffer.add_item( new UndoNodeExpander( nodes ) );
+        undo_buffer.add_item( new UndoNodeExpander( selected, nodes ) );
         queue_draw();
         changed();
       }
@@ -1499,7 +1499,7 @@ public class OutlineTable : DrawingArea {
           selected.collapse_next( nodes );
         }
         selected.adjust_nodes( selected.last_y, false, "left key" );
-        undo_buffer.add_item( new UndoNodeExpander( nodes ) );
+        undo_buffer.add_item( new UndoNodeExpander( selected, nodes ) );
         queue_draw();
         changed();
       }

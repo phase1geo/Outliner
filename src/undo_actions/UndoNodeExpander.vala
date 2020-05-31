@@ -21,18 +21,21 @@
 
 public class UndoNodeExpander : UndoItem {
 
+  private Node        _parent;
   private Array<Node> _nodes;
 
   /* Default constructor */
-  public UndoNodeExpander( Array<Node> nodes ) {
+  public UndoNodeExpander( Node parent, Array<Node> nodes ) {
     base( _( "expander change" ) );
-    _nodes = nodes;
+    _parent = parent;
+    _nodes  = nodes;
   }
 
   public void toggle( OutlineTable table ) {
     for( int i=0; i<_nodes.length; i++ ) {
-      _nodes.index( i ).expanded = !_nodes.index( i ).expanded;
+      _nodes.index( i ).expanded_only = !_nodes.index( i ).expanded;
     }
+    _parent.adjust_nodes( _parent.last_y, false, "expander undo" );
     table.queue_draw();
     table.changed();
   }
