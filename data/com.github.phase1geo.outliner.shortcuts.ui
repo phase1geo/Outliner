@@ -270,8 +270,29 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes">Enter Focus View</property>
+                <property name="title" translatable="yes">Add Current to Focus Stack</property>
                 <property name="accelerator">f</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Exit Focus View</property>
+                <property name="accelerator">Escape</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Go Back in Focus View Stack</property>
+                <property name="accelerator">bracketleft</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Go Forward in Focus View Stack</property>
+                <property name="accelerator">bracketright</property>
                 <property name="visible">1</property>
               </object>
             </child>
