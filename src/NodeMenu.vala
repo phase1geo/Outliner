@@ -125,8 +125,8 @@ public class NodeMenu : Gtk.Menu {
     _expander = new Gtk.MenuItem.with_label( _( "Expand Children" ) );
     _expander.activate.connect( toggle_expand );
 
-    _focus = new Gtk.MenuItem.with_label( _( "Enter Focus Mode" ) );
-    _focus.activate.connect( focus_mode );
+    _focus = new Gtk.MenuItem.with_label( _( "Focus" ) );
+    _focus.activate.connect( focus_mode_enter );
     Utils.add_accel_label( _focus, 'f', 0 );
 
     var select = new Gtk.MenuItem.with_label( _( "Select Row" ) );
@@ -408,8 +408,8 @@ public class NodeMenu : Gtk.Menu {
   }
 
   /* Enters focus mode */
-  private void focus_mode() {
-    _ot.enter_focus_mode();
+  private void focus_mode_enter() {
+    _ot.focus_mode_enter();
   }
 
   /* Selects the node just above the selected node */

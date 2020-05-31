@@ -270,6 +270,11 @@ public class Node {
       _expanded = value;
     }
   }
+  public bool hidden {
+    get {
+      return( _hidden );
+    }
+  }
   public bool hide_note {
     get {
       return( _hide_note );
