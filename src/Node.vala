@@ -1064,40 +1064,85 @@ public class Node {
 
   }
 
-  /* Expand all of the nodes within this node tree */
-  public void expand_all() {
-
-    expanded = true;
-
-    for( int i=0; i<children.length; i++ ) {
-      children.index( i ).expand_all();
+  /* Expands the next unexpanded level of hierachy */
+  public void expand_next( Array<Node> nodes ) {
+    if( !is_leaf() ) {
+      if( !expanded ) {
+        _expanded = true;
+        nodes.append_val( this );
+      } else {
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).expand_next( nodes );
+        }
+      }
     }
+  }
 
+  /* Expand all of the nodes within this node tree */
+  public void expand_all( Array<Node> nodes ) {
+    if( !expanded ) {
+      _expanded = true;
+      nodes.append_val( this );
+    }
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).expand_all( nodes );
+    }
+  }
+
+  /* Calculate the maximum depth that is not collapsedd */
+  private void get_collapse_next_depth( ref int max_depth ) {
+    if( !is_leaf() ) {
+      if( expanded ) {
+        if( depth > max_depth ) {
+          max_depth = depth;
+        }
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).get_collapse_next_depth( ref max_depth );
+        }
+      }
+    }
+  }
+
+  /* Collapse all nodes that match the maximum depth */
+  private void collapse_at_depth( int max_depth, Array<Node> nodes ) {
+    if( !is_leaf() ) {
+      if( depth == max_depth ) {
+        _expanded = false;
+        nodes.append_val( this );
+      } else {
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).collapse_at_depth( max_depth, nodes );
+        }
+      }
+    }
+  }
+
+  /* Collapses the next level of hierarchy */
+  public void collapse_next( Array<Node> nodes ) {
+    int max_depth = depth;
+    get_collapse_next_depth( ref max_depth );
+    collapse_at_depth( max_depth, nodes );
   }
 
   /* Collapses all nodes within this node tree */
-  public void collapse_all() {
-
-    expanded = false;
-
-    for( int i=0; i<children.length; i++ ) {
-      children.index( i ).collapse_all();
+  public void collapse_all( Array<Node> nodes ) {
+    if( expanded ) {
+      _expanded = false;
+      nodes.append_val( this );
     }
-
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).collapse_all( nodes );
+    }
   }
 
   /* Returns true if the node is a root node (has no parent) */
   public bool is_root() {
-
     return( parent == null );
-
   }
 
   /* Returns true if the node is a leaf node (has no children) */
   public bool is_leaf() {
-
     return( children.length == 0 );
-
   }
 
   /* Returns true if we are a descendant of the given node */
