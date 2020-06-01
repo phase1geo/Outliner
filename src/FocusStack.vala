@@ -59,4 +59,14 @@ public class FocusStack {
     return( ((_index + 1) == _stack.length) ? null : _stack.index( ++_index ) );
   }
 
+  /* Returns true if the back button should be valid */
+  public bool back_valid() {
+    return( _index > 0 );
+  }
+
+  /* Returns true if the forward button should be valid */
+  public bool forward_valid() {
+    return( (_index + 1) < _stack.length );
+  }
+
 }

@@ -222,6 +222,11 @@ public class OutlineTable : DrawingArea {
     }
   }
   public bool tasks_on_right { get; private set; default = true; }
+  public FocusStack focus_stack {
+    get {
+      return( _focus_stack );
+    }
+  }
 
   /* Allocate static parsers */
   public MarkdownParser markdown_parser { get; private set; }
@@ -915,6 +920,7 @@ public class OutlineTable : DrawingArea {
           case 65362 :  handle_up( shift );      break;
           case 65364 :  handle_down( shift );    break;
           case 65507 :  handle_control( true );  break;
+          case 65307 :  handle_escape();         break;
         }
       }
     }
