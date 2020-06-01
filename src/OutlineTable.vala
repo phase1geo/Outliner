@@ -1338,7 +1338,7 @@ public class OutlineTable : DrawingArea {
       }
     } else if( _filtered ) {
       _focus_stack.clear();
-      filter_nodes( "", null );
+      filter_nodes( "", false, null );
     }
   }
 
@@ -2581,18 +2581,17 @@ public class OutlineTable : DrawingArea {
   /* Enters focus mode for the selected mode */
   public void focus_mode_enter() {
     _focus_stack.push( selected );
-    filter_nodes( _( "In Focus Mode." ), (node) => {
+    filter_nodes( _( "In Focus Mode." ), false, (node) => {
       return( (node == selected) || node.is_descendant_of( selected ) );
     });
   }
 
   /* Moves the focus mode back by one */
   public void focus_mode_back() {
-    stdout.printf( "In focus_mode_back\n" );
     var node = _focus_stack.back();
     if( node != null ) {
       selected = node;
-      filter_nodes( _( "In Focus Mode." ), (node) => {
+      filter_nodes( _( "In Focus Mode." ), false, (node) => {
         return( (node == selected) || node.is_descendant_of( selected ) );
       });
     }
@@ -2603,17 +2602,19 @@ public class OutlineTable : DrawingArea {
     var node = _focus_stack.forward();
     if( node != null ) {
       selected = node;
-      filter_nodes( _( "In Focus Mode." ), (node) => {
+      filter_nodes( _( "In Focus Mode." ), false, (node) => {
         return( (node == selected) || node.is_descendant_of( selected ) );
       });
     }
   }
 
   /* Filters the rows that match the given NodeFilterFunc */
-  public void filter_nodes( string msg, NodeFilterFunc? func ) {
+  public void filter_nodes( string msg, bool show_parent, NodeFilterFunc? func ) {
     _filtered = false;
     for( int i=0; i<root.children.length; i++ ) {
-      _filtered |= root.children.index( i ).filter( func );
+      var shown = false;
+      root.children.index( i ).filter( func, ref _filtered, ref shown );
+      root.children.index( i ).hidden &= !show_parent || !shown;
     }
     if( _filtered || (func == null) ) {
       root.adjust_nodes( 0, false, "filter_nodes" );

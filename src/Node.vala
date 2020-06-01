@@ -146,7 +146,6 @@ public class Node {
   private double        _h         = 80;
   private int           _depth     = 0;
   private bool          _expanded  = true;
-  private bool          _hidden    = false;
   private Pango.Layout  _lt_layout;
   private double        _lt_width  = 0;
   private bool          _hide_note = true;
@@ -270,11 +269,7 @@ public class Node {
       _expanded = value;
     }
   }
-  public bool hidden {
-    get {
-      return( _hidden );
-    }
-  }
+  public bool hidden { get; set; default = false; }
   public bool hide_note {
     get {
       return( _hide_note );
@@ -293,7 +288,7 @@ public class Node {
   public double      indent    { get; set; default = 25; }
   public Node?       parent    { get; set; default = null; }
   public Array<Node> children  { get; set; default = new Array<Node>(); }
-  public double      last_y    { get { return( _y + (_hidden ? 0 : _h) ); } }
+  public double      last_y    { get { return( _y + (hidden ? 0 : _h) ); } }
   public bool        over_note_icon { get; set; default = false; }
 
   /* Constructor */
@@ -842,12 +837,12 @@ public class Node {
 
   /* Returns true if the given coordinates are within this node */
   public bool is_within( double x, double y ) {
-    return( !_hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
+    return( !hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
   }
 
   /* Returns true if the given coordinates lie within the expander */
   public bool is_within_expander( double x, double y ) {
-    if( is_leaf() || _hidden ) return( false );
+    if( is_leaf() || hidden ) return( false );
     double ex, ey, ew, eh;
     expander_bbox( out ex, out ey, out ew, out eh );
     return( Utils.is_within_bounds( x, y, ex, ey, ew, eh ) );
@@ -855,14 +850,14 @@ public class Node {
 
   /* Returns true if the given coordinates reside within the note icon boundaries */
   public bool is_within_note_icon( double x, double y ) {
-    if( _hidden ) return( false );
+    if( hidden ) return( false );
     double nx, ny, nw, nh;
     note_bbox( out nx, out ny, out nw, out nh );
     return( Utils.is_within_bounds( x, y, nx, ny, nw, nh ) );
   }
 
   public bool is_within_task( double x, double y ) {
-    if( _hidden ) return( false );
+    if( hidden ) return( false );
     double tx, ty, tw, th;
     task_bbox( out tx, out ty, out tw, out th );
     return( (task != NodeTaskMode.NONE) && Utils.is_within_bounds( x, y, tx, ty, tw, th ) );
@@ -870,22 +865,22 @@ public class Node {
 
   /* Returns true if the given coordinates reside within the name text area */
   public bool is_within_name( double x, double y ) {
-    return( !_hidden && Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
+    return( !hidden && Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
   }
 
   /* Returns true if the given coordinates reside within the note text area */
   public bool is_within_note( double x, double y ) {
-    return( !_hidden && Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
+    return( !hidden && Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
   }
 
   /* Returns true if the given coordinates lie within the attachto area */
   public bool is_within_attachto( double x, double y ) {
-    return( !_hidden && Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
+    return( !hidden && Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
   }
 
   /* Returns true if the given coordinates lie within the attachabove area */
   public bool is_within_attachabove( double x, double y ) {
-    return( !_hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
+    return( !hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
   }
 
   /* Change the name font to the given value */
@@ -1243,14 +1238,14 @@ public class Node {
   }
 
   /* Changes the filter based on the given filter function */
-  public bool filter( NodeFilterFunc? func ) {
-    var hidden = (func != null) && !func( this );
-    _hidden = hidden;
+  public void filter( NodeFilterFunc? func, ref bool one_hidden, ref bool one_shown ) {
+    hidden      = (func != null) && !func( this );
+    one_hidden |= _hidden;
+    one_shown  |= !_hidden;
     for( int i=0; i<children.length; i++ ) {
       var child = children.index( i );
-      hidden |= child.filter( func );
+      child.filter( func, ref one_hidden, ref one_shown );
     }
-    return( hidden );
   }
 
   /*********************/
@@ -1575,7 +1570,7 @@ public class Node {
 
     var tmode = opts.show_modes ? mode : NodeMode.NONE;
 
-    if( (is_root() && (tmode != NodeMode.MOVETO)) || _hidden ) return;
+    if( (is_root() && (tmode != NodeMode.MOVETO)) || hidden ) return;
 
     draw_background( ctx, theme, opts );
     draw_note_icon( ctx, theme, opts );

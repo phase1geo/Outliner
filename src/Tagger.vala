@@ -66,7 +66,7 @@ public class Tagger {
   /* Called whenever the user clicks on a tag */
   public void tag_clicked( string tag ) {
     _ot.filter_nodes(
-      _( "Nodes are currently filtered by tag @%s." ).printf( tag ),
+      _( "Nodes are currently filtered by tag @%s." ).printf( tag ), true,
       (node) => {
         return( node.name.text.contains_tag( FormatTag.TAG, tag ) );
       }
