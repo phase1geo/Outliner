@@ -1264,7 +1264,7 @@ public class OutlineTable : DrawingArea {
   private void handle_backspace() {
     if( is_node_editable() ) {
       if( selected.name.text.text == "" ) {
-        var prev = selected.get_previous_node();
+        var prev = node_previous( selected );
         if( prev != null ) {
           delete_current_node();
           selected = prev;
@@ -1581,7 +1581,7 @@ public class OutlineTable : DrawingArea {
       _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
-      var node = shift ? root.children.index( 0 ) : selected.get_previous_node();
+      var node = shift ? node_top() : node_previous( selected );
       if( node != null ) {
         selected = node;
         queue_draw();
@@ -1748,7 +1748,7 @@ public class OutlineTable : DrawingArea {
       _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
-      var node = selected.get_next_node();
+      var node = node_next( selected );
       if( node != null ) {
         selected = node;
         queue_draw();
@@ -2006,7 +2006,7 @@ public class OutlineTable : DrawingArea {
       var y1   = sw.vadjustment.value;
       sw.vadjustment.value = y1 - vh;
       if( y1 == sw.vadjustment.value ) {
-        change_selected( root.children.index( 0 ) );
+        change_selected( node_top() );
       } else {
         var node = node_at_coordinates( 0, (sw.vadjustment.value + vh) );
         if( node != null ) {
@@ -2026,7 +2026,7 @@ public class OutlineTable : DrawingArea {
       var y1 = sw.vadjustment.value;
       sw.vadjustment.value = y1 + vh;
       if( y1 == sw.vadjustment.value ) {
-        change_selected( root.get_last_node() );
+        change_selected( node_bottom() );
       } else {
         var node = node_at_coordinates( 0, sw.vadjustment.value );
         if( node != null ) {
@@ -2096,7 +2096,7 @@ public class OutlineTable : DrawingArea {
   /* Jumps to the given label */
   public void goto_label( int label ) {
     var node = _labels.get_node( label );
-    if( node != null ) {
+    if( (node != null) && !node.hidden ) {
       selected = node;
       queue_draw();
     }
@@ -2107,6 +2107,69 @@ public class OutlineTable : DrawingArea {
     _labels.clear_all();
     queue_draw();
     changed();
+  }
+
+  private Node? node_parent( Node node ) {
+    do {
+      node = node.parent;
+    } while( !node.is_root() && node.hidden );
+    return( node.is_root() ? null : node );
+  }
+
+  private Node? node_top() {
+    var node = root.get_first_node();
+    while( (node != null) && node.hidden ) {
+      node = node.get_next_node();
+    }
+    return( node );
+  }
+
+  private Node? node_bottom() {
+    var node = root.get_last_node();
+    while( (node != null) && node.hidden ) {
+      node = node.get_previous_node();
+    }
+    return( node );
+  }
+
+  private Node? node_last_child( Node node ) {
+    var n = node.get_last_child();
+    while( (n != null) && n.hidden ) {
+      n = node_previous_sibling( n );
+    }
+    return( n );
+  }
+
+  private Node? node_next( Node node ) {
+    var n = node.get_next_node();
+    while( (n != null) && n.hidden ) {
+      n = n.get_next_node();
+    }
+    return( n );
+  }
+
+  private Node? node_previous( Node node ) {
+    var n = node.get_previous_node();
+    while( (n != null) && n.hidden ) {
+      n = n.get_previous_node();
+    }
+    return( n );
+  }
+
+  private Node? node_next_sibling( Node node ) {
+    var n = node.get_next_sibling();
+    while( (n != null) && n.hidden ) {
+      n = n.get_next_sibling();
+    }
+    return( n );
+  }
+
+  private Node? node_previous_sibling( Node? node ) {
+    var n = node.get_previous_sibling();
+    while( (n != null) && n.hidden ) {
+      n = n.get_previous_sibling();
+    }
+    return( n );
   }
 
   /* Handles any printable characters */
@@ -2122,21 +2185,21 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( selected != null ) {
       switch( str ) {
-        case "a" :  change_selected( selected.parent );  break;
-        case "B" :  change_selected( root.get_last_node() );  break;
-        case "c" :  change_selected( selected.get_last_child() );  break;
+        case "a" :  change_selected( node_parent( selected ) );  break;
+        case "B" :  change_selected( node_bottom() );  break;
+        case "c" :  change_selected( node_last_child( selected ) );  break;
         case "e" :  edit_selected( true );  break;
         case "E" :  edit_selected( false );  break;
         case "f" :  focus_mode_enter();  break;
         case "h" :  unindent();  break;
         case "H" :  place_at_top( selected );  break;
-        case "j" :  change_selected( selected.get_next_node() );  break;
-        case "k" :  change_selected( selected.get_previous_node() );  break;
+        case "j" :  change_selected( node_next( selected ) );  break;
+        case "k" :  change_selected( node_previous( selected ) );  break;
         case "l" :  indent();  break;
-        case "n" :  change_selected( selected.get_next_sibling() );  break;
-        case "p" :  change_selected( selected.get_previous_sibling() );  break;
+        case "n" :  change_selected( node_next_sibling( selected ) );  break;
+        case "p" :  change_selected( node_previous_sibling( selected ) );  break;
         case "t" :  rotate_task();  break;
-        case "T" :  change_selected( root.get_first_node() );  break;
+        case "T" :  change_selected( node_top() );  break;
         case "#" :  toggle_label();  break;
         case "*" :  clear_all_labels();  break;
         case "<" :  focus_mode_back();  break;
@@ -2171,9 +2234,6 @@ public class OutlineTable : DrawingArea {
   public void change_selected( Node? node ) {
     if( (node == null) || node.is_root() ) return;
     selected = node;
-    if( selected.hidden && _focus_stack.in_focus() ) {
-      focus_mode_enter();;
-    }
     queue_draw();
     see( selected );
   }
