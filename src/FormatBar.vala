@@ -151,18 +151,16 @@ public class FormatBar : Gtk.Popover {
 
     box.pack_start( _copy,               false, false, 0 );
     box.pack_start( _cut,                false, false, 0 );
-    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-    box.pack_start( _bold,               false, false, 0 );
-    box.pack_start( _italics,            false, false, 0 );
     if( !table.markdown ) {
+      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
+      box.pack_start( _bold,               false, false, 0 );
+      box.pack_start( _italics,            false, false, 0 );
       box.pack_start( _underline,          false, false, 0 );
       box.pack_start( _strike,             false, false, 0 );
-    }
-    box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-    box.pack_start( _code,               false, false, 0 );
-    box.pack_start( _header,             false, false, 0 );
-    box.pack_start( _link,               false, false, 0 );
-    if( !table.markdown ) {
+      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
+      box.pack_start( _code,               false, false, 0 );
+      box.pack_start( _header,             false, false, 0 );
+      box.pack_start( _link,               false, false, 0 );
       box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
       box.pack_start( _super,              false, false, 0 );
       box.pack_start( _sub,                false, false, 0 );
@@ -219,25 +217,13 @@ public class FormatBar : Gtk.Popover {
 
   private void format_text( FormatTag tag, string? extra=null ) {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
-    if( _table.markdown ) {
-      _table.markdown_parser.insert_tag( ct, tag, ct.selstart, ct.selend, _table.undo_text, extra );
-      switch( tag ) {
-        case FormatTag.BOLD    :  _bold.set_active( false );     break;
-        case FormatTag.ITALICS :  _italics.set_active( false );  break;
-        case FormatTag.CODE    :  _code.set_active( false );     break;
-        case FormatTag.URL     :  _link.set_active( false );     break;
-        case FormatTag.HEADER  :  activate_header( 0 );          break;
-      }
-    } else {
-      ct.add_tag( tag, extra, _table.undo_text );
-    }
+    ct.add_tag( tag, extra, _table.undo_text );
     _table.queue_draw();
     _table.changed();
     _table.grab_focus();
   }
 
   private void unformat_text( FormatTag tag ) {
-    if( _table.markdown ) return;
     if( _table.selected.mode == NodeMode.EDITABLE ) {
       _table.selected.name.remove_tag( tag, _table.undo_text );
     } else {
@@ -392,11 +378,7 @@ public class FormatBar : Gtk.Popover {
   /* Clears all tags from selected text */
   private void handle_clear() {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
-    if( _table.markdown ) {
-      _table.markdown_parser.remove_all_tags( ct, ct.selstart, ct.selend, _table.undo_text );
-    } else {
-      ct.remove_all_tags( _table.undo_text );
-    }
+    ct.remove_all_tags( _table.undo_text );
     _ignore_active = true;
     _bold.set_active( false );
     _italics.set_active( false );
