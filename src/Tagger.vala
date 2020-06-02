@@ -138,7 +138,7 @@ public class Tagger {
       var label = (Label)row.get_child();
       var value = label.get_text();
       _ot.add_tag( value );
-      popover.popdown();
+      Utils.hide_popover( popover );
     });
 
     var scroll = new ScrolledWindow( null, null );
@@ -152,7 +152,7 @@ public class Tagger {
     _entry.activate.connect( () => {
       var value = _entry.text;
       _ot.add_tag( value );
-      popover.popdown();
+      Utils.hide_popover( popover );
     });
     _entry.insert_text.connect( filter_tag_text );
     _entry.search_changed.connect( () => {
@@ -165,7 +165,8 @@ public class Tagger {
     box.show_all();
 
     popover.add( box );
-    popover.popup();
+
+    Utils.show_popover( popover );
 
     /* Preload the tags */
     populate_listbox( listbox, get_matches( "" ) );

@@ -208,11 +208,7 @@ public class FormatBar : Gtk.Popover {
   }
 
   private void close() {
-#if GTK322
-    popdown();
-#else
-    hide();
-#endif
+    Utils.hide_popover( this );
   }
 
   private void format_text( FormatTag tag, string? extra=null ) {

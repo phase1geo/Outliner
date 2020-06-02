@@ -79,20 +79,11 @@ public class LinkEditor : Popover {
 
   /* Shows or hides this popover */
   private void show_popover( bool show ) {
-
-#if GTK322
     if( show ) {
-      popup();
+      Utils.show_popover( this );
     } else {
-      popdown();
+      Utils.hide_popover( this );
     }
-#else
-    if( show ) {
-      show();
-    } else {
-      hide();
-    }
-#endif
   }
 
   /*

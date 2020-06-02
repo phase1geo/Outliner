@@ -2380,29 +2380,16 @@ public class OutlineTable : DrawingArea {
       _format_bar.position    = PositionType.TOP;
     }
 
-#if GTK322
-    _format_bar.popup();
-#else
-    _format_bar.show();
-#endif
+    Utils.show_popover( _format_bar );
 
   }
 
   /* Hides the format bar if it is currently visible and destroys it */
   private void hide_format_bar() {
-
     if( _format_bar != null ) {
-
-#if GTK322
-      _format_bar.popdown();
-#else
-      _format_bar.hide();
-#endif
-
+      Utils.hide_popover( _format_bar );
       _format_bar = null;
-
     }
-
   }
 
   /* Shows/Hides the formatting toolbar */
