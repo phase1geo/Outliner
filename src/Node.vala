@@ -1430,12 +1430,25 @@ public class Node {
     Utils.set_context_color_with_alpha( ctx, theme.symbol_color, 0.5 );
     ctx.set_line_width( 1 );
 
+    var parent = this.parent;
+    while( !parent.is_root() ) {
+      if( parent.get_next_sibling() != null ) {
+        var x = (padx * 4) + 10 + (parent.depth * indent) + (expander_size / 2);
+        ctx.move_to( x, _y );
+        ctx.line_to( x, (_y + _h) );
+        ctx.stroke();
+      }
+      parent = parent.parent;
+    }
+
+    /*
     for( int i=1; i<_depth; i++ ) {
       var x = (padx * 4) + 10 + (i * indent) + (expander_size / 2);
       ctx.move_to( x, _y );
       ctx.line_to( x, (_y + _h) );
       ctx.stroke();
     }
+    */
 
   }
 
