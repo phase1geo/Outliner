@@ -70,6 +70,7 @@ public class OutlineTable : DrawingArea {
   private int             _note_size;
   private bool            _show_tasks = false;
   private bool            _show_depth = true;
+  private bool            _min_depth  = false;
   private Tagger          _tagger;
   private TextCompletion  _completion;
   private bool            _markdown;
@@ -198,6 +199,11 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool min_depth {
+    get {
+      return( _min_depth );
+    }
+  }
   public bool markdown {
     get {
       return( _markdown );
@@ -289,6 +295,7 @@ public class OutlineTable : DrawingArea {
     _show_depth    = settings.get_boolean( "default-show-depth" );
     _markdown      = settings.get_boolean( "default-markdown-enabled" );
     tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
+    _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
 
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
