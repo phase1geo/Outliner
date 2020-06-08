@@ -2772,7 +2772,7 @@ public class OutlineTable : DrawingArea {
   /* Removes the specified node from the table */
   public void delete_node( Node node ) {
     var was_selected = (node == selected);
-    var next         = node.get_next_node() ?? node.get_previous_node();
+    var next         = node.get_next_sibling() ?? node.get_previous_node();
     node.parent.remove_child( node );
     if( was_selected ) {
       selected = next;
