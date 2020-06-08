@@ -171,6 +171,7 @@ public class Node {
     }
     set {
       if( (_mode != value) && !is_root() ) {
+        var name_was_edited = _mode == NodeMode.EDITABLE;
         var note_was_edited = _mode == NodeMode.NOTEEDIT;
         _mode = value;
         name.edit = (_mode == NodeMode.EDITABLE);
@@ -179,6 +180,9 @@ public class Node {
           hide_note = true;
         }
         update_height( true );
+        if( (name_was_edited || (_mode == NodeMode.EDITABLE)) && is_main() && (name.text.text == "") && (children.length == 0) ) {
+          parent.set_list_types();
+        }
       }
     }
   }
@@ -1145,6 +1149,11 @@ public class Node {
     return( parent == null );
   }
 
+  /* Returns true if the node is a main node (its parent is the root node) */
+  public bool is_main() {
+    return( (parent != null) && parent.is_root() );
+  }
+
   /* Returns true if the node is a leaf node (has no children) */
   public bool is_leaf() {
     return( children.length == 0 );
@@ -1252,13 +1261,27 @@ public class Node {
   /* NUMBERING METHODS */
   /*********************/
 
+  /* Returns the section ID for this node */
+  private int section() {
+    if( _parent != null ) {
+      var index = 0;
+      for( int i=0; i<_parent.children.length; i++ ) {
+        if( !_parent.children.index( i ).draw_as_blank() ) index++;
+        if( this == _parent.children.index( i ) ) {
+          return( index );
+        }
+      }
+    }
+    return( -1 );
+  }
+
   /* Sets the line type value */
   private void set_list_type() {
     int width, height;
     switch( _ot.list_type ) {
       case NodeListType.OUTLINE :  _lt_layout.set_text( ordered_item() + ".", -1 );     break;
       case NodeListType.SECTION :  _lt_layout.set_text( ordered_section() + ".", -1 );  break;
-      default                   :  _lt_layout.set_text( "", -1 );                       break;
+      default                   :  _lt_layout.set_text( "", -1 );                              break;
     }
     _lt_layout.get_size( out width, out height );
     _lt_width = width / Pango.SCALE;
@@ -1270,6 +1293,7 @@ public class Node {
   public void set_list_types() {
     for( int i=0; i<children.length; i++ ) {
       var child = children.index( i );
+      if( child.draw_as_blank() ) continue;
       child.set_list_type();
       child.set_list_types();
     }
@@ -1277,13 +1301,13 @@ public class Node {
 
   public string ordered_item() {
     switch( depth ) {
-      case 1  :  return( roman_number( index() + 1 ).up() );
-      case 2  :  return( letter( index() ).up() );
+      case 1  :  return( roman_number( section() ).up() );
+      case 2  :  return( letter( section() - 1 ).up() );
       default :
         switch( (depth - 3) % 3 ) {
-          case 0  :  return( (index() + 1).to_string() );
-          case 1  :  return( letter( index() ).down() );
-          case 2  :  return( roman_number( index() + 1 ).down() );
+          case 0  :  return( section().to_string() );
+          case 1  :  return( letter( section() - 1 ).down() );
+          case 2  :  return( roman_number( section() ).down() );
           default :  return( "" );
         }
     }
@@ -1334,11 +1358,11 @@ public class Node {
 
     if( is_root() ) return( "" );
 
-    var value = (index() + 1).to_string();
+    var value = section().to_string();
     var node  = parent;
 
     while( !node.is_root() ) {
-      value = (node.index() + 1).to_string() + "." + value;
+      value = node.section().to_string() + "." + value;
       node  = node.parent;
     }
 
@@ -1350,9 +1374,12 @@ public class Node {
   /* DRAWING METHODS */
   /*******************/
 
+  public bool draw_as_blank() {
+    return( (mode != NodeMode.EDITABLE) && is_main() && (name.text.text == "") && (children.length == 0) );
+  }
+
   /* Draws the background for the given row */
   public void draw_background( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
-
 
     var background = theme.background;
     var alpha      = this.alpha;
@@ -1455,7 +1482,7 @@ public class Node {
   /* Draw the task indicator */
   public void draw_task( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
-    if( task == NodeTaskMode.NONE ) return;
+    if( (task == NodeTaskMode.NONE) ) return;
 
     double tx, ty, tw, th;
     var tmode = opts.show_modes ? mode : NodeMode.NONE;
@@ -1586,13 +1613,16 @@ public class Node {
     if( (is_root() && (tmode != NodeMode.MOVETO)) || hidden ) return;
 
     draw_background( ctx, theme, opts );
-    draw_note_icon( ctx, theme, opts );
-    draw_expander( ctx, theme, opts );
-    draw_depth( ctx, theme, opts );
-    draw_task( ctx, theme, opts );
-    draw_list_type( ctx, theme, opts );
-    draw_name( ctx, theme, opts );
-    draw_note( ctx, theme, opts );
+
+    if( !draw_as_blank() ) {
+      draw_note_icon( ctx, theme, opts );
+      draw_expander( ctx, theme, opts );
+      draw_depth( ctx, theme, opts );
+      draw_task( ctx, theme, opts );
+      draw_list_type( ctx, theme, opts );
+      draw_name( ctx, theme, opts );
+      draw_note( ctx, theme, opts );
+    }
 
   }
 
