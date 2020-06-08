@@ -1066,7 +1066,7 @@ public class MainWindow : ApplicationWindow {
     dialog.add_filter( filter );
     if( dialog.run() == ResponseType.ACCEPT ) {
       string fname = dialog.get_filename();
-      if( fname.substring( -7, -1 ) != ".outliner" ) {
+      if( fname.substring( -9, -1 ) != ".outliner" ) {
         fname += ".outliner";
       }
       ot.document.filename = fname;
