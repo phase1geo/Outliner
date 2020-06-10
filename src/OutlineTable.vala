@@ -987,6 +987,9 @@ public class OutlineTable : DrawingArea {
   public void toggle_expand( Node node ) {
     var nodes = new Array<Node>();
     node.expanded = !node.expanded;
+    if( !node.expanded && selected.is_descendant_of( node ) ) {
+      selected = node;
+    }
     nodes.append_val( node );
     undo_buffer.add_item( new UndoNodeExpander( node, nodes ) );
     queue_draw();
@@ -2909,7 +2912,7 @@ public class OutlineTable : DrawingArea {
   /* Draws all of the root node trees */
   public void draw_all( Context ctx ) {
     root.draw_tree( ctx, _theme, _draw_options );
-    if( (selected != null) && ((selected.parent == null) || selected.parent.expanded) ) {
+    if( (selected != null) && !selected.hidden ) {
       selected.draw( ctx, _theme, _draw_options );
     }
     _labels.draw( ctx, _theme );
