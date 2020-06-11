@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-16 03:21-0500\n"
+"POT-Creation-Date: 2020-06-10 23:39-0500\n"
 "PO-Revision-Date: 2020-05-17 11:56+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: \n"
@@ -114,7 +114,7 @@ msgstr "knoop vervangen"
 msgid "delete item"
 msgstr "item verwijderen"
 
-#: src/undo_actions/UndoNodeUnindent.vala:28
+#: src/undo_actions/UndoNodeUnindent.vala:29
 msgid "unindent item"
 msgstr "item niet inspringen"
 
@@ -166,11 +166,11 @@ msgstr "Gesloten tabblad heropenen"
 msgid "Closed Tabs"
 msgstr "Gesloten tabbladen"
 
-#: src/FormatBar.vala:60 src/NodeMenu.vala:61
+#: src/FormatBar.vala:60 src/NodeMenu.vala:62
 msgid "Copy"
 msgstr "Kopiëren"
 
-#: src/FormatBar.vala:65 src/NodeMenu.vala:65
+#: src/FormatBar.vala:65 src/NodeMenu.vala:66
 msgid "Cut"
 msgstr "Knippen"
 
@@ -242,325 +242,350 @@ msgstr "URL:"
 msgid "Apply"
 msgstr "Toepassen"
 
-#: src/LinkEditor.vala:62 src/MainWindow.vala:801 src/MainWindow.vala:841
-#: src/MainWindow.vala:960 src/MainWindow.vala:1059
+#: src/LinkEditor.vala:62 src/MainWindow.vala:902 src/MainWindow.vala:942
+#: src/MainWindow.vala:1061 src/MainWindow.vala:1160
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/MainWindow.vala:113 src/MainWindow.vala:963
+#: src/MainWindow.vala:124 src/MainWindow.vala:1064
 msgid "Outliner"
 msgstr "Outliner"
 
-#: src/MainWindow.vala:143 data/com.github.phase1geo.outliner.shortcuts.ui:21
+#: src/MainWindow.vala:154 data/com.github.phase1geo.outliner.shortcuts.ui:21
 msgid "New File"
 msgstr "Nieuw bestand"
 
-#: src/MainWindow.vala:148 src/MainWindow.vala:841
+#: src/MainWindow.vala:159 src/MainWindow.vala:942
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr "Bestand openen"
 
-#: src/MainWindow.vala:153 data/com.github.phase1geo.outliner.shortcuts.ui:42
+#: src/MainWindow.vala:164 data/com.github.phase1geo.outliner.shortcuts.ui:42
 msgid "Save File As"
 msgstr "Bestand opslaan als"
 
-#: src/MainWindow.vala:158 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:169 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr "Ongedaan maken"
 
-#: src/MainWindow.vala:164 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:175 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr "Opnieuw uitvoeren"
 
-#: src/MainWindow.vala:230
+#: src/MainWindow.vala:264
 msgid "Unnamed Document"
 msgstr "Naamloos document"
 
-#: src/MainWindow.vala:441
+#: src/MainWindow.vala:383
+msgid "Backward in Focus History    &lt;"
+msgstr ""
+
+#: src/MainWindow.vala:391
+msgid "Forward in Focus History    &gt;"
+msgstr ""
+
+#: src/MainWindow.vala:516
 msgid "Search"
 msgstr "Zoeken"
 
-#: src/MainWindow.vala:452
+#: src/MainWindow.vala:527
 msgid "Statistics"
 msgstr "Statistieken"
 
-#: src/MainWindow.vala:463
+#: src/MainWindow.vala:538
 msgid "<b>Text Statistics</b>"
 msgstr "<b>Tekststatistieken</b>"
 
-#: src/MainWindow.vala:467
+#: src/MainWindow.vala:542
 msgid "Characters:"
 msgstr "Aantal tekens:"
 
-#: src/MainWindow.vala:472
+#: src/MainWindow.vala:547
 msgid "Words:"
 msgstr "Aantal woorden:"
 
-#: src/MainWindow.vala:477
+#: src/MainWindow.vala:552
 msgid "Rows:"
 msgstr "Aantal rijen:"
 
-#: src/MainWindow.vala:482
+#: src/MainWindow.vala:557
 msgid "<b>Checkbox Statistics</b>"
 msgstr "<b>Aankruisvakstatistieken</b>"
 
-#: src/MainWindow.vala:486
+#: src/MainWindow.vala:561
 msgid "Total:"
 msgstr "Totaal:"
 
-#: src/MainWindow.vala:491
+#: src/MainWindow.vala:566
 msgid "Incomplete:"
 msgstr "Onvoltooid:"
 
-#: src/MainWindow.vala:496
+#: src/MainWindow.vala:571
 msgid "In Progress:"
 msgstr "In uitvoering:"
 
-#: src/MainWindow.vala:501
+#: src/MainWindow.vala:576
 msgid "Completed:"
 msgstr "Voltooid:"
 
-#: src/MainWindow.vala:563 src/MainWindow.vala:1059
+#: src/MainWindow.vala:638 src/MainWindow.vala:1160
 msgid "Export"
 msgstr "Exporteren"
 
-#: src/MainWindow.vala:570
+#: src/MainWindow.vala:645
 msgid "Export…"
 msgstr "Exporteren…"
 
-#: src/MainWindow.vala:574
+#: src/MainWindow.vala:649
 msgid "Print…"
 msgstr "Afdrukken…"
 
-#: src/MainWindow.vala:597
+#: src/MainWindow.vala:672
 msgid "Properties"
 msgstr "Eigenschappen"
 
-#: src/MainWindow.vala:604
+#: src/MainWindow.vala:679
 msgid "Zoom (%):"
 msgstr "Zoomniveau (%):"
 
-#: src/MainWindow.vala:618
+#: src/MainWindow.vala:693
 msgid "Theme:"
 msgstr "Thema:"
 
-#: src/MainWindow.vala:644
+#: src/MainWindow.vala:719
 msgid "Enumeration Style:"
 msgstr "Opsommingstijl:"
 
-#: src/MainWindow.vala:660
+#: src/MainWindow.vala:735
 msgid "Row Font:"
 msgstr "Rijlettertype:"
 
-#: src/MainWindow.vala:680
+#: src/MainWindow.vala:755
 msgid "Note Font:"
 msgstr "Aantekeninglettertype:"
 
-#: src/MainWindow.vala:700
+#: src/MainWindow.vala:775
 msgid "Condensed Mode:"
 msgstr "Compacte modus:"
 
-#: src/MainWindow.vala:713
+#: src/MainWindow.vala:788
 msgid "Show Checkboxes"
 msgstr "Aankruisvakjes tonen"
 
-#: src/MainWindow.vala:731
+#: src/MainWindow.vala:801
+msgid "Show Depth Lines"
+msgstr ""
+
+#: src/MainWindow.vala:814
+msgid "Enable Markdown Highlighting"
+msgstr ""
+
+#: src/MainWindow.vala:832
 msgid "Shortcuts Cheatsheet"
 msgstr "Sneltoetsoverzicht"
 
-#: src/MainWindow.vala:736
+#: src/MainWindow.vala:837
 msgid "Reset Fonts to Defaults"
 msgstr "Standaardlettertypen herstellen"
 
-#: src/MainWindow.vala:792
+#: src/MainWindow.vala:893
 msgid "Save current unnamed document?"
 msgstr "Wil je het huidige, naamloze document opslaan?"
 
-#: src/MainWindow.vala:793
+#: src/MainWindow.vala:894
 msgid "Changes will be permanently lost if not saved."
 msgstr "Als je dat niet doet, gaan alle aanpassingen permanent verloren."
 
-#: src/MainWindow.vala:798
+#: src/MainWindow.vala:899
 msgid "Discard Changes"
 msgstr "Aanpassingen verwerpen"
 
-#: src/MainWindow.vala:804 src/MainWindow.vala:960
+#: src/MainWindow.vala:905 src/MainWindow.vala:1061
 msgid "Save"
 msgstr "Opslaan"
 
-#: src/MainWindow.vala:841
+#: src/MainWindow.vala:942
 msgid "Open"
 msgstr "Openen"
 
-#: src/MainWindow.vala:959
+#: src/MainWindow.vala:1060
 msgid "Save File"
 msgstr "Bestand opslaan"
 
-#: src/MainWindow.vala:1058
+#: src/MainWindow.vala:1159
 msgid "Export As"
 msgstr "Exporteren als"
 
-#: src/MainWindow.vala:1063
+#: src/MainWindow.vala:1164
 msgid "HTML"
 msgstr "HTML"
 
-#: src/MainWindow.vala:1070
+#: src/MainWindow.vala:1171
 msgid "Markdown"
 msgstr "Markdown"
 
-#: src/MainWindow.vala:1077
+#: src/MainWindow.vala:1178
 msgid "Minder"
 msgstr "Minder"
 
-#: src/MainWindow.vala:1083
+#: src/MainWindow.vala:1184
 msgid "OPML"
 msgstr "OPML"
 
-#: src/MainWindow.vala:1089
+#: src/MainWindow.vala:1190
 msgid "Org-Mode"
 msgstr "Org-modus"
 
-#: src/MainWindow.vala:1095
+#: src/MainWindow.vala:1196
 msgid "PDF"
 msgstr "PDF"
 
-#: src/MainWindow.vala:1101
+#: src/MainWindow.vala:1202
 msgid "PlainText"
 msgstr "Platte tekst"
 
-#: src/NodeMenu.vala:69
+#: src/NodeMenu.vala:70
 msgid "Paste"
 msgstr "Plakken"
 
-#: src/NodeMenu.vala:73
+#: src/NodeMenu.vala:74
 msgid "Paste and Replace"
 msgstr "Plakken en vervangen"
 
-#: src/NodeMenu.vala:77
+#: src/NodeMenu.vala:78
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: src/NodeMenu.vala:81
+#: src/NodeMenu.vala:82
 msgid "Clone"
 msgstr "Klonen"
 
-#: src/NodeMenu.vala:85
+#: src/NodeMenu.vala:86
 msgid "Copy As Clone"
 msgstr "Kopiëren als kloon"
 
-#: src/NodeMenu.vala:88
+#: src/NodeMenu.vala:89
 msgid "Paste Clone"
 msgstr "Kloon plakken"
 
-#: src/NodeMenu.vala:91
+#: src/NodeMenu.vala:92
 msgid "Unclone"
 msgstr "Kloon ongedaan maken"
 
-#: src/NodeMenu.vala:94 data/com.github.phase1geo.outliner.shortcuts.ui:211
+#: src/NodeMenu.vala:95 data/com.github.phase1geo.outliner.shortcuts.ui:211
 msgid "Edit Text"
 msgstr "Tekst aanpassen"
 
-#: src/NodeMenu.vala:98 data/com.github.phase1geo.outliner.shortcuts.ui:218
+#: src/NodeMenu.vala:99 data/com.github.phase1geo.outliner.shortcuts.ui:225
 msgid "Edit Note"
 msgstr "Aantekening aanpassen"
 
-#: src/NodeMenu.vala:102 src/NodeMenu.vala:304
+#: src/NodeMenu.vala:103 src/NodeMenu.vala:314
 msgid "Show Note"
 msgstr "Aantekening tonen"
 
-#: src/NodeMenu.vala:105 data/com.github.phase1geo.outliner.shortcuts.ui:157
+#: src/NodeMenu.vala:106 data/com.github.phase1geo.outliner.shortcuts.ui:232
+#, fuzzy
+msgid "Add Tag"
+msgstr "Label toevoegen"
+
+#: src/NodeMenu.vala:109 data/com.github.phase1geo.outliner.shortcuts.ui:157
 msgid "Add Row Above"
 msgstr "Rij hierboven toevoegen"
 
-#: src/NodeMenu.vala:109 data/com.github.phase1geo.outliner.shortcuts.ui:150
+#: src/NodeMenu.vala:113 data/com.github.phase1geo.outliner.shortcuts.ui:150
 msgid "Add Row Below"
 msgstr "Rij hieronder toevoegen"
 
-#: src/NodeMenu.vala:113
+#: src/NodeMenu.vala:117
 msgid "Indent"
 msgstr "Inspringen"
 
-#: src/NodeMenu.vala:117
+#: src/NodeMenu.vala:121
 msgid "Unindent"
 msgstr "Niet inspringen"
 
-#: src/NodeMenu.vala:121
+#: src/NodeMenu.vala:125
 msgid "Expand Children"
 msgstr "Onderliggende items uitklappen"
 
-#: src/NodeMenu.vala:124
+#: src/NodeMenu.vala:128
+msgid "Focus"
+msgstr ""
+
+#: src/NodeMenu.vala:132
 msgid "Select Row"
 msgstr "Rij selecteren"
 
-#: src/NodeMenu.vala:128
+#: src/NodeMenu.vala:136
 msgid "Select Row Above"
 msgstr "Rij hierboven selecteren"
 
-#: src/NodeMenu.vala:132
+#: src/NodeMenu.vala:140
 msgid "Select Row Below"
 msgstr "Rij hieronder selecteren"
 
-#: src/NodeMenu.vala:136
+#: src/NodeMenu.vala:144
 msgid "Select Previous Sibling Row"
 msgstr "Vorige afgeleide rij selecteren"
 
-#: src/NodeMenu.vala:140
+#: src/NodeMenu.vala:148
 msgid "Select Next Sibling Row"
 msgstr "Volgende afgeleide rij selecteren"
 
-#: src/NodeMenu.vala:144 data/com.github.phase1geo.outliner.shortcuts.ui:245
+#: src/NodeMenu.vala:152 data/com.github.phase1geo.outliner.shortcuts.ui:307
 msgid "Select Parent Row"
 msgstr "Bovenliggende rij selecteren"
 
-#: src/NodeMenu.vala:148
+#: src/NodeMenu.vala:156
 msgid "Select Last Child Row"
 msgstr "Laatste afgeleide rij selecteren"
 
-#: src/NodeMenu.vala:152
+#: src/NodeMenu.vala:160
 msgid "Select First Row"
 msgstr "Eerste rij selecteren"
 
-#: src/NodeMenu.vala:156
+#: src/NodeMenu.vala:164
 msgid "Select Last Row"
 msgstr "Laatste rij selecteren"
 
-#: src/NodeMenu.vala:160
+#: src/NodeMenu.vala:168
 msgid "Select Labeled Row"
 msgstr "Gelabelde rij selecteren"
 
-#: src/NodeMenu.vala:164
+#: src/NodeMenu.vala:172
 msgid "Labels"
 msgstr "Labels"
 
-#: src/NodeMenu.vala:168 src/NodeMenu.vala:287
+#: src/NodeMenu.vala:176 src/NodeMenu.vala:297
 msgid "Add Label"
 msgstr "Label toevoegen"
 
-#: src/NodeMenu.vala:172
+#: src/NodeMenu.vala:180
 msgid "Move To Label"
 msgstr "Verplaatsen naar label"
 
-#: src/NodeMenu.vala:176
+#: src/NodeMenu.vala:184
 msgid "Clear All Labels"
 msgstr "Alle labels verwijderen"
 
-#: src/NodeMenu.vala:237 src/NodeMenu.vala:245
+#: src/NodeMenu.vala:247 src/NodeMenu.vala:255
 msgid "Label-"
 msgstr "Label-"
 
-#: src/NodeMenu.vala:290
+#: src/NodeMenu.vala:300
 msgid "Remove Label"
 msgstr "Label verwijderen"
 
-#: src/NodeMenu.vala:307
+#: src/NodeMenu.vala:317
 msgid "Hide Note"
 msgstr "Aantekening verbergen"
 
-#: src/NodeMenu.vala:311
+#: src/NodeMenu.vala:321
 msgid "Hide Children"
 msgstr "Onderliggende items verbergen"
 
-#: src/NodeMenu.vala:311
+#: src/NodeMenu.vala:321
 msgid "Show Children"
 msgstr "Onderliggende items tonen"
 
@@ -584,13 +609,27 @@ msgstr "Toont opsommingen met contour (bijv.: I., A., 1.)"
 msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr "Toont sectie-opsommingen (bijv. 2., 2.1., 2.1.3)"
 
-#: src/OutlineTable.vala:609
+#: src/OutlineTable.vala:714
 msgid "Show note"
 msgstr "Aantekening tonen"
 
-#: src/OutlineTable.vala:609
+#: src/OutlineTable.vala:714
 msgid "Hide note"
 msgstr "Aantekening verbergen"
+
+#: src/OutlineTable.vala:718
+#, c-format
+msgid "%u subrows"
+msgstr ""
+
+#: src/OutlineTable.vala:2646 src/OutlineTable.vala:2663
+#: src/OutlineTable.vala:2674
+msgid "In Focus Mode."
+msgstr ""
+
+#: src/OutlineTable.vala:2696
+msgid "Hit the Escape key to exit."
+msgstr ""
 
 #: src/SearchBar.vala:94
 msgid "Find text…"
@@ -673,7 +712,7 @@ msgid "Zoom To Actual Size"
 msgstr "Zoomen naar ware grootte"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:119
-#: data/com.github.phase1geo.outliner.shortcuts.ui:509
+#: data/com.github.phase1geo.outliner.shortcuts.ui:571
 msgid "Miscellaneous"
 msgstr "Overig"
 
@@ -690,7 +729,7 @@ msgid "Row Commands"
 msgstr "Rij-opdrachten"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:146
-#: data/com.github.phase1geo.outliner.shortcuts.ui:344
+#: data/com.github.phase1geo.outliner.shortcuts.ui:406
 msgid "Creation/Deletion"
 msgstr "Toevoegen/Verwijderen"
 
@@ -699,7 +738,7 @@ msgid "Delete Row"
 msgstr "Rij verwijderen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:173
-#: data/com.github.phase1geo.outliner.shortcuts.ui:591
+#: data/com.github.phase1geo.outliner.shortcuts.ui:653
 msgid "Clipboard"
 msgstr "Klembord"
 
@@ -723,248 +762,285 @@ msgstr "Rij hierboven plakken"
 msgid "Changing Current"
 msgstr "Huidige aanpassen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:225
-msgid "Expand Subrows"
-msgstr "Onderliggende rijen uitklappen"
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:232
-msgid "Collapse Subrows"
-msgstr "Onderliggende rijen inklappen"
+#: data/com.github.phase1geo.outliner.shortcuts.ui:218
+msgid "Change Task State"
+msgstr ""
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:241
+#, fuzzy
+msgid "Changing View"
+msgstr "Huidige aanpassen"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:245
+#, fuzzy
+msgid "Expand One Subrow Level"
+msgstr "Onderliggende rijen uitklappen"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:252
+#, fuzzy
+msgid "Collapse One Subrow Level"
+msgstr "Onderliggende rijen inklappen"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:259
+#, fuzzy
+msgid "Expand All Subrows"
+msgstr "Onderliggende rijen uitklappen"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:266
+#, fuzzy
+msgid "Collapse All Subrows"
+msgstr "Onderliggende rijen inklappen"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:273
+msgid "Add Current to Focus Stack"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:280
+msgid "Exit Focus View"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:287
+msgid "Go Back in Focus View Stack"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:294
+msgid "Go Forward in Focus View Stack"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:303
 msgid "Traversal"
 msgstr "Traversieel"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:252
+#: data/com.github.phase1geo.outliner.shortcuts.ui:314
 msgid "Select Root Row"
 msgstr "Hoofdrij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:259
+#: data/com.github.phase1geo.outliner.shortcuts.ui:321
 msgid "Select Previous Row"
 msgstr "Vorige rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:266
+#: data/com.github.phase1geo.outliner.shortcuts.ui:328
 msgid "Select Next Row"
 msgstr "Volgende rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:273
+#: data/com.github.phase1geo.outliner.shortcuts.ui:335
 msgid "Select Row One Page Up"
 msgstr "Rij één pagina omhoog selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:280
+#: data/com.github.phase1geo.outliner.shortcuts.ui:342
 msgid "Select Row One Page Down"
 msgstr "Rij één pagina omlaag selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:287
+#: data/com.github.phase1geo.outliner.shortcuts.ui:349
 msgid "Select Top-most Row"
 msgstr "Bovenste rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:294
+#: data/com.github.phase1geo.outliner.shortcuts.ui:356
 msgid "Select Bottom-most Row"
 msgstr "Onderste rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:303
+#: data/com.github.phase1geo.outliner.shortcuts.ui:365
 msgid "Row Movement"
 msgstr "Rijverplaatsing"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:307
+#: data/com.github.phase1geo.outliner.shortcuts.ui:369
 msgid "Move Selected Group Up"
 msgstr "Geselecteerde groep omhoog verplaatsen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:314
+#: data/com.github.phase1geo.outliner.shortcuts.ui:376
 msgid "Move Selected Group Down"
 msgstr "Geselecteerde groep omlaag verplaatsen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:321
+#: data/com.github.phase1geo.outliner.shortcuts.ui:383
 msgid "Move Selected Group To Top"
 msgstr "Geselecteerde groep naar bovenkant verplaatsen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:328
+#: data/com.github.phase1geo.outliner.shortcuts.ui:390
 msgid "Move Selected Group To Bottom"
 msgstr "Geselecteerde groep naar onderkant verplaatsen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:340
+#: data/com.github.phase1geo.outliner.shortcuts.ui:402
 msgid "Label Commands"
 msgstr "Labelopdrachten"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:348
+#: data/com.github.phase1geo.outliner.shortcuts.ui:410
 msgid "Add/Remove Label"
 msgstr "Label toevoegen/verwijderen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:355
+#: data/com.github.phase1geo.outliner.shortcuts.ui:417
 msgid "Remove All Labels"
 msgstr "Alle labels verwijderen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:364
-#: data/com.github.phase1geo.outliner.shortcuts.ui:618
+#: data/com.github.phase1geo.outliner.shortcuts.ui:426
+#: data/com.github.phase1geo.outliner.shortcuts.ui:680
 msgid "Selection"
 msgstr "Selectie"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:368
+#: data/com.github.phase1geo.outliner.shortcuts.ui:430
 msgid "Select Label-1 Row"
 msgstr "Label-1-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:375
+#: data/com.github.phase1geo.outliner.shortcuts.ui:437
 msgid "Select Label-2 Row"
 msgstr "Label-2-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:382
+#: data/com.github.phase1geo.outliner.shortcuts.ui:444
 msgid "Select Label-3 Row"
 msgstr "Label-3-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:389
+#: data/com.github.phase1geo.outliner.shortcuts.ui:451
 msgid "Select Label-4 Row"
 msgstr "Label-4-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:396
+#: data/com.github.phase1geo.outliner.shortcuts.ui:458
 msgid "Select Label-5 Row"
 msgstr "Label-5-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:403
+#: data/com.github.phase1geo.outliner.shortcuts.ui:465
 msgid "Select Label-6 Row"
 msgstr "Label-6-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:410
+#: data/com.github.phase1geo.outliner.shortcuts.ui:472
 msgid "Select Label-7 Row"
 msgstr "Label-7-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:417
+#: data/com.github.phase1geo.outliner.shortcuts.ui:479
 msgid "Select Label-8 Row"
 msgstr "Label-8-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:424
+#: data/com.github.phase1geo.outliner.shortcuts.ui:486
 msgid "Select Label-9 Row"
 msgstr "Label-9-rij selecteren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:433
+#: data/com.github.phase1geo.outliner.shortcuts.ui:495
 msgid "Move Row Into Labeled Row"
 msgstr "Rij verplaatsen naar gelabelde rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:437
+#: data/com.github.phase1geo.outliner.shortcuts.ui:499
 msgid "Move To Label-1 Row"
 msgstr "Verplaatsen naar label-1-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:444
+#: data/com.github.phase1geo.outliner.shortcuts.ui:506
 msgid "Move To Label-2 Row"
 msgstr "Verplaatsen naar label-2-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:451
+#: data/com.github.phase1geo.outliner.shortcuts.ui:513
 msgid "Move To Label-3 Row"
 msgstr "Verplaatsen naar label-3-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:458
+#: data/com.github.phase1geo.outliner.shortcuts.ui:520
 msgid "Move To Label-4 Row"
 msgstr "Verplaatsen naar label-4-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:465
+#: data/com.github.phase1geo.outliner.shortcuts.ui:527
 msgid "Move To Label-5 Row"
 msgstr "Verplaatsen naar label-5-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:472
+#: data/com.github.phase1geo.outliner.shortcuts.ui:534
 msgid "Move To Label-6 Row"
 msgstr "Verplaatsen naar label-6-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:479
+#: data/com.github.phase1geo.outliner.shortcuts.ui:541
 msgid "Move To Label-7 Row"
 msgstr "Verplaatsen naar label-7-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:486
+#: data/com.github.phase1geo.outliner.shortcuts.ui:548
 msgid "Move To Label-8 Row"
 msgstr "Verplaatsen naar label-8-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:493
+#: data/com.github.phase1geo.outliner.shortcuts.ui:555
 msgid "Move To Label-9 Row"
 msgstr "Verplaatsen naar label-9-rij"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:505
+#: data/com.github.phase1geo.outliner.shortcuts.ui:567
 msgid "Text Editing"
 msgstr "Tekstbewerking"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:513
+#: data/com.github.phase1geo.outliner.shortcuts.ui:575
 msgid "Show Emoji Picker"
 msgstr "Emojikiezer tonen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:520
+#: data/com.github.phase1geo.outliner.shortcuts.ui:582
 msgid "End Editing"
 msgstr "Stoppen met bewerken"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:529
+#: data/com.github.phase1geo.outliner.shortcuts.ui:591
 msgid "Cursor Movement"
 msgstr "Cursorverplaatsing"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:533
+#: data/com.github.phase1geo.outliner.shortcuts.ui:595
 msgid "Next Character"
 msgstr "Volgende teken"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:540
+#: data/com.github.phase1geo.outliner.shortcuts.ui:602
 msgid "Previous Character"
 msgstr "Vorige teken"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:547
+#: data/com.github.phase1geo.outliner.shortcuts.ui:609
 msgid "Next Word"
 msgstr "Volgende woord"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:554
+#: data/com.github.phase1geo.outliner.shortcuts.ui:616
 msgid "Previous Word"
 msgstr "Vorige woord"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:561
+#: data/com.github.phase1geo.outliner.shortcuts.ui:623
 msgid "Next Line"
 msgstr "Volgende regel"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:568
+#: data/com.github.phase1geo.outliner.shortcuts.ui:630
 msgid "Previous Line"
 msgstr "Vorige regel"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:575
+#: data/com.github.phase1geo.outliner.shortcuts.ui:637
 msgid "Start Of Text"
 msgstr "Begin van de tekst"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:582
+#: data/com.github.phase1geo.outliner.shortcuts.ui:644
 msgid "End Of Text"
 msgstr "Einde van de tekst"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:595
+#: data/com.github.phase1geo.outliner.shortcuts.ui:657
 msgid "Copy Selected Text"
 msgstr "Geselecteerde tekst kopiëren"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:602
+#: data/com.github.phase1geo.outliner.shortcuts.ui:664
 msgid "Cut Selected Text"
 msgstr "Geselecteerde tekst knippen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:609
+#: data/com.github.phase1geo.outliner.shortcuts.ui:671
 msgid "Paste Text"
 msgstr "Tekst plakken"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:622
+#: data/com.github.phase1geo.outliner.shortcuts.ui:684
 msgid "Add Next Character"
 msgstr "Volgende teken toevoegen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:629
+#: data/com.github.phase1geo.outliner.shortcuts.ui:691
 msgid "Add Previous Character"
 msgstr "Vorige teken toevoegen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:636
+#: data/com.github.phase1geo.outliner.shortcuts.ui:698
 msgid "Add Next Word"
 msgstr "Volgende woord toevoegen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:643
+#: data/com.github.phase1geo.outliner.shortcuts.ui:705
 msgid "Add Previous Word"
 msgstr "Vorige woord toevoegen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:650
+#: data/com.github.phase1geo.outliner.shortcuts.ui:712
 msgid "Add Next Line"
 msgstr "Volgende regel toevoegen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:657
+#: data/com.github.phase1geo.outliner.shortcuts.ui:719
 msgid "Add Previous Line"
 msgstr "Vorige regel toevoegen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:664
+#: data/com.github.phase1geo.outliner.shortcuts.ui:726
 msgid "Add Start Of Text"
 msgstr "Begin van de tekst toevoegen"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:671
+#: data/com.github.phase1geo.outliner.shortcuts.ui:733
 msgid "Add End Of Text"
 msgstr "Einde van de tekst toevoegen"
 

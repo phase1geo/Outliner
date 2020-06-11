@@ -11,17 +11,22 @@
 Quickly create outlines and export them in a number of useful formats.
 
 - Quickly create and navigate outlines using the keyboard or mouse.
-- Full support for text formatting.
+- Full support for rich text formatting and/or Markdown formatting.
 - Add notes to any outline text.
+- Add tags to any outline row.
+- Add checkboxes to any or all outline text.
 - Close/Hide any group within the outline for increased focus.
 - Quick search and replace of any text within the document, including notes.
-- View document statistics such as character count, word count and row count.
+- Optionally focus on a portion of the document at a time when editing.
+- View document statistics such as character count, word count, row count and task information.
+- Support for showing depth lines.
 - Unlimited undo/redo of any change.
 - Automatically saves in the background.
 - Open multiple outlines with the use of tabs.
 - Built-in themes.
+- Support for changing fonts within a document.
 - Import from Minder and OPML.
-- Export to HTML, Markdown, Minder, OPML, PDF and PlainText.
+- Export to HTML, Markdown, Minder, OPML, Org-Mode, PDF and PlainText.
 - Printer support.
 
 ## Installation
