@@ -85,3 +85,10 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE.m
         <img src="https://appcenter.elementary.io/badge.svg">
     </a>
 </p>
+
+### Iconography
+
+The Outliner icon was created by Nararyans R.I. (@Fatih20 on GitHub).  He has produced a video showing the process of
+creating this icon with Inkscape at:
+
+<https://open.lbry.com/@Fatih109:4/Outliner:b?r=Cg1pp5MCWV1a5Nj5jDumPs9b13dNZqWG>
