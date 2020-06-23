@@ -51,7 +51,7 @@ public class FocusStack {
 
   /* Moves backward in the stack by one */
   public Node? back() {
-    return( (_index == 0) ? null : _stack.index( --_index ) );
+    return( (_index <= 0) ? null : _stack.index( --_index ) );
   }
 
   /* Moves forward in the stack by one */
