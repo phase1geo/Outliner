@@ -143,10 +143,11 @@ public class OutlinerClipboard {
     /* Get the list of targets that we will support */
     foreach( var target in targets ) {
       switch( target.name() ) {
-        case NODES_TARGET_NAME :  nodes_atom = target;  break;
-        case FTEXT_TARGET_NAME :  ftext_atom = target;  break;
+        case NODES_TARGET_NAME :  nodes_atom = nodes_atom ?? target;  break;
+        case FTEXT_TARGET_NAME :  ftext_atom = ftext_atom ?? target;  break;
         case "text/plain"      :
-        case "STRING"          :  text_atom  = target;  break;
+        case "UTF8_STRING"     :
+        case "STRING"          :  text_atom  = text_atom ?? target;  break;
       }
     }
 
