@@ -43,12 +43,14 @@ public class OutlinerClipboard {
   }
 
   const TargetEntry[] text_target_list = {
+    { "UTF8_STRING",     0, Target.STRING },
     { "text/plain",      0, Target.STRING },
     { "STRING",          0, Target.STRING },
     { FTEXT_TARGET_NAME, 0, Target.FTEXT }
   };
 
   const TargetEntry[] node_target_list = {
+    { "UTF8_STRING",     0, Target.STRING },
     { "text/plain",      0, Target.STRING },
     { "STRING",          0, Target.STRING },
     { NODES_TARGET_NAME, 0, Target.NODES }
