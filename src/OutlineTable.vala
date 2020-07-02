@@ -32,8 +32,10 @@ public delegate bool NodeFilterFunc( Node node );
 
 public class OutlineTable : DrawingArea {
 
-  private const CursorType click_cursor = CursorType.HAND2;
-  private const CursorType text_cursor  = CursorType.XTERM;
+  private const CursorType click_cursor   = CursorType.HAND2;
+  private const CursorType text_cursor    = CursorType.XTERM;
+  private const double     dim_selected   = 0.3;
+  private const double     dim_unselected = 0.1;
 
   private MainWindow      _win;
   private Document        _doc;
@@ -92,7 +94,7 @@ public class OutlineTable : DrawingArea {
           _selected.select_mode.disconnect( select_mode_changed );
           _selected.cursor_changed.disconnect( selected_cursor_changed );
           if( (_focus_node != null) && (_selected != _focus_node) && !_selected.is_descendant_of( _focus_node ) ) {
-            _selected.alpha = 0.1;
+            _selected.alpha = dim_unselected;
           }
         }
         if( value != null ) {
@@ -103,8 +105,8 @@ public class OutlineTable : DrawingArea {
           set_node_mode( _selected, NodeMode.SELECTED );
           _selected.select_mode.connect( select_mode_changed );
           _selected.cursor_changed.connect( selected_cursor_changed );
-          if( _focus_node != null ) {
-            _selected.alpha = 1.0;
+          if( (_focus_node != null) && (_selected != _focus_node) && !_selected.is_descendant_of( _focus_node ) ) {
+            _selected.alpha = dim_selected;
           }
         }
         selected_changed();
@@ -2636,7 +2638,7 @@ public class OutlineTable : DrawingArea {
 
   /* Enters focus mode for the selected mode */
   public void focus_on_selected() {
-    root.set_tree_alpha( 0.1 );
+    root.set_tree_alpha( dim_unselected );
     selected.set_tree_alpha( 1.0 );
     _focus_node = selected;
     focus_mode( _( "In Focus Mode.  Hit the Escape key to exit." ) );
