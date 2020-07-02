@@ -224,18 +224,12 @@ public class MainWindow : ApplicationWindow {
   /* Shows or hides the information bar, setting the message to the given value */
   private void show_info_bar( string? msg ) {
     if( _nb.current != null ) {
-      var table = get_current_table( "show_info_bar" );
-      var box   = _nb.current.page as Gtk.Box;
-      var info  = box.get_children().nth_data( 2 ) as Gtk.InfoBar;
+      var box  = _nb.current.page as Gtk.Box;
+      var info = box.get_children().nth_data( 2 ) as Gtk.InfoBar;
       if( info != null ) {
         if( msg != null ) {
-          var ibox = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Box;
-          var prev = ibox.get_children().nth_data( 0 ) as Gtk.Button;
-          var next = ibox.get_children().nth_data( 1 ) as Gtk.Button;
-          var ilbl = ibox.get_children().nth_data( 2 ) as Gtk.Label;
-          ilbl.label = msg;
-          prev.set_sensitive( table.focus_stack.back_valid() );
-          next.set_sensitive( table.focus_stack.forward_valid() );
+          var lbl = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Label;
+          lbl.label = msg;
           info.set_revealed( true );
         } else {
           info.set_revealed( false );
@@ -275,6 +269,7 @@ public class MainWindow : ApplicationWindow {
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
+    ot.grab_focus();
     save_tab_state( tab );
   }
 
@@ -317,6 +312,7 @@ public class MainWindow : ApplicationWindow {
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
     ot.theme_changed.connect( theme_changed );
+    ot.focus_mode.connect( show_info_bar );
     ot.nodes_filtered.connect( show_info_bar );
 
     if( fname != null ) {
@@ -377,34 +373,10 @@ public class MainWindow : ApplicationWindow {
   /* Creates the info bar UI */
   private InfoBar create_info_bar() {
 
-    var focus_prev = new Button.from_icon_name( "go-previous", IconSize.SMALL_TOOLBAR );
-    var focus_next = new Button.from_icon_name( "go-next",     IconSize.SMALL_TOOLBAR );
-
-    focus_prev.set_tooltip_markup( _( "Backward in Focus History    &lt;" ) );
-    focus_prev.clicked.connect(() => {
-      var table = get_current_table( "focus_prev" );
-      table.focus_mode_back();
-      focus_prev.set_sensitive( table.focus_stack.back_valid() );
-      focus_next.set_sensitive( table.focus_stack.forward_valid() );
-    });
-
-    focus_next.set_tooltip_markup( _( "Forward in Focus History    &gt;" ) );
-    focus_next.clicked.connect(() => {
-      var table = get_current_table( "focus_next" );
-      table.focus_mode_forward();
-      focus_prev.set_sensitive( table.focus_stack.back_valid() );
-      focus_next.set_sensitive( table.focus_stack.forward_valid() );
-    });
-
-    var focus_lbl = new Label( "" );
-
-    var history_box = new Box( Orientation.HORIZONTAL, 0 );
-    history_box.pack_start( focus_prev, false, false, 5 );
-    history_box.pack_start( focus_next, false, false, 5 );
-    history_box.pack_start( focus_lbl,  false, false, 5 );
+    var lbl = new Label( "" );
 
     var info_bar = new InfoBar();
-    info_bar.get_content_area().add( history_box );
+    info_bar.get_content_area().add( lbl );
     info_bar.set_revealed( false );
     info_bar.message_type = MessageType.INFO;
 

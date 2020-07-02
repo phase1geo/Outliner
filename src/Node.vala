@@ -611,6 +611,13 @@ public class Node {
     return( last_y );
   }
 
+  public void set_tree_alpha( double value ) {
+    alpha = value;
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).set_tree_alpha( value );
+    }
+  }
+
   /* Adjusts the position of the text object */
   private void position_text() {
     var zoom = _ot.win.get_zoom_factor();

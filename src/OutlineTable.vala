@@ -75,7 +75,7 @@ public class OutlineTable : DrawingArea {
   private TextCompletion  _completion;
   private bool            _markdown;
   private bool            _filtered   = false;
-  private FocusStack      _focus_stack;
+  private Node?           _focus_node = null;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -91,6 +91,9 @@ public class OutlineTable : DrawingArea {
           set_node_mode( _selected, NodeMode.NONE );
           _selected.select_mode.disconnect( select_mode_changed );
           _selected.cursor_changed.disconnect( selected_cursor_changed );
+          if( (_focus_node != null) && (_selected != _focus_node) && !_selected.is_descendant_of( _focus_node ) ) {
+            _selected.alpha = 0.1;
+          }
         }
         if( value != null ) {
           see( value );
@@ -100,6 +103,9 @@ public class OutlineTable : DrawingArea {
           set_node_mode( _selected, NodeMode.SELECTED );
           _selected.select_mode.connect( select_mode_changed );
           _selected.cursor_changed.connect( selected_cursor_changed );
+          if( _focus_node != null ) {
+            _selected.alpha = 1.0;
+          }
         }
         selected_changed();
       }
@@ -228,11 +234,6 @@ public class OutlineTable : DrawingArea {
     }
   }
   public bool tasks_on_right { get; private set; default = true; }
-  public FocusStack focus_stack {
-    get {
-      return( _focus_stack );
-    }
-  }
 
   /* Allocate static parsers */
   public MarkdownParser markdown_parser { get; private set; }
@@ -247,6 +248,7 @@ public class OutlineTable : DrawingArea {
   public signal void cursor_changed();
   public signal void show_tasks_changed();
   public signal void markdown_changed();
+  public signal void focus_mode( string? msg );
   public signal void nodes_filtered( string? msg );
 
   /* Default constructor */
@@ -271,9 +273,6 @@ public class OutlineTable : DrawingArea {
 
     /* Create the tags */
     _tagger = new Tagger( this );
-
-    /* Allocate memory for the focus view stack */
-    _focus_stack = new FocusStack();
 
     /* Create the parsers */
     tagger_parser   = new TaggerParser( this );
@@ -348,9 +347,6 @@ public class OutlineTable : DrawingArea {
     _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
-
-    /* Grab keyboard focus */
-    grab_focus();
 
   }
 
@@ -920,8 +916,6 @@ public class OutlineTable : DrawingArea {
           case 55    :  goto_label( 6 );         break;
           case 56    :  goto_label( 7 );         break;
           case 57    :  goto_label( 8 );         break;
-          case 60    :  focus_mode_back();       break;
-          case 62    :  focus_mode_forward();    break;
           case 106   :  handle_down( shift );    break;
           case 107   :  handle_up( shift );      break;
           case 65362 :  handle_up( shift );      break;
@@ -1352,9 +1346,8 @@ public class OutlineTable : DrawingArea {
         queue_draw();
         changed();
       }
-    } else if( _filtered ) {
-      _focus_stack.clear();
-      filter_nodes( "", false, null );
+    } else if( root.alpha < 1.0 ) {
+      focus_leave();
     }
   }
 
@@ -2200,7 +2193,7 @@ public class OutlineTable : DrawingArea {
         case "c" :  change_selected( node_last_child( selected ) );  break;
         case "e" :  edit_selected( true );  break;
         case "E" :  edit_selected( false );  break;
-        case "f" :  focus_mode_enter();  break;
+        case "f" :  focus_on_selected();  break;
         case "h" :  unindent();  break;
         case "H" :  place_at_top( selected );  break;
         case "j" :  change_selected( node_next( selected ) );  break;
@@ -2212,8 +2205,6 @@ public class OutlineTable : DrawingArea {
         case "T" :  change_selected( node_top() );  break;
         case "#" :  toggle_label();  break;
         case "*" :  clear_all_labels();  break;
-        case "<" :  focus_mode_back();  break;
-        case ">" :  focus_mode_forward();  break;
         case "1" :  goto_label( 0 );  break;
         case "2" :  goto_label( 1 );  break;
         case "3" :  goto_label( 2 );  break;
@@ -2233,8 +2224,10 @@ public class OutlineTable : DrawingArea {
     if( selected == null ) return;
     if( title ) {
       set_node_mode( selected, NodeMode.EDITABLE );
+      selected.name.move_cursor_to_end();
     } else {
       set_node_mode( selected, NodeMode.NOTEEDIT );
+      selected.note.move_cursor_to_end();
       selected.hide_note = false;
     }
     queue_draw();
@@ -2642,33 +2635,20 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Enters focus mode for the selected mode */
-  public void focus_mode_enter() {
-    _focus_stack.push( selected );
-    filter_nodes( _( "In Focus Mode." ), false, (node) => {
-      return( (node == selected) || node.is_descendant_of( selected ) );
-    });
+  public void focus_on_selected() {
+    root.set_tree_alpha( 0.1 );
+    selected.set_tree_alpha( 1.0 );
+    _focus_node = selected;
+    focus_mode( _( "In Focus Mode.  Hit the Escape key to exit." ) );
+    queue_draw();
   }
 
-  /* Moves the focus mode back by one */
-  public void focus_mode_back() {
-    var node = _focus_stack.back();
-    if( node != null ) {
-      selected = node;
-      filter_nodes( _( "In Focus Mode." ), false, (node) => {
-        return( (node == selected) || node.is_descendant_of( selected ) );
-      });
-    }
-  }
-
-  /* Moves forward in the focus stack by one */
-  public void focus_mode_forward() {
-    var node = _focus_stack.forward();
-    if( node != null ) {
-      selected = node;
-      filter_nodes( _( "In Focus Mode." ), false, (node) => {
-        return( (node == selected) || node.is_descendant_of( selected ) );
-      });
-    }
+  /* Return to unfocused mode */
+  public void focus_leave() {
+    root.set_tree_alpha( 1.0 );
+    focus_mode( null );
+    _focus_node = null;
+    queue_draw();
   }
 
   /* Filters the rows that match the given NodeFilterFunc */

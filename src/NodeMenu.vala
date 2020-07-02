@@ -409,7 +409,7 @@ public class NodeMenu : Gtk.Menu {
 
   /* Enters focus mode */
   private void focus_mode_enter() {
-    _ot.focus_mode_enter();
+    _ot.focus_on_selected();
   }
 
   /* Selects the node just above the selected node */

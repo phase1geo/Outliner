@@ -228,7 +228,7 @@ public class CanvasText : Object {
     extra = "";
     if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
       var cindex = text.text.char_count( cursor + trailing );
-      FormatTag[] tags = { FormatTag.URL, FormatTag.TAG };
+      FormatTag[] tags = { FormatTag.URL };  // TEMPORARY , FormatTag.TAG };
       foreach( FormatTag t in tags ) {
         var e = text.get_extra( t, cindex );
         if( e != null ) {
@@ -902,6 +902,16 @@ public class CanvasText : Object {
     if( copy_layout ) {
       layout = _pango_layout.copy();
       layout.set_attributes( _text.get_attributes_from_theme( theme ) );
+    }
+
+    if( alpha < 1.0 ) {
+      layout = _pango_layout.copy();
+      var attrs      = layout.get_attributes();
+      var alpha_attr = Pango.attr_foreground_alpha_new( (uint16)(65536 * alpha) );
+      alpha_attr.start_index = 0;
+      alpha_attr.end_index   = _text.text.length;
+      attrs.change( (owned)alpha_attr );
+      layout.set_attributes( attrs );
     }
 
     /* Output the text */
