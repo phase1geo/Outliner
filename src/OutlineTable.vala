@@ -348,9 +348,6 @@ public class OutlineTable : DrawingArea {
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
 
-    /* Grab keyboard focus */
-    grab_focus();
-
   }
 
   /* Called whenever the selection mode changed of the current node */

@@ -269,6 +269,7 @@ public class MainWindow : ApplicationWindow {
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
+    ot.grab_focus();
     save_tab_state( tab );
   }
 
