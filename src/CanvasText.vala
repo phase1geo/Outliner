@@ -904,6 +904,16 @@ public class CanvasText : Object {
       layout.set_attributes( _text.get_attributes_from_theme( theme ) );
     }
 
+    if( alpha < 1.0 ) {
+      layout = _pango_layout.copy();
+      var attrs      = layout.get_attributes();
+      var alpha_attr = Pango.attr_foreground_alpha_new( (uint16)(65536 * alpha) );
+      alpha_attr.start_index = 0;
+      alpha_attr.end_index   = _text.text.length;
+      attrs.change( (owned)alpha_attr );
+      layout.set_attributes( attrs );
+    }
+
     /* Output the text */
     ctx.move_to( posx, posy );
     Utils.set_context_color_with_alpha( ctx, fg, alpha );

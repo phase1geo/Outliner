@@ -51,7 +51,6 @@ sources += files(
   'ExportUtils.vala',
   'FormatBar.vala',
   'FormattedText.vala',
-  'FocusStack.vala',
   'LinkEditor.vala',
   'MainWindow.vala',
   'Node.vala',
