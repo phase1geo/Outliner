@@ -228,7 +228,7 @@ public class CanvasText : Object {
     extra = "";
     if( _pango_layout.xy_to_index( adjusted_x, adjusted_y, out cursor, out trailing ) ) {
       var cindex = text.text.char_count( cursor + trailing );
-      FormatTag[] tags = { FormatTag.URL, FormatTag.TAG };
+      FormatTag[] tags = { FormatTag.URL };  // TEMPORARY , FormatTag.TAG };
       foreach( FormatTag t in tags ) {
         var e = text.get_extra( t, cindex );
         if( e != null ) {
