@@ -569,7 +569,10 @@ public class Node {
   */
   private void set_ot_height() {
     if( this == get_root_node().get_last_node() ) {
-      _ot.set_size_request( -1, (int)last_y );
+      var vp = _ot.parent.parent as Viewport;
+      var vh = vp.get_allocated_height();
+      var end_y = ((int)last_y > ((int)y + vh)) ? (int)last_y : ((int)y + vh);
+      _ot.set_size_request( -1, end_y );
     }
   }
 

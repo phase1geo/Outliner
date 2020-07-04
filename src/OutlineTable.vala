@@ -901,7 +901,7 @@ public class OutlineTable : DrawingArea {
             case 65365 :  handle_pageup();            break;
             case 65366 :  handle_pagedn();            break;
             case 65507 :  handle_control( true );     break;
-            default    :  handle_printable( e.str );  break;
+            default    :  handle_printable( e.str, e.keyval );  break;
           }
         }
       }
@@ -2044,7 +2044,7 @@ public class OutlineTable : DrawingArea {
 
   /* Called by the input method manager when the user has a string to commit */
   private void handle_im_commit( string str ) {
-    handle_printable( str );
+    handle_printable( str, 0 );
   }
 
   /* Helper class for the handle_im_retrieve_surrounding method */
@@ -2178,7 +2178,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Handles any printable characters */
-  private void handle_printable( string str ) {
+  private void handle_printable( string str, uint keyval ) {
     if( !str.get_char( 0 ).isprint() ) return;
     if( is_node_editable() ) {
       selected.name.insert( str, undo_text );
@@ -2189,10 +2189,11 @@ public class OutlineTable : DrawingArea {
       see( selected );
       queue_draw();
     } else if( selected != null ) {
+      stdout.printf( "str: %s, keyval: %u\n", str, keyval );
       switch( str ) {
-        case "a" :  change_selected( node_parent( selected ) );  break;
+        case "a" :  change_selected( node_parent( selected ) );  break;  // 0
         case "B" :  change_selected( node_bottom() );  break;
-        case "c" :  change_selected( node_last_child( selected ) );  break;
+        case "c" :  change_selected( node_last_child( selected ) );  break;  // 2
         case "e" :  edit_selected( true );  break;
         case "E" :  edit_selected( false );  break;
         case "f" :  focus_on_selected();  break;
@@ -2524,7 +2525,12 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Update the size of this widget */
-    set_size_request( -1, (int)root.get_last_node().last_y );
+    var last_node = root.get_last_node();
+    var last_y = (int)last_node.last_y;
+    var vp     = parent.parent as Viewport;
+    var vh     = vp.get_allocated_height();
+    var end_y  = (last_y > ((int)last_node.y + vh)) ? last_y : ((int)last_node.y + vh);
+    set_size_request( -1, end_y );
 
     /* Draw everything */
     queue_draw();
@@ -2641,6 +2647,7 @@ public class OutlineTable : DrawingArea {
     root.set_tree_alpha( dim_unselected );
     selected.set_tree_alpha( 1.0 );
     _focus_node = selected;
+    place_at_top( selected );
     focus_mode( _( "In Focus Mode.  Hit the Escape key to exit." ) );
     queue_draw();
   }
