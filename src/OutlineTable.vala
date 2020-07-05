@@ -463,10 +463,30 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /*
+   Resizes this table such that the last row can be positioned at the top
+   of the window.
+  */
+  public bool resize_table() {
+
+    var last_node = root.get_last_node();
+    var last_y    = (int)last_node.last_y;
+    var vp        = parent.parent as Viewport;
+    var vh        = vp.get_allocated_height();
+    var end_y     = (last_y > ((int)last_node.y + vh)) ? last_y : ((int)last_node.y + vh);
+
+    set_size_request( -1, end_y );
+
+    return( false );
+
+  }
+
   /* Positions the scrolled window such that the given node is placed at the top */
   public void place_at_top( Node node ) {
+
     var sw = parent.parent.parent as ScrolledWindow;
     sw.vadjustment.value = node.y;
+
   }
 
   /* Internal see command that is called after this has been resized */
@@ -2525,12 +2545,7 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Update the size of this widget */
-    var last_node = root.get_last_node();
-    var last_y = (int)last_node.last_y;
-    var vp     = parent.parent as Viewport;
-    var vh     = vp.get_allocated_height();
-    var end_y  = (last_y > ((int)last_node.y + vh)) ? last_y : ((int)last_node.y + vh);
-    set_size_request( -1, end_y );
+    Timeout.add( 50, resize_table );
 
     /* Draw everything */
     queue_draw();
