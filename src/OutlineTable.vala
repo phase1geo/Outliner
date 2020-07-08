@@ -346,7 +346,7 @@ public class OutlineTable : DrawingArea {
     _im_context = new IMMulticontext();
     _im_context.set_client_window( this.get_window() );
     _im_context.set_use_preedit( false );
-    _im_context.commit.connect( handle_im_commit );
+    // _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
 
@@ -401,6 +401,7 @@ public class OutlineTable : DrawingArea {
       if( (mode == NodeMode.EDITABLE) || (mode == NodeMode.NOTEEDIT) ) {
         if( node.mode != mode ) {
           update_im_cursor( (mode == NodeMode.EDITABLE) ? node.name : node.note );
+          _im_context.commit.connect( handle_im_commit );
           _im_context.focus_in();
           if( mode == NodeMode.EDITABLE ) {
             _tagger.preedit_load_tags( node.name.text );
@@ -411,6 +412,7 @@ public class OutlineTable : DrawingArea {
           _tagger.postedit_load_tags( node.name.text );
         }
         _im_context.focus_out();
+        _im_context.commit.disconnect( handle_im_commit );
       }
       node.mode = mode;
     }
