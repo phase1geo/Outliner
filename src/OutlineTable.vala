@@ -342,7 +342,7 @@ public class OutlineTable : DrawingArea {
     /* Make sure the drawing area can receive keyboard focus */
     this.can_focus = true;
 
-    /* Make sure that we us the IMMulticontext input method */
+    /* Make sure that we us the IMMulticontext input method when editing text only */
     _im_context = new IMMulticontext();
     _im_context.set_client_window( this.get_window() );
     _im_context.set_use_preedit( false );
@@ -865,85 +865,109 @@ public class OutlineTable : DrawingArea {
     if( selected != null ) {
       if( control ) {
         switch( e.keyval ) {
-          case 99    :  do_copy();                      break;
-          case 120   :  do_cut();                       break;
-          case 118   :  do_paste( false );              break;
-          case 86    :  do_paste( true );               break;
-          case 65293 :  handle_control_return();        break;
-          case 65289 :  handle_control_tab();           break;
-          case 65363 :  handle_control_right( shift );  break;
-          case 65361 :  handle_control_left( shift );   break;
-          case 65362 :  handle_control_up( shift );     break;
-          case 65364 :  handle_control_down( shift );   break;
-          case 65288 :  handle_control_backspace();     break;
-          case 65535 :  handle_control_delete();        break;
-          case 46    :  handle_control_period();        break;
-          case 47    :  handle_control_slash();         break;
-          case 49    :  handle_control_number( 0 );     break;
-          case 50    :  handle_control_number( 1 );     break;
-          case 51    :  handle_control_number( 2 );     break;
-          case 52    :  handle_control_number( 3 );     break;
-          case 53    :  handle_control_number( 4 );     break;
-          case 54    :  handle_control_number( 5 );     break;
-          case 55    :  handle_control_number( 6 );     break;
-          case 56    :  handle_control_number( 7 );     break;
-          case 57    :  handle_control_number( 8 );     break;
-          case 65    :  handle_control_a( true );       break;
-          case 66    :  handle_control_b( true );       break;
-          case 84    :  handle_control_t( true );       break;
-          case 92    :  handle_control_backslash();     break;
-          case 97    :  handle_control_a( false );      break;
-          case 98    :  handle_control_b( false );      break;
-          case 100   :  handle_control_d();             break;
-          case 104   :  handle_control_h();             break;
-          case 105   :  handle_control_i();             break;
-          case 106   :  handle_control_j();             break;
-          case 107   :  handle_control_k();             break;
-          case 116   :  handle_control_t( false );      break;
-          case 117   :  handle_control_u();             break;
-          case 119   :  handle_control_w();             break;
+          case Key.c         :  do_copy();                      break;
+          case Key.x         :  do_cut();                       break;
+          case Key.v         :  do_paste( false );              break;
+          case Key.V         :  do_paste( true );               break;
+          case Key.Return    :  handle_control_return();        break;
+          case Key.Tab       :  handle_control_tab();           break;
+          case Key.Right     :  handle_control_right( shift );  break;
+          case Key.Left      :  handle_control_left( shift );   break;
+          case Key.Up        :  handle_control_up( shift );     break;
+          case Key.Down      :  handle_control_down( shift );   break;
+          case Key.BackSpace :  handle_control_backspace();     break;
+          case Key.Delete    :  handle_control_delete();        break;
+          case Key.period    :  handle_control_period();        break;
+          case Key.slash     :  handle_control_slash();         break;
+          case Key.@1        :  handle_control_number( 0 );     break;
+          case Key.@2        :  handle_control_number( 1 );     break;
+          case Key.@3        :  handle_control_number( 2 );     break;
+          case Key.@4        :  handle_control_number( 3 );     break;
+          case Key.@5        :  handle_control_number( 4 );     break;
+          case Key.@6        :  handle_control_number( 5 );     break;
+          case Key.@7        :  handle_control_number( 6 );     break;
+          case Key.@8        :  handle_control_number( 7 );     break;
+          case Key.@9        :  handle_control_number( 8 );     break;
+          case Key.A         :  handle_control_a( true );       break;
+          case Key.B         :  handle_control_b( true );       break;
+          case Key.T         :  handle_control_t( true );       break;
+          case Key.backslash :  handle_control_backslash();     break;
+          case Key.a         :  handle_control_a( false );      break;
+          case Key.b         :  handle_control_b( false );      break;
+          case Key.d         :  handle_control_d();             break;
+          case Key.h         :  handle_control_h();             break;
+          case Key.i         :  handle_control_i();             break;
+          case Key.j         :  handle_control_j();             break;
+          case Key.k         :  handle_control_k();             break;
+          case Key.t         :  handle_control_t( false );      break;
+          case Key.u         :  handle_control_u();             break;
+          case Key.w         :  handle_control_w();             break;
         }
       } else if( nomod || shift ) {
-        if( !_im_context.filter_keypress( e ) ) {
-          switch( e.keyval ) {
-            case 65288 :  handle_backspace();         break;
-            case 65535 :  handle_delete();            break;
-            case 65307 :  handle_escape();            break;
-            case 65293 :  handle_return( shift );     break;
-            case 65289 :  handle_tab();               break;
-            case 65056 :  handle_shift_tab();         break;
-            case 65363 :  handle_right( shift );      break;
-            case 65361 :  handle_left( shift );       break;
-            case 65360 :  handle_home();              break;
-            case 65367 :  handle_end();               break;
-            case 65362 :  handle_up( shift );         break;
-            case 65364 :  handle_down( shift );       break;
-            case 65365 :  handle_pageup();            break;
-            case 65366 :  handle_pagedn();            break;
-            case 65507 :  handle_control( true );     break;
-            default    :  handle_printable( e.str, e.keyval );  break;
-          }
+        switch( e.keyval ) {
+          case Key.BackSpace    :  handle_backspace();         break;
+          case Key.Delete       :  handle_delete();            break;
+          case Key.Escape       :  handle_escape();            break;
+          case Key.Return       :  handle_return( shift );     break;
+          case Key.Tab          :  handle_tab();               break;
+          case Key.ISO_Left_Tab :  handle_shift_tab();         break;
+          case Key.Right        :  handle_right( shift );      break;
+          case Key.Left         :  handle_left( shift );       break;
+          case Key.Home         :  handle_home();              break;
+          case Key.End          :  handle_end();               break;
+          case Key.Up           :  handle_up( shift );         break;
+          case Key.Down         :  handle_down( shift );       break;
+          case Key.Page_Up      :  handle_pageup();            break;
+          case Key.Page_Down    :  handle_pagedn();            break;
+          case Key.Control_L    :  handle_control( true );     break;
+          case Key.a            :  change_selected( node_parent( selected ) );  break;
+          case Key.B            :  change_selected( node_bottom() );  break;
+          case Key.c            :  change_selected( node_last_child( selected ) );  break;
+          case Key.e            :  edit_selected( true );  break;
+          case Key.E            :  edit_selected( false );  break;
+          case Key.f            :  focus_on_selected();  break;
+          case Key.h            :  unindent();  break;
+          case Key.H            :  place_at_top( selected );  break;
+          case Key.j            :  change_selected( node_next( selected ) );  break;
+          case Key.k            :  change_selected( node_previous( selected ) );  break;
+          case Key.l            :  indent();  break;
+          case Key.n            :  change_selected( node_next_sibling( selected ) );  break;
+          case Key.p            :  change_selected( node_previous_sibling( selected ) );  break;
+          case Key.t            :  rotate_task();  break;
+          case Key.T            :  change_selected( node_top() );  break;
+          case Key.numbersign   :  toggle_label();  break;
+          case Key.asterisk     :  clear_all_labels();  break;
+          case Key.@1           :  goto_label( 0 );  break;
+          case Key.@2           :  goto_label( 1 );  break;
+          case Key.@3           :  goto_label( 2 );  break;
+          case Key.@4           :  goto_label( 3 );  break;
+          case Key.@5           :  goto_label( 4 );  break;
+          case Key.@6           :  goto_label( 5 );  break;
+          case Key.@7           :  goto_label( 6 );  break;
+          case Key.@8           :  goto_label( 7 );  break;
+          case Key.@9           :  goto_label( 8 );  break;
+          case Key.at           :  tagger.show_add_ui();  break;
         }
       }
     } else {
       if( !control ) {
         switch( e.keyval ) {
-          case 42    :  clear_all_labels();      break;
-          case 49    :  goto_label( 0 );         break;
-          case 50    :  goto_label( 1 );         break;
-          case 51    :  goto_label( 2 );         break;
-          case 52    :  goto_label( 3 );         break;
-          case 53    :  goto_label( 4 );         break;
-          case 54    :  goto_label( 5 );         break;
-          case 55    :  goto_label( 6 );         break;
-          case 56    :  goto_label( 7 );         break;
-          case 57    :  goto_label( 8 );         break;
-          case 106   :  handle_down( shift );    break;
-          case 107   :  handle_up( shift );      break;
-          case 65362 :  handle_up( shift );      break;
-          case 65364 :  handle_down( shift );    break;
-          case 65507 :  handle_control( true );  break;
-          case 65307 :  handle_escape();         break;
+          case Key.asterisk  :  clear_all_labels();      break;
+          case Key.@1        :  goto_label( 0 );         break;
+          case Key.@2        :  goto_label( 1 );         break;
+          case Key.@3        :  goto_label( 2 );         break;
+          case Key.@4        :  goto_label( 3 );         break;
+          case Key.@5        :  goto_label( 4 );         break;
+          case Key.@6        :  goto_label( 5 );         break;
+          case Key.@7        :  goto_label( 6 );         break;
+          case Key.@8        :  goto_label( 7 );         break;
+          case Key.@9        :  goto_label( 8 );         break;
+          case Key.j         :  handle_down( shift );    break;
+          case Key.k         :  handle_up( shift );      break;
+          case Key.Up        :  handle_up( shift );      break;
+          case Key.Down      :  handle_down( shift );    break;
+          case Key.Control_L :  handle_control( true );  break;
+          case Key.Escape    :  handle_escape();         break;
         }
       }
     }
@@ -2064,7 +2088,16 @@ public class OutlineTable : DrawingArea {
 
   /* Called by the input method manager when the user has a string to commit */
   private void handle_im_commit( string str ) {
-    handle_printable( str, 0 );
+    if( !str.get_char( 0 ).isprint() ) return;
+    if( is_node_editable() ) {
+      selected.name.insert( str, undo_text );
+      see( selected );
+      queue_draw();
+    } else if( is_note_editable() ) {
+      selected.note.insert( str, undo_text );
+      see( selected );
+      queue_draw();
+    }
   }
 
   /* Helper class for the handle_im_retrieve_surrounding method */
@@ -2189,57 +2222,16 @@ public class OutlineTable : DrawingArea {
     return( n );
   }
 
+  /*
+   Returns the node that is the sibling above the current one.  If the current
+   node is the top-most node, return null.
+  */
   private Node? node_previous_sibling( Node? node ) {
     var n = node.get_previous_sibling();
     while( (n != null) && n.hidden ) {
       n = n.get_previous_sibling();
     }
     return( n );
-  }
-
-  /* Handles any printable characters */
-  private void handle_printable( string str, uint keyval ) {
-    if( !str.get_char( 0 ).isprint() ) return;
-    if( is_node_editable() ) {
-      selected.name.insert( str, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.insert( str, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( selected != null ) {
-      stdout.printf( "str: %s, keyval: %u\n", str, keyval );
-      switch( str ) {
-        case "a" :  change_selected( node_parent( selected ) );  break;  // 0
-        case "B" :  change_selected( node_bottom() );  break;
-        case "c" :  change_selected( node_last_child( selected ) );  break;  // 2
-        case "e" :  edit_selected( true );  break;
-        case "E" :  edit_selected( false );  break;
-        case "f" :  focus_on_selected();  break;
-        case "h" :  unindent();  break;
-        case "H" :  place_at_top( selected );  break;
-        case "j" :  change_selected( node_next( selected ) );  break;
-        case "k" :  change_selected( node_previous( selected ) );  break;
-        case "l" :  indent();  break;
-        case "n" :  change_selected( node_next_sibling( selected ) );  break;
-        case "p" :  change_selected( node_previous_sibling( selected ) );  break;
-        case "t" :  rotate_task();  break;
-        case "T" :  change_selected( node_top() );  break;
-        case "#" :  toggle_label();  break;
-        case "*" :  clear_all_labels();  break;
-        case "1" :  goto_label( 0 );  break;
-        case "2" :  goto_label( 1 );  break;
-        case "3" :  goto_label( 2 );  break;
-        case "4" :  goto_label( 3 );  break;
-        case "5" :  goto_label( 4 );  break;
-        case "6" :  goto_label( 5 );  break;
-        case "7" :  goto_label( 6 );  break;
-        case "8" :  goto_label( 7 );  break;
-        case "9" :  goto_label( 8 );  break;
-        case "@" :  tagger.show_add_ui();  break;
-      }
-    }
   }
 
   /* Edit the selected node */
