@@ -346,7 +346,7 @@ public class OutlineTable : DrawingArea {
     _im_context = new IMMulticontext();
     _im_context.set_client_window( this.get_window() );
     _im_context.set_use_preedit( false );
-    // _im_context.commit.connect( handle_im_commit );
+    _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
 
@@ -401,7 +401,7 @@ public class OutlineTable : DrawingArea {
       if( (mode == NodeMode.EDITABLE) || (mode == NodeMode.NOTEEDIT) ) {
         if( node.mode != mode ) {
           update_im_cursor( (mode == NodeMode.EDITABLE) ? node.name : node.note );
-          _im_context.commit.connect( handle_im_commit );
+          // _im_context.commit.connect( handle_im_commit );
           _im_context.focus_in();
           if( mode == NodeMode.EDITABLE ) {
             _tagger.preedit_load_tags( node.name.text );
@@ -412,7 +412,7 @@ public class OutlineTable : DrawingArea {
           _tagger.postedit_load_tags( node.name.text );
         }
         _im_context.focus_out();
-        _im_context.commit.disconnect( handle_im_commit );
+        // _im_context.commit.disconnect( handle_im_commit );
       }
       node.mode = mode;
     }
@@ -906,49 +906,51 @@ public class OutlineTable : DrawingArea {
           case Key.w         :  handle_control_w();             break;
         }
       } else if( nomod || shift ) {
-        switch( e.keyval ) {
-          case Key.BackSpace    :  handle_backspace();         break;
-          case Key.Delete       :  handle_delete();            break;
-          case Key.Escape       :  handle_escape();            break;
-          case Key.Return       :  handle_return( shift );     break;
-          case Key.Tab          :  handle_tab();               break;
-          case Key.ISO_Left_Tab :  handle_shift_tab();         break;
-          case Key.Right        :  handle_right( shift );      break;
-          case Key.Left         :  handle_left( shift );       break;
-          case Key.Home         :  handle_home();              break;
-          case Key.End          :  handle_end();               break;
-          case Key.Up           :  handle_up( shift );         break;
-          case Key.Down         :  handle_down( shift );       break;
-          case Key.Page_Up      :  handle_pageup();            break;
-          case Key.Page_Down    :  handle_pagedn();            break;
-          case Key.Control_L    :  handle_control( true );     break;
-          case Key.a            :  change_selected( node_parent( selected ) );  break;
-          case Key.B            :  change_selected( node_bottom() );  break;
-          case Key.c            :  change_selected( node_last_child( selected ) );  break;
-          case Key.e            :  edit_selected( true );  break;
-          case Key.E            :  edit_selected( false );  break;
-          case Key.f            :  focus_on_selected();  break;
-          case Key.h            :  unindent();  break;
-          case Key.H            :  place_at_top( selected );  break;
-          case Key.j            :  change_selected( node_next( selected ) );  break;
-          case Key.k            :  change_selected( node_previous( selected ) );  break;
-          case Key.l            :  indent();  break;
-          case Key.n            :  change_selected( node_next_sibling( selected ) );  break;
-          case Key.p            :  change_selected( node_previous_sibling( selected ) );  break;
-          case Key.t            :  rotate_task();  break;
-          case Key.T            :  change_selected( node_top() );  break;
-          case Key.numbersign   :  toggle_label();  break;
-          case Key.asterisk     :  clear_all_labels();  break;
-          case Key.@1           :  goto_label( 0 );  break;
-          case Key.@2           :  goto_label( 1 );  break;
-          case Key.@3           :  goto_label( 2 );  break;
-          case Key.@4           :  goto_label( 3 );  break;
-          case Key.@5           :  goto_label( 4 );  break;
-          case Key.@6           :  goto_label( 5 );  break;
-          case Key.@7           :  goto_label( 6 );  break;
-          case Key.@8           :  goto_label( 7 );  break;
-          case Key.@9           :  goto_label( 8 );  break;
-          case Key.at           :  tagger.show_add_ui();  break;
+        if( !insert_user_text( e.str ) ) {
+          switch( e.keyval ) {
+            case Key.BackSpace    :  handle_backspace();         break;
+            case Key.Delete       :  handle_delete();            break;
+            case Key.Escape       :  handle_escape();            break;
+            case Key.Return       :  handle_return( shift );     break;
+            case Key.Tab          :  handle_tab();               break;
+            case Key.ISO_Left_Tab :  handle_shift_tab();         break;
+            case Key.Right        :  handle_right( shift );      break;
+            case Key.Left         :  handle_left( shift );       break;
+            case Key.Home         :  handle_home();              break;
+            case Key.End          :  handle_end();               break;
+            case Key.Up           :  handle_up( shift );         break;
+            case Key.Down         :  handle_down( shift );       break;
+            case Key.Page_Up      :  handle_pageup();            break;
+            case Key.Page_Down    :  handle_pagedn();            break;
+            case Key.Control_L    :  handle_control( true );     break;
+            case Key.a            :  change_selected( node_parent( selected ) );  break;
+            case Key.B            :  change_selected( node_bottom() );  break;
+            case Key.c            :  change_selected( node_last_child( selected ) );  break;
+            case Key.e            :  edit_selected( true );  break;
+            case Key.E            :  edit_selected( false );  break;
+            case Key.f            :  focus_on_selected();  break;
+            case Key.h            :  unindent();  break;
+            case Key.H            :  place_at_top( selected );  break;
+            case Key.j            :  change_selected( node_next( selected ) );  break;
+            case Key.k            :  change_selected( node_previous( selected ) );  break;
+            case Key.l            :  indent();  break;
+            case Key.n            :  change_selected( node_next_sibling( selected ) );  break;
+            case Key.p            :  change_selected( node_previous_sibling( selected ) );  break;
+            case Key.t            :  rotate_task();  break;
+            case Key.T            :  change_selected( node_top() );  break;
+            case Key.numbersign   :  toggle_label();  break;
+            case Key.asterisk     :  clear_all_labels();  break;
+            case Key.@1           :  goto_label( 0 );  break;
+            case Key.@2           :  goto_label( 1 );  break;
+            case Key.@3           :  goto_label( 2 );  break;
+            case Key.@4           :  goto_label( 3 );  break;
+            case Key.@5           :  goto_label( 4 );  break;
+            case Key.@6           :  goto_label( 5 );  break;
+            case Key.@7           :  goto_label( 6 );  break;
+            case Key.@8           :  goto_label( 7 );  break;
+            case Key.@9           :  goto_label( 8 );  break;
+            case Key.at           :  tagger.show_add_ui();  break;
+          }
         }
       }
     } else {
@@ -983,7 +985,7 @@ public class OutlineTable : DrawingArea {
 
   /* Called whenever a key is released */
   private bool on_keyrelease( EventKey e ) {
-    if( e.keyval == 65507 ) {
+    if( e.keyval == Key.Control_L ) {
       handle_control( false );
     }
     return( true );
@@ -2090,7 +2092,11 @@ public class OutlineTable : DrawingArea {
 
   /* Called by the input method manager when the user has a string to commit */
   private void handle_im_commit( string str ) {
-    if( !str.get_char( 0 ).isprint() ) return;
+    insert_user_text( str );
+  }
+
+  private bool insert_user_text( string str ) {
+    if( !str.get_char( 0 ).isprint() ) return( false );
     if( is_node_editable() ) {
       selected.name.insert( str, undo_text );
       see( selected );
@@ -2099,7 +2105,10 @@ public class OutlineTable : DrawingArea {
       selected.note.insert( str, undo_text );
       see( selected );
       queue_draw();
+    } else {
+      return( false );
     }
+    return( true );
   }
 
   /* Helper class for the handle_im_retrieve_surrounding method */
