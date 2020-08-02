@@ -215,6 +215,13 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Change Task State</property>
+                <property name="accelerator">t</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Edit Note</property>
                 <property name="accelerator">&lt;shift&gt;e</property>
                 <property name="visible">1</property>
@@ -222,15 +229,70 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes">Expand Subrows</property>
+                <property name="title" translatable="yes">Add Tag</property>
+                <property name="accelerator">at</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Changing View</property>
+            <property name="visible">1</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Expand One Subrow Level</property>
                 <property name="accelerator">Right</property>
                 <property name="visible">1</property>
               </object>
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes">Collapse Subrows</property>
+                <property name="title" translatable="yes">Collapse One Subrow Level</property>
                 <property name="accelerator">Left</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Expand All Subrows</property>
+                <property name="accelerator">&lt;Shift&gt;Right</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Collapse All Subrows</property>
+                <property name="accelerator">&lt;Shift&gt;Left</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Add Current to Focus Stack</property>
+                <property name="accelerator">f</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Exit Focus View</property>
+                <property name="accelerator">Escape</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Go Back in Focus View Stack</property>
+                <property name="accelerator">bracketleft</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Go Forward in Focus View Stack</property>
+                <property name="accelerator">bracketright</property>
                 <property name="visible">1</property>
               </object>
             </child>

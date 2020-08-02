@@ -19,32 +19,21 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public class UndoNodeUnindent : UndoItem {
-
-  private Node _node;
-  private int  _num_children;
+public class UrlParser : TextParser {
 
   /* Default constructor */
-  public UndoNodeUnindent( Node node ) {
-    base( _( "unindent item" ) );
-    _node         = node;
-    _num_children = (int)node.children.length;
+  public UrlParser() {
+    base( "URL" );
+
+    /* Links */
+    add_regex( "((mailto:)?[a-z0-9.-]+@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)", highlight_url );
+    add_regex( "((https?|ftp):[^'\">\\s]+)", highlight_url );
+
   }
 
-  /* Causes the stored item to be put into the before state */
-  public override void undo( OutlineTable table ) {
-    table.indent_node( _node );
-    var children = (int)_node.children.length;
-    for( int i=_num_children; i<children; i++ ) {
-      var child = _node.children.index( _num_children );
-      _node.remove_child( child );
-      _node.parent.add_child( child, -1 );
-    }
-  }
-
-  /* Causes the stored item to be put into the after state */
-  public override void redo( OutlineTable table ) {
-    table.unindent_node( _node );
+  /* Add the URL link */
+  private void highlight_url( FormattedText text, MatchInfo match ) {
+    add_tag( text, match, 0, FormatTag.URL, get_text( match, 0 ) );
   }
 
 }

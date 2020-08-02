@@ -136,7 +136,7 @@ public class ColorPicker : Box {
     update_css( _chooser.rgba );
     set_active( true );
     color_changed( _chooser.rgba );
-    _select.popover.popdown();
+    Utils.hide_popover( _select.popover );
     return( true );
   }
 

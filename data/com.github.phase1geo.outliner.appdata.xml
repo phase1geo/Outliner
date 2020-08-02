@@ -32,22 +32,22 @@
       <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
       <li xml:lang="nl">Maak snel overzichten en blader met je toetsenbord of muis.</li>
       <li xml:lang="fr">Créez et naviguez rapidement à travers des plans en utilisant le clavier ou la souris.</li>
-      <li>Full support for text formatting.</li>
-      <li xml:lang="nl">Volledige ondersteuning voor tekstopmaak.</li>
-      <li xml:lang="fr">Prise en charge complète de la mise en forme du texte.</li>
+      <li>Full support for rich text formatting and/or Markdown formatting.</li>
       <li>Add notes to any outline text.</li>
       <li xml:lang="nl">Voeg aantekeningen toe.</li>
       <li xml:lang="fr">Ajoutez des notes à n'importe quel élément de plan.</li>
+      <li>Add tags to any outline row.</li>
       <li>Add checkboxes to any or all outline text.</li>
+      <li xml:lang="nl">Voeg aankruisvakjes toe.</li>
       <li>Close/Hide any group within the outline for increased focus.</li>
       <li xml:lang="nl">Sluit/Verberg elke groep binnen het overzicht om beter te kunnen focussen.</li>
       <li xml:lang="fr">Fermez/Masquez un groupe à tout moment depuis le plan pour plus de concentration.</li>
       <li>Quick search and replace of any text within the document, including notes.</li>
       <li xml:lang="nl">Zoek en vervang snel tekst in het document of je aantekeningen.</li>
       <li xml:lang="fr">Cherchez et remplacez rapidement n'importe quel texte dans le document, notes incluses.</li>
-      <li>View document statistics such as character count, word count and row count.</li>
-      <li xml:lang="nl">Toon documentstatistieken, zoals het aantal tekens, woorden en rijen.</li>
-      <li xml:lang="fr">Visualisez les statistiques du document telles que le nombre de caractères, de mots et de lignes.</li>
+      <li>Optionally focus on a portion of the document at a time when editing.</li>
+      <li>View document statistics such as character count, word count, row count and task information.</li>
+      <li>Support for showing depth lines.</li>
       <li>Unlimited undo/redo of any change.</li>
       <li xml:lang="nl">Onbeperkt ongedaan maken/opnieuw uitvoeren.</li>
       <li xml:lang="fr">Nombre d'actions annuler/rétablir illimités pour toute modification.</li>
@@ -61,10 +61,12 @@
       <li xml:lang="nl">Ingebouwde thema's.</li>
       <li xml:lang="fr">Thèmes intégrés.</li>
       <li>Support for changing fonts within a document.</li>
+      <li xml:lang="nl">Ondersteuning voor het aanpassen van lettertypen.</li>
       <li>Import from Minder and OPML.</li>
       <li xml:lang="nl">Importeer uit Minder en OPML.</li>
       <li xml:lang="fr">Importez des fichiers au format Minder ou OPML.</li>
       <li>Export to HTML, Markdown, Minder, OPML, Org-Mode, PDF and PlainText.</li>
+      <li xml:lang="nl">Exporteer naar HTML, Markdown, Minder, OPML, Org-modus, PDF en platte tekst.</li>
       <li>Printer support.</li>
       <li xml:lang="nl">Afdrukondersteuning.</li>
       <li xml:lang="fr">Prise en charge de l'impression.</li>
@@ -109,76 +111,164 @@
     <value key="x-appcenter-suggested-price">10</value>
   </custom>
   <releases>
+    <release version="1.3.0" date="2020-08-02">
+      <description>
+        <p>New</p>
+        <p xml:lang="nl">Nieuw</p>
+        <p xml:lang="fr">Nouveau</p>
+        <ul>
+          <li>Added support for displaying/hiding row depth lines.</li>
+          <li>Added support for adding and highlighting row tags, including optional auto-completion support.</li>
+          <li>Added support for node filtering based on tags.</li>
+          <li>Added support for stack-based focus mode.</li>
+          <li>Added support for Markdown and new Markdown format toolbar.</li>
+          <li>Added tooltip when mouse cursor is over a group row expander which displays the number of subrows contained within it.</li>
+          <li>Added support for opening one or more files from the command-line or from a file browser.</li>
+        </ul>
+        <p>Changes</p>
+        <p xml:lang="nl">Wijzigingen</p>
+        <p xml:lang="fr">Modifications</p>
+        <ul>
+          <li>Changed application icon (thanks to Nararyans R.I.)</li>
+          <li>Changed default location of checkboxes to display to the right of rows.</li>
+          <li>Changed behavior of unindenting a row such that row order is no longer modified.</li>
+          <li>Changed behavior of the Return key when adding a new row from a group row such that the new row will be added to the group as the first row of that group.</li>
+          <li>Changed mouse cursor when it is over a checkbox.</li>
+          <li>Changed behavior of left and right keys on a group row to expand/collapse the tree one level at a time.</li>
+          <li>Assigned Shift-right and Shift-left to expand/collapse the entire hierarchy for a given group row.</li>
+          <li>Reorganized Node commands in keyboard shortcut cheatsheet.</li>
+          <li>Updated Dutch translation (thanks to Heimen Stoffels).</li>
+        </ul>
+        <p>Bug Fixes</p>
+        <p xml:lang="nl">Foutoplossingen</p>
+        <p xml:lang="fr">Corrections de bugs</p>
+        <ul>
+          <li>Added missing keyboard shortcut for task toggling to cheatsheet.</li>
+          <li>Fixed issues with exporting supported XML-based filetypes.</li>
+          <li>Fixed display issue when a descendant node is selected and one of its ancestors is collapsed.</li>
+          <li>Fixed Save As window adding the .outliner prefix to a file that already has this prefix.</li>
+          <li>Fixed display issue that can occur when a group is deleted.</li>
+          <li>Fixed issues with undo/redo support for expanding/collapsing groups.</li>
+          <li>Fixed issue with pasting UTF8 strings from clipboard.</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.2.0" date="2020-05-17">
       <description>
         <p>New</p>
+        <p xml:lang="nl">Nieuw</p>
         <p xml:lang="fr">Nouveau</p>
         <ul>
           <li>Added highlight for row that the mouse cursor is currently over.</li>
+          <li xml:lang="nl">Markering toegevoegd aan de rij waar de muis bovenzweeft.</li>
           <li>Added support for row labeling for the purposes of moving and selecting rows.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor het labelen van rijen voor verplaatsen en selecteren.</li>
           <li>Added support for changing document and application default fonts.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor het aanpassen van de document- en toepassingslettertypen.</li>
           <li>Added support for adding checkbox state to rows.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor het toevoegen van aankruisvakjes.</li>
           <li>Added checkbox statistics to the statistics panel.</li>
+          <li xml:lang="nl">Aankruisvakstatistieken toegevoegd aan het statistiekenpaneel.</li>
           <li>Added Org-Mode export mode.</li>
+          <li xml:lang="nl">Org-Mode toegevoegd als exportmodus.</li>
         </ul>
         <p>Changes</p>
+        <p xml:lang="nl">Wijzigingen</p>
         <p xml:lang="fr">Modifications</p>
         <ul>
           <li>When only row is deleted, a new row will be added and placed into edit mode.</li>
+          <li xml:lang="nl">Een nieuwe rij wordt alleen toegevoegd na het verwijderen van een rij in bewerkmodus.</li>
           <li>Updated keyboard shortcut cheatsheet.</li>
+          <li xml:lang="nl">Sneltoetsoverzicht bijgewerkt.</li>
           <li>Changed cursor and added tooltip when cursor is over URL and Control is held down.</li>
+          <li xml:lang="nl">Cursor aangepast en hulpballon toegevoegd aan url's als Ctrl ingedrukt is.</li>
           <li>Enhanced clipboard functionality.</li>
+          <li xml:lang="nl">Klembordfunctionaliteit verbeterd.</li>
           <li>Modified look of statistics panel to improve readability of display groups of information.</li>
+          <li xml:lang="nl">Uiterlijk van het statistiekenpaneel aangepast voor verbeterde leesbaarheid van gegroepeerde informatie.</li>
         </ul>
         <p>Bug Fixes</p>
+        <p xml:lang="nl">Foutoplossingen</p>
         <p xml:lang="fr">Corrections de bugs</p>
         <ul>
           <li>Fixed right margin for descendant rows.</li>
+          <li xml:lang="nl">Rechtermarge van afgeleide rijen gerepareerd.</li>
           <li>Fixed exports to allow existing files to be overwritten.</li>
+          <li xml:lang="nl">Exporteren kan nu bestaande bestanden overschrijven.</li>
         </ul>
       </description>
     </release>
     <release version="1.1.0" date="2020-04-20">
       <description>
         <p>New</p>
+        <p xml:lang="nl">Nieuw</p>
         <p xml:lang="fr">Nouveau</p>
         <ul>
           <li>Added support for row cloning.</li>
+          <li xml:lang="nl">Onderteuning toegevoegd voor het klonen van rijen.</li>
           <li xml:lang="fr">Ajout de la prise en charge du clonage de lignes.</li>
           <li>Added French translation (thanks to Nathan Bonnemains).</li>
+          <li xml:lang="nl">Franse vertaling (met dank aan Nathan Bonnemains).</li>
           <li>Added Dutch translation (thanks to Heimen Stoffels).</li>
+          <li xml:lang="nl">Nederlandse vertaling (met dank aan Heimen Stoffels).</li>
           <li>Added support for subscript and superscript text formatting.</li>
+          <li xml:lang="nl">Volledige ondersteuning toegevoegd voor subscript en superscript.</li>
           <li>Added support for using input methods.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor invoermethoden.</li>
           <li>Added new keyboard shortcuts for selecting and moving rows.</li>
+          <li xml:lang="nl">Sneltoetsen toegevoegd voor het selecteren en verplaatsen van rijen.</li>
           <li>Added new <em>H</em> keyboard shortcut for positioning currently selected row at the top of the window.</li>
+          <li xml:lang="nl">&lt;em&gt;H&lt;/em&gt;-sneltoets toegevoegd voor het positioneren van de huidige geselecteerde rij bovenaan het venster.</li>
           <li>Added keyboard shortcuts for deleting the next or previous word.</li>
+          <li xml:lang="nl">Sneltoetsen toegevoegd voor het verwijderen van het vorige of volgende woord.</li>
           <li>Added new selection submenu to contextual menu.</li>
+          <li xml:lang="nl">Selectiesubmenu toegevoegd aan het rechtermuisknopmenu.</li>
           <li>Added clear formatting button to format bar.</li>
+          <li xml:lang="nl">Knop toegevoegd aan opmaakwerkbalk voor het wissen van de opmaak.</li>
         </ul>
         <p>Changes</p>
+        <p xml:lang="nl">Wijzigingen</p>
         <p xml:lang="fr">Modifications</p>
         <ul>
           <li>Removed support for the <em>m</em> command.</li>
+          <li xml:lang="nl">Sneltoets &lt;em&gt;m&lt;/em&gt; verwijderd.</li>
           <li>Improved look of format bar, especially for dark themes.</li>
+          <li xml:lang="nl">Uiterlijk van de opmaakwerkbalk verbeterd, vooral voor donkere thema's.</li>
           <li>Changed tab bar coloring to match the background color of the current tab.</li>
+          <li xml:lang="nl">De tabbladbalk kleurt nu mee met de achtergrondkleur van het huidige tabblad.</li>
           <li>Changed default filename from <em>unnamed</em> to be the translated name.</li>
+          <li xml:lang="nl">Standaard bestandsnaam aangepast van &lt;em&gt;unnamed&lt;/em&gt; naar de vertaalde naam.</li>
           <li>Improved undo/redo tooltips to look better in non-English translations.</li>
+          <li xml:lang="nl">Hulpballonnen van ongedaan maken/opnieuw uitvoeren verbeterd in niet-Engelse talen.</li>
         </ul>
         <p>Bug Fixes</p>
+        <p xml:lang="nl">Foutoplossingen</p>
         <p xml:lang="fr">Corrections de bugs</p>
         <ul>
           <li>Fixed issue with deleting a single character for multi-byte characters.</li>
+          <li xml:lang="nl">Probleem opgelost met het verwijderen van één teken in multi-bytetekens.</li>
           <li>Fixed application screenshots.</li>
+          <li xml:lang="nl">Toepassingsschermfoto's verbeterd.</li>
           <li>Fixed application crash when <em>a</em> command used when selected row is a top-level row.</li>
+          <li xml:lang="nl">Crash opgelost omtrent het gebruik van de sneltoets &lt;em&gt;a&lt;/em&gt; op geselecteerde rijen.</li>
           <li>Fixed issues with showing or hiding a note.</li>
+          <li xml:lang="nl">Problemen opgelost omtrent aantekeningen.</li>
           <li>Fixed <em>New Document</em> plank command to open a new tab after loading application data.</li>
+          <li xml:lang="nl">De opdracht &lt;em&gt;Nieuw document&lt;/em&gt; werkt nu wél juist na het openen van een nieuw tabblad direct na het starten.</li>
           <li>Fixed theming issues when two tabs use different themes.</li>
+          <li xml:lang="nl">Themaproblemen opgelost bij tabbladen die verschillende thema's gebruiken.</li>
           <li>Fixed translation string issues (thanks to Nathan Bonnemains).</li>
+          <li xml:lang="nl">Vertaalproblemen opgelost (met dank aan Nathan Bonnemains).</li>
           <li>Fixed text positioning issues when tags are added to text.</li>
+          <li xml:lang="nl">Tekstpositioneringsproblemen opgelost omtrent labels.</li>
           <li>Fixed issues with making shortcut cheatsheet text translatable.</li>
+          <li xml:lang="nl">Problemen opgelost omtrent de vertaling van het sneltoetsoverzicht.</li>
           <li>Fixed application crash when moving a row to the top of the document.</li>
+          <li xml:lang="nl">Crash opgelost bij het verplaatsen van een rij naar de bovenkant.</li>
           <li>Fixed title of shortcut cheatsheet.</li>
+          <li xml:lang="nl">Titel van het sneltoetsoverzicht verbeterd.</li>
           <li>Fixed application crashes and incorrectly placed rows when moving them via the mouse.</li>
+          <li xml:lang="nl">Crashes en door muisverplaatsingen onjuist geplaatste rijen gerepareerd.</li>
         </ul>
       </description>
     </release>

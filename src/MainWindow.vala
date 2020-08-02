@@ -48,6 +48,8 @@ public class MainWindow : ApplicationWindow {
   private FontButton      _fonts_note;
   private Switch          _condensed;
   private Switch          _show_tasks;
+  private Switch          _show_depth;
+  private Switch          _markdown;
   private Label           _stats_chars;
   private Label           _stats_words;
   private Label           _stats_rows;
@@ -55,11 +57,18 @@ public class MainWindow : ApplicationWindow {
   private Label           _stats_topen;
   private Label           _stats_tip;
   private Label           _stats_tdone;
-  private bool            _debug          = false;
-  private bool            _prefer_dark    = false;
+  private bool            _debug                 = false;
+  private bool            _prefer_dark           = false;
   private HashMap<string,RadioButton> _theme_buttons;
 
+  public GLib.Settings settings {
+    get {
+      return( _settings );
+    }
+  }
+
   public static Themes themes = new Themes();
+  public static bool   enable_tag_completion = true;
 
   private const GLib.ActionEntry[] action_entries = {
     { "action_new",           action_new },
@@ -101,6 +110,8 @@ public class MainWindow : ApplicationWindow {
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
+
+    enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
 
     /* Add the theme CSS */
     themes.add_css();
@@ -210,6 +221,23 @@ public class MainWindow : ApplicationWindow {
     }
   }
 
+  /* Shows or hides the information bar, setting the message to the given value */
+  private void show_info_bar( string? msg ) {
+    if( _nb.current != null ) {
+      var box  = _nb.current.page as Gtk.Box;
+      var info = box.get_children().nth_data( 2 ) as Gtk.InfoBar;
+      if( info != null ) {
+        if( msg != null ) {
+          var lbl = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Label;
+          lbl.label = msg;
+          info.set_revealed( true );
+        } else {
+          info.set_revealed( false );
+        }
+      }
+    }
+  }
+
   /* Handles any changes to the dark mode preference gsettings for the desktop */
   private void handle_prefer_dark_changes() {
     var lookup = SettingsSchemaSource.get_default().lookup( DESKTOP_SCHEMA, false );
@@ -241,6 +269,7 @@ public class MainWindow : ApplicationWindow {
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
+    ot.grab_focus();
     save_tab_state( tab );
   }
 
@@ -283,6 +312,8 @@ public class MainWindow : ApplicationWindow {
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
     ot.theme_changed.connect( theme_changed );
+    ot.focus_mode.connect( show_info_bar );
+    ot.nodes_filtered.connect( show_info_bar );
 
     if( fname != null ) {
       ot.document.filename = fname;
@@ -300,13 +331,15 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the search bar */
     var search = new SearchBar( ot );
-
-    /* Create the search revealer */
     var search_reveal = new Revealer();
     search_reveal.add( search );
 
+    /* Create the info bar */
+    var info_bar = create_info_bar();
+
     box.pack_start( search_reveal, false, true );
     box.pack_start( scroll,        true,  true );
+    box.pack_start( info_bar,      false, true );
 
     /* Create the tab in the notebook */
     var tab = new Tab( ot.document.label, null, box );
@@ -334,6 +367,20 @@ public class MainWindow : ApplicationWindow {
     ot.grab_focus();
 
     return( ot );
+
+  }
+
+  /* Creates the info bar UI */
+  private InfoBar create_info_bar() {
+
+    var lbl = new Label( "" );
+
+    var info_bar = new InfoBar();
+    info_bar.get_content_area().add( lbl );
+    info_bar.set_revealed( false );
+    info_bar.message_type = MessageType.INFO;
+
+    return( info_bar );
 
   }
 
@@ -721,6 +768,32 @@ public class MainWindow : ApplicationWindow {
     tbox.pack_end(   _show_tasks, false, false, 10 );
     box.pack_start( tbox, false, false, 10 );
 
+    /* Add show depth switch */
+    var dbox = new Box( Orientation.HORIZONTAL, 0 );
+    var dlbl = new Label( _( "Show Depth Lines" ) );
+    _show_depth = new Switch();
+    _show_depth.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.show_depth = state;
+      return( false );
+    });
+    dbox.pack_start( dlbl,        false, true,  10 );
+    dbox.pack_end(   _show_depth, false, false, 10 );
+    box.pack_start( dbox, false, false, 10 );
+
+    /* Add the Markdown switch */
+    var mbox = new Box( Orientation.HORIZONTAL, 0 );
+    var mlbl = new Label( _( "Enable Markdown Highlighting" ) );
+    _markdown = new Switch();
+    _markdown.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.markdown = state;
+      return( false );
+    });
+    mbox.pack_start( mlbl,      false, true, 10 );
+    mbox.pack_end(   _markdown, false, false, 10 );
+    box.pack_start( mbox, false, false, 10 );
+
     /* Add a separator for the ModelButtons */
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
 
@@ -965,7 +1038,7 @@ public class MainWindow : ApplicationWindow {
     dialog.add_filter( filter );
     if( dialog.run() == ResponseType.ACCEPT ) {
       string fname = dialog.get_filename();
-      if( fname.substring( -7, -1 ) != ".outliner" ) {
+      if( fname.substring( -9, -1 ) != ".outliner" ) {
         fname += ".outliner";
       }
       ot.document.filename = fname;
@@ -1158,6 +1231,8 @@ public class MainWindow : ApplicationWindow {
     _theme_buttons.get( theme_name ).active = true;
     _condensed.state     = table.condensed;
     _show_tasks.state    = table.show_tasks;
+    _show_depth.state    = table.show_depth;
+    _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
   }
 
@@ -1203,6 +1278,13 @@ public class MainWindow : ApplicationWindow {
     /* Update the UI */
     do_fonts_changed( table );
 
+  }
+
+  /* Returns the height of a single line label */
+  public int get_label_height() {
+    int min_height, nat_height;
+    _stats_chars.get_preferred_height( out min_height, out nat_height );
+    return( nat_height );
   }
 
 }

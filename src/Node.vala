@@ -114,6 +114,7 @@ public class NodeDrawOptions {
   public bool show_note_bg   { get; set; default = true; }
   public bool show_note_ol   { get; set; default = false; }
   public bool show_expander  { get; set; default = true; }
+  public bool show_depth     { get; set; default = true; }
   public bool use_theme      { get; set; default = false; }
   public NodeDrawOptions() {}
 }
@@ -134,23 +135,23 @@ public class Node {
   private static int next_id  = 0;
   private static int clone_id = 0;
 
-  private OutlineTable _ot;
-  private int          _id        = next_id++;
-  private CanvasText   _name;
-  private CanvasText   _note;
-  private NodeMode     _mode      = NodeMode.NONE;
-  private double       _x         = 0;
-  private double       _y         = 40;
-  private double       _w         = 500;
-  private double       _h         = 80;
-  private int          _depth     = 0;
-  private bool         _expanded  = true;
-  private Pango.Layout _lt_layout;
-  private double       _lt_width  = 0;
-  private bool         _hide_note = true;
-  private int          _clone_id  = -1;
-  private NodeTaskMode _task      = NodeTaskMode.OPEN;
-  private bool         _debug     = false;
+  private OutlineTable  _ot;
+  private int           _id        = next_id++;
+  private CanvasText    _name;
+  private CanvasText    _note;
+  private NodeMode      _mode      = NodeMode.NONE;
+  private double        _x         = 0;
+  private double        _y         = 40;
+  private double        _w         = 500;
+  private double        _h         = 80;
+  private int           _depth     = 0;
+  private bool          _expanded  = true;
+  private Pango.Layout  _lt_layout;
+  private double        _lt_width  = 0;
+  private bool          _hide_note = true;
+  private int           _clone_id  = -1;
+  private NodeTaskMode  _task      = NodeTaskMode.OPEN;
+  private bool          _debug     = false;
 
   private static Pixbuf? _note_icon = null;
 
@@ -263,6 +264,12 @@ public class Node {
       }
     }
   }
+  public bool expanded_only {
+    set {
+      _expanded = value;
+    }
+  }
+  public bool hidden { get; set; default = false; }
   public bool hide_note {
     get {
       return( _hide_note );
@@ -281,7 +288,7 @@ public class Node {
   public double      indent    { get; set; default = 25; }
   public Node?       parent    { get; set; default = null; }
   public Array<Node> children  { get; set; default = new Array<Node>(); }
-  public double      last_y    { get { return( _y + _h ); } }
+  public double      last_y    { get { return( _y + (hidden ? 0 : _h) ); } }
   public bool        over_note_icon { get; set; default = false; }
 
   /* Constructor */
@@ -292,6 +299,7 @@ public class Node {
     _lt_layout = ot.create_pango_layout( null );
 
     _name = new CanvasText( ot, ot.get_allocated_width() );
+    _name.text.add_parser( ot.tagger_parser );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
@@ -308,12 +316,14 @@ public class Node {
 
     position_text();
     update_width();
+    table_markdown_changed();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
+    ot.markdown_changed.connect( table_markdown_changed );
 
   }
 
@@ -337,6 +347,7 @@ public class Node {
     _lt_layout = ot.create_pango_layout( null );
 
     _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
+    _name.text.add_parser( ot.tagger_parser );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
@@ -353,11 +364,14 @@ public class Node {
 
     position_text();
     update_width();
+    table_markdown_changed();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
+    ot.show_tasks_changed.connect( update_height_from_resize );
+    ot.markdown_changed.connect( table_markdown_changed );
 
   }
 
@@ -366,6 +380,8 @@ public class Node {
     _ot.win.configure_event.disconnect( window_size_changed );
     _ot.zoom_changed.disconnect( table_zoom_changed );
     _ot.theme_changed.disconnect( table_theme_changed );
+    _ot.show_tasks_changed.disconnect( update_height_from_resize );
+    _ot.markdown_changed.disconnect( table_markdown_changed );
   }
 
   /* Create the note icon pixbuf if we need to */
@@ -401,6 +417,17 @@ public class Node {
   private void table_theme_changed() {
     _name.update_size( false );
     _note.update_size( false );
+  }
+
+  /* Handle any changes to the markdown parser */
+  private void table_markdown_changed() {
+    if( _ot.markdown ) {
+      _name.text.add_parser( _ot.markdown_parser );
+      _note.text.add_parser( _ot.markdown_parser );
+    } else {
+      _name.text.remove_parser( _ot.markdown_parser );
+      _note.text.remove_parser( _ot.markdown_parser );
+    }
   }
 
   /* Generates the select mode signal for the name field */
@@ -493,6 +520,7 @@ public class Node {
   */
   private void update_height_from_resize() {
     position_text();
+    update_width();
     update_height( true );
   }
 
@@ -541,7 +569,7 @@ public class Node {
   */
   private void set_ot_height() {
     if( this == get_root_node().get_last_node() ) {
-      _ot.set_size_request( -1, (int)last_y );
+      _ot.resize_table();
     }
   }
 
@@ -583,10 +611,17 @@ public class Node {
     return( last_y );
   }
 
+  public void set_tree_alpha( double value ) {
+    alpha = value;
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).set_tree_alpha( value );
+    }
+  }
+
   /* Adjusts the position of the text object */
   private void position_text() {
     var zoom = _ot.win.get_zoom_factor();
-    var tx   = (task == NodeTaskMode.NONE) ? 0 : (task_size + padx);
+    var tx   = ((task == NodeTaskMode.NONE) || _ot.tasks_on_right) ? 0 : (task_size + padx);
     var ltx  = (_ot.list_type == NodeListType.NONE) ? 0 : (_lt_width + (padx * zoom));
     name.posx = note.posx = x + (padx * 5) + (depth * indent) + 20 + tx + ltx;
     name.posy = y + pady;
@@ -787,7 +822,13 @@ public class Node {
 
   /* Returns the area where we will draw the task icon */
   private void task_bbox( out double x, out double y, out double w, out double h ) {
-    x = this.x + (padx * 5) + 20 + (depth * indent);
+    if( _ot.tasks_on_right ) {
+      int win_width, win_height;
+      _ot.win.get_size( out win_width, out win_height );
+      x = win_width - ((padx * 4) + 20);
+    } else {
+      x = this.x + (padx * 5) + 20 + (depth * indent);
+    }
     y = this.y + pady + ((name.get_line_height() / 2) - (task_size / 2));
     w = task_size;
     h = task_size;
@@ -803,27 +844,27 @@ public class Node {
 
   /* Returns true if the given coordinates are within this node */
   public bool is_within( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
+    return( !hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
   }
 
   /* Returns true if the given coordinates lie within the expander */
   public bool is_within_expander( double x, double y ) {
-    if( !is_leaf() ) {
-      double ex, ey, ew, eh;
-      expander_bbox( out ex, out ey, out ew, out eh );
-      return( Utils.is_within_bounds( x, y, ex, ey, ew, eh ) );
-    }
-    return( false );
+    if( is_leaf() || hidden ) return( false );
+    double ex, ey, ew, eh;
+    expander_bbox( out ex, out ey, out ew, out eh );
+    return( Utils.is_within_bounds( x, y, ex, ey, ew, eh ) );
   }
 
   /* Returns true if the given coordinates reside within the note icon boundaries */
   public bool is_within_note_icon( double x, double y ) {
+    if( hidden ) return( false );
     double nx, ny, nw, nh;
     note_bbox( out nx, out ny, out nw, out nh );
     return( Utils.is_within_bounds( x, y, nx, ny, nw, nh ) );
   }
 
   public bool is_within_task( double x, double y ) {
+    if( hidden ) return( false );
     double tx, ty, tw, th;
     task_bbox( out tx, out ty, out tw, out th );
     return( (task != NodeTaskMode.NONE) && Utils.is_within_bounds( x, y, tx, ty, tw, th ) );
@@ -831,22 +872,22 @@ public class Node {
 
   /* Returns true if the given coordinates reside within the name text area */
   public bool is_within_name( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
+    return( !hidden && Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
   }
 
   /* Returns true if the given coordinates reside within the note text area */
   public bool is_within_note( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
+    return( !hidden && Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
   }
 
   /* Returns true if the given coordinates lie within the attachto area */
   public bool is_within_attachto( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
+    return( !hidden && Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
   }
 
   /* Returns true if the given coordinates lie within the attachabove area */
   public bool is_within_attachabove( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
+    return( !hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
   }
 
   /* Change the name font to the given value */
@@ -1035,40 +1076,85 @@ public class Node {
 
   }
 
-  /* Expand all of the nodes within this node tree */
-  public void expand_all() {
-
-    expanded = true;
-
-    for( int i=0; i<children.length; i++ ) {
-      children.index( i ).expand_all();
+  /* Expands the next unexpanded level of hierachy */
+  public void expand_next( Array<Node> nodes ) {
+    if( !is_leaf() ) {
+      if( !expanded ) {
+        _expanded = true;
+        nodes.append_val( this );
+      } else {
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).expand_next( nodes );
+        }
+      }
     }
+  }
 
+  /* Expand all of the nodes within this node tree */
+  public void expand_all( Array<Node> nodes ) {
+    if( !expanded ) {
+      _expanded = true;
+      nodes.append_val( this );
+    }
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).expand_all( nodes );
+    }
+  }
+
+  /* Calculate the maximum depth that is not collapsedd */
+  private void get_collapse_next_depth( ref int max_depth ) {
+    if( !is_leaf() ) {
+      if( expanded ) {
+        if( depth > max_depth ) {
+          max_depth = depth;
+        }
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).get_collapse_next_depth( ref max_depth );
+        }
+      }
+    }
+  }
+
+  /* Collapse all nodes that match the maximum depth */
+  private void collapse_at_depth( int max_depth, Array<Node> nodes ) {
+    if( !is_leaf() ) {
+      if( depth == max_depth ) {
+        _expanded = false;
+        nodes.append_val( this );
+      } else {
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).collapse_at_depth( max_depth, nodes );
+        }
+      }
+    }
+  }
+
+  /* Collapses the next level of hierarchy */
+  public void collapse_next( Array<Node> nodes ) {
+    int max_depth = depth;
+    get_collapse_next_depth( ref max_depth );
+    collapse_at_depth( max_depth, nodes );
   }
 
   /* Collapses all nodes within this node tree */
-  public void collapse_all() {
-
-    expanded = false;
-
-    for( int i=0; i<children.length; i++ ) {
-      children.index( i ).collapse_all();
+  public void collapse_all( Array<Node> nodes ) {
+    if( expanded ) {
+      _expanded = false;
+      nodes.append_val( this );
     }
-
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).collapse_all( nodes );
+    }
   }
 
   /* Returns true if the node is a root node (has no parent) */
   public bool is_root() {
-
     return( parent == null );
-
   }
 
   /* Returns true if the node is a leaf node (has no children) */
   public bool is_leaf() {
-
     return( children.length == 0 );
-
   }
 
   /* Returns true if we are a descendant of the given node */
@@ -1155,6 +1241,17 @@ public class Node {
     }
     for( int i=0; i<children.length; i++ ) {
       children.index( i ).replace_all( str, ref undo );
+    }
+  }
+
+  /* Changes the filter based on the given filter function */
+  public void filter( NodeFilterFunc? func, ref bool one_hidden, ref bool one_shown ) {
+    hidden      = (func != null) && !func( this );
+    one_hidden |= _hidden;
+    one_shown  |= !_hidden;
+    for( int i=0; i<children.length; i++ ) {
+      var child = children.index( i );
+      child.filter( func, ref one_hidden, ref one_shown );
     }
   }
 
@@ -1333,6 +1430,35 @@ public class Node {
 
   }
 
+  public void draw_depth( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
+
+    if( !opts.show_depth || !_ot.show_depth || _parent.is_root() ) return;
+
+    Utils.set_context_color_with_alpha( ctx, theme.symbol_color, 0.5 );
+    ctx.set_line_width( 1 );
+
+    if( _ot.min_depth ) {
+      var parent = this.parent;
+      while( !parent.is_root() ) {
+        if( parent.get_next_sibling() != null ) {
+          var x = (padx * 4) + 10 + (parent.depth * indent) + (expander_size / 2);
+          ctx.move_to( x, _y );
+          ctx.line_to( x, (_y + _h) );
+          ctx.stroke();
+        }
+        parent = parent.parent;
+      }
+    } else {
+      for( int i=1; i<_depth; i++ ) {
+        var x = (padx * 4) + 10 + (i * indent) + (expander_size / 2);
+        ctx.move_to( x, _y );
+        ctx.line_to( x, (_y + _h) );
+        ctx.stroke();
+      }
+    }
+
+  }
+
   /* Draw the task indicator */
   public void draw_task( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
@@ -1464,11 +1590,12 @@ public class Node {
 
     var tmode = opts.show_modes ? mode : NodeMode.NONE;
 
-    if( is_root() && (tmode != NodeMode.MOVETO) ) return;
+    if( (is_root() && (tmode != NodeMode.MOVETO)) || hidden ) return;
 
     draw_background( ctx, theme, opts );
     draw_note_icon( ctx, theme, opts );
     draw_expander( ctx, theme, opts );
+    draw_depth( ctx, theme, opts );
     draw_task( ctx, theme, opts );
     draw_list_type( ctx, theme, opts );
     draw_name( ctx, theme, opts );

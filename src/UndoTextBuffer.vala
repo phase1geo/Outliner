@@ -51,6 +51,14 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
+  /* Call after multiple pieces of text have been inserted */
+  public void add_inserts( Array<InsertText?> its, int start_cursor ) {
+    var item = new UndoTextMultiInsert( its, start_cursor, ct.cursor );
+    if( !merge_with_last( item ) ) {
+      add_item( item );
+    }
+  }
+
   /* Call after text has been deleted */
   public void add_delete( int start, string orig_text, Array<UndoTagInfo>? tags, int start_cursor ) {
     var item = new UndoTextDelete( orig_text, start, tags, start_cursor, ct.cursor );

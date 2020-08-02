@@ -81,5 +81,40 @@
       <summary>Default font size to use for new document notes</summary>
       <description>Default font size to use for new document notes</description>
     </key>
+    <key name="default-show-tasks" type="b">
+      <default>false</default>
+      <summary>Default state of the Show Checkboxes property switch</summary>
+      <description>Default state of the Show Checkboxes property switch</description>
+    </key>
+    <key name="default-show-depth" type="b">
+      <default>false</default>
+      <summary>Default state of the Show Row Depth property switch</summary>
+      <description>Default state of the Show Row Depth property switch</description>
+    </key>
+    <key name="minimum-depth-line-display" type="b">
+      <default>false</default>
+      <summary>Minimizes the drawing of depth lines (when enabled)</summary>
+      <description>Only draws depth lines (when enabled) in cases where a row has a sibling row below it</description>
+    </key>
+    <key name="default-markdown-enabled" type="b">
+      <default>false</default>
+      <summary>Default state of the markdown indicator for new documents</summary>
+      <description>Default state of the markdown indicator for new documents</description>
+    </key>
+    <key name="enable-tag-auto-completion" type="b">
+      <default>true</default>
+      <summary>Controls the display of the auto-completer when adding tags</summary>
+      <description>Controls the display of the auto-completer when adding tags</description>
+    </key>
+    <key name="max-auto-completion-items" type="i">
+      <default>10</default>
+      <summary>Specifies the maximum number of items that will be displayed in the auto-completion drowndown.</summary>
+      <description>Specifies the maximum number of items that will be displayed in the auto-completion drowndown.</description>
+    </key>
+    <key name="checkboxes-on-right" type="b">
+      <default>true</default>
+      <summary>Specifies if checkboxes are displayed on the right (true) or left (false) side of the row.</summary>
+      <description>Specifies if checkboxes are displayed on the right (true) or left (false) side of the row.</description>
+    </key>
   </schema>
 </schemalist>

@@ -47,9 +47,12 @@ public class ThemeSolarizedDark : Theme {
     note_background    = get_color( "#001b26" );
     attachable_color   = get_color( "#6C71C4" );
     url                = get_color( "Orange" );
+    tag                = get_color( "#a00000" );
     hilite             = get_color( "Green" );
+    syntax             = get_color( "grey" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
+    markdown_listitem  = get_color( "red" );
     prefer_dark        = true;
 
   }
