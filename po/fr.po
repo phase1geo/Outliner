@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-23 20:46-0500\n"
+"POT-Creation-Date: 2020-08-02 12:26-0500\n"
 "PO-Revision-Date: 2020-04-10 21:50+0200\n"
 "Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
 "Language-Team: none\n"
@@ -245,12 +245,12 @@ msgstr "URL :"
 msgid "Apply"
 msgstr "Appliquer"
 
-#: src/LinkEditor.vala:62 src/MainWindow.vala:902 src/MainWindow.vala:942
-#: src/MainWindow.vala:1061 src/MainWindow.vala:1160
+#: src/LinkEditor.vala:62 src/MainWindow.vala:874 src/MainWindow.vala:914
+#: src/MainWindow.vala:1033 src/MainWindow.vala:1132
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/MainWindow.vala:124 src/MainWindow.vala:1064
+#: src/MainWindow.vala:124 src/MainWindow.vala:1036
 msgid "Outliner"
 msgstr "Outliner"
 
@@ -258,7 +258,7 @@ msgstr "Outliner"
 msgid "New File"
 msgstr "Nouveau fichier"
 
-#: src/MainWindow.vala:159 src/MainWindow.vala:942
+#: src/MainWindow.vala:159 src/MainWindow.vala:914
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr "Ouvrir un fichier"
@@ -275,182 +275,174 @@ msgstr "Annuler"
 msgid "Redo"
 msgstr "Rétablir"
 
-#: src/MainWindow.vala:264
+#: src/MainWindow.vala:258
 msgid "Unnamed Document"
 msgstr "Document sans nom"
 
-#: src/MainWindow.vala:383
-msgid "Backward in Focus History    &lt;"
-msgstr ""
-
-#: src/MainWindow.vala:391
-msgid "Forward in Focus History    &gt;"
-msgstr ""
-
-#: src/MainWindow.vala:516
+#: src/MainWindow.vala:488
 msgid "Search"
 msgstr "Rechercher"
 
-#: src/MainWindow.vala:527
+#: src/MainWindow.vala:499
 msgid "Statistics"
 msgstr "Statistiques"
 
-#: src/MainWindow.vala:538
+#: src/MainWindow.vala:510
 #, fuzzy
 msgid "<b>Text Statistics</b>"
 msgstr "Statistiques"
 
-#: src/MainWindow.vala:542
+#: src/MainWindow.vala:514
 #, fuzzy
 msgid "Characters:"
 msgstr "Caractères :"
 
-#: src/MainWindow.vala:547
+#: src/MainWindow.vala:519
 msgid "Words:"
 msgstr "Mots :"
 
-#: src/MainWindow.vala:552
+#: src/MainWindow.vala:524
 msgid "Rows:"
 msgstr "Lignes :"
 
-#: src/MainWindow.vala:557
+#: src/MainWindow.vala:529
 msgid "<b>Checkbox Statistics</b>"
 msgstr ""
 
-#: src/MainWindow.vala:561
+#: src/MainWindow.vala:533
 msgid "Total:"
 msgstr ""
 
-#: src/MainWindow.vala:566
+#: src/MainWindow.vala:538
 msgid "Incomplete:"
 msgstr ""
 
-#: src/MainWindow.vala:571
+#: src/MainWindow.vala:543
 msgid "In Progress:"
 msgstr ""
 
-#: src/MainWindow.vala:576
+#: src/MainWindow.vala:548
 msgid "Completed:"
 msgstr ""
 
-#: src/MainWindow.vala:638 src/MainWindow.vala:1160
+#: src/MainWindow.vala:610 src/MainWindow.vala:1132
 msgid "Export"
 msgstr "Exporter"
 
-#: src/MainWindow.vala:645
+#: src/MainWindow.vala:617
 msgid "Export…"
 msgstr "Exporter…"
 
-#: src/MainWindow.vala:649
+#: src/MainWindow.vala:621
 #, fuzzy
 msgid "Print…"
 msgstr "Imprimer"
 
-#: src/MainWindow.vala:672
+#: src/MainWindow.vala:644
 msgid "Properties"
 msgstr "Propriétés"
 
-#: src/MainWindow.vala:679
+#: src/MainWindow.vala:651
 msgid "Zoom (%):"
 msgstr "Zoom (%) :"
 
-#: src/MainWindow.vala:693
+#: src/MainWindow.vala:665
 msgid "Theme:"
 msgstr "Thème :"
 
-#: src/MainWindow.vala:719
+#: src/MainWindow.vala:691
 msgid "Enumeration Style:"
 msgstr "Type d'énumération :"
 
-#: src/MainWindow.vala:735
+#: src/MainWindow.vala:707
 #, fuzzy
 msgid "Row Font:"
 msgstr "Déplacement"
 
-#: src/MainWindow.vala:755
+#: src/MainWindow.vala:727
 msgid "Note Font:"
 msgstr ""
 
-#: src/MainWindow.vala:775
+#: src/MainWindow.vala:747
 #, fuzzy
 msgid "Condensed Mode:"
 msgstr "Mode condensé"
 
-#: src/MainWindow.vala:788
+#: src/MainWindow.vala:760
 msgid "Show Checkboxes"
 msgstr ""
 
-#: src/MainWindow.vala:801
+#: src/MainWindow.vala:773
 msgid "Show Depth Lines"
 msgstr ""
 
-#: src/MainWindow.vala:814
+#: src/MainWindow.vala:786
 msgid "Enable Markdown Highlighting"
 msgstr ""
 
-#: src/MainWindow.vala:832
+#: src/MainWindow.vala:804
 msgid "Shortcuts Cheatsheet"
 msgstr "Feuille de raccourcis"
 
-#: src/MainWindow.vala:837
+#: src/MainWindow.vala:809
 msgid "Reset Fonts to Defaults"
 msgstr ""
 
-#: src/MainWindow.vala:893
+#: src/MainWindow.vala:865
 msgid "Save current unnamed document?"
 msgstr "Enregistrer le document sans nom actuel ?"
 
-#: src/MainWindow.vala:894
+#: src/MainWindow.vala:866
 msgid "Changes will be permanently lost if not saved."
 msgstr ""
 "Les modifications seront définitivement perdues si elles ne sont pas "
 "enregistrées."
 
-#: src/MainWindow.vala:899
+#: src/MainWindow.vala:871
 msgid "Discard Changes"
 msgstr "Abandonner les modifications"
 
-#: src/MainWindow.vala:905 src/MainWindow.vala:1061
+#: src/MainWindow.vala:877 src/MainWindow.vala:1033
 msgid "Save"
 msgstr "Enregistrer"
 
-#: src/MainWindow.vala:942
+#: src/MainWindow.vala:914
 msgid "Open"
 msgstr "Ouvrir"
 
-#: src/MainWindow.vala:1060
+#: src/MainWindow.vala:1032
 msgid "Save File"
 msgstr "Enregistrer le fichier"
 
-#: src/MainWindow.vala:1159
+#: src/MainWindow.vala:1131
 msgid "Export As"
 msgstr "Exporter en tant que"
 
-#: src/MainWindow.vala:1164
+#: src/MainWindow.vala:1136
 msgid "HTML"
 msgstr "HTML"
 
-#: src/MainWindow.vala:1171
+#: src/MainWindow.vala:1143
 msgid "Markdown"
 msgstr "Markdown"
 
-#: src/MainWindow.vala:1178
+#: src/MainWindow.vala:1150
 msgid "Minder"
 msgstr "Minder"
 
-#: src/MainWindow.vala:1184
+#: src/MainWindow.vala:1156
 msgid "OPML"
 msgstr "OPML"
 
-#: src/MainWindow.vala:1190
+#: src/MainWindow.vala:1162
 msgid "Org-Mode"
 msgstr ""
 
-#: src/MainWindow.vala:1196
+#: src/MainWindow.vala:1168
 msgid "PDF"
 msgstr "PDF"
 
-#: src/MainWindow.vala:1202
+#: src/MainWindow.vala:1174
 msgid "PlainText"
 msgstr "Texte brut"
 
@@ -621,25 +613,24 @@ msgstr "Affiche une énumération de type plan (par ex. I., A., 1.)"
 msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr "Affiche une énumération de type section (par ex. 2., 2.1., 2.1.3.)"
 
-#: src/OutlineTable.vala:714
+#: src/OutlineTable.vala:734
 msgid "Show note"
 msgstr "Afficher la note"
 
-#: src/OutlineTable.vala:714
+#: src/OutlineTable.vala:734
 msgid "Hide note"
 msgstr "Masquer la note"
 
-#: src/OutlineTable.vala:718
+#: src/OutlineTable.vala:738
 #, c-format
 msgid "%u subrows"
 msgstr ""
 
-#: src/OutlineTable.vala:2647 src/OutlineTable.vala:2657
-#: src/OutlineTable.vala:2668
-msgid "In Focus Mode."
+#: src/OutlineTable.vala:2669
+msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr ""
 
-#: src/OutlineTable.vala:2690
+#: src/OutlineTable.vala:2697
 msgid "Hit the Escape key to exit."
 msgstr ""
 
