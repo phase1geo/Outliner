@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-02 12:26-0500\n"
-"PO-Revision-Date: 2020-05-17 11:56+0200\n"
+"PO-Revision-Date: 2020-08-03 13:22+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Poedit 2.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/exports/ExportMinder.vala:105
@@ -366,11 +366,11 @@ msgstr "Aankruisvakjes tonen"
 
 #: src/MainWindow.vala:773
 msgid "Show Depth Lines"
-msgstr ""
+msgstr "Dieptelijnen tonen"
 
 #: src/MainWindow.vala:786
 msgid "Enable Markdown Highlighting"
-msgstr ""
+msgstr "Markdown-markering gebruiken"
 
 #: src/MainWindow.vala:804
 msgid "Shortcuts Cheatsheet"
@@ -477,7 +477,6 @@ msgid "Show Note"
 msgstr "Aantekening tonen"
 
 #: src/NodeMenu.vala:106 data/com.github.phase1geo.outliner.shortcuts.ui:232
-#, fuzzy
 msgid "Add Tag"
 msgstr "Label toevoegen"
 
@@ -503,7 +502,7 @@ msgstr "Onderliggende items uitklappen"
 
 #: src/NodeMenu.vala:128
 msgid "Focus"
-msgstr ""
+msgstr "Focussen"
 
 #: src/NodeMenu.vala:132
 msgid "Select Row"
@@ -612,15 +611,15 @@ msgstr "Aantekening verbergen"
 #: src/OutlineTable.vala:738
 #, c-format
 msgid "%u subrows"
-msgstr ""
+msgstr "%u onderliggende rijen"
 
 #: src/OutlineTable.vala:2669
 msgid "In Focus Mode.  Hit the Escape key to exit."
-msgstr ""
+msgstr "Focusmodus ingeschakeld.  Druk op Escape om te verlaten."
 
 #: src/OutlineTable.vala:2697
 msgid "Hit the Escape key to exit."
-msgstr ""
+msgstr "Druk op Escape om te verlaten."
 
 #: src/SearchBar.vala:94
 msgid "Find text…"
@@ -755,48 +754,43 @@ msgstr "Huidige aanpassen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:218
 msgid "Change Task State"
-msgstr ""
+msgstr "Taakstatus aanpassen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:241
-#, fuzzy
 msgid "Changing View"
-msgstr "Huidige aanpassen"
+msgstr "Weergave wijzigen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:245
-#, fuzzy
 msgid "Expand One Subrow Level"
-msgstr "Onderliggende rijen uitklappen"
+msgstr "Eén onderliggende rij uitklappen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:252
-#, fuzzy
 msgid "Collapse One Subrow Level"
-msgstr "Onderliggende rijen inklappen"
+msgstr "Eén onderliggende rij inklappen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:259
-#, fuzzy
 msgid "Expand All Subrows"
-msgstr "Onderliggende rijen uitklappen"
+msgstr "Alle onderliggende rijen uitklappen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:266
-#, fuzzy
 msgid "Collapse All Subrows"
-msgstr "Onderliggende rijen inklappen"
+msgstr "Alle onderliggende rijen inklappen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:273
 msgid "Add Current to Focus Stack"
-msgstr ""
+msgstr "Huidige toevoegen aan focusreeks"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:280
 msgid "Exit Focus View"
-msgstr ""
+msgstr "Focusmodus verlaten"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:287
 msgid "Go Back in Focus View Stack"
-msgstr ""
+msgstr "Terug in focusweergave"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:294
 msgid "Go Forward in Focus View Stack"
-msgstr ""
+msgstr "Vooruit in focusweergave"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:303
 msgid "Traversal"
