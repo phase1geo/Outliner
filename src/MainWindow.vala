@@ -606,19 +606,22 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the menu button */
     var menu_btn = new MenuButton();
-    menu_btn.set_image( new Image.from_icon_name( "document-export", IconSize.LARGE_TOOLBAR ) );
-    menu_btn.set_tooltip_text( _( "Export" ) );
+    menu_btn.image = new Image.from_icon_name( "document-export", IconSize.LARGE_TOOLBAR );
+    menu_btn.tooltip_text = _( "Export" );
+
     _header.pack_end( menu_btn );
 
     /* Create export menu */
     var box = new Box( Orientation.VERTICAL, 5 );
 
     var export = new ModelButton();
-    export.text        = _( "Export…" );
+    export.get_child().destroy();
+    export.add( new Granite.AccelLabel( _( "Export…" ), "<Control>e" ) );
     export.action_name = "win.action_export";
 
     var print = new ModelButton();
-    print.text        = _( "Print…" );
+    print.get_child().destroy();
+    print.add( new Granite.AccelLabel( _( "Print…" ), "<Control>p" ) );
     print.action_name = "win.action_print";
     print.set_sensitive( false );
 
@@ -631,6 +634,7 @@ public class MainWindow : ApplicationWindow {
     /* Create the popover and associate it with clicking on the menu button */
     _export = new Popover( null );
     _export.add( box );
+
     menu_btn.popover = _export;
 
   }
