@@ -1187,20 +1187,23 @@ public class MainWindow : ApplicationWindow {
       var use_ul = _settings.get_boolean( "export-html-use-ul-style" );
 
       if( html_filter == filter ) {
-        ExportHTML.export( repair_filename( fname, {".html", ".htm"} ), table, use_ul );
+        ExportHTML.export( fname = repair_filename( fname, {".html", ".htm"} ), table, use_ul );
       } else if( md_filter == filter ) {
-        ExportMarkdown.export( repair_filename( fname, {".md", ".markdown"} ), table );
+        ExportMarkdown.export( fname = repair_filename( fname, {".md", ".markdown"} ), table );
       } else if( minder_filter == filter ) {
-        ExportMinder.export( repair_filename( fname, {".minder"} ), table );
+        ExportMinder.export( fname = repair_filename( fname, {".minder"} ), table );
       } else if( opml_filter == filter ) {
-        ExportOPML.export( repair_filename( fname, {".opml"} ), table );
+        ExportOPML.export( fname = repair_filename( fname, {".opml"} ), table );
       } else if( org_filter == filter ) {
-        ExportOrgMode.export( repair_filename( fname, {".org"} ), table );
+        ExportOrgMode.export( fname = repair_filename( fname, {".org"} ), table );
       } else if( pdf_filter == filter ) {
-        ExportPDF.export( repair_filename( fname, {".pdf"} ), table );
+        ExportPDF.export( fname = repair_filename( fname, {".pdf"} ), table );
       } else if( txt_filter == filter ) {
-        ExportText.export( repair_filename( fname, {".txt"} ), table );
+        ExportText.export( fname = repair_filename( fname, {".txt"} ), table );
       }
+
+      /* Send a notification */
+      notification( _( "Outliner Export Completed" ), fname );
 
     }
 
@@ -1289,6 +1292,21 @@ public class MainWindow : ApplicationWindow {
     int min_height, nat_height;
     _stats_chars.get_preferred_height( out min_height, out nat_height );
     return( nat_height );
+  }
+
+  /* Generate a notification */
+  public void notification( string title, string msg, NotificationPriority priority = NotificationPriority.NORMAL ) {
+
+    GLib.Application? app = null;
+    @get( "application", ref app );
+
+    if( app != null ) {
+      var notification = new Notification( title );
+      notification.set_body( msg );
+      notification.set_priority( priority );
+      app.send_notification( "com.github.phase1geo.outliner", notification );
+    }
+
   }
 
 }
