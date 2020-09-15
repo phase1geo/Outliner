@@ -805,7 +805,8 @@ public class MainWindow : ApplicationWindow {
 
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
-    shortcuts.text = _( "Shortcuts Cheatsheet" );
+    shortcuts.get_child().destroy();
+    shortcuts.add( new Granite.AccelLabel( _( "Shortcuts Cheatsheet" ), "F1" ) );
     shortcuts.action_name = "win.action_shortcuts";
     btn_box.pack_start( shortcuts, false, false, 5 );
 
