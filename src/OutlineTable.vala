@@ -950,6 +950,8 @@ public class OutlineTable : DrawingArea {
             case Key.@8           :  goto_label( 7 );  break;
             case Key.@9           :  goto_label( 8 );  break;
             case Key.at           :  tagger.show_add_ui();  break;
+            case Key.F10          :  if( shift ) show_contextual_menu( e );  break;
+            case Key.Menu         :  show_contextual_menu( e );  break;
           }
         }
       }
@@ -1013,7 +1015,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Displays the contextual menu based on what is currently selected */
-  private void show_contextual_menu( EventButton event ) {
+  private void show_contextual_menu( Event event ) {
 
 #if GTK322
     if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {

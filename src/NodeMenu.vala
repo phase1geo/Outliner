@@ -245,7 +245,7 @@ public class NodeMenu : Gtk.Menu {
       var index     = i;
 
       var move_item = new Gtk.CheckMenuItem();
-      move_item.add( new Granite.AccelLabel( _( "Label-" ), "<Control>%d".printf( i + 1 ) ) );
+      move_item.add( new Granite.AccelLabel( _( "Label-" ) + lbl_value.to_string(), "<Control>" + lbl_value.to_string() ) );
       move_item.activate.connect(() => {
         _ot.handle_control_number( index );
       });
