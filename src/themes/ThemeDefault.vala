@@ -47,7 +47,7 @@ public class ThemeDefault : Theme {
     note_background    = get_color( "#cdcdcd" );
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
-    tag                = get_color( "Red" );
+    tag                = get_color( "#c00000" );
     hilite             = get_color( "#3689e6" );
     syntax             = get_color( "grey" );
     match_foreground   = get_color( "Black" );

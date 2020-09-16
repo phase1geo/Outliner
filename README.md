@@ -11,17 +11,22 @@
 Quickly create outlines and export them in a number of useful formats.
 
 - Quickly create and navigate outlines using the keyboard or mouse.
-- Full support for text formatting.
+- Full support for rich text formatting and/or Markdown formatting.
 - Add notes to any outline text.
+- Add tags to any outline row.
+- Add checkboxes to any or all outline text.
 - Close/Hide any group within the outline for increased focus.
 - Quick search and replace of any text within the document, including notes.
-- View document statistics such as character count, word count and row count.
+- Optionally focus on a portion of the document at a time when editing.
+- View document statistics such as character count, word count, row count and task information.
+- Support for showing depth lines.
 - Unlimited undo/redo of any change.
 - Automatically saves in the background.
 - Open multiple outlines with the use of tabs.
 - Built-in themes.
+- Support for changing fonts within a document.
 - Import from Minder and OPML.
-- Export to HTML, Markdown, Minder, OPML, PDF and PlainText.
+- Export to HTML, Markdown, Minder, OPML, Org-Mode, PDF and PlainText.
 - Printer support.
 
 ## Installation
@@ -75,8 +80,14 @@ Options:
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE.md) file for details.
 
+### Iconography
+
+The Outliner icon was created by Nararyans R.I. (@Fatih20 on GitHub).  He has produced a video showing the process of
+creating this icon with Inkscape [here](https://open.lbry.com/@Fatih109:4/Outliner:b?r=Cg1pp5MCWV1a5Nj5jDumPs9b13dNZqWG)
+
 <p align="center">
     <a href="https://appcenter.elementary.io/com.github.phase1geo.outliner">
         <img src="https://appcenter.elementary.io/badge.svg">
     </a>
 </p>
+

@@ -224,18 +224,12 @@ public class MainWindow : ApplicationWindow {
   /* Shows or hides the information bar, setting the message to the given value */
   private void show_info_bar( string? msg ) {
     if( _nb.current != null ) {
-      var table = get_current_table( "show_info_bar" );
-      var box   = _nb.current.page as Gtk.Box;
-      var info  = box.get_children().nth_data( 2 ) as Gtk.InfoBar;
+      var box  = _nb.current.page as Gtk.Box;
+      var info = box.get_children().nth_data( 2 ) as Gtk.InfoBar;
       if( info != null ) {
         if( msg != null ) {
-          var ibox = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Box;
-          var prev = ibox.get_children().nth_data( 0 ) as Gtk.Button;
-          var next = ibox.get_children().nth_data( 1 ) as Gtk.Button;
-          var ilbl = ibox.get_children().nth_data( 2 ) as Gtk.Label;
-          ilbl.label = msg;
-          prev.set_sensitive( table.focus_stack.back_valid() );
-          next.set_sensitive( table.focus_stack.forward_valid() );
+          var lbl = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Label;
+          lbl.label = msg;
           info.set_revealed( true );
         } else {
           info.set_revealed( false );
@@ -275,6 +269,7 @@ public class MainWindow : ApplicationWindow {
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
+    ot.grab_focus();
     save_tab_state( tab );
   }
 
@@ -317,6 +312,7 @@ public class MainWindow : ApplicationWindow {
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
     ot.theme_changed.connect( theme_changed );
+    ot.focus_mode.connect( show_info_bar );
     ot.nodes_filtered.connect( show_info_bar );
 
     if( fname != null ) {
@@ -377,34 +373,10 @@ public class MainWindow : ApplicationWindow {
   /* Creates the info bar UI */
   private InfoBar create_info_bar() {
 
-    var focus_prev = new Button.from_icon_name( "go-previous", IconSize.SMALL_TOOLBAR );
-    var focus_next = new Button.from_icon_name( "go-next",     IconSize.SMALL_TOOLBAR );
-
-    focus_prev.set_tooltip_markup( _( "Backward in Focus History    &lt;" ) );
-    focus_prev.clicked.connect(() => {
-      var table = get_current_table( "focus_prev" );
-      table.focus_mode_back();
-      focus_prev.set_sensitive( table.focus_stack.back_valid() );
-      focus_next.set_sensitive( table.focus_stack.forward_valid() );
-    });
-
-    focus_next.set_tooltip_markup( _( "Forward in Focus History    &gt;" ) );
-    focus_next.clicked.connect(() => {
-      var table = get_current_table( "focus_next" );
-      table.focus_mode_forward();
-      focus_prev.set_sensitive( table.focus_stack.back_valid() );
-      focus_next.set_sensitive( table.focus_stack.forward_valid() );
-    });
-
-    var focus_lbl = new Label( "" );
-
-    var history_box = new Box( Orientation.HORIZONTAL, 0 );
-    history_box.pack_start( focus_prev, false, false, 5 );
-    history_box.pack_start( focus_next, false, false, 5 );
-    history_box.pack_start( focus_lbl,  false, false, 5 );
+    var lbl = new Label( "" );
 
     var info_bar = new InfoBar();
-    info_bar.get_content_area().add( history_box );
+    info_bar.get_content_area().add( lbl );
     info_bar.set_revealed( false );
     info_bar.message_type = MessageType.INFO;
 
@@ -634,19 +606,22 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the menu button */
     var menu_btn = new MenuButton();
-    menu_btn.set_image( new Image.from_icon_name( "document-export", IconSize.LARGE_TOOLBAR ) );
-    menu_btn.set_tooltip_text( _( "Export" ) );
+    menu_btn.image = new Image.from_icon_name( "document-export", IconSize.LARGE_TOOLBAR );
+    menu_btn.tooltip_text = _( "Export" );
+
     _header.pack_end( menu_btn );
 
     /* Create export menu */
     var box = new Box( Orientation.VERTICAL, 5 );
 
     var export = new ModelButton();
-    export.text        = _( "Export…" );
+    export.get_child().destroy();
+    export.add( new Granite.AccelLabel( _( "Export…" ), "<Control>e" ) );
     export.action_name = "win.action_export";
 
     var print = new ModelButton();
-    print.text        = _( "Print…" );
+    print.get_child().destroy();
+    print.add( new Granite.AccelLabel( _( "Print…" ), "<Control>p" ) );
     print.action_name = "win.action_print";
     print.set_sensitive( false );
 
@@ -659,6 +634,7 @@ public class MainWindow : ApplicationWindow {
     /* Create the popover and associate it with clicking on the menu button */
     _export = new Popover( null );
     _export.add( box );
+
     menu_btn.popover = _export;
 
   }
@@ -829,7 +805,8 @@ public class MainWindow : ApplicationWindow {
 
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
-    shortcuts.text = _( "Shortcuts Cheatsheet" );
+    shortcuts.get_child().destroy();
+    shortcuts.add( new Granite.AccelLabel( _( "Shortcuts Cheatsheet" ), "F1" ) );
     shortcuts.action_name = "win.action_shortcuts";
     btn_box.pack_start( shortcuts, false, false, 5 );
 
@@ -1066,7 +1043,7 @@ public class MainWindow : ApplicationWindow {
     dialog.add_filter( filter );
     if( dialog.run() == ResponseType.ACCEPT ) {
       string fname = dialog.get_filename();
-      if( fname.substring( -7, -1 ) != ".outliner" ) {
+      if( fname.substring( -9, -1 ) != ".outliner" ) {
         fname += ".outliner";
       }
       ot.document.filename = fname;
@@ -1211,20 +1188,23 @@ public class MainWindow : ApplicationWindow {
       var use_ul = _settings.get_boolean( "export-html-use-ul-style" );
 
       if( html_filter == filter ) {
-        ExportHTML.export( repair_filename( fname, {".html", ".htm"} ), table, use_ul );
+        ExportHTML.export( fname = repair_filename( fname, {".html", ".htm"} ), table, use_ul );
       } else if( md_filter == filter ) {
-        ExportMarkdown.export( repair_filename( fname, {".md", ".markdown"} ), table );
+        ExportMarkdown.export( fname = repair_filename( fname, {".md", ".markdown"} ), table );
       } else if( minder_filter == filter ) {
-        ExportMinder.export( repair_filename( fname, {".minder"} ), table );
+        ExportMinder.export( fname = repair_filename( fname, {".minder"} ), table );
       } else if( opml_filter == filter ) {
-        ExportOPML.export( repair_filename( fname, {".opml"} ), table );
+        ExportOPML.export( fname = repair_filename( fname, {".opml"} ), table );
       } else if( org_filter == filter ) {
-        ExportOrgMode.export( repair_filename( fname, {".org"} ), table );
+        ExportOrgMode.export( fname = repair_filename( fname, {".org"} ), table );
       } else if( pdf_filter == filter ) {
-        ExportPDF.export( repair_filename( fname, {".pdf"} ), table );
+        ExportPDF.export( fname = repair_filename( fname, {".pdf"} ), table );
       } else if( txt_filter == filter ) {
-        ExportText.export( repair_filename( fname, {".txt"} ), table );
+        ExportText.export( fname = repair_filename( fname, {".txt"} ), table );
       }
+
+      /* Send a notification */
+      notification( _( "Outliner Export Completed" ), fname );
 
     }
 
@@ -1313,6 +1293,21 @@ public class MainWindow : ApplicationWindow {
     int min_height, nat_height;
     _stats_chars.get_preferred_height( out min_height, out nat_height );
     return( nat_height );
+  }
+
+  /* Generate a notification */
+  public void notification( string title, string msg, NotificationPriority priority = NotificationPriority.NORMAL ) {
+
+    GLib.Application? app = null;
+    @get( "application", ref app );
+
+    if( app != null ) {
+      var notification = new Notification( title );
+      notification.set_body( msg );
+      notification.set_priority( priority );
+      app.send_notification( "com.github.phase1geo.outliner", notification );
+    }
+
   }
 
 }

@@ -91,6 +91,11 @@
       <summary>Default state of the Show Row Depth property switch</summary>
       <description>Default state of the Show Row Depth property switch</description>
     </key>
+    <key name="minimum-depth-line-display" type="b">
+      <default>false</default>
+      <summary>Minimizes the drawing of depth lines (when enabled)</summary>
+      <description>Only draws depth lines (when enabled) in cases where a row has a sibling row below it</description>
+    </key>
     <key name="default-markdown-enabled" type="b">
       <default>false</default>
       <summary>Default state of the markdown indicator for new documents</summary>

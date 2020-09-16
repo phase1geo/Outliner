@@ -32,8 +32,10 @@ public delegate bool NodeFilterFunc( Node node );
 
 public class OutlineTable : DrawingArea {
 
-  private const CursorType click_cursor = CursorType.HAND2;
-  private const CursorType text_cursor  = CursorType.XTERM;
+  private const CursorType click_cursor   = CursorType.HAND2;
+  private const CursorType text_cursor    = CursorType.XTERM;
+  private const double     dim_selected   = 0.3;
+  private const double     dim_unselected = 0.1;
 
   private MainWindow      _win;
   private Document        _doc;
@@ -70,11 +72,12 @@ public class OutlineTable : DrawingArea {
   private int             _note_size;
   private bool            _show_tasks = false;
   private bool            _show_depth = true;
+  private bool            _min_depth  = false;
   private Tagger          _tagger;
   private TextCompletion  _completion;
   private bool            _markdown;
   private bool            _filtered   = false;
-  private FocusStack      _focus_stack;
+  private Node?           _focus_node = null;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -90,6 +93,9 @@ public class OutlineTable : DrawingArea {
           set_node_mode( _selected, NodeMode.NONE );
           _selected.select_mode.disconnect( select_mode_changed );
           _selected.cursor_changed.disconnect( selected_cursor_changed );
+          if( (_focus_node != null) && (_selected != _focus_node) && !_selected.is_descendant_of( _focus_node ) ) {
+            _selected.alpha = dim_unselected;
+          }
         }
         if( value != null ) {
           see( value );
@@ -99,6 +105,9 @@ public class OutlineTable : DrawingArea {
           set_node_mode( _selected, NodeMode.SELECTED );
           _selected.select_mode.connect( select_mode_changed );
           _selected.cursor_changed.connect( selected_cursor_changed );
+          if( (_focus_node != null) && (_selected != _focus_node) && !_selected.is_descendant_of( _focus_node ) ) {
+            _selected.alpha = dim_selected;
+          }
         }
         selected_changed();
       }
@@ -198,6 +207,11 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool min_depth {
+    get {
+      return( _min_depth );
+    }
+  }
   public bool markdown {
     get {
       return( _markdown );
@@ -222,11 +236,6 @@ public class OutlineTable : DrawingArea {
     }
   }
   public bool tasks_on_right { get; private set; default = true; }
-  public FocusStack focus_stack {
-    get {
-      return( _focus_stack );
-    }
-  }
 
   /* Allocate static parsers */
   public MarkdownParser markdown_parser { get; private set; }
@@ -241,6 +250,7 @@ public class OutlineTable : DrawingArea {
   public signal void cursor_changed();
   public signal void show_tasks_changed();
   public signal void markdown_changed();
+  public signal void focus_mode( string? msg );
   public signal void nodes_filtered( string? msg );
 
   /* Default constructor */
@@ -266,9 +276,6 @@ public class OutlineTable : DrawingArea {
     /* Create the tags */
     _tagger = new Tagger( this );
 
-    /* Allocate memory for the focus view stack */
-    _focus_stack = new FocusStack();
-
     /* Create the parsers */
     tagger_parser   = new TaggerParser( this );
     markdown_parser = new MarkdownParser( this );
@@ -289,6 +296,7 @@ public class OutlineTable : DrawingArea {
     _show_depth    = settings.get_boolean( "default-show-depth" );
     _markdown      = settings.get_boolean( "default-markdown-enabled" );
     tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
+    _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
 
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
@@ -334,16 +342,13 @@ public class OutlineTable : DrawingArea {
     /* Make sure the drawing area can receive keyboard focus */
     this.can_focus = true;
 
-    /* Make sure that we us the IMMulticontext input method */
+    /* Make sure that we us the IMMulticontext input method when editing text only */
     _im_context = new IMMulticontext();
     _im_context.set_client_window( this.get_window() );
     _im_context.set_use_preedit( false );
     _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
-
-    /* Grab keyboard focus */
-    grab_focus();
 
   }
 
@@ -396,6 +401,7 @@ public class OutlineTable : DrawingArea {
       if( (mode == NodeMode.EDITABLE) || (mode == NodeMode.NOTEEDIT) ) {
         if( node.mode != mode ) {
           update_im_cursor( (mode == NodeMode.EDITABLE) ? node.name : node.note );
+          // _im_context.commit.connect( handle_im_commit );
           _im_context.focus_in();
           if( mode == NodeMode.EDITABLE ) {
             _tagger.preedit_load_tags( node.name.text );
@@ -406,6 +412,7 @@ public class OutlineTable : DrawingArea {
           _tagger.postedit_load_tags( node.name.text );
         }
         _im_context.focus_out();
+        // _im_context.commit.disconnect( handle_im_commit );
       }
       node.mode = mode;
     }
@@ -458,10 +465,30 @@ public class OutlineTable : DrawingArea {
     }
   }
 
+  /*
+   Resizes this table such that the last row can be positioned at the top
+   of the window.
+  */
+  public bool resize_table() {
+
+    var last_node = root.get_last_node();
+    var last_y    = (int)last_node.last_y;
+    var vp        = parent.parent as Viewport;
+    var vh        = vp.get_allocated_height();
+    var end_y     = (last_y > ((int)last_node.y + vh)) ? last_y : ((int)last_node.y + vh);
+
+    set_size_request( -1, end_y );
+
+    return( false );
+
+  }
+
   /* Positions the scrolled window such that the given node is placed at the top */
   public void place_at_top( Node node ) {
+
     var sw = parent.parent.parent as ScrolledWindow;
     sw.vadjustment.value = node.y;
+
   }
 
   /* Internal see command that is called after this has been resized */
@@ -840,87 +867,113 @@ public class OutlineTable : DrawingArea {
     if( selected != null ) {
       if( control ) {
         switch( e.keyval ) {
-          case 99    :  do_copy();                      break;
-          case 120   :  do_cut();                       break;
-          case 118   :  do_paste( false );              break;
-          case 86    :  do_paste( true );               break;
-          case 65293 :  handle_control_return();        break;
-          case 65289 :  handle_control_tab();           break;
-          case 65363 :  handle_control_right( shift );  break;
-          case 65361 :  handle_control_left( shift );   break;
-          case 65362 :  handle_control_up( shift );     break;
-          case 65364 :  handle_control_down( shift );   break;
-          case 65288 :  handle_control_backspace();     break;
-          case 65535 :  handle_control_delete();        break;
-          case 46    :  handle_control_period();        break;
-          case 47    :  handle_control_slash();         break;
-          case 49    :  handle_control_number( 0 );     break;
-          case 50    :  handle_control_number( 1 );     break;
-          case 51    :  handle_control_number( 2 );     break;
-          case 52    :  handle_control_number( 3 );     break;
-          case 53    :  handle_control_number( 4 );     break;
-          case 54    :  handle_control_number( 5 );     break;
-          case 55    :  handle_control_number( 6 );     break;
-          case 56    :  handle_control_number( 7 );     break;
-          case 57    :  handle_control_number( 8 );     break;
-          case 65    :  handle_control_a( true );       break;
-          case 66    :  handle_control_b( true );       break;
-          case 84    :  handle_control_t( true );       break;
-          case 92    :  handle_control_backslash();     break;
-          case 97    :  handle_control_a( false );      break;
-          case 98    :  handle_control_b( false );      break;
-          case 100   :  handle_control_d();             break;
-          case 104   :  handle_control_h();             break;
-          case 105   :  handle_control_i();             break;
-          case 106   :  handle_control_j();             break;
-          case 107   :  handle_control_k();             break;
-          case 116   :  handle_control_t( false );      break;
-          case 117   :  handle_control_u();             break;
-          case 119   :  handle_control_w();             break;
+          case Key.c         :  do_copy();                      break;
+          case Key.x         :  do_cut();                       break;
+          case Key.v         :  do_paste( false );              break;
+          case Key.V         :  do_paste( true );               break;
+          case Key.Return    :  handle_control_return();        break;
+          case Key.Tab       :  handle_control_tab();           break;
+          case Key.Right     :  handle_control_right( shift );  break;
+          case Key.Left      :  handle_control_left( shift );   break;
+          case Key.Up        :  handle_control_up( shift );     break;
+          case Key.Down      :  handle_control_down( shift );   break;
+          case Key.BackSpace :  handle_control_backspace();     break;
+          case Key.Delete    :  handle_control_delete();        break;
+          case Key.period    :  handle_control_period();        break;
+          case Key.slash     :  handle_control_slash();         break;
+          case Key.@1        :  handle_control_number( 0 );     break;
+          case Key.@2        :  handle_control_number( 1 );     break;
+          case Key.@3        :  handle_control_number( 2 );     break;
+          case Key.@4        :  handle_control_number( 3 );     break;
+          case Key.@5        :  handle_control_number( 4 );     break;
+          case Key.@6        :  handle_control_number( 5 );     break;
+          case Key.@7        :  handle_control_number( 6 );     break;
+          case Key.@8        :  handle_control_number( 7 );     break;
+          case Key.@9        :  handle_control_number( 8 );     break;
+          case Key.A         :  handle_control_a( true );       break;
+          case Key.B         :  handle_control_b( true );       break;
+          case Key.T         :  handle_control_t( true );       break;
+          case Key.backslash :  handle_control_backslash();     break;
+          case Key.a         :  handle_control_a( false );      break;
+          case Key.b         :  handle_control_b( false );      break;
+          case Key.d         :  handle_control_d();             break;
+          case Key.h         :  handle_control_h();             break;
+          case Key.i         :  handle_control_i();             break;
+          case Key.j         :  handle_control_j();             break;
+          case Key.k         :  handle_control_k();             break;
+          case Key.t         :  handle_control_t( false );      break;
+          case Key.u         :  handle_control_u();             break;
+          case Key.w         :  handle_control_w();             break;
         }
       } else if( nomod || shift ) {
-        if( !_im_context.filter_keypress( e ) ) {
+        if( !insert_user_text( e.str ) ) {
           switch( e.keyval ) {
-            case 65288 :  handle_backspace();         break;
-            case 65535 :  handle_delete();            break;
-            case 65307 :  handle_escape();            break;
-            case 65293 :  handle_return( shift );     break;
-            case 65289 :  handle_tab();               break;
-            case 65056 :  handle_shift_tab();         break;
-            case 65363 :  handle_right( shift );      break;
-            case 65361 :  handle_left( shift );       break;
-            case 65360 :  handle_home();              break;
-            case 65367 :  handle_end();               break;
-            case 65362 :  handle_up( shift );         break;
-            case 65364 :  handle_down( shift );       break;
-            case 65365 :  handle_pageup();            break;
-            case 65366 :  handle_pagedn();            break;
-            case 65507 :  handle_control( true );     break;
-            default    :  handle_printable( e.str );  break;
+            case Key.BackSpace    :  handle_backspace();         break;
+            case Key.Delete       :  handle_delete();            break;
+            case Key.Escape       :  handle_escape();            break;
+            case Key.Return       :  handle_return( shift );     break;
+            case Key.Tab          :  handle_tab();               break;
+            case Key.ISO_Left_Tab :  handle_shift_tab();         break;
+            case Key.Right        :  handle_right( shift );      break;
+            case Key.Left         :  handle_left( shift );       break;
+            case Key.Home         :  handle_home();              break;
+            case Key.End          :  handle_end();               break;
+            case Key.Up           :  handle_up( shift );         break;
+            case Key.Down         :  handle_down( shift );       break;
+            case Key.Page_Up      :  handle_pageup();            break;
+            case Key.Page_Down    :  handle_pagedn();            break;
+            case Key.Control_L    :  handle_control( true );     break;
+            case Key.a            :  change_selected( node_parent( selected ) );  break;
+            case Key.B            :  change_selected( node_bottom() );  break;
+            case Key.c            :  change_selected( node_last_child( selected ) );  break;
+            case Key.e            :  edit_selected( true );  break;
+            case Key.E            :  edit_selected( false );  break;
+            case Key.f            :  focus_on_selected();  break;
+            case Key.h            :  unindent();  break;
+            case Key.H            :  place_at_top( selected );  break;
+            case Key.j            :  change_selected( node_next( selected ) );  break;
+            case Key.k            :  change_selected( node_previous( selected ) );  break;
+            case Key.l            :  indent();  break;
+            case Key.n            :  change_selected( node_next_sibling( selected ) );  break;
+            case Key.p            :  change_selected( node_previous_sibling( selected ) );  break;
+            case Key.t            :  rotate_task();  break;
+            case Key.T            :  change_selected( node_top() );  break;
+            case Key.numbersign   :  toggle_label();  break;
+            case Key.asterisk     :  clear_all_labels();  break;
+            case Key.@1           :  goto_label( 0 );  break;
+            case Key.@2           :  goto_label( 1 );  break;
+            case Key.@3           :  goto_label( 2 );  break;
+            case Key.@4           :  goto_label( 3 );  break;
+            case Key.@5           :  goto_label( 4 );  break;
+            case Key.@6           :  goto_label( 5 );  break;
+            case Key.@7           :  goto_label( 6 );  break;
+            case Key.@8           :  goto_label( 7 );  break;
+            case Key.@9           :  goto_label( 8 );  break;
+            case Key.at           :  tagger.show_add_ui();  break;
+            case Key.F10          :  if( shift ) show_contextual_menu( e );  break;
+            case Key.Menu         :  show_contextual_menu( e );  break;
           }
         }
       }
     } else {
       if( !control ) {
         switch( e.keyval ) {
-          case 42    :  clear_all_labels();      break;
-          case 49    :  goto_label( 0 );         break;
-          case 50    :  goto_label( 1 );         break;
-          case 51    :  goto_label( 2 );         break;
-          case 52    :  goto_label( 3 );         break;
-          case 53    :  goto_label( 4 );         break;
-          case 54    :  goto_label( 5 );         break;
-          case 55    :  goto_label( 6 );         break;
-          case 56    :  goto_label( 7 );         break;
-          case 57    :  goto_label( 8 );         break;
-          case 60    :  focus_mode_back();       break;
-          case 62    :  focus_mode_forward();    break;
-          case 106   :  handle_down( shift );    break;
-          case 107   :  handle_up( shift );      break;
-          case 65362 :  handle_up( shift );      break;
-          case 65364 :  handle_down( shift );    break;
-          case 65507 :  handle_control( true );  break;
-          case 65307 :  handle_escape();         break;
+          case Key.asterisk  :  clear_all_labels();      break;
+          case Key.@1        :  goto_label( 0 );         break;
+          case Key.@2        :  goto_label( 1 );         break;
+          case Key.@3        :  goto_label( 2 );         break;
+          case Key.@4        :  goto_label( 3 );         break;
+          case Key.@5        :  goto_label( 4 );         break;
+          case Key.@6        :  goto_label( 5 );         break;
+          case Key.@7        :  goto_label( 6 );         break;
+          case Key.@8        :  goto_label( 7 );         break;
+          case Key.@9        :  goto_label( 8 );         break;
+          case Key.j         :  handle_down( shift );    break;
+          case Key.k         :  handle_up( shift );      break;
+          case Key.Up        :  handle_up( shift );      break;
+          case Key.Down      :  handle_down( shift );    break;
+          case Key.Control_L :  handle_control( true );  break;
+          case Key.Escape    :  handle_escape();         break;
         }
       }
     }
@@ -934,7 +987,7 @@ public class OutlineTable : DrawingArea {
 
   /* Called whenever a key is released */
   private bool on_keyrelease( EventKey e ) {
-    if( e.keyval == 65507 ) {
+    if( e.keyval == Key.Control_L ) {
       handle_control( false );
     }
     return( true );
@@ -962,7 +1015,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Displays the contextual menu based on what is currently selected */
-  private void show_contextual_menu( EventButton event ) {
+  private void show_contextual_menu( Event event ) {
 
 #if GTK322
     if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {
@@ -980,6 +1033,9 @@ public class OutlineTable : DrawingArea {
   public void toggle_expand( Node node ) {
     var nodes = new Array<Node>();
     node.expanded = !node.expanded;
+    if( !node.expanded && selected.is_descendant_of( node ) ) {
+      selected = node;
+    }
     nodes.append_val( node );
     undo_buffer.add_item( new UndoNodeExpander( node, nodes ) );
     queue_draw();
@@ -1342,9 +1398,8 @@ public class OutlineTable : DrawingArea {
         queue_draw();
         changed();
       }
-    } else if( _filtered ) {
-      _focus_stack.clear();
-      filter_nodes( "", false, null );
+    } else if( root.alpha < 1.0 ) {
+      focus_leave();
     }
   }
 
@@ -2039,7 +2094,23 @@ public class OutlineTable : DrawingArea {
 
   /* Called by the input method manager when the user has a string to commit */
   private void handle_im_commit( string str ) {
-    handle_printable( str );
+    insert_user_text( str );
+  }
+
+  private bool insert_user_text( string str ) {
+    if( !str.get_char( 0 ).isprint() ) return( false );
+    if( is_node_editable() ) {
+      selected.name.insert( str, undo_text );
+      see( selected );
+      queue_draw();
+    } else if( is_note_editable() ) {
+      selected.note.insert( str, undo_text );
+      see( selected );
+      queue_draw();
+    } else {
+      return( false );
+    }
+    return( true );
   }
 
   /* Helper class for the handle_im_retrieve_surrounding method */
@@ -2164,6 +2235,10 @@ public class OutlineTable : DrawingArea {
     return( n );
   }
 
+  /*
+   Returns the node that is the sibling above the current one.  If the current
+   node is the top-most node, return null.
+  */
   private Node? node_previous_sibling( Node? node ) {
     var n = node.get_previous_sibling();
     while( (n != null) && n.hidden ) {
@@ -2172,59 +2247,15 @@ public class OutlineTable : DrawingArea {
     return( n );
   }
 
-  /* Handles any printable characters */
-  private void handle_printable( string str ) {
-    if( !str.get_char( 0 ).isprint() ) return;
-    if( is_node_editable() ) {
-      selected.name.insert( str, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.insert( str, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( selected != null ) {
-      switch( str ) {
-        case "a" :  change_selected( node_parent( selected ) );  break;
-        case "B" :  change_selected( node_bottom() );  break;
-        case "c" :  change_selected( node_last_child( selected ) );  break;
-        case "e" :  edit_selected( true );  break;
-        case "E" :  edit_selected( false );  break;
-        case "f" :  focus_mode_enter();  break;
-        case "h" :  unindent();  break;
-        case "H" :  place_at_top( selected );  break;
-        case "j" :  change_selected( node_next( selected ) );  break;
-        case "k" :  change_selected( node_previous( selected ) );  break;
-        case "l" :  indent();  break;
-        case "n" :  change_selected( node_next_sibling( selected ) );  break;
-        case "p" :  change_selected( node_previous_sibling( selected ) );  break;
-        case "t" :  rotate_task();  break;
-        case "T" :  change_selected( node_top() );  break;
-        case "#" :  toggle_label();  break;
-        case "*" :  clear_all_labels();  break;
-        case "<" :  focus_mode_back();  break;
-        case ">" :  focus_mode_forward();  break;
-        case "1" :  goto_label( 0 );  break;
-        case "2" :  goto_label( 1 );  break;
-        case "3" :  goto_label( 2 );  break;
-        case "4" :  goto_label( 3 );  break;
-        case "5" :  goto_label( 4 );  break;
-        case "6" :  goto_label( 5 );  break;
-        case "7" :  goto_label( 6 );  break;
-        case "8" :  goto_label( 7 );  break;
-        case "9" :  goto_label( 8 );  break;
-        case "@" :  tagger.show_add_ui();  break;
-      }
-    }
-  }
-
   /* Edit the selected node */
   public void edit_selected( bool title ) {
     if( selected == null ) return;
     if( title ) {
       set_node_mode( selected, NodeMode.EDITABLE );
+      selected.name.move_cursor_to_end();
     } else {
       set_node_mode( selected, NodeMode.NOTEEDIT );
+      selected.note.move_cursor_to_end();
       selected.hide_note = false;
     }
     queue_draw();
@@ -2519,7 +2550,7 @@ public class OutlineTable : DrawingArea {
     }
 
     /* Update the size of this widget */
-    set_size_request( -1, (int)root.get_last_node().last_y );
+    Timeout.add( 50, resize_table );
 
     /* Draw everything */
     queue_draw();
@@ -2632,33 +2663,21 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Enters focus mode for the selected mode */
-  public void focus_mode_enter() {
-    _focus_stack.push( selected );
-    filter_nodes( _( "In Focus Mode." ), false, (node) => {
-      return( (node == selected) || node.is_descendant_of( selected ) );
-    });
+  public void focus_on_selected() {
+    root.set_tree_alpha( dim_unselected );
+    selected.set_tree_alpha( 1.0 );
+    _focus_node = selected;
+    place_at_top( selected );
+    focus_mode( _( "In Focus Mode.  Hit the Escape key to exit." ) );
+    queue_draw();
   }
 
-  /* Moves the focus mode back by one */
-  public void focus_mode_back() {
-    var node = _focus_stack.back();
-    if( node != null ) {
-      selected = node;
-      filter_nodes( _( "In Focus Mode." ), false, (node) => {
-        return( (node == selected) || node.is_descendant_of( selected ) );
-      });
-    }
-  }
-
-  /* Moves forward in the focus stack by one */
-  public void focus_mode_forward() {
-    var node = _focus_stack.forward();
-    if( node != null ) {
-      selected = node;
-      filter_nodes( _( "In Focus Mode." ), false, (node) => {
-        return( (node == selected) || node.is_descendant_of( selected ) );
-      });
-    }
+  /* Return to unfocused mode */
+  public void focus_leave() {
+    root.set_tree_alpha( 1.0 );
+    focus_mode( null );
+    _focus_node = null;
+    queue_draw();
   }
 
   /* Filters the rows that match the given NodeFilterFunc */
@@ -2772,7 +2791,7 @@ public class OutlineTable : DrawingArea {
   /* Removes the specified node from the table */
   public void delete_node( Node node ) {
     var was_selected = (node == selected);
-    var next         = node.get_next_node() ?? node.get_previous_node();
+    var next         = node.get_next_sibling() ?? node.get_previous_node();
     node.parent.remove_child( node );
     if( was_selected ) {
       selected = next;
@@ -2902,7 +2921,7 @@ public class OutlineTable : DrawingArea {
   /* Draws all of the root node trees */
   public void draw_all( Context ctx ) {
     root.draw_tree( ctx, _theme, _draw_options );
-    if( (selected != null) && ((selected.parent == null) || selected.parent.expanded) ) {
+    if( (selected != null) && !selected.hidden ) {
       selected.draw( ctx, _theme, _draw_options );
     }
     _labels.draw( ctx, _theme );

@@ -168,7 +168,7 @@ public class ExportMinder : Object {
   public static bool import( string fname, OutlineTable table ) {
 
     /* Read in the contents of the Minder file */
-    var doc = Xml.Parser.parse_file( fname );
+    var doc = Xml.Parser.read_file( fname, null, Xml.ParserOption.HUGE );
     if( doc == null ) {
       return( false );
     }

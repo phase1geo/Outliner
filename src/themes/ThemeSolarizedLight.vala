@@ -47,7 +47,7 @@ public class ThemeSolarizedLight : Theme {
     note_background    = get_color( "#cbc5b6" );  // Background color with value of 50
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
-    tag                = get_color( "Red" );
+    tag                = get_color( "#c00000" );
     hilite             = get_color( "yellow" );
     syntax             = get_color( "grey" );
     match_foreground   = get_color( "Black" );

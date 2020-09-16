@@ -22,12 +22,15 @@
       <p>Quickly create outlines and export them in a number of useful formats.</p>
       <ul>
         <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
-        <li>Full support for text formatting.</li>
+        <li>Full support for rich text formatting and/or Markdown formatting.</li>
         <li>Add notes to any outline text.</li>
+        <li>Add tags to any outline row.</li>
         <li>Add checkboxes to any or all outline text.</li>
         <li>Close/Hide any group within the outline for increased focus.</li>
         <li>Quick search and replace of any text within the document, including notes.</li>
-        <li>View document statistics such as character count, word count and row count.</li>
+        <li>Optionally focus on a portion of the document at a time when editing.</li>
+        <li>View document statistics such as character count, word count, row count and task information.</li>
+        <li>Support for showing depth lines.</li>
         <li>Unlimited undo/redo of any change.</li>
         <li>Automatically saves in the background.</li>
         <li>Open multiple outlines with the use of tabs.</li>
@@ -77,6 +80,42 @@
       <value key="x-appcenter-suggested-price">10</value>
     </custom>
     <releases>
+      <release version="1.3.0" date="2020-08-02">
+        <description>
+          <p>New</p>
+          <ul>
+            <li>Added support for displaying/hiding row depth lines.</li>
+            <li>Added support for adding and highlighting row tags, including optional auto-completion support.</li>
+            <li>Added support for node filtering based on tags.</li>
+            <li>Added support for stack-based focus mode.</li>
+            <li>Added support for Markdown and new Markdown format toolbar.</li>
+            <li>Added tooltip when mouse cursor is over a group row expander which displays the number of subrows contained within it.</li>
+            <li>Added support for opening one or more files from the command-line or from a file browser.</li>
+          </ul>
+          <p>Changes</p>
+          <ul>
+            <li>Changed application icon (thanks to Nararyans R.I.)</li>
+            <li>Changed default location of checkboxes to display to the right of rows.</li>
+            <li>Changed behavior of unindenting a row such that row order is no longer modified.</li>
+            <li>Changed behavior of the Return key when adding a new row from a group row such that the new row will be added to the group as the first row of that group.</li>
+            <li>Changed mouse cursor when it is over a checkbox.</li>
+            <li>Changed behavior of left and right keys on a group row to expand/collapse the tree one level at a time.</li>
+            <li>Assigned Shift-right and Shift-left to expand/collapse the entire hierarchy for a given group row.</li>
+            <li>Reorganized Node commands in keyboard shortcut cheatsheet.</li>
+            <li>Updated Dutch translation (thanks to Heimen Stoffels).</li>
+          </ul>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Added missing keyboard shortcut for task toggling to cheatsheet.</li>
+            <li>Fixed issues with exporting supported XML-based filetypes.</li>
+            <li>Fixed display issue when a descendant node is selected and one of its ancestors is collapsed.</li>
+            <li>Fixed Save As window adding the .outliner prefix to a file that already has this prefix.</li>
+            <li>Fixed display issue that can occur when a group is deleted.</li>
+            <li>Fixed issues with undo/redo support for expanding/collapsing groups.</li>
+            <li>Fixed issue with pasting UTF8 strings from clipboard.</li>
+          </ul>
+        </description>
+      </release>
       <release version="1.2.0" date="2020-05-17">
         <description>
           <p>New</p>

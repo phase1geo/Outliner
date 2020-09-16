@@ -59,25 +59,25 @@ public class NodeMenu : Gtk.Menu {
 
     _ot = ot;
 
-    _copy = new Gtk.MenuItem.with_label( _( "Copy" ) );
+    _copy = new Gtk.MenuItem();
+    _copy.add( new Granite.AccelLabel( _( "Copy" ), "<Control>c" ) );
     _copy.activate.connect( copy );
-    Utils.add_accel_label( _copy, 'c', Gdk.ModifierType.CONTROL_MASK );
 
-    _cut = new Gtk.MenuItem.with_label( _( "Cut" ) );
+    _cut = new Gtk.MenuItem();
+    _cut.add( new Granite.AccelLabel( _( "Cut" ), "<Control>x" ) );
     _cut.activate.connect( cut );
-    Utils.add_accel_label( _cut, 'x', Gdk.ModifierType.CONTROL_MASK );
 
-    _paste = new Gtk.MenuItem.with_label( _( "Paste" ) );
+    _paste = new Gtk.MenuItem();
+    _paste.add( new Granite.AccelLabel( _( "Paste" ), "<Control>v" ) );
     _paste.activate.connect( paste );
-    Utils.add_accel_label( _paste, 'v', Gdk.ModifierType.CONTROL_MASK );
 
-    _paste_replace = new Gtk.MenuItem.with_label( _( "Paste and Replace" ) );
+    _paste_replace = new Gtk.MenuItem();
+    _paste_replace.add( new Granite.AccelLabel( _( "Paste and Replace" ), "<Control><Shift>v" ) );
     _paste_replace.activate.connect( paste_replace );
-    Utils.add_accel_label( _paste_replace, 'v', (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK) );
 
-    _delete = new Gtk.MenuItem.with_label( _( "Delete" ) );
+    _delete = new Gtk.MenuItem();
+    _delete.add( new Granite.AccelLabel( _( "Delete" ), "Delete" ) );
     _delete.activate.connect( delete_node );
-    Utils.add_accel_label( _delete, 65535, 0 );
 
     var clone = new Gtk.MenuItem.with_label( _( "Clone" ) );
     var clone_menu = new Gtk.Menu();
@@ -92,13 +92,13 @@ public class NodeMenu : Gtk.Menu {
     _unclone = new Gtk.MenuItem.with_label( _( "Unclone" ) );
     _unclone.activate.connect( unclone );
 
-    _edit_text = new Gtk.MenuItem.with_label( _( "Edit Text" ) );
+    _edit_text = new Gtk.MenuItem();
+    _edit_text.add( new Granite.AccelLabel( _( "Edit Text" ), "e" ) );
     _edit_text.activate.connect( edit_text );
-    Utils.add_accel_label( _edit_text, 'e', 0 );
 
-    _edit_note = new Gtk.MenuItem.with_label( _( "Edit Note" ) );
+    _edit_note = new Gtk.MenuItem();
+    _edit_note.add( new Granite.AccelLabel( _( "Edit Note" ), "<Shift>e" ) );
     _edit_note.activate.connect( edit_note );
-    Utils.add_accel_label( _edit_note, 'e', Gdk.ModifierType.SHIFT_MASK );
 
     _note_display = new Gtk.MenuItem.with_label( _( "Show Note" ) );
     _note_display.activate.connect( toggle_note );
@@ -106,64 +106,64 @@ public class NodeMenu : Gtk.Menu {
     var tag_add = new Gtk.MenuItem.with_label( _( "Add Tag" ) );
     tag_add.activate.connect( add_tag );
 
-    _add_above = new Gtk.MenuItem.with_label( _( "Add Row Above" ) );
+    _add_above = new Gtk.MenuItem();
+    _add_above.add( new Granite.AccelLabel( _( "Add Row Above" ), "<Shift>Return" ) );
     _add_above.activate.connect( add_row_above );
-    Utils.add_accel_label( _add_above, 65293, Gdk.ModifierType.SHIFT_MASK );
 
-    _add_below = new Gtk.MenuItem.with_label( _( "Add Row Below" ) );
+    _add_below = new Gtk.MenuItem();
+    _add_below.add( new Granite.AccelLabel( _( "Add Row Below" ), "Return" ) );
     _add_below.activate.connect( add_row_below );
-    Utils.add_accel_label( _add_below, 65293, 0 );
 
-    _indent = new Gtk.MenuItem.with_label( _( "Indent" ) );
+    _indent = new Gtk.MenuItem();
+    _indent.add( new Granite.AccelLabel( _( "Indent" ), "Tab" ) );
     _indent.activate.connect( indent );
-    Utils.add_accel_label( _indent, 65289, 0 );
 
-    _unindent = new Gtk.MenuItem.with_label( _( "Unindent" ) );
+    _unindent = new Gtk.MenuItem();
+    _unindent.add( new Granite.AccelLabel( _( "Unindent" ), "<Shift>Tab" ) );
     _unindent.activate.connect( unindent );
-    Utils.add_accel_label( _unindent, 65289, Gdk.ModifierType.SHIFT_MASK );
 
     _expander = new Gtk.MenuItem.with_label( _( "Expand Children" ) );
     _expander.activate.connect( toggle_expand );
 
-    _focus = new Gtk.MenuItem.with_label( _( "Focus" ) );
+    _focus = new Gtk.MenuItem();
+    _focus.add( new Granite.AccelLabel( _( "Focus" ), "f" ) );
     _focus.activate.connect( focus_mode_enter );
-    Utils.add_accel_label( _focus, 'f', 0 );
 
     var select = new Gtk.MenuItem.with_label( _( "Select Row" ) );
     var selmenu = new Gtk.Menu();
     select.set_submenu( selmenu );
 
-    _select_above = new Gtk.MenuItem.with_label( _( "Select Row Above" ) );
+    _select_above = new Gtk.MenuItem();
+    _select_above.add( new Granite.AccelLabel( _( "Select Row Above" ), "Up" ) );
     _select_above.activate.connect( select_node_above );
-    Utils.add_accel_label( _select_above, 65362, 0 );
 
-    _select_below = new Gtk.MenuItem.with_label( _( "Select Row Below" ) );
+    _select_below = new Gtk.MenuItem();
+    _select_below.add( new Granite.AccelLabel( _( "Select Row Below" ), "Down" ) );
     _select_below.activate.connect( select_node_below );
-    Utils.add_accel_label( _select_below, 65364, 0 );
 
-    _select_prev_sibling = new Gtk.MenuItem.with_label( _( "Select Previous Sibling Row" ) );
+    _select_prev_sibling = new Gtk.MenuItem();
+    _select_prev_sibling.add( new Granite.AccelLabel( _( "Select Previous Sibling Row" ), "<Shift>Up" ) );
     _select_prev_sibling.activate.connect( select_prev_sibling_node );
-    Utils.add_accel_label( _select_prev_sibling, 65362, Gdk.ModifierType.SHIFT_MASK );
 
-    _select_next_sibling = new Gtk.MenuItem.with_label( _( "Select Next Sibling Row" ) );
+    _select_next_sibling = new Gtk.MenuItem();
+    _select_next_sibling.add( new Granite.AccelLabel( _( "Select Next Sibling Row" ), "<Shift>Down" ) );
     _select_next_sibling.activate.connect( select_next_sibling_node );
-    Utils.add_accel_label( _select_next_sibling, 65364, Gdk.ModifierType.SHIFT_MASK );
 
-    _select_parent = new Gtk.MenuItem.with_label( _( "Select Parent Row" ) );
+    _select_parent = new Gtk.MenuItem();
+    _select_parent.add( new Granite.AccelLabel( _( "Select Parent Row" ), "a" ) );
     _select_parent.activate.connect( select_parent_node );
-    Utils.add_accel_label( _select_parent, 97, 0 );
 
-    _select_last_child = new Gtk.MenuItem.with_label( _( "Select Last Child Row" ) );
+    _select_last_child = new Gtk.MenuItem();
+    _select_last_child.add( new Granite.AccelLabel( _( "Select Last Child Row" ), "c" ) );
     _select_last_child.activate.connect( select_last_child_node );
-    Utils.add_accel_label( _select_last_child, 99, 0 );
 
-    _select_first = new Gtk.MenuItem.with_label( _( "Select First Row" ) );
+    _select_first = new Gtk.MenuItem();
+    _select_first.add( new Granite.AccelLabel( _( "Select First Row" ), "<Shift>t" ) );
     _select_first.activate.connect( select_first_node );
-    Utils.add_accel_label( _select_first, 116, Gdk.ModifierType.SHIFT_MASK );
 
-    _select_last = new Gtk.MenuItem.with_label( _( "Select Last Row" ) );
+    _select_last = new Gtk.MenuItem();
+    _select_last.add( new Granite.AccelLabel( _( "Select Last Row" ), "<Shift>b" ) );
     _select_last.activate.connect( select_last_node );
-    Utils.add_accel_label( _select_last, 98, Gdk.ModifierType.SHIFT_MASK );
 
     _select_label = new Gtk.MenuItem.with_label( _( "Select Labeled Row" ) );
     var lbl_selmenu = new Gtk.Menu();
@@ -173,8 +173,8 @@ public class NodeMenu : Gtk.Menu {
     var lblmenu = new Gtk.Menu();
     labels.set_submenu( lblmenu );
 
-    _add_label = new Gtk.MenuItem.with_label( _( "Add Label" ) );
-    Utils.add_accel_label( _add_label, 35, 0 );
+    _add_label = new Gtk.MenuItem();
+    _add_label.add( new Granite.AccelLabel( _( "Add Label" ), "numbersign" ) );
     _add_label.activate.connect( toggle_label );
 
     var move_to_label = new Gtk.MenuItem.with_label( _( "Move To Label" ) );
@@ -244,19 +244,19 @@ public class NodeMenu : Gtk.Menu {
       var lbl_value = i + 1;
       var index     = i;
 
-      var move_item = new Gtk.CheckMenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
+      var move_item = new Gtk.CheckMenuItem();
+      move_item.add( new Granite.AccelLabel( _( "Label-" ) + lbl_value.to_string(), "<Control>" + lbl_value.to_string() ) );
       move_item.activate.connect(() => {
         _ot.handle_control_number( index );
       });
-      Utils.add_accel_label( move_item, (i + 49), Gdk.ModifierType.CONTROL_MASK );
       lbl_movemenu.add( move_item );
       _move_labels.append_val( move_item );
 
-      var sel_item = new Gtk.MenuItem.with_label( _( "Label-" ) + lbl_value.to_string() );
+      var sel_item = new Gtk.MenuItem();
+      sel_item.add( new Granite.AccelLabel( _( "Label-" ) + lbl_value.to_string(), lbl_value.to_string() ) );
       sel_item.activate.connect(() => {
         select_label( index );
       });
-      Utils.add_accel_label( sel_item, (i + 49), 0 );
       lbl_selmenu.add( sel_item );
       _select_labels.append_val( sel_item );
 
@@ -409,7 +409,7 @@ public class NodeMenu : Gtk.Menu {
 
   /* Enters focus mode */
   private void focus_mode_enter() {
-    _ot.focus_mode_enter();
+    _ot.focus_on_selected();
   }
 
   /* Selects the node just above the selected node */

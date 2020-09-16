@@ -573,7 +573,7 @@ public class Node {
   */
   private void set_ot_height() {
     if( this == get_root_node().get_last_node() ) {
-      _ot.set_size_request( -1, (int)last_y );
+      _ot.resize_table();
     }
   }
 
@@ -613,6 +613,13 @@ public class Node {
       }
     }
     return( last_y );
+  }
+
+  public void set_tree_alpha( double value ) {
+    alpha = value;
+    for( int i=0; i<children.length; i++ ) {
+      children.index( i ).set_tree_alpha( value );
+    }
   }
 
   /* Adjusts the position of the text object */
@@ -1457,25 +1464,25 @@ public class Node {
     Utils.set_context_color_with_alpha( ctx, theme.symbol_color, 0.5 );
     ctx.set_line_width( 1 );
 
-    var parent = this.parent;
-    while( !parent.is_root() ) {
-      if( parent.get_next_sibling() != null ) {
-        var x = (padx * 4) + 10 + (parent.depth * indent) + (expander_size / 2);
+    if( _ot.min_depth ) {
+      var parent = this.parent;
+      while( !parent.is_root() ) {
+        if( parent.get_next_sibling() != null ) {
+          var x = (padx * 4) + 10 + (parent.depth * indent) + (expander_size / 2);
+          ctx.move_to( x, _y );
+          ctx.line_to( x, (_y + _h) );
+          ctx.stroke();
+        }
+        parent = parent.parent;
+      }
+    } else {
+      for( int i=1; i<_depth; i++ ) {
+        var x = (padx * 4) + 10 + (i * indent) + (expander_size / 2);
         ctx.move_to( x, _y );
         ctx.line_to( x, (_y + _h) );
         ctx.stroke();
       }
-      parent = parent.parent;
     }
-
-    /*
-    for( int i=1; i<_depth; i++ ) {
-      var x = (padx * 4) + 10 + (i * indent) + (expander_size / 2);
-      ctx.move_to( x, _y );
-      ctx.line_to( x, (_y + _h) );
-      ctx.stroke();
-    }
-    */
 
   }
 
