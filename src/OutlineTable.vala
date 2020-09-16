@@ -76,6 +76,7 @@ public class OutlineTable : DrawingArea {
   private Tagger          _tagger;
   private TextCompletion  _completion;
   private bool            _markdown;
+  private bool            _blank_rows;
   private bool            _filtered   = false;
   private Node?           _focus_node = null;
 
@@ -230,6 +231,18 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool blank_rows {
+    get {
+      return( _blank_rows );
+    }
+    set {
+      if( _blank_rows != value ) {
+        _blank_rows = value;
+        queue_draw();
+        changed();
+      }
+    }
+  }
   public Tagger tagger {
     get {
       return( _tagger );
@@ -295,6 +308,7 @@ public class OutlineTable : DrawingArea {
     _show_tasks    = settings.get_boolean( "default-show-tasks" );
     _show_depth    = settings.get_boolean( "default-show-depth" );
     _markdown      = settings.get_boolean( "default-markdown-enabled" );
+    _blank_rows    = settings.get_boolean( "enable-blank-rows" );
     tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
     _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
 
@@ -2538,6 +2552,11 @@ public class OutlineTable : DrawingArea {
       _markdown = bool.parse( m );
     }
 
+    var br = n->get_prop( "blank-rows" );
+    if( br != null ) {
+      _blank_rows = bool.parse( br );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -2596,6 +2615,7 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "show-tasks",       _show_tasks.to_string() );
     n->set_prop( "show-depth",       _show_depth.to_string() );
     n->set_prop( "markdown",         _markdown.to_string() );
+    n->set_prop( "blank-rows",       _blank_rows.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );

@@ -1382,7 +1382,7 @@ public class Node {
   /*******************/
 
   public bool draw_as_blank() {
-    return( (mode != NodeMode.EDITABLE) && is_main() && (name.text.text == "") && (children.length == 0) );
+    return( (mode != NodeMode.EDITABLE) && is_main() && (name.text.text == "") && (children.length == 0) && _ot.blank_rows );
   }
 
   /* Draws the background for the given row */
