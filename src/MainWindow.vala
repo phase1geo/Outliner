@@ -49,6 +49,7 @@ public class MainWindow : ApplicationWindow {
   private Switch          _condensed;
   private Switch          _show_tasks;
   private Switch          _show_depth;
+  private Switch          _blank_rows;
   private Switch          _markdown;
   private Label           _stats_chars;
   private Label           _stats_words;
@@ -785,6 +786,19 @@ public class MainWindow : ApplicationWindow {
     dbox.pack_end(   _show_depth, false, false, 10 );
     box.pack_start( dbox, false, false, 10 );
 
+    /* Add blank rows switch */
+    var brbox = new Box( Orientation.HORIZONTAL, 0 );
+    var brlbl = new Label( _( "Enable Blank Rows" ) );
+    _blank_rows = new Switch();
+    _blank_rows.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.blank_rows = state;
+      return( false );
+    });
+    brbox.pack_start( brlbl,       false, true, 10 );
+    brbox.pack_end(   _blank_rows, false, false, 10 );
+    box.pack_start( brbox, false, false, 10 );
+
     /* Add the Markdown switch */
     var mbox = new Box( Orientation.HORIZONTAL, 0 );
     var mlbl = new Label( _( "Enable Markdown Highlighting" ) );
@@ -1240,6 +1254,7 @@ public class MainWindow : ApplicationWindow {
     _condensed.state     = table.condensed;
     _show_tasks.state    = table.show_tasks;
     _show_depth.state    = table.show_depth;
+    _blank_rows.state    = table.blank_rows;
     _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
   }
