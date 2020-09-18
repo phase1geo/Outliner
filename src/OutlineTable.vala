@@ -528,6 +528,11 @@ public class OutlineTable : DrawingArea {
     return( (selected != null) && (selected.mode == NodeMode.NOTEEDIT) );
   }
 
+  /* Returns true if the currently selected node is joinable */
+  private bool is_node_joinable() {
+    return( is_node_selected() && (selected.get_previous_sibling() == selected.get_previous_node()) );
+  }
+
   /* Returns true if the currently selected node is editable and has text selected */
   private bool is_node_text_selected() {
     return( is_node_editable() && selected.name.is_selected() );
@@ -881,43 +886,43 @@ public class OutlineTable : DrawingArea {
     if( selected != null ) {
       if( control ) {
         switch( e.keyval ) {
-          case Key.c         :  do_copy();                      break;
-          case Key.x         :  do_cut();                       break;
-          case Key.v         :  do_paste( false );              break;
-          case Key.V         :  do_paste( true );               break;
-          case Key.Return    :  handle_control_return();        break;
-          case Key.Tab       :  handle_control_tab();           break;
-          case Key.Right     :  handle_control_right( shift );  break;
-          case Key.Left      :  handle_control_left( shift );   break;
-          case Key.Up        :  handle_control_up( shift );     break;
-          case Key.Down      :  handle_control_down( shift );   break;
-          case Key.BackSpace :  handle_control_backspace();     break;
-          case Key.Delete    :  handle_control_delete();        break;
-          case Key.period    :  handle_control_period();        break;
-          case Key.slash     :  handle_control_slash();         break;
-          case Key.@1        :  handle_control_number( 0 );     break;
-          case Key.@2        :  handle_control_number( 1 );     break;
-          case Key.@3        :  handle_control_number( 2 );     break;
-          case Key.@4        :  handle_control_number( 3 );     break;
-          case Key.@5        :  handle_control_number( 4 );     break;
-          case Key.@6        :  handle_control_number( 5 );     break;
-          case Key.@7        :  handle_control_number( 6 );     break;
-          case Key.@8        :  handle_control_number( 7 );     break;
-          case Key.@9        :  handle_control_number( 8 );     break;
-          case Key.A         :  handle_control_a( true );       break;
-          case Key.B         :  handle_control_b( true );       break;
-          case Key.T         :  handle_control_t( true );       break;
-          case Key.backslash :  handle_control_backslash();     break;
-          case Key.a         :  handle_control_a( false );      break;
-          case Key.b         :  handle_control_b( false );      break;
-          case Key.d         :  handle_control_d();             break;
-          case Key.h         :  handle_control_h();             break;
-          case Key.i         :  handle_control_i();             break;
-          case Key.j         :  handle_control_j();             break;
-          case Key.k         :  handle_control_k();             break;
-          case Key.t         :  handle_control_t( false );      break;
-          case Key.u         :  handle_control_u();             break;
-          case Key.w         :  handle_control_w();             break;
+          case Key.c         :  do_copy();                       break;
+          case Key.x         :  do_cut();                        break;
+          case Key.v         :  do_paste( false );               break;
+          case Key.V         :  do_paste( true );                break;
+          case Key.Return    :  handle_control_return( shift );  break;
+          case Key.Tab       :  handle_control_tab();            break;
+          case Key.Right     :  handle_control_right( shift );   break;
+          case Key.Left      :  handle_control_left( shift );    break;
+          case Key.Up        :  handle_control_up( shift );      break;
+          case Key.Down      :  handle_control_down( shift );    break;
+          case Key.BackSpace :  handle_control_backspace();      break;
+          case Key.Delete    :  handle_control_delete();         break;
+          case Key.period    :  handle_control_period();         break;
+          case Key.slash     :  handle_control_slash();          break;
+          case Key.@1        :  handle_control_number( 0 );      break;
+          case Key.@2        :  handle_control_number( 1 );      break;
+          case Key.@3        :  handle_control_number( 2 );      break;
+          case Key.@4        :  handle_control_number( 3 );      break;
+          case Key.@5        :  handle_control_number( 4 );      break;
+          case Key.@6        :  handle_control_number( 5 );      break;
+          case Key.@7        :  handle_control_number( 6 );      break;
+          case Key.@8        :  handle_control_number( 7 );      break;
+          case Key.@9        :  handle_control_number( 8 );      break;
+          case Key.A         :  handle_control_a( true );        break;
+          case Key.B         :  handle_control_b( true );        break;
+          case Key.T         :  handle_control_t( true );        break;
+          case Key.backslash :  handle_control_backslash();      break;
+          case Key.a         :  handle_control_a( false );       break;
+          case Key.b         :  handle_control_b( false );       break;
+          case Key.d         :  handle_control_d();              break;
+          case Key.h         :  handle_control_h();              break;
+          case Key.i         :  handle_control_i();              break;
+          case Key.j         :  handle_control_j();              break;
+          case Key.k         :  handle_control_k();              break;
+          case Key.t         :  handle_control_t( false );       break;
+          case Key.u         :  handle_control_u();              break;
+          case Key.w         :  handle_control_w();              break;
         }
       } else if( nomod || shift ) {
         if( !insert_user_text( e.str ) ) {
@@ -1441,8 +1446,8 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  /* Handles a Control-Return keypress */
-  private void handle_control_return() {
+  /* Splits the text at the current cursor position */
+  private void split_text() {
     if( is_node_editable() ) {
       var sel    = selected;
       var curpos = selected.name.cursor;
@@ -1453,12 +1458,41 @@ public class OutlineTable : DrawingArea {
       var node   = create_node( title, tags );
       selected.name.text.remove_text( curpos, (endpos - curpos ) );
       insert_node( sel.parent, node, index );
-      set_node_mode( selected, NodeMode.EDITABLE );
       _im_context.reset();
       undo_buffer.add_item( new UndoNodeSplit( selected ) );
+    }
+  }
+
+  /* Joins the current row with the row above it */
+  private void join_row() {
+    if( is_node_joinable() ) {
+      var sel  = selected;
+      var prev = selected.get_previous_node();
+      undo_buffer.add_item( new UndoNodeJoin( sel, prev ) );
+      prev.name.text.insert_formatted_text( prev.name.text.text.length, sel.name.text );
+      for( int i=0; i<sel.children.length; i++ ) {
+        var child = sel.children.index( 0 );
+        sel.remove_child( child );
+        prev.add_child( child );
+      }
+      sel.parent.remove_child( sel );
+      selected = prev;
+      queue_draw();
+      changed();
+    }
+  }
+
+  /* Handles a Control-Return keypress */
+  private void handle_control_return( bool shift ) {
+    if( is_node_editable() && !shift ) {
+      split_text();
     } else if( is_note_editable() ) {
       selected.note.insert( "\n", undo_text );
       queue_draw();
+    } else if( is_node_selected() ) {
+      if( shift ) {
+        join_row();
+      }
     }
   }
 
