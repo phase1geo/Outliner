@@ -123,7 +123,7 @@ public class MainWindow : ApplicationWindow {
     _header = new HeaderBar();
     _header.set_show_close_button( true );
     _header.get_style_context().add_class( "outliner-toolbar" );
-    _header.get_style_context().add_class( "titlebar" );
+    // _header.get_style_context().add_class( "titlebar" );
 
     /* Add header bar revealer */
     _header_revealer = new Revealer();
@@ -1308,6 +1308,7 @@ public class MainWindow : ApplicationWindow {
 
     /* Hide the header bar */
     _header_revealer.reveal_child = false;
+    _nb.show_tabs = false;
 
   }
 
