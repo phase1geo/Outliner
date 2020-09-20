@@ -37,6 +37,7 @@ public class NodeMenu : Gtk.Menu {
   private Gtk.MenuItem _note_display;
   private Gtk.MenuItem _add_above;
   private Gtk.MenuItem _add_below;
+  private Gtk.MenuItem _join;
   private Gtk.MenuItem _indent;
   private Gtk.MenuItem _unindent;
   private Gtk.MenuItem _expander;
@@ -113,6 +114,10 @@ public class NodeMenu : Gtk.Menu {
     _add_below = new Gtk.MenuItem();
     _add_below.add( new Granite.AccelLabel( _( "Add Row Below" ), "Return" ) );
     _add_below.activate.connect( add_row_below );
+
+    _join = new Gtk.MenuItem();
+    _join.add( new Granite.AccelLabel( _( "Join To Row Above" ), "<Control>BackSpace" ) );
+    _join.activate.connect( join_row );
 
     _indent = new Gtk.MenuItem();
     _indent.add( new Granite.AccelLabel( _( "Indent" ), "Tab" ) );
@@ -204,6 +209,7 @@ public class NodeMenu : Gtk.Menu {
     add( new SeparatorMenuItem() );
     add( _add_above );
     add( _add_below );
+    add( _join );
     add( new SeparatorMenuItem() );
     add( select );
     add( labels );
@@ -292,6 +298,7 @@ public class NodeMenu : Gtk.Menu {
     _select_first.set_sensitive( (first_node != _ot.selected) && !first_node.is_root() );
     _select_last.set_sensitive( (_ot.root.get_last_node() != _ot.selected) && !first_node.is_root() );
     _select_label.set_sensitive( false );
+    _join.set_sensitive( _ot.is_node_joinable() );
 
     if( _ot.labels.get_label_for_node( _ot.selected ) == -1 ) {
       _add_label.label = _( "Add Label" );
@@ -390,6 +397,11 @@ public class NodeMenu : Gtk.Menu {
   /* Adds a new row below the currently selected row */
   private void add_row_below() {
     _ot.add_sibling_node( true );
+  }
+
+  /* Joins the current row to the one above it */
+  private void join_row() {
+    _ot.join_row();
   }
 
   /* Indents the currently selected row by one level */
