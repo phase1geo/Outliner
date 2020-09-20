@@ -1460,8 +1460,14 @@ public class OutlineTable : DrawingArea {
       var index  = selected.index() + 1;
       var tags   = selected.name.text.get_tags_in_range( curpos, endpos );
       var node   = create_node( title, tags );
+      var num_children = selected.children.length;
       selected.name.text.remove_text( curpos, (endpos - curpos ) );
       insert_node( sel.parent, node, index );
+      for( int i=0; i<num_children; i++ ) {
+        var child = sel.children.index( 0 );
+        sel.remove_child( child );
+        node.add_child( child );
+      }
       _im_context.reset();
       undo_buffer.add_item( new UndoNodeSplit( selected ) );
     }
