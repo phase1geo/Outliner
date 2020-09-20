@@ -529,7 +529,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Returns true if the currently selected node is joinable */
-  private bool is_node_joinable() {
+  public bool is_node_joinable() {
     return( is_node_selected() && (selected.get_previous_node() != null) );
   }
 
@@ -847,19 +847,21 @@ public class OutlineTable : DrawingArea {
 
       /* If the user clicked in an expander, toggle the expander */
       if( !_motion ) {
-        if( _active.is_within_expander( e.x, e.y ) ) {
-          toggle_expand( _active );
-        } else if( _active.is_within_note_icon( e.x, e.y ) ) {
-          var control = (bool)(e.state & ModifierType.CONTROL_MASK);
-          if( control ) {
-            toggle_notes( _active );
-          } else {
-            toggle_note( _active, true );
+        if( _active != null ) {
+          if( _active.is_within_expander( e.x, e.y ) ) {
+            toggle_expand( _active );
+          } else if( _active.is_within_note_icon( e.x, e.y ) ) {
+            var control = (bool)(e.state & ModifierType.CONTROL_MASK);
+            if( control ) {
+              toggle_notes( _active );
+            } else {
+              toggle_note( _active, true );
+            }
+          } else if( _active.is_within_task( e.x, e.y ) ) {
+            _active.task = (_active.task == NodeTaskMode.OPEN) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
+            queue_draw();
+            changed();
           }
-        } else if( _active.is_within_task( e.x, e.y ) ) {
-          _active.task = (_active.task == NodeTaskMode.OPEN) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
-          queue_draw();
-          changed();
         }
       }
 
@@ -1373,6 +1375,8 @@ public class OutlineTable : DrawingArea {
       selected.note.backspace_word( undo_text );
       see( selected );
       queue_draw();
+    } else if( is_node_joinable() ) {
+      join_row();
     }
   }
 
@@ -1464,24 +1468,22 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Joins the current row with the row above it */
-  private void join_row() {
-    if( is_node_joinable() ) {
-      var sel          = selected;
-      var prev         = selected.get_previous_node();
-      var sel_children = sel.children.length;
-      undo_buffer.add_item( new UndoNodeJoin( sel, prev ) );
-      prev.name.text.set_text( prev.name.text.text + " " );
-      prev.name.text.insert_formatted_text( prev.name.text.text.length, sel.name.text );
-      for( int i=0; i<sel_children; i++ ) {
-        var child = sel.children.index( 0 );
-        sel.remove_child( child );
-        prev.add_child( child );
-      }
-      sel.parent.remove_child( sel );
-      selected = prev;
-      queue_draw();
-      changed();
+  public void join_row() {
+    var sel          = selected;
+    var prev         = selected.get_previous_node();
+    var sel_children = sel.children.length;
+    undo_buffer.add_item( new UndoNodeJoin( sel, prev ) );
+    prev.name.text.set_text( prev.name.text.text + " " );
+    prev.name.text.insert_formatted_text( prev.name.text.text.length, sel.name.text );
+    for( int i=0; i<sel_children; i++ ) {
+      var child = sel.children.index( 0 );
+      sel.remove_child( child );
+      prev.add_child( child );
     }
+    sel.parent.remove_child( sel );
+    selected = prev;
+    queue_draw();
+    changed();
   }
 
   /* Handles a Control-Return keypress */
@@ -1491,10 +1493,6 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_editable() ) {
       selected.note.insert( "\n", undo_text );
       queue_draw();
-    } else if( is_node_selected() ) {
-      if( shift ) {
-        join_row();
-      }
     }
   }
 
