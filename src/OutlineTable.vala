@@ -530,7 +530,7 @@ public class OutlineTable : DrawingArea {
 
   /* Returns true if the currently selected node is joinable */
   private bool is_node_joinable() {
-    return( is_node_selected() && (selected.get_previous_sibling() == selected.get_previous_node()) );
+    return( is_node_selected() && (selected.get_previous_node() != null) );
   }
 
   /* Returns true if the currently selected node is editable and has text selected */
@@ -1466,11 +1466,13 @@ public class OutlineTable : DrawingArea {
   /* Joins the current row with the row above it */
   private void join_row() {
     if( is_node_joinable() ) {
-      var sel  = selected;
-      var prev = selected.get_previous_node();
+      var sel          = selected;
+      var prev         = selected.get_previous_node();
+      var sel_children = sel.children.length;
       undo_buffer.add_item( new UndoNodeJoin( sel, prev ) );
+      prev.name.text.set_text( prev.name.text.text + " " );
       prev.name.text.insert_formatted_text( prev.name.text.text.length, sel.name.text );
-      for( int i=0; i<sel.children.length; i++ ) {
+      for( int i=0; i<sel_children; i++ ) {
         var child = sel.children.index( 0 );
         sel.remove_child( child );
         prev.add_child( child );
