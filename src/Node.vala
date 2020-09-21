@@ -332,7 +332,9 @@ public class Node {
   }
 
   /* Constructor of root node */
-  public Node.root() {}
+  public Node.root( OutlineTable ot ) {
+    _ot = ot;
+  }
 
   /* Copy constructor */
   public Node.clone_from_node( OutlineTable ot, Node node ) {

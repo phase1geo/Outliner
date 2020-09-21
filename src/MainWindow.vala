@@ -114,6 +114,8 @@ public class MainWindow : ApplicationWindow {
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
 
+    var focus_mode = settings.get_boolean( "focus-mode" );
+
     enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
 
     /* Add the theme CSS */
@@ -128,7 +130,7 @@ public class MainWindow : ApplicationWindow {
     /* Add header bar revealer */
     _header_revealer = new Revealer();
     _header_revealer.add( _header );
-    _header_revealer.reveal_child = true;
+    _header_revealer.reveal_child = !focus_mode;
 
     /* Set the main window data */
     title = _( "Outliner" );
@@ -152,7 +154,7 @@ public class MainWindow : ApplicationWindow {
 
     _nb = new DynamicNotebook();
     _nb.add_button_visible = false;
-    _nb.tab_bar_behavior   = DynamicNotebook.TabBarBehavior.SINGLE;
+    _nb.tab_bar_behavior   = focus_mode ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
     _nb.tab_switched.connect( tab_switched );
     _nb.tab_reordered.connect( tab_reordered );
     _nb.tab_removed.connect( tab_removed );
@@ -278,6 +280,7 @@ public class MainWindow : ApplicationWindow {
     do_fonts_changed( ot );
     update_title( ot );
     canvas_changed( ot );
+    ot.top_margin = _settings.get_boolean( "focus-mode" ) ? 60 : 0;
     ot.update_theme();
     ot.grab_focus();
     save_tab_state( tab );

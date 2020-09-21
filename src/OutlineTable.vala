@@ -277,7 +277,7 @@ public class OutlineTable : DrawingArea {
     _doc = new Document( this, settings );
 
     /* Create the root node */
-    root = new Node.root();
+    root = new Node.root( this );
 
     /* Create contextual menu(s) */
     _node_menu = new NodeMenu( this );
@@ -313,6 +313,7 @@ public class OutlineTable : DrawingArea {
     _blank_rows    = settings.get_boolean( "enable-blank-rows" );
     tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
     _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
+    top_margin     = settings.get_boolean( "focus-mode" ) ? 60 : 0;
 
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
