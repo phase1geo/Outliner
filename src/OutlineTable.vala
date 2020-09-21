@@ -79,6 +79,7 @@ public class OutlineTable : DrawingArea {
   private bool            _blank_rows;
   private bool            _filtered   = false;
   private Node?           _focus_node = null;
+  private bool            _in_focus_exit = false;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -249,6 +250,7 @@ public class OutlineTable : DrawingArea {
     }
   }
   public bool tasks_on_right { get; private set; default = true; }
+  public int  top_margin     { get; set; default = 0; }
 
   /* Allocate static parsers */
   public MarkdownParser markdown_parser { get; private set; }
@@ -315,6 +317,11 @@ public class OutlineTable : DrawingArea {
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
+      top_margin     = settings.get_boolean( "focus-mode" ) ? 60 : 0;
+      if( root.children.length > 0 ) {
+        root.children.index( 0 ).y = top_margin;
+        root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
+      }
       show_tasks_changed();
       queue_draw();
     });
@@ -687,6 +694,19 @@ public class OutlineTable : DrawingArea {
     _motion_x = e.x;
     _motion_y = e.y;
 
+    /* Handles the focus on exit button */
+    var prev_in_focus_exit = _in_focus_exit;
+    _in_focus_exit = false;
+
+    if( is_within_focus_exit( e.x, e.y ) ) {
+      _in_focus_exit = true;
+      set_tooltip_markup( _( "Exit focus mode" ) );
+      queue_draw();
+    } else if( prev_in_focus_exit ) {
+      set_tooltip_markup( null );
+      queue_draw();
+    }
+
     if( _pressed ) {
 
       /* If we are moving a clicked row for the first time, handle it */
@@ -807,6 +827,12 @@ public class OutlineTable : DrawingArea {
   private bool on_release( EventButton e ) {
 
     if( _pressed ) {
+
+      /* Handles a click on the focus mode exit button */
+      if( _in_focus_exit ) {
+        _in_focus_exit = false;
+        win.action_focus_mode();
+      }
 
       /* Handle a node move */
       if( _motion ) {
@@ -2967,6 +2993,7 @@ public class OutlineTable : DrawingArea {
   public bool on_draw( Context ctx ) {
 
     draw_background( ctx );
+    draw_exit_focus_mode( ctx );
     draw_all( ctx );
 
     return( false );
@@ -2976,6 +3003,30 @@ public class OutlineTable : DrawingArea {
   /* Draw the background from the stylesheet */
   private void draw_background( Context ctx ) {
     get_style_context().render_background( ctx, 0, 0, get_allocated_width(), get_allocated_height() );
+  }
+
+  /* Returns true if the coordinates are within the focus exit */
+  private bool is_within_focus_exit( double x, double y ) {
+    if( win.settings.get_boolean( "focus-mode" ) ) {
+      var width = get_allocated_width();
+      return( Utils.is_within_bounds( x, y, (width - 45), 15, 30, 30 ) );
+    }
+    return( false );
+  }
+
+  /* Draws the focus mode exit icon */
+  private void draw_exit_focus_mode( Context ctx ) {
+    if( win.settings.get_boolean( "focus-mode" ) ) {
+      var width = get_allocated_width();
+      Utils.set_context_color_with_alpha( ctx, _theme.symbol_color, (_in_focus_exit ? 1.0 : 0.5) );
+      ctx.set_line_width( 4 );
+      ctx.arc( (width - 30), 30, 15, 0, (2 * Math.PI) );
+      ctx.move_to( (width - 35), 25 );
+      ctx.line_to( (width - 25), 35 );
+      ctx.move_to( (width - 25), 25 );
+      ctx.line_to( (width - 35), 35 );
+      ctx.stroke();
+    }
   }
 
   /* Draws all of the root node trees */

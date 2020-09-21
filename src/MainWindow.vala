@@ -1304,11 +1304,14 @@ public class MainWindow : ApplicationWindow {
   }
 
   /* Hides the header bar */
-  private void action_focus_mode() {
+  public void action_focus_mode() {
+
+    var enable = _header_revealer.reveal_child;
 
     /* Hide the header bar */
-    _header_revealer.reveal_child = false;
-    _nb.show_tabs = false;
+    _header_revealer.reveal_child = !enable;
+    _nb.show_tabs = !enable;
+    _settings.set_boolean( "focus-mode", enable );
 
   }
 
