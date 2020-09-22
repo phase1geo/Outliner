@@ -1312,7 +1312,7 @@ public class MainWindow : ApplicationWindow {
 
     /* Hide the header bar */
     _header_revealer.reveal_child = !enable;
-    _nb.show_tabs = !enable;
+    _nb.tab_bar_behavior   = enable ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
     _settings.set_boolean( "focus-mode", enable );
 
   }
