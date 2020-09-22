@@ -35,7 +35,8 @@ public class MainWindow : ApplicationWindow {
   private const string DARK_KEY       = "prefer-dark";
 
   private GLib.Settings   _settings;
-  private HeaderBar?      _header         = null;
+  private Revealer        _header_revealer;
+  private HeaderBar       _header;
   private DynamicNotebook _nb;
   private Button          _search_btn;
   private Popover?        _export         = null;
@@ -83,6 +84,7 @@ public class MainWindow : ApplicationWindow {
     { "action_export",        action_export },
     { "action_print",         action_print },
     { "action_shortcuts",     action_shortcuts },
+    { "action_focus_mode",    action_focus_mode },
     { "action_reset_fonts",   action_reset_fonts },
     { "action_zoom_in1",      action_zoom_in },
     { "action_zoom_in2",      action_zoom_in },
@@ -112,6 +114,8 @@ public class MainWindow : ApplicationWindow {
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
 
+    var focus_mode = settings.get_boolean( "focus-mode" );
+
     enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
 
     /* Add the theme CSS */
@@ -120,6 +124,13 @@ public class MainWindow : ApplicationWindow {
     /* Create the header bar */
     _header = new HeaderBar();
     _header.set_show_close_button( true );
+    _header.get_style_context().add_class( "outliner-toolbar" );
+    _header.get_style_context().add_class( "titlebar" );
+
+    /* Add header bar revealer */
+    _header_revealer = new Revealer();
+    _header_revealer.add( _header );
+    _header_revealer.reveal_child = !focus_mode;
 
     /* Set the main window data */
     title = _( "Outliner" );
@@ -129,9 +140,12 @@ public class MainWindow : ApplicationWindow {
       move( window_x, window_y );
     }
     set_default_size( window_w, window_h );
-    set_titlebar( _header );
+    set_titlebar( _header_revealer );
     set_border_width( 2 );
     destroy.connect( Gtk.main_quit );
+
+    /* Allows the titlebar to be drawn without a large black border */
+    _header_revealer.get_style_context().remove_class( "titlebar" );
 
     /* Set the stage for menu actions */
     var actions = new SimpleActionGroup ();
@@ -143,7 +157,7 @@ public class MainWindow : ApplicationWindow {
 
     _nb = new DynamicNotebook();
     _nb.add_button_visible = false;
-    _nb.tab_bar_behavior   = DynamicNotebook.TabBarBehavior.SINGLE;
+    _nb.tab_bar_behavior   = focus_mode ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
     _nb.tab_switched.connect( tab_switched );
     _nb.tab_reordered.connect( tab_reordered );
     _nb.tab_removed.connect( tab_removed );
@@ -474,6 +488,7 @@ public class MainWindow : ApplicationWindow {
     app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
     app.set_accels_for_action( "win.action_shortcuts",   { "F1" } );
+    app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
     app.set_accels_for_action( "win.action_zoom_in1",    { "<Control>plus" } );
     app.set_accels_for_action( "win.action_zoom_in2",    { "<Control>equal" } );
     app.set_accels_for_action( "win.action_zoom_out",    { "<Control>minus" } );
@@ -824,6 +839,14 @@ public class MainWindow : ApplicationWindow {
     shortcuts.action_name = "win.action_shortcuts";
     btn_box.pack_start( shortcuts, false, false, 5 );
 
+    /* Focus mode */
+    var focus_mode = new ModelButton();
+    focus_mode.get_child().destroy();
+    focus_mode.add( new Granite.AccelLabel( _( "Enter Focus Mode" ), "F2" ) );
+    focus_mode.action_name = "win.action_focus_mode";
+    btn_box.pack_start( focus_mode, false, false, 5 );
+
+    /* Font reset */
     var reset_fonts = new ModelButton();
     reset_fonts.text = _( "Reset Fonts to Defaults" );
     reset_fonts.action_name = "win.action_reset_fonts";
@@ -1282,6 +1305,18 @@ public class MainWindow : ApplicationWindow {
     }
 
     win.show();
+
+  }
+
+  /* Hides the header bar */
+  public void action_focus_mode() {
+
+    var enable = _header_revealer.reveal_child;
+
+    /* Hide the header bar */
+    _header_revealer.reveal_child = !enable;
+    _nb.tab_bar_behavior   = enable ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
+    _settings.set_boolean( "focus-mode", enable );
 
   }
 
