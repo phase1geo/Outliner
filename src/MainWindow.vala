@@ -125,7 +125,7 @@ public class MainWindow : ApplicationWindow {
     _header = new HeaderBar();
     _header.set_show_close_button( true );
     _header.get_style_context().add_class( "outliner-toolbar" );
-    // _header.get_style_context().add_class( "titlebar" );
+    _header.get_style_context().add_class( "titlebar" );
 
     /* Add header bar revealer */
     _header_revealer = new Revealer();
@@ -143,6 +143,9 @@ public class MainWindow : ApplicationWindow {
     set_titlebar( _header_revealer );
     set_border_width( 2 );
     destroy.connect( Gtk.main_quit );
+
+    /* Allows the titlebar to be drawn without a large black border */
+    _header_revealer.get_style_context().remove_class( "titlebar" );
 
     /* Set the stage for menu actions */
     var actions = new SimpleActionGroup ();

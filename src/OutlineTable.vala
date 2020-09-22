@@ -249,11 +249,7 @@ public class OutlineTable : DrawingArea {
       return( _tagger );
     }
   }
-  public int top_margin {
-    get {
-      return( _win.settings.get_boolean( "focus-mode" ) ? 60 : 0 );
-    }
-  }
+  public int top_margin      { get; private set; default = 60; }
   public bool tasks_on_right { get; private set; default = true; }
 
   /* Allocate static parsers */
@@ -703,7 +699,7 @@ public class OutlineTable : DrawingArea {
 
     if( is_within_focus_exit( e.x, e.y ) ) {
       _in_focus_exit = true;
-      set_tooltip_markup( _( "Exit focus mode" ) );
+      set_tooltip_markup( Utils.tooltip_with_accel( _( "Exit Focus Mode" ), "F2" ) );
       queue_draw();
     } else if( prev_in_focus_exit ) {
       set_tooltip_markup( null );
