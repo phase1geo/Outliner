@@ -249,8 +249,12 @@ public class OutlineTable : DrawingArea {
       return( _tagger );
     }
   }
+  public int top_margin {
+    get {
+      return( _win.settings.get_boolean( "focus-mode" ) ? 60 : 0 );
+    }
+  }
   public bool tasks_on_right { get; private set; default = true; }
-  public int  top_margin     { get; set; default = 0; }
 
   /* Allocate static parsers */
   public MarkdownParser markdown_parser { get; private set; }
@@ -313,12 +317,10 @@ public class OutlineTable : DrawingArea {
     _blank_rows    = settings.get_boolean( "enable-blank-rows" );
     tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
     _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
-    top_margin     = settings.get_boolean( "focus-mode" ) ? 60 : 0;
 
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
-      top_margin     = settings.get_boolean( "focus-mode" ) ? 60 : 0;
       if( root.children.length > 0 ) {
         root.children.index( 0 ).y = top_margin;
         root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );

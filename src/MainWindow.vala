@@ -280,7 +280,6 @@ public class MainWindow : ApplicationWindow {
     do_fonts_changed( ot );
     update_title( ot );
     canvas_changed( ot );
-    ot.top_margin = _settings.get_boolean( "focus-mode" ) ? 60 : 0;
     ot.update_theme();
     ot.grab_focus();
     save_tab_state( tab );
