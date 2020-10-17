@@ -80,6 +80,27 @@
       <value key="x-appcenter-suggested-price">10</value>
     </custom>
     <releases>
+      <release version="1.4.0" date="2020-10-16">
+        <description>
+          <p>New</p>
+          <ul>
+            <li>Added menu accelerators for Export, Print and Shortcut Cheatsheet menu items.</li>
+            <li>Added support for showing notifications after export completes.</li>
+            <li>Added support for Menu or Shift-F10 keyboard shortcut for showing contextual menu.</li>
+            <li>Added support for displaying main rows without text as blank rows.</li>
+            <li>Added support for joining two rows.</li>
+            <li>Added support for hiding header bar and tab bar for focused writing mode.</li>
+          </ul>
+          <p>Changes</p>
+          <ul>
+            <li>Updated Dutch translation (thanks to Heimen Stoffels).</li>
+            <li>Improved look of menu accelerators.</li>
+            <li>Changing behavior of row split.</li>
+            <li>Updated shortcut cheatsheet.</li>
+            <li>Adding top margin to document for improved readability.</li>
+          </ul>
+        </description>
+      </release>
       <release version="1.3.0" date="2020-08-02">
         <description>
           <p>New</p>
