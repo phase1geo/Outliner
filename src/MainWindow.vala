@@ -35,7 +35,8 @@ public class MainWindow : ApplicationWindow {
   private const string DARK_KEY       = "prefer-dark";
 
   private GLib.Settings   _settings;
-  private HeaderBar?      _header         = null;
+  private Revealer        _header_revealer;
+  private HeaderBar       _header;
   private DynamicNotebook _nb;
   private Button          _search_btn;
   private Popover?        _export         = null;
@@ -49,6 +50,7 @@ public class MainWindow : ApplicationWindow {
   private Switch          _condensed;
   private Switch          _show_tasks;
   private Switch          _show_depth;
+  private Switch          _blank_rows;
   private Switch          _markdown;
   private Label           _stats_chars;
   private Label           _stats_words;
@@ -82,6 +84,7 @@ public class MainWindow : ApplicationWindow {
     { "action_export",        action_export },
     { "action_print",         action_print },
     { "action_shortcuts",     action_shortcuts },
+    { "action_focus_mode",    action_focus_mode },
     { "action_reset_fonts",   action_reset_fonts },
     { "action_zoom_in1",      action_zoom_in },
     { "action_zoom_in2",      action_zoom_in },
@@ -111,6 +114,8 @@ public class MainWindow : ApplicationWindow {
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
 
+    var focus_mode = settings.get_boolean( "focus-mode" );
+
     enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
 
     /* Add the theme CSS */
@@ -119,6 +124,13 @@ public class MainWindow : ApplicationWindow {
     /* Create the header bar */
     _header = new HeaderBar();
     _header.set_show_close_button( true );
+    _header.get_style_context().add_class( "outliner-toolbar" );
+    _header.get_style_context().add_class( "titlebar" );
+
+    /* Add header bar revealer */
+    _header_revealer = new Revealer();
+    _header_revealer.add( _header );
+    _header_revealer.reveal_child = !focus_mode;
 
     /* Set the main window data */
     title = _( "Outliner" );
@@ -128,9 +140,12 @@ public class MainWindow : ApplicationWindow {
       move( window_x, window_y );
     }
     set_default_size( window_w, window_h );
-    set_titlebar( _header );
+    set_titlebar( _header_revealer );
     set_border_width( 2 );
     destroy.connect( Gtk.main_quit );
+
+    /* Allows the titlebar to be drawn without a large black border */
+    _header_revealer.get_style_context().remove_class( "titlebar" );
 
     /* Set the stage for menu actions */
     var actions = new SimpleActionGroup ();
@@ -142,7 +157,7 @@ public class MainWindow : ApplicationWindow {
 
     _nb = new DynamicNotebook();
     _nb.add_button_visible = false;
-    _nb.tab_bar_behavior   = DynamicNotebook.TabBarBehavior.SINGLE;
+    _nb.tab_bar_behavior   = focus_mode ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
     _nb.tab_switched.connect( tab_switched );
     _nb.tab_reordered.connect( tab_reordered );
     _nb.tab_removed.connect( tab_removed );
@@ -473,6 +488,7 @@ public class MainWindow : ApplicationWindow {
     app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
     app.set_accels_for_action( "win.action_shortcuts",   { "F1" } );
+    app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
     app.set_accels_for_action( "win.action_zoom_in1",    { "<Control>plus" } );
     app.set_accels_for_action( "win.action_zoom_in2",    { "<Control>equal" } );
     app.set_accels_for_action( "win.action_zoom_out",    { "<Control>minus" } );
@@ -606,19 +622,22 @@ public class MainWindow : ApplicationWindow {
 
     /* Create the menu button */
     var menu_btn = new MenuButton();
-    menu_btn.set_image( new Image.from_icon_name( "document-export", IconSize.LARGE_TOOLBAR ) );
-    menu_btn.set_tooltip_text( _( "Export" ) );
+    menu_btn.image = new Image.from_icon_name( "document-export", IconSize.LARGE_TOOLBAR );
+    menu_btn.tooltip_text = _( "Export" );
+
     _header.pack_end( menu_btn );
 
     /* Create export menu */
     var box = new Box( Orientation.VERTICAL, 5 );
 
     var export = new ModelButton();
-    export.text        = _( "Export…" );
+    export.get_child().destroy();
+    export.add( new Granite.AccelLabel( _( "Export…" ), "<Control>e" ) );
     export.action_name = "win.action_export";
 
     var print = new ModelButton();
-    print.text        = _( "Print…" );
+    print.get_child().destroy();
+    print.add( new Granite.AccelLabel( _( "Print…" ), "<Control>p" ) );
     print.action_name = "win.action_print";
     print.set_sensitive( false );
 
@@ -631,6 +650,7 @@ public class MainWindow : ApplicationWindow {
     /* Create the popover and associate it with clicking on the menu button */
     _export = new Popover( null );
     _export.add( box );
+
     menu_btn.popover = _export;
 
   }
@@ -781,6 +801,19 @@ public class MainWindow : ApplicationWindow {
     dbox.pack_end(   _show_depth, false, false, 10 );
     box.pack_start( dbox, false, false, 10 );
 
+    /* Add blank rows switch */
+    var brbox = new Box( Orientation.HORIZONTAL, 0 );
+    var brlbl = new Label( _( "Enable Blank Rows" ) );
+    _blank_rows = new Switch();
+    _blank_rows.state_set.connect( (state) => {
+      var table = get_current_table();
+      table.blank_rows = state;
+      return( false );
+    });
+    brbox.pack_start( brlbl,       false, true, 10 );
+    brbox.pack_end(   _blank_rows, false, false, 10 );
+    box.pack_start( brbox, false, false, 10 );
+
     /* Add the Markdown switch */
     var mbox = new Box( Orientation.HORIZONTAL, 0 );
     var mlbl = new Label( _( "Enable Markdown Highlighting" ) );
@@ -801,10 +834,19 @@ public class MainWindow : ApplicationWindow {
 
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
-    shortcuts.text = _( "Shortcuts Cheatsheet" );
+    shortcuts.get_child().destroy();
+    shortcuts.add( new Granite.AccelLabel( _( "Shortcuts Cheatsheet" ), "F1" ) );
     shortcuts.action_name = "win.action_shortcuts";
     btn_box.pack_start( shortcuts, false, false, 5 );
 
+    /* Focus mode */
+    var focus_mode = new ModelButton();
+    focus_mode.get_child().destroy();
+    focus_mode.add( new Granite.AccelLabel( _( "Enter Focus Mode" ), "F2" ) );
+    focus_mode.action_name = "win.action_focus_mode";
+    btn_box.pack_start( focus_mode, false, false, 5 );
+
+    /* Font reset */
     var reset_fonts = new ModelButton();
     reset_fonts.text = _( "Reset Fonts to Defaults" );
     reset_fonts.action_name = "win.action_reset_fonts";
@@ -1183,20 +1225,23 @@ public class MainWindow : ApplicationWindow {
       var use_ul = _settings.get_boolean( "export-html-use-ul-style" );
 
       if( html_filter == filter ) {
-        ExportHTML.export( repair_filename( fname, {".html", ".htm"} ), table, use_ul );
+        ExportHTML.export( fname = repair_filename( fname, {".html", ".htm"} ), table, use_ul );
       } else if( md_filter == filter ) {
-        ExportMarkdown.export( repair_filename( fname, {".md", ".markdown"} ), table );
+        ExportMarkdown.export( fname = repair_filename( fname, {".md", ".markdown"} ), table );
       } else if( minder_filter == filter ) {
-        ExportMinder.export( repair_filename( fname, {".minder"} ), table );
+        ExportMinder.export( fname = repair_filename( fname, {".minder"} ), table );
       } else if( opml_filter == filter ) {
-        ExportOPML.export( repair_filename( fname, {".opml"} ), table );
+        ExportOPML.export( fname = repair_filename( fname, {".opml"} ), table );
       } else if( org_filter == filter ) {
-        ExportOrgMode.export( repair_filename( fname, {".org"} ), table );
+        ExportOrgMode.export( fname = repair_filename( fname, {".org"} ), table );
       } else if( pdf_filter == filter ) {
-        ExportPDF.export( repair_filename( fname, {".pdf"} ), table );
+        ExportPDF.export( fname = repair_filename( fname, {".pdf"} ), table );
       } else if( txt_filter == filter ) {
-        ExportText.export( repair_filename( fname, {".txt"} ), table );
+        ExportText.export( fname = repair_filename( fname, {".txt"} ), table );
       }
+
+      /* Send a notification */
+      notification( _( "Outliner Export Completed" ), fname );
 
     }
 
@@ -1232,6 +1277,7 @@ public class MainWindow : ApplicationWindow {
     _condensed.state     = table.condensed;
     _show_tasks.state    = table.show_tasks;
     _show_depth.state    = table.show_depth;
+    _blank_rows.state    = table.blank_rows;
     _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
   }
@@ -1262,6 +1308,18 @@ public class MainWindow : ApplicationWindow {
 
   }
 
+  /* Hides the header bar */
+  public void action_focus_mode() {
+
+    var enable = _header_revealer.reveal_child;
+
+    /* Hide the header bar */
+    _header_revealer.reveal_child = !enable;
+    _nb.tab_bar_behavior   = enable ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
+    _settings.set_boolean( "focus-mode", enable );
+
+  }
+
   /* Called whenever the user selects the reset fonts button in the properties popover */
   private void action_reset_fonts() {
 
@@ -1285,6 +1343,21 @@ public class MainWindow : ApplicationWindow {
     int min_height, nat_height;
     _stats_chars.get_preferred_height( out min_height, out nat_height );
     return( nat_height );
+  }
+
+  /* Generate a notification */
+  public void notification( string title, string msg, NotificationPriority priority = NotificationPriority.NORMAL ) {
+
+    GLib.Application? app = null;
+    @get( "application", ref app );
+
+    if( app != null ) {
+      var notification = new Notification( title );
+      notification.set_body( msg );
+      notification.set_priority( priority );
+      app.send_notification( "com.github.phase1geo.outliner", notification );
+    }
+
   }
 
 }

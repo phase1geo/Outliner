@@ -116,5 +116,15 @@
       <summary>Specifies if checkboxes are displayed on the right (true) or left (false) side of the row.</summary>
       <description>Specifies if checkboxes are displayed on the right (true) or left (false) side of the row.</description>
     </key>
+    <key name="enable-blank-rows" type="b">
+      <default>false</default>
+      <summary>Specifies if main rows without subrows that contain no text are drawn as blank rows.</summary>
+      <description>Specifies if main rows without subrows that contain no text are drawn as blank rows.</description>
+    </key>
+    <key name="focus-mode" type="b">
+      <default>false</default>
+      <summary>Specifies the current state of focused writing mode.</summary>
+      <description>Specifies the current state of focused writing mode.</description>
+    </key>
   </schema>
 </schemalist>

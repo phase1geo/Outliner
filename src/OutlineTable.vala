@@ -76,8 +76,10 @@ public class OutlineTable : DrawingArea {
   private Tagger          _tagger;
   private TextCompletion  _completion;
   private bool            _markdown;
+  private bool            _blank_rows;
   private bool            _filtered   = false;
   private Node?           _focus_node = null;
+  private bool            _in_focus_exit = false;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -230,11 +232,24 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool blank_rows {
+    get {
+      return( _blank_rows );
+    }
+    set {
+      if( _blank_rows != value ) {
+        _blank_rows = value;
+        queue_draw();
+        changed();
+      }
+    }
+  }
   public Tagger tagger {
     get {
       return( _tagger );
     }
   }
+  public int top_margin      { get; private set; default = 60; }
   public bool tasks_on_right { get; private set; default = true; }
 
   /* Allocate static parsers */
@@ -262,7 +277,7 @@ public class OutlineTable : DrawingArea {
     _doc = new Document( this, settings );
 
     /* Create the root node */
-    root = new Node.root();
+    root = new Node.root( this );
 
     /* Create contextual menu(s) */
     _node_menu = new NodeMenu( this );
@@ -295,12 +310,17 @@ public class OutlineTable : DrawingArea {
     _show_tasks    = settings.get_boolean( "default-show-tasks" );
     _show_depth    = settings.get_boolean( "default-show-depth" );
     _markdown      = settings.get_boolean( "default-markdown-enabled" );
+    _blank_rows    = settings.get_boolean( "enable-blank-rows" );
     tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
     _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
 
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
+      if( root.children.length > 0 ) {
+        root.children.index( 0 ).y = top_margin;
+        root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
+      }
       show_tasks_changed();
       queue_draw();
     });
@@ -514,6 +534,11 @@ public class OutlineTable : DrawingArea {
     return( (selected != null) && (selected.mode == NodeMode.NOTEEDIT) );
   }
 
+  /* Returns true if the currently selected node is joinable */
+  public bool is_node_joinable() {
+    return( is_node_selected() && (selected.get_previous_node() != null) );
+  }
+
   /* Returns true if the currently selected node is editable and has text selected */
   private bool is_node_text_selected() {
     return( is_node_editable() && selected.name.is_selected() );
@@ -668,6 +693,19 @@ public class OutlineTable : DrawingArea {
     _motion_x = e.x;
     _motion_y = e.y;
 
+    /* Handles the focus on exit button */
+    var prev_in_focus_exit = _in_focus_exit;
+    _in_focus_exit = false;
+
+    if( is_within_focus_exit( e.x, e.y ) ) {
+      _in_focus_exit = true;
+      set_tooltip_markup( Utils.tooltip_with_accel( _( "Exit Focus Mode" ), "F2" ) );
+      queue_draw();
+    } else if( prev_in_focus_exit ) {
+      set_tooltip_markup( null );
+      queue_draw();
+    }
+
     if( _pressed ) {
 
       /* If we are moving a clicked row for the first time, handle it */
@@ -789,6 +827,12 @@ public class OutlineTable : DrawingArea {
 
     if( _pressed ) {
 
+      /* Handles a click on the focus mode exit button */
+      if( _in_focus_exit ) {
+        _in_focus_exit = false;
+        win.action_focus_mode();
+      }
+
       /* Handle a node move */
       if( _motion ) {
         if( _active != null ) {
@@ -828,19 +872,21 @@ public class OutlineTable : DrawingArea {
 
       /* If the user clicked in an expander, toggle the expander */
       if( !_motion ) {
-        if( _active.is_within_expander( e.x, e.y ) ) {
-          toggle_expand( _active );
-        } else if( _active.is_within_note_icon( e.x, e.y ) ) {
-          var control = (bool)(e.state & ModifierType.CONTROL_MASK);
-          if( control ) {
-            toggle_notes( _active );
-          } else {
-            toggle_note( _active, true );
+        if( _active != null ) {
+          if( _active.is_within_expander( e.x, e.y ) ) {
+            toggle_expand( _active );
+          } else if( _active.is_within_note_icon( e.x, e.y ) ) {
+            var control = (bool)(e.state & ModifierType.CONTROL_MASK);
+            if( control ) {
+              toggle_notes( _active );
+            } else {
+              toggle_note( _active, true );
+            }
+          } else if( _active.is_within_task( e.x, e.y ) ) {
+            _active.task = (_active.task == NodeTaskMode.OPEN) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
+            queue_draw();
+            changed();
           }
-        } else if( _active.is_within_task( e.x, e.y ) ) {
-          _active.task = (_active.task == NodeTaskMode.OPEN) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
-          queue_draw();
-          changed();
         }
       }
 
@@ -867,43 +913,43 @@ public class OutlineTable : DrawingArea {
     if( selected != null ) {
       if( control ) {
         switch( e.keyval ) {
-          case Key.c         :  do_copy();                      break;
-          case Key.x         :  do_cut();                       break;
-          case Key.v         :  do_paste( false );              break;
-          case Key.V         :  do_paste( true );               break;
-          case Key.Return    :  handle_control_return();        break;
-          case Key.Tab       :  handle_control_tab();           break;
-          case Key.Right     :  handle_control_right( shift );  break;
-          case Key.Left      :  handle_control_left( shift );   break;
-          case Key.Up        :  handle_control_up( shift );     break;
-          case Key.Down      :  handle_control_down( shift );   break;
-          case Key.BackSpace :  handle_control_backspace();     break;
-          case Key.Delete    :  handle_control_delete();        break;
-          case Key.period    :  handle_control_period();        break;
-          case Key.slash     :  handle_control_slash();         break;
-          case Key.@1        :  handle_control_number( 0 );     break;
-          case Key.@2        :  handle_control_number( 1 );     break;
-          case Key.@3        :  handle_control_number( 2 );     break;
-          case Key.@4        :  handle_control_number( 3 );     break;
-          case Key.@5        :  handle_control_number( 4 );     break;
-          case Key.@6        :  handle_control_number( 5 );     break;
-          case Key.@7        :  handle_control_number( 6 );     break;
-          case Key.@8        :  handle_control_number( 7 );     break;
-          case Key.@9        :  handle_control_number( 8 );     break;
-          case Key.A         :  handle_control_a( true );       break;
-          case Key.B         :  handle_control_b( true );       break;
-          case Key.T         :  handle_control_t( true );       break;
-          case Key.backslash :  handle_control_backslash();     break;
-          case Key.a         :  handle_control_a( false );      break;
-          case Key.b         :  handle_control_b( false );      break;
-          case Key.d         :  handle_control_d();             break;
-          case Key.h         :  handle_control_h();             break;
-          case Key.i         :  handle_control_i();             break;
-          case Key.j         :  handle_control_j();             break;
-          case Key.k         :  handle_control_k();             break;
-          case Key.t         :  handle_control_t( false );      break;
-          case Key.u         :  handle_control_u();             break;
-          case Key.w         :  handle_control_w();             break;
+          case Key.c         :  do_copy();                       break;
+          case Key.x         :  do_cut();                        break;
+          case Key.v         :  do_paste( false );               break;
+          case Key.V         :  do_paste( true );                break;
+          case Key.Return    :  handle_control_return( shift );  break;
+          case Key.Tab       :  handle_control_tab();            break;
+          case Key.Right     :  handle_control_right( shift );   break;
+          case Key.Left      :  handle_control_left( shift );    break;
+          case Key.Up        :  handle_control_up( shift );      break;
+          case Key.Down      :  handle_control_down( shift );    break;
+          case Key.BackSpace :  handle_control_backspace();      break;
+          case Key.Delete    :  handle_control_delete();         break;
+          case Key.period    :  handle_control_period();         break;
+          case Key.slash     :  handle_control_slash();          break;
+          case Key.@1        :  handle_control_number( 0 );      break;
+          case Key.@2        :  handle_control_number( 1 );      break;
+          case Key.@3        :  handle_control_number( 2 );      break;
+          case Key.@4        :  handle_control_number( 3 );      break;
+          case Key.@5        :  handle_control_number( 4 );      break;
+          case Key.@6        :  handle_control_number( 5 );      break;
+          case Key.@7        :  handle_control_number( 6 );      break;
+          case Key.@8        :  handle_control_number( 7 );      break;
+          case Key.@9        :  handle_control_number( 8 );      break;
+          case Key.A         :  handle_control_a( true );        break;
+          case Key.B         :  handle_control_b( true );        break;
+          case Key.T         :  handle_control_t( true );        break;
+          case Key.backslash :  handle_control_backslash();      break;
+          case Key.a         :  handle_control_a( false );       break;
+          case Key.b         :  handle_control_b( false );       break;
+          case Key.d         :  handle_control_d();              break;
+          case Key.h         :  handle_control_h();              break;
+          case Key.i         :  handle_control_i();              break;
+          case Key.j         :  handle_control_j();              break;
+          case Key.k         :  handle_control_k();              break;
+          case Key.t         :  handle_control_t( false );       break;
+          case Key.u         :  handle_control_u();              break;
+          case Key.w         :  handle_control_w();              break;
         }
       } else if( nomod || shift ) {
         if( !insert_user_text( e.str ) ) {
@@ -950,6 +996,8 @@ public class OutlineTable : DrawingArea {
             case Key.@8           :  goto_label( 7 );  break;
             case Key.@9           :  goto_label( 8 );  break;
             case Key.at           :  tagger.show_add_ui();  break;
+            case Key.F10          :  if( shift ) show_contextual_menu( e );  break;
+            case Key.Menu         :  show_contextual_menu( e );  break;
           }
         }
       }
@@ -1013,7 +1061,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Displays the contextual menu based on what is currently selected */
-  private void show_contextual_menu( EventButton event ) {
+  private void show_contextual_menu( Event event ) {
 
 #if GTK322
     if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {
@@ -1352,6 +1400,8 @@ public class OutlineTable : DrawingArea {
       selected.note.backspace_word( undo_text );
       see( selected );
       queue_draw();
+    } else if( is_node_joinable() ) {
+      join_row();
     }
   }
 
@@ -1425,8 +1475,8 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  /* Handles a Control-Return keypress */
-  private void handle_control_return() {
+  /* Splits the text at the current cursor position */
+  private void split_text() {
     if( is_node_editable() ) {
       var sel    = selected;
       var curpos = selected.name.cursor;
@@ -1435,11 +1485,42 @@ public class OutlineTable : DrawingArea {
       var index  = selected.index() + 1;
       var tags   = selected.name.text.get_tags_in_range( curpos, endpos );
       var node   = create_node( title, tags );
+      var num_children = selected.children.length;
       selected.name.text.remove_text( curpos, (endpos - curpos ) );
       insert_node( sel.parent, node, index );
-      set_node_mode( selected, NodeMode.EDITABLE );
+      for( int i=0; i<num_children; i++ ) {
+        var child = sel.children.index( 0 );
+        sel.remove_child( child );
+        node.add_child( child );
+      }
       _im_context.reset();
       undo_buffer.add_item( new UndoNodeSplit( selected ) );
+    }
+  }
+
+  /* Joins the current row with the row above it */
+  public void join_row() {
+    var sel          = selected;
+    var prev         = selected.get_previous_node();
+    var sel_children = sel.children.length;
+    undo_buffer.add_item( new UndoNodeJoin( sel, prev ) );
+    prev.name.text.set_text( prev.name.text.text + " " );
+    prev.name.text.insert_formatted_text( prev.name.text.text.length, sel.name.text );
+    for( int i=0; i<sel_children; i++ ) {
+      var child = sel.children.index( 0 );
+      sel.remove_child( child );
+      prev.add_child( child );
+    }
+    sel.parent.remove_child( sel );
+    selected = prev;
+    queue_draw();
+    changed();
+  }
+
+  /* Handles a Control-Return keypress */
+  private void handle_control_return( bool shift ) {
+    if( is_node_editable() && !shift ) {
+      split_text();
     } else if( is_note_editable() ) {
       selected.note.insert( "\n", undo_text );
       queue_draw();
@@ -2536,6 +2617,11 @@ public class OutlineTable : DrawingArea {
       _markdown = bool.parse( m );
     }
 
+    var br = n->get_prop( "blank-rows" );
+    if( br != null ) {
+      _blank_rows = bool.parse( br );
+    }
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -2594,6 +2680,7 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "show-tasks",       _show_tasks.to_string() );
     n->set_prop( "show-depth",       _show_depth.to_string() );
     n->set_prop( "markdown",         _markdown.to_string() );
+    n->set_prop( "blank-rows",       _blank_rows.to_string() );
 
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
@@ -2905,6 +2992,7 @@ public class OutlineTable : DrawingArea {
   public bool on_draw( Context ctx ) {
 
     draw_background( ctx );
+    draw_exit_focus_mode( ctx );
     draw_all( ctx );
 
     return( false );
@@ -2914,6 +3002,30 @@ public class OutlineTable : DrawingArea {
   /* Draw the background from the stylesheet */
   private void draw_background( Context ctx ) {
     get_style_context().render_background( ctx, 0, 0, get_allocated_width(), get_allocated_height() );
+  }
+
+  /* Returns true if the coordinates are within the focus exit */
+  private bool is_within_focus_exit( double x, double y ) {
+    if( win.settings.get_boolean( "focus-mode" ) ) {
+      var width = get_allocated_width();
+      return( Utils.is_within_bounds( x, y, (width - 45), 15, 30, 30 ) );
+    }
+    return( false );
+  }
+
+  /* Draws the focus mode exit icon */
+  private void draw_exit_focus_mode( Context ctx ) {
+    if( win.settings.get_boolean( "focus-mode" ) ) {
+      var width = get_allocated_width();
+      Utils.set_context_color_with_alpha( ctx, _theme.symbol_color, (_in_focus_exit ? 1.0 : 0.5) );
+      ctx.set_line_width( 4 );
+      ctx.arc( (width - 30), 30, 15, 0, (2 * Math.PI) );
+      ctx.move_to( (width - 35), 25 );
+      ctx.line_to( (width - 25), 35 );
+      ctx.move_to( (width - 25), 25 );
+      ctx.line_to( (width - 35), 35 );
+      ctx.stroke();
+    }
   }
 
   /* Draws all of the root node trees */
