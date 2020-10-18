@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-16 20:27-0500\n"
-"PO-Revision-Date: 2020-10-18 12:13+0200\n"
+"PO-Revision-Date: 2020-10-18 12:18+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -502,7 +502,7 @@ msgstr "Rij hieronder toevoegen"
 
 #: src/NodeMenu.vala:119
 msgid "Join To Row Above"
-msgstr "Koppelen aan bovenliggende rij"
+msgstr "Samenvoegen met rij hierboven"
 
 #: src/NodeMenu.vala:123
 msgid "Indent"
@@ -870,7 +870,7 @@ msgstr "Geselecteerde groep naar onderkant verplaatsen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:404
 msgid "Join Row To Row Above"
-msgstr "Koppelen aan bovenliggende rij"
+msgstr "Samenvoegen met rij hierboven"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:416
 msgid "Label Commands"
