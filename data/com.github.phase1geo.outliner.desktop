@@ -7,6 +7,10 @@ Exec=com.github.phase1geo.outliner %f
 Icon=com.github.phase1geo.outliner
 Terminal=false
 Type=Application
+
+
+
+
 MimeType=application/com.github.phase1geo.outliner;
 X-GNOME-Gettext-Domain=Outliner
 X-GNOME-UsesNotifications=true
