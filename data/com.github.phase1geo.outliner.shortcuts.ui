@@ -175,7 +175,7 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes">Promote/Indent Row</property>
+                <property name="title" translatable="yes">Promote / Indent Row</property>
                 <property name="accelerator">Tab</property>
                 <property name="visible">1</property>
               </object>
