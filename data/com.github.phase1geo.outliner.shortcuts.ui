@@ -154,14 +154,14 @@
             <property name="visible">1</property>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes">Add Row Below</property>
+                <property name="title" translatable="yes">Add &amp; Edit Row</property>
                 <property name="accelerator">Return</property>
                 <property name="visible">1</property>
               </object>
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes">Add Row Above</property>
+                <property name="title" translatable="yes">Add &amp; Edit Row Above</property>
                 <property name="accelerator">&lt;ctrl&gt;Return</property>
                 <property name="visible">1</property>
               </object>
@@ -170,6 +170,20 @@
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Delete Row</property>
                 <property name="accelerator">Delete</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Promote/Indent Row</property>
+                <property name="accelerator">Tab</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Demote Row</property>
+                <property name="accelerator">&lt;Shift&gt;Tab</property>
                 <property name="visible">1</property>
               </object>
             </child>
