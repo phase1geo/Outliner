@@ -1467,7 +1467,7 @@ public class OutlineTable : DrawingArea {
         queue_draw();
       }
     } else if( selected != null ) {
-      if( selected.children.length > 0 ) {
+      if( (selected.children.length > 0) && selected.expanded ) {
         add_child_node( 0 );
       } else {
         add_sibling_node( !shift );
