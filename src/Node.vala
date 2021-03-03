@@ -1051,6 +1051,9 @@ public class Node {
       children.insert_val( index, child );
     }
 
+    /* Make sure that this node is expanded */
+    expanded = true;
+
     child.parent = this;
 
     var prev = child.get_previous_node();
