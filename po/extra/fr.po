@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-16 20:27-0500\n"
+"POT-Creation-Date: 2021-04-25 13:10-0500\n"
 "PO-Revision-Date: 2020-04-10 21:50+0200\n"
 "Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
 "Language-Team: none\n"
@@ -436,8 +436,8 @@ msgstr ""
 #: data/com.github.phase1geo.outliner.appdata.xml.in:176
 #, fuzzy
 msgid ""
-"Added new <em>H</em> keyboard shortcut for positioning currently selected "
-"row at the top of the window."
+"Added new _H_ keyboard shortcut for positioning currently selected row at "
+"the top of the window."
 msgstr ""
 "Ajout de la possibilité de positionner la ligne sélectionnée en haut de la "
 "fenêtre."
@@ -457,7 +457,7 @@ msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:183
 #, fuzzy
-msgid "Removed support for the <em>m</em> command."
+msgid "Removed support for the _m_ command."
 msgstr ""
 "Suppression de la prise en charge de la commande <em>m</em> dans la zone de "
 "sélection."
@@ -472,8 +472,7 @@ msgid ""
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:186
-msgid ""
-"Changed default filename from <em>unnamed</em> to be the translated name."
+msgid "Changed default filename from unnamed to be the translated name."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:187
@@ -491,8 +490,8 @@ msgstr ""
 #: data/com.github.phase1geo.outliner.appdata.xml.in:193
 #, fuzzy
 msgid ""
-"Fixed application crash when <em>a</em> command used when selected row is a "
-"top-level row."
+"Fixed application crash when the _a_ command used when selected row is a top-"
+"level row."
 msgstr ""
 "Correction d'un plantage de l'application lors de l'utilisation de la "
 "commande <em>a</em> alors que la première ligne est sélectionnée."
@@ -505,7 +504,7 @@ msgstr "Correction de l'action d'afficher/masquer un nœud."
 #: data/com.github.phase1geo.outliner.appdata.xml.in:195
 #, fuzzy
 msgid ""
-"Fixed <em>New Document</em> plank command to open a new tab after loading "
+"Fixed _New Document_ plank command to open a new tab after loading "
 "application data."
 msgstr ""
 "Correction d'un problème avec la commande <em>Nouveau document</em> dans "

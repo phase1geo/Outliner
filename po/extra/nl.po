@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-16 20:27-0500\n"
+"POT-Creation-Date: 2021-04-25 13:10-0500\n"
 "PO-Revision-Date: 2020-10-18 12:17+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: \n"
@@ -428,9 +428,10 @@ msgid "Added new keyboard shortcuts for selecting and moving rows."
 msgstr "Sneltoetsen toegevoegd voor het selecteren en verplaatsen van rijen."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:176
+#, fuzzy
 msgid ""
-"Added new <em>H</em> keyboard shortcut for positioning currently selected "
-"row at the top of the window."
+"Added new _H_ keyboard shortcut for positioning currently selected row at "
+"the top of the window."
 msgstr ""
 "<em>H</em>-sneltoets toegevoegd voor het positioneren van de huidige "
 "geselecteerde rij bovenaan het venster."
@@ -449,7 +450,8 @@ msgid "Added clear formatting button to format bar."
 msgstr "Knop toegevoegd aan opmaakwerkbalk voor het wissen van de opmaak."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:183
-msgid "Removed support for the <em>m</em> command."
+#, fuzzy
+msgid "Removed support for the _m_ command."
 msgstr "Sneltoets <em>m</em> verwijderd."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:184
@@ -464,8 +466,8 @@ msgstr ""
 "De tabbladbalk kleurt nu mee met de achtergrondkleur van het huidige tabblad."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:186
-msgid ""
-"Changed default filename from <em>unnamed</em> to be the translated name."
+#, fuzzy
+msgid "Changed default filename from unnamed to be the translated name."
 msgstr ""
 "Standaard bestandsnaam aangepast van <em>unnamed</em> naar de vertaalde naam."
 
@@ -485,9 +487,10 @@ msgid "Fixed application screenshots."
 msgstr "Toepassingsschermfoto's verbeterd."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:193
+#, fuzzy
 msgid ""
-"Fixed application crash when <em>a</em> command used when selected row is a "
-"top-level row."
+"Fixed application crash when the _a_ command used when selected row is a top-"
+"level row."
 msgstr ""
 "Crash opgelost omtrent het gebruik van de sneltoets <em>a</em> op "
 "geselecteerde rijen."
@@ -497,8 +500,9 @@ msgid "Fixed issues with showing or hiding a note."
 msgstr "Problemen opgelost omtrent aantekeningen."
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:195
+#, fuzzy
 msgid ""
-"Fixed <em>New Document</em> plank command to open a new tab after loading "
+"Fixed _New Document_ plank command to open a new tab after loading "
 "application data."
 msgstr ""
 "De opdracht <em>Nieuw document</em> werkt nu wél juist na het openen van een "

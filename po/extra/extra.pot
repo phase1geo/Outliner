@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-16 20:27-0500\n"
+"POT-Creation-Date: 2021-04-25 13:10-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -383,8 +383,8 @@ msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:176
 msgid ""
-"Added new <em>H</em> keyboard shortcut for positioning currently selected "
-"row at the top of the window."
+"Added new _H_ keyboard shortcut for positioning currently selected row at "
+"the top of the window."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:177
@@ -400,7 +400,7 @@ msgid "Added clear formatting button to format bar."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:183
-msgid "Removed support for the <em>m</em> command."
+msgid "Removed support for the _m_ command."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:184
@@ -413,8 +413,7 @@ msgid ""
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:186
-msgid ""
-"Changed default filename from <em>unnamed</em> to be the translated name."
+msgid "Changed default filename from unnamed to be the translated name."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:187
@@ -431,8 +430,8 @@ msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:193
 msgid ""
-"Fixed application crash when <em>a</em> command used when selected row is a "
-"top-level row."
+"Fixed application crash when the _a_ command used when selected row is a top-"
+"level row."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:194
@@ -441,7 +440,7 @@ msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:195
 msgid ""
-"Fixed <em>New Document</em> plank command to open a new tab after loading "
+"Fixed _New Document_ plank command to open a new tab after loading "
 "application data."
 msgstr ""
 

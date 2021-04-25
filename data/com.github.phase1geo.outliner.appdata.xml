@@ -123,11 +123,17 @@
         <p xml:lang="fr">Nouveau</p>
         <ul>
           <li>Added menu accelerators for Export, Print and Shortcut Cheatsheet menu items.</li>
+          <li xml:lang="nl">Sneltoetsen toegevoegd voor exporteren, afdrukken en het tonen van het sneltoetsoverzicht.</li>
           <li>Added support for showing notifications after export completes.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor het tonen van meldingen na voltooien van export.</li>
           <li>Added support for Menu or Shift-F10 keyboard shortcut for showing contextual menu.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor de sneltoets Menu of Shift+F10 om het rechtermuisknopmenu te openen.</li>
           <li>Added support for displaying main rows without text as blank rows.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor het tonen van hoofdrijen als blanco rijen.</li>
           <li>Added support for joining two rows.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor het samenvoegen van rijen.</li>
           <li>Added support for hiding header bar and tab bar for focused writing mode.</li>
+          <li xml:lang="nl">Ondersteuning toegevoegd voor het verbergen van de kop- en tabbladbalken in focusmodus.</li>
         </ul>
         <p>Changes</p>
         <p xml:lang="nl">Wijzigingen</p>
@@ -136,9 +142,13 @@
           <li>Updated Dutch translation (thanks to Heimen Stoffels).</li>
           <li xml:lang="nl">Nederlandse vertaling bijgewerkt (met dank aan Heimen Stoffels).</li>
           <li>Improved look of menu accelerators.</li>
+          <li xml:lang="nl">Vormgeving van sneltoetsaanwijzingen verbeterd.</li>
           <li>Changing behavior of row split.</li>
+          <li xml:lang="nl">Gedrag van rijsplitsing veranderd.</li>
           <li>Updated shortcut cheatsheet.</li>
+          <li xml:lang="nl">Sneltoetsoverzicht bijgewerkt.</li>
           <li>Adding top margin to document for improved readability.</li>
+          <li xml:lang="nl">Marge aan bovenkant van document toegevoegd voor verbeterde leesbaarheid.</li>
         </ul>
       </description>
     </release>
@@ -271,8 +281,7 @@
           <li xml:lang="nl">Ondersteuning toegevoegd voor invoermethoden.</li>
           <li>Added new keyboard shortcuts for selecting and moving rows.</li>
           <li xml:lang="nl">Sneltoetsen toegevoegd voor het selecteren en verplaatsen van rijen.</li>
-          <li>Added new <em>H</em> keyboard shortcut for positioning currently selected row at the top of the window.</li>
-          <li xml:lang="nl">&lt;em&gt;H&lt;/em&gt;-sneltoets toegevoegd voor het positioneren van de huidige geselecteerde rij bovenaan het venster.</li>
+          <li>Added new _H_ keyboard shortcut for positioning currently selected row at the top of the window.</li>
           <li>Added keyboard shortcuts for deleting the next or previous word.</li>
           <li xml:lang="nl">Sneltoetsen toegevoegd voor het verwijderen van het vorige of volgende woord.</li>
           <li>Added new selection submenu to contextual menu.</li>
@@ -284,14 +293,12 @@
         <p xml:lang="nl">Wijzigingen</p>
         <p xml:lang="fr">Modifications</p>
         <ul>
-          <li>Removed support for the <em>m</em> command.</li>
-          <li xml:lang="nl">Sneltoets &lt;em&gt;m&lt;/em&gt; verwijderd.</li>
+          <li>Removed support for the _m_ command.</li>
           <li>Improved look of format bar, especially for dark themes.</li>
           <li xml:lang="nl">Uiterlijk van de opmaakwerkbalk verbeterd, vooral voor donkere thema's.</li>
           <li>Changed tab bar coloring to match the background color of the current tab.</li>
           <li xml:lang="nl">De tabbladbalk kleurt nu mee met de achtergrondkleur van het huidige tabblad.</li>
-          <li>Changed default filename from <em>unnamed</em> to be the translated name.</li>
-          <li xml:lang="nl">Standaard bestandsnaam aangepast van &lt;em&gt;unnamed&lt;/em&gt; naar de vertaalde naam.</li>
+          <li>Changed default filename from unnamed to be the translated name.</li>
           <li>Improved undo/redo tooltips to look better in non-English translations.</li>
           <li xml:lang="nl">Hulpballonnen van ongedaan maken/opnieuw uitvoeren verbeterd in niet-Engelse talen.</li>
         </ul>
@@ -303,12 +310,10 @@
           <li xml:lang="nl">Probleem opgelost met het verwijderen van één teken in multi-bytetekens.</li>
           <li>Fixed application screenshots.</li>
           <li xml:lang="nl">Toepassingsschermfoto's verbeterd.</li>
-          <li>Fixed application crash when <em>a</em> command used when selected row is a top-level row.</li>
-          <li xml:lang="nl">Crash opgelost omtrent het gebruik van de sneltoets &lt;em&gt;a&lt;/em&gt; op geselecteerde rijen.</li>
+          <li>Fixed application crash when the _a_ command used when selected row is a top-level row.</li>
           <li>Fixed issues with showing or hiding a note.</li>
           <li xml:lang="nl">Problemen opgelost omtrent aantekeningen.</li>
-          <li>Fixed <em>New Document</em> plank command to open a new tab after loading application data.</li>
-          <li xml:lang="nl">De opdracht &lt;em&gt;Nieuw document&lt;/em&gt; werkt nu wél juist na het openen van een nieuw tabblad direct na het starten.</li>
+          <li>Fixed _New Document_ plank command to open a new tab after loading application data.</li>
           <li>Fixed theming issues when two tabs use different themes.</li>
           <li xml:lang="nl">Themaproblemen opgelost bij tabbladen die verschillende thema's gebruiken.</li>
           <li>Fixed translation string issues (thanks to Nathan Bonnemains).</li>

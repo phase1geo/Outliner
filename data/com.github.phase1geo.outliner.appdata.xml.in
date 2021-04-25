@@ -173,26 +173,26 @@
             <li>Added support for subscript and superscript text formatting.</li>
             <li>Added support for using input methods.</li>
             <li>Added new keyboard shortcuts for selecting and moving rows.</li>
-            <li>Added new <em>H</em> keyboard shortcut for positioning currently selected row at the top of the window.</li>
+            <li>Added new _H_ keyboard shortcut for positioning currently selected row at the top of the window.</li>
             <li>Added keyboard shortcuts for deleting the next or previous word.</li>
             <li>Added new selection submenu to contextual menu.</li>
             <li>Added clear formatting button to format bar.</li>
           </ul>
           <p>Changes</p>
           <ul>
-            <li>Removed support for the <em>m</em> command.</li>
+            <li>Removed support for the _m_ command.</li>
             <li>Improved look of format bar, especially for dark themes.</li>
             <li>Changed tab bar coloring to match the background color of the current tab.</li>
-            <li>Changed default filename from <em>unnamed</em> to be the translated name.</li>
+            <li>Changed default filename from unnamed to be the translated name.</li>
             <li>Improved undo/redo tooltips to look better in non-English translations.</li>
           </ul>
           <p>Bug Fixes</p>
           <ul>
             <li>Fixed issue with deleting a single character for multi-byte characters.</li>
             <li>Fixed application screenshots.</li>
-            <li>Fixed application crash when <em>a</em> command used when selected row is a top-level row.</li>
+            <li>Fixed application crash when the _a_ command used when selected row is a top-level row.</li>
             <li>Fixed issues with showing or hiding a note.</li>
-            <li>Fixed <em>New Document</em> plank command to open a new tab after loading application data.</li>
+            <li>Fixed _New Document_ plank command to open a new tab after loading application data.</li>
             <li>Fixed theming issues when two tabs use different themes.</li>
             <li>Fixed translation string issues (thanks to Nathan Bonnemains).</li>
             <li>Fixed text positioning issues when tags are added to text.</li>
