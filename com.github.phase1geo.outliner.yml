@@ -1,0 +1,48 @@
+app-id: com.github.phase1geo.outliner
+runtime: io.elementary.Platform
+runtime-version: 'daily' #change this to release version (currently 0.1.0) once they fix the lack of inherited GL extensions bug
+sdk: io.elementary.Sdk
+command: com.github.phase1geo.outliner
+finish-args:
+  - '--filesystem=host'
+
+  - '--socket=fallback-x11'
+  - '--socket=wayland'
+  - '--filesystem=xdg-run/dconf'
+  - '--talk-name=org.gnome.SettingsDaemon'
+  - '--talk-name=ca.desrt.dconf'
+  - '--env=DCONF_USER_CONFIG_DIR=.config/dconf'
+cleanup:
+  - '/include'
+  - '/lib/pkgconfig'
+  - '/man'
+  - '/share/gtk-doc'
+  - '/share/man'
+  - '/share/pkgconfig'
+  - '/share/vala'
+  - '*.a'
+  - '*.la'
+modules:
+
+  - name: discount
+    buildsystem: simple
+    cleanup:
+        '*.a'
+
+    build-commands:
+      - ./configure.sh --prefix=/app --enable-all-features --github-checkbox --with-fenced-code --shared
+      - sed -e 's|/sbin/ldconfig|/sbin/ldconfig -n|' -i librarian.sh
+      - make install
+
+    sources:
+      - type: archive
+        url: http://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.6.tar.bz2
+        sha256: ae68a4832ff8e620286304ec525c1fe8957be4d8f1e774588eb03d1c3deb74a7
+
+  - name: Outliner
+    buildsystem: meson
+    config-opts:
+     - '--libdir=lib'
+    sources:
+      - type: dir
+        path: .
