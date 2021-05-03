@@ -1,4 +1,4 @@
-/*
+  /*
 * Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
@@ -61,6 +61,7 @@ public class MainWindow : ApplicationWindow {
   private Label           _stats_tdone;
   private bool            _debug                 = false;
   private bool            _prefer_dark           = false;
+  private Box                         _themes;
   private HashMap<string,RadioButton> _theme_buttons;
 
   public GLib.Settings settings {
@@ -106,9 +107,6 @@ public class MainWindow : ApplicationWindow {
     /* Initialize variables */
     _theme_buttons = new HashMap<string,RadioButton>();
 
-    /* Handle any changes to the dark mode preference setting */
-    handle_prefer_dark_changes();
-
     var window_x = settings.get_int( "window-x" );
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
@@ -120,6 +118,12 @@ public class MainWindow : ApplicationWindow {
 
     /* Add the theme CSS */
     themes.add_css();
+
+    /* Listen for changes to the system dark mode */
+    var granite_settings = Granite.Settings.get_default();
+    granite_settings.notify["prefers-color-scheme"].connect( () => {
+      update_themes();
+    });
 
     /* Create the header bar */
     _header = new HeaderBar();
@@ -250,19 +254,6 @@ public class MainWindow : ApplicationWindow {
           info.set_revealed( false );
         }
       }
-    }
-  }
-
-  /* Handles any changes to the dark mode preference gsettings for the desktop */
-  private void handle_prefer_dark_changes() {
-    var lookup = SettingsSchemaSource.get_default().lookup( DESKTOP_SCHEMA, false );
-    if( lookup != null ) {
-      var desktop_settings = new GLib.Settings( DESKTOP_SCHEMA );
-      _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
-      desktop_settings.changed.connect(() => {
-        _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
-        theme_changed( get_current_table( "handle_prefer_dark_changes" ) );
-      });
     }
   }
 
@@ -680,13 +671,19 @@ public class MainWindow : ApplicationWindow {
     box.pack_start( zoom_box, false, false, 10 );
 
     /* Add theme selector */
-    var names     = new Array<string>();
     var theme_box = new Box( Orientation.HORIZONTAL, 0 );
     var theme_lbl = new Label( _( "Theme:" ) );
+    _themes = new Box( Orientation.HORIZONTAL, 0 );
     theme_box.pack_start( theme_lbl, false, false, 10 );
-    RadioButton? rb = null;
+    theme_box.pack_end(   _themes, false, false, 10 );
+    box.pack_start( theme_box, false, false, 10 );
+
+    var names = new Array<string>();
     themes.names( ref names );
-    for( int i=((int)names.length - 1); i>=0; i-- ) {
+
+    RadioButton? rb = null;
+
+    for( int i=0; i<names.length; i++ ) {
       var theme  = themes.get_theme( names.index( i ) );
       var button = new RadioButton.from_widget( rb );
       button.halign       = Align.CENTER;
@@ -699,12 +696,12 @@ public class MainWindow : ApplicationWindow {
         theme_changed( table );
       });
       _theme_buttons.set( theme.name, button );
-      theme_box.pack_end( button, false, false, 10 );
       if( rb == null ) {
         rb = button;
       }
     }
-    box.pack_start( theme_box, false, false, 10 );
+
+    update_themes();
 
     /* Add list type selector */
     var ltbox = new Box( Orientation.HORIZONTAL, 0 );
@@ -860,6 +857,33 @@ public class MainWindow : ApplicationWindow {
     var prop_popover = new Popover( null );
     prop_popover.add( box );
     prop_btn.popover = prop_popover;
+
+  }
+
+  /* Called whenever the themes need to be updated */
+  private void update_themes() {
+
+    var settings = Granite.Settings.get_default();
+    var dark     = settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+
+    /* Remove all of the themes */
+    _themes.get_children().foreach((entry) => {
+      _themes.remove( entry );
+    });
+
+    var names = new Array<string>();
+    themes.names( ref names );
+
+    for( int i=0; i<names.length; i++ ) {
+      var theme = themes.get_theme( names.index( i ) );
+      stdout.printf( "theme: %s, prefer_dark: %s, dark: %s\n", theme.name, theme.prefer_dark.to_string(), dark.to_string() );
+      if( theme.prefer_dark == dark ) {
+        var button = _theme_buttons.get( theme.name );
+        _themes.pack_start( button, false, false, 10 );
+      }
+    }
+
+    _themes.show_all();
 
   }
 
