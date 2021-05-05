@@ -876,7 +876,6 @@ public class MainWindow : ApplicationWindow {
 
     for( int i=0; i<names.length; i++ ) {
       var theme = themes.get_theme( names.index( i ) );
-      stdout.printf( "theme: %s, prefer_dark: %s, dark: %s\n", theme.name, theme.prefer_dark.to_string(), dark.to_string() );
       if( theme.prefer_dark == dark ) {
         var button = _theme_buttons.get( theme.name );
         _themes.pack_start( button, false, false, 10 );
