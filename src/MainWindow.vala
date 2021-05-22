@@ -1,4 +1,4 @@
-  /*
+   /*
 * Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
@@ -29,38 +29,34 @@ public enum TabAddReason {
   LOAD
 }
 
-public class MainWindow : ApplicationWindow {
+public class MainWindow : Hdy.ApplicationWindow {
 
-  private const string DESKTOP_SCHEMA = "io.elementary.desktop";
-  private const string DARK_KEY       = "prefer-dark";
-
-  private GLib.Settings   _settings;
-  private Revealer        _header_revealer;
-  private HeaderBar       _header;
-  private DynamicNotebook _nb;
-  private Button          _search_btn;
-  private Popover?        _export         = null;
-  private Button?         _undo_btn       = null;
-  private Button?         _redo_btn       = null;
-  private SpinButton      _zoom;
-  private double          _zoom_factor    = 1.0;
-  private Granite.Widgets.ModeButton _list_types;
-  private FontButton      _fonts_name;
-  private FontButton      _fonts_note;
-  private Switch          _condensed;
-  private Switch          _show_tasks;
-  private Switch          _show_depth;
-  private Switch          _blank_rows;
-  private Switch          _markdown;
-  private Label           _stats_chars;
-  private Label           _stats_words;
-  private Label           _stats_rows;
-  private Label           _stats_ttotal;
-  private Label           _stats_topen;
-  private Label           _stats_tip;
-  private Label           _stats_tdone;
-  private bool            _debug                 = false;
-  private bool            _prefer_dark           = false;
+  private GLib.Settings               _settings;
+  private Revealer                    _header_revealer;
+  private Hdy.HeaderBar               _header;
+  private DynamicNotebook             _nb;
+  private Button                      _search_btn;
+  private Popover?                    _export      = null;
+  private Button?                     _undo_btn    = null;
+  private Button?                     _redo_btn    = null;
+  private SpinButton                  _zoom;
+  private double                      _zoom_factor = 1.0;
+  private Granite.Widgets.ModeButton  _list_types;
+  private FontButton                  _fonts_name;
+  private FontButton                  _fonts_note;
+  private Switch                      _condensed;
+  private Switch                      _show_tasks;
+  private Switch                      _show_depth;
+  private Switch                      _blank_rows;
+  private Switch                      _markdown;
+  private Label                       _stats_chars;
+  private Label                       _stats_words;
+  private Label                       _stats_rows;
+  private Label                       _stats_ttotal;
+  private Label                       _stats_topen;
+  private Label                       _stats_tip;
+  private Label                       _stats_tdone;
+  private bool                        _debug       = false;
   private Box                         _themes;
   private HashMap<string,RadioButton> _theme_buttons;
 
@@ -126,7 +122,7 @@ public class MainWindow : ApplicationWindow {
     });
 
     /* Create the header bar */
-    _header = new HeaderBar();
+    _header = new Hdy.HeaderBar();
     _header.set_show_close_button( true );
     _header.get_style_context().add_class( "outliner-toolbar" );
     _header.get_style_context().add_class( "titlebar" );
@@ -144,8 +140,6 @@ public class MainWindow : ApplicationWindow {
       move( window_x, window_y );
     }
     set_default_size( window_w, window_h );
-    set_titlebar( _header_revealer );
-    set_border_width( 2 );
     destroy.connect( Gtk.main_quit );
 
     /* Allows the titlebar to be drawn without a large black border */
@@ -202,10 +196,18 @@ public class MainWindow : ApplicationWindow {
     add_stats_button();
     add_search_button();
 
+    var top_box = new Box( Orientation.VERTICAL, 0 );
+    top_box.pack_start( _header_revealer, false, true, 0 );
+    top_box.pack_start( _nb, true, true, 0 );
+
     /* Display the UI */
-    add( _nb );
+    add( top_box );
     show_all();
 
+  }
+
+  static construct {
+    Hdy.init();
   }
 
   /* Returns the OutlineTable from the given tab */
@@ -311,6 +313,7 @@ public class MainWindow : ApplicationWindow {
   public OutlineTable add_tab( string? fname, TabAddReason reason ) {
 
     var box = new Box( Orientation.VERTICAL, 0 );
+    box.border_width = 0;
 
     /* Create and pack the canvas */
     var ot = new OutlineTable( this, _settings );

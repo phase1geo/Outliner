@@ -28,7 +28,7 @@ public class ThemeDefault : Theme {
   public ThemeDefault() {
 
     name  = "default";
-    label = _( "Default" );
+    label = _( "Light" );
 
     /* Generate the non-link colors */
     even               = get_color( "#ffffff" );

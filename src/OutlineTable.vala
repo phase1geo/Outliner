@@ -574,6 +574,7 @@ public class OutlineTable : DrawingArea {
       switch( tag ) {
         case FormatTag.URL :  Utils.open_url( extra );       break;
         case FormatTag.TAG :  _tagger.tag_clicked( extra );  break;
+        default            :  break;
       }
       return( false );
     }
@@ -583,6 +584,7 @@ public class OutlineTable : DrawingArea {
       case EventType.BUTTON_PRESS        :  text.set_cursor_at_char( e.x, e.y, shift );  break;
       case EventType.DOUBLE_BUTTON_PRESS :  text.set_cursor_at_word( e.x, e.y, shift );  break;
       case EventType.TRIPLE_BUTTON_PRESS :  text.set_cursor_all( false );                break;
+      default                            :  break;
     }
 
     /* Sets the selected mode */
@@ -657,6 +659,7 @@ public class OutlineTable : DrawingArea {
     switch( _press_type ) {
       case EventType.BUTTON_PRESS        :  ct.set_cursor_at_char( x, y, true );  break;
       case EventType.DOUBLE_BUTTON_PRESS :  ct.set_cursor_at_word( x, y, true );  break;
+      default                            :  break;
     }
     queue_draw();
   }

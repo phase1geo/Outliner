@@ -72,8 +72,8 @@ public class ExportHTML : Object {
         case FormatTag.COLOR      :  return( "<span style=\"color:%s;\">".printf( extra ) );
         case FormatTag.HILITE     :  return( "<span style=\"background-color:%s;\">".printf( extra ) );
         case FormatTag.URL        :  return( "<a href=\"%s\">".printf( extra ) );
+        default                   :  return( "" );
       }
-      return( "" );
     };
     ExportUtils.ExportEndFunc end_func = (tag, start, extra) => {
       switch( tag ) {
@@ -88,8 +88,8 @@ public class ExportHTML : Object {
         case FormatTag.COLOR      :  return( "</span>" );
         case FormatTag.HILITE     :  return( "</span>" );
         case FormatTag.URL        :  return( "</a>" );
+        default                   :  return( "" );
       }
-      return( "" );
     };
     ExportUtils.ExportEncodeFunc encode_func = (str) => {
       return( str.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).replace( "\n", "<br />" ) );

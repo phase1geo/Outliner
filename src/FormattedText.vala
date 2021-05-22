@@ -733,11 +733,26 @@ public class FormattedText {
   /* Called whenever the theme changes */
   public static void set_theme( Theme theme ) {
     if( _attr_tags == null ) return;
-    (_attr_tags[FormatTag.URL] as UrlInfo).update_color( theme.url );
-    (_attr_tags[FormatTag.TAG] as TaggingInfo).update_color( theme.tag );
-    (_attr_tags[FormatTag.SYNTAX] as SyntaxInfo).update_color( theme.syntax );
-    (_attr_tags[FormatTag.MATCH] as MatchInfo).update_color( theme.match_foreground, theme.match_background );
-    (_attr_tags[FormatTag.SELECT] as SelectInfo).update_color( theme.textsel_foreground, theme.textsel_background );
+    var url = _attr_tags[FormatTag.URL] as UrlInfo;
+    if( url != null ) {
+      url.update_color( theme.url );
+    }
+    var tag = _attr_tags[FormatTag.TAG] as TaggingInfo;
+    if( tag != null ) {
+      tag.update_color( theme.tag );
+    }
+    var syntax = _attr_tags[FormatTag.SYNTAX] as SyntaxInfo;
+    if( syntax != null ) {
+      syntax.update_color( theme.syntax );
+    }
+    var match = _attr_tags[FormatTag.MATCH] as MatchInfo;
+    if( match != null ) {
+      match.update_color( theme.match_foreground, theme.match_background );
+    }
+    var select = _attr_tags[FormatTag.SELECT] as SelectInfo;
+    if( select != null ) {
+      select.update_color( theme.textsel_foreground, theme.textsel_background );
+    }
   }
 
   /* Adds the given parser */
