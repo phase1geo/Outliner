@@ -46,7 +46,7 @@ public class ThemeMaterial : Theme {
     note_foreground    = get_color( "Grey" );
     note_background    = get_color( "#262626" );
     attachable_color   = get_color( "#9bdb4d" );
-    url                = get_color( "Blue" );
+    url                = get_color( "LightBlue" );
     tag                = get_color( "#c00000" );
     hilite             = get_color( "#3689e6" );
     syntax             = get_color( "grey" );
