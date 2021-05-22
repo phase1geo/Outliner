@@ -37,6 +37,8 @@ public class Themes : Object {
     var theme_dark        = new ThemeDark();
     var theme_solar_light = new ThemeSolarizedLight();
     var theme_solar_dark  = new ThemeSolarizedDark();
+    var theme_mild        = new ThemeMild();
+    var theme_material    = new ThemeMaterial();
     var theme_print_color = new ThemePrintColor();
     var theme_print_gray  = new ThemePrintGrayscale();
 
@@ -45,6 +47,8 @@ public class Themes : Object {
     _themes.append_val( theme_dark );
     _themes.append_val( theme_solar_light );
     _themes.append_val( theme_solar_dark );
+    _themes.append_val( theme_mild );
+    _themes.append_val( theme_material );
     _themes.append_val( theme_print_color );
     _themes.append_val( theme_print_gray );
 
