@@ -42,7 +42,7 @@ public class ThemeMaterial : Theme {
     textsel_background = get_color( "#64baff" );
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "White" );
-    symbol_color       = get_color( "#000000" );
+    symbol_color       = get_color( "Grey" );
     note_foreground    = get_color( "Grey" );
     note_background    = get_color( "#262626" );
     attachable_color   = get_color( "#9bdb4d" );
