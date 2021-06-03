@@ -116,10 +116,12 @@ public class MainWindow : Hdy.ApplicationWindow {
     themes.add_css();
 
     /* Listen for changes to the system dark mode */
+#if GRANITE_6_OR_NEWER
     var granite_settings = Granite.Settings.get_default();
     granite_settings.notify["prefers-color-scheme"].connect( () => {
       update_themes();
     });
+#endif
 
     /* Create the header bar */
     _header = new Hdy.HeaderBar();
@@ -866,8 +868,14 @@ public class MainWindow : Hdy.ApplicationWindow {
   /* Called whenever the themes need to be updated */
   private void update_themes() {
 
+#if GRANITE_6_OR_NEWER
     var settings = Granite.Settings.get_default();
     var dark     = settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+    var hide     = true;
+#else
+    var dark     = false;
+    var hide     = false;
+#endif
 
     /* Remove all of the themes */
     _themes.get_children().foreach((entry) => {
@@ -879,7 +887,7 @@ public class MainWindow : Hdy.ApplicationWindow {
 
     for( int i=0; i<names.length; i++ ) {
       var theme = themes.get_theme( names.index( i ) );
-      if( theme.prefer_dark == dark ) {
+      if( !hide || (theme.prefer_dark == dark) ) {
         var button = _theme_buttons.get( theme.name );
         _themes.pack_start( button, false, false, 10 );
       }
