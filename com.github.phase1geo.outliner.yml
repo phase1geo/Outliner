@@ -12,6 +12,10 @@ finish-args:
   - '--talk-name=org.gnome.SettingsDaemon'
   - '--talk-name=ca.desrt.dconf'
   - '--env=DCONF_USER_CONFIG_DIR=.config/dconf'
+
+      # needed for perfers-color-scheme
+  - '--system-talk-name=org.freedesktop.Accounts'
+
 cleanup:
   - '/include'
   - '/lib/pkgconfig'
