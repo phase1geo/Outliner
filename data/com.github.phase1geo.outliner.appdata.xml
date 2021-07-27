@@ -114,6 +114,7 @@
     <value key="x-appcenter-color-primary">#D48E15</value>
     <value key="x-appcenter-color-primary-text">#000000</value>
     <value key="x-appcenter-suggested-price">10</value>
+    <value key="x-appcenter-stripe">pk_live_wsAhF3dNEsmhB6oQIQknujgL00dBOT1gsG</value>
   </custom>
   <releases>
     <release version="1.4.0" date="2020-10-16">
