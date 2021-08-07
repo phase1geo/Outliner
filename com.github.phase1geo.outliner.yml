@@ -1,6 +1,6 @@
 app-id: com.github.phase1geo.outliner
 runtime: io.elementary.Platform
-runtime-version: 'daily' #change this to release version (currently 0.1.0) once they fix the lack of inherited GL extensions bug
+runtime-version: '6'
 sdk: io.elementary.Sdk
 command: com.github.phase1geo.outliner
 finish-args:
