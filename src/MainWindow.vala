@@ -371,6 +371,7 @@ public class MainWindow : Hdy.ApplicationWindow {
         break;
       case TabAddReason.IMPORT :
       case TabAddReason.OPEN :
+        ot.initialize_for_open();
         _nb.current = tab;
         break;
     }
@@ -380,6 +381,27 @@ public class MainWindow : Hdy.ApplicationWindow {
     return( ot );
 
   }
+
+  /*
+   Checks to see if any other tab contains the given filename.  If the filename
+   is already found, refresh the tab with the file contents and make it the current
+   tab; otherwise, add the new tab and populate it.
+  */
+  private OutlineTable add_tab_conditionally( string fname, TabAddReason reason ) {
+
+    foreach( Tab tab in _nb.tabs ) {
+      var ot = get_table( tab );
+      if( ot.document.filename == fname ) {
+        ot.initialize_for_open();
+        _nb.current = tab;
+        return( ot );
+      }
+    }
+
+    return( add_tab( fname, reason ) );
+
+  }
+
 
   /* Creates the info bar UI */
   private InfoBar create_info_bar() {
@@ -1019,14 +1041,14 @@ public class MainWindow : Hdy.ApplicationWindow {
       return( false );
     }
     if( fname.has_suffix( ".outliner" ) ) {
-      var table = add_tab( fname, TabAddReason.OPEN );
+      var table = add_tab_conditionally( fname, TabAddReason.OPEN );
       update_title( table );
       table.document.load();
       return( true );
     } else if( fname.has_suffix( ".opml" ) ||
                fname.has_suffix( ".minder" ) ) {
       var rname = fname.slice( 0, fname.last_index_of( "." ) ) + ".outliner";
-      var table = add_tab( rname, TabAddReason.IMPORT );
+      var table = add_tab_conditionally( rname, TabAddReason.IMPORT );
       update_title( table );
       if( fname.has_suffix( ".opml" ) ) {
         ExportOPML.import( fname, table );

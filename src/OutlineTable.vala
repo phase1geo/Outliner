@@ -2537,6 +2537,23 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /* Sets up the canvas for an opened file */
+  public void initialize_for_open() {
+
+    /* Create a new root node */
+    root = new Node( this );
+
+    /* Clear the undo buffer */
+    undo_buffer.clear();
+
+    /* Clear the selection */
+    selected = null;
+
+    /* Initialize variables */
+    _press_type = EventType.NOTHING;
+
+  }
+
   /*
    If the format bar needs to be created, create it.  Place it at the current
    cursor position and make sure that it is visible.
