@@ -134,6 +134,13 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Show Keyboard Shortcuts</property>
+                <property name="accelerator">&lt;ctrl&gt;question</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Quit Application</property>
                 <property name="accelerator">&lt;ctrl&gt;q</property>
                 <property name="visible">1</property>
@@ -674,6 +681,20 @@
           <object class="GtkShortcutsGroup">
             <property name="title" translatable="yes">Selection</property>
             <property name="visible">1</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Select All</property>
+                <property name="accelerator">&lt;ctrl&gt;a</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Deselect All</property>
+                <property name="accelerator">&lt;ctrl&gt;&lt;shift&gt;a</property>
+                <property name="visible">1</property>
+              </object>
+            </child>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Add Next Character</property>

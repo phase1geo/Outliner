@@ -483,7 +483,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
     app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
-    app.set_accels_for_action( "win.action_shortcuts",   { "F1" } );
+    app.set_accels_for_action( "win.action_shortcuts",   { "<Control>question" } );
     app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
     app.set_accels_for_action( "win.action_zoom_in1",    { "<Control>plus" } );
     app.set_accels_for_action( "win.action_zoom_in2",    { "<Control>equal" } );
@@ -837,7 +837,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
     shortcuts.get_child().destroy();
-    shortcuts.add( new Granite.AccelLabel( _( "Shortcuts Cheatsheet" ), "F1" ) );
+    shortcuts.add( new Granite.AccelLabel( _( "Shortcuts Cheatsheet" ), "<Control>question" ) );
     shortcuts.action_name = "win.action_shortcuts";
     btn_box.pack_start( shortcuts, false, false, 5 );
 

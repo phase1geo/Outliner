@@ -2000,12 +2000,20 @@ public class OutlineTable : DrawingArea {
   /* Selects all text */
   private void handle_control_a( bool shift ) {
     if( is_node_editable() ) {
-      selected.name.set_cursor_all( false );
+      if( shift ) {
+        selected.name.set_cursor_none();
+      } else {
+        selected.name.set_cursor_all( false );
+      }
       see( selected );
       _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
-      selected.note.set_cursor_all( false );
+      if( shift ) {
+        selected.note.set_cursor_none();
+      } else {
+        selected.note.set_cursor_all( false );
+      }
       see( selected );
       _im_context.reset();
       queue_draw();
