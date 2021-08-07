@@ -62,7 +62,6 @@ dependencies = [
     dependency('gtk+-3.0'),
     dependency('libxml-2.0'),
     dependency('webkit2gtk-4.0'),
-    dependency('gtksourceview-4'),
     dependency('libhandy-1'),
     libmarkdown,
     math_dep
