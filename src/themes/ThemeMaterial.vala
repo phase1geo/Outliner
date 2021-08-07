@@ -22,38 +22,38 @@
 using Gdk;
 using Gtk;
 
-public class ThemeDefault : Theme {
+public class ThemeMaterial : Theme {
 
   /* Create the theme colors */
-  public ThemeDefault() {
+  public ThemeMaterial() {
 
-    name  = "default";
-    label = _( "Light" );
+    name  = "material";
+    label = _( "Material" );
 
     /* Generate the non-link colors */
     even               = get_color( "#ffffff" );
     odd                = get_color( "#cccccc" );
-    background         = get_color( "#ffffff" );
-    foreground         = get_color( "Black" );
+    background         = get_color( "#121212" );
+    foreground         = get_color( "#eeeee" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );
-    nodesel_background = get_color( "#64baff" );
+    nodesel_background = get_color( "#444444" );
     nodesel_foreground = get_color( "Black" );
     textsel_background = get_color( "#64baff" );
     textsel_foreground = get_color( "White" );
-    text_cursor        = get_color( "Black" );
-    symbol_color       = get_color( "#444444" );
-    note_foreground    = get_color( "Blue" );
-    note_background    = get_color( "#cdcdcd" );
+    text_cursor        = get_color( "White" );
+    symbol_color       = get_color( "Grey" );
+    note_foreground    = get_color( "Grey" );
+    note_background    = get_color( "#262626" );
     attachable_color   = get_color( "#9bdb4d" );
-    url                = get_color( "Blue" );
+    url                = get_color( "LightBlue" );
     tag                = get_color( "#c00000" );
     hilite             = get_color( "#3689e6" );
     syntax             = get_color( "grey" );
     match_foreground   = get_color( "Black" );
     match_background   = get_color( "Gold" );
     markdown_listitem  = get_color( "red" );
-    prefer_dark        = false;
+    prefer_dark        = true;
 
   }
 

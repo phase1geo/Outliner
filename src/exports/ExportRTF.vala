@@ -68,6 +68,7 @@ public class ExportRTF : Object {
         case FormatTag.COLOR      :  return( "\\cf4" );
         case FormatTag.HILITE     :  return( "\\highlight7" );
         case FormatTag.URL        :  return( "\\cs1\\ul\\cf2" );
+        default                   :  return( "" );
       }
       return( "" );
     };
@@ -82,8 +83,9 @@ public class ExportRTF : Object {
         case FormatTag.HILITE     :
         case FormatTag.URL        :
           return( ";}" );
+        default                   :
+          return( "" );
       }
-      return( "" );
     };
     ExportUtils.ExportEncodeFunc encode_func = (str) => {
       return( str );

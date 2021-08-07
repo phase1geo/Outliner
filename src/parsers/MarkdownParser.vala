@@ -118,6 +118,7 @@ public class MarkdownParser : TextParser {
       case FormatTag.BOLD    :  insert_surround( ct, "**", start_pos, end_pos, undo_buffer );  break;
       case FormatTag.ITALICS :  insert_surround( ct, "_", start_pos, end_pos, undo_buffer );  break;
       case FormatTag.URL     :  insert_link( ct, start_pos, end_pos, extra, undo_buffer );  break;
+      default                :  break;
     }
   }
 

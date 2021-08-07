@@ -1,4 +1,4 @@
-/*
+   /*
 * Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
@@ -29,38 +29,35 @@ public enum TabAddReason {
   LOAD
 }
 
-public class MainWindow : ApplicationWindow {
+public class MainWindow : Hdy.ApplicationWindow {
 
-  private const string DESKTOP_SCHEMA = "io.elementary.desktop";
-  private const string DARK_KEY       = "prefer-dark";
-
-  private GLib.Settings   _settings;
-  private Revealer        _header_revealer;
-  private HeaderBar       _header;
-  private DynamicNotebook _nb;
-  private Button          _search_btn;
-  private Popover?        _export         = null;
-  private Button?         _undo_btn       = null;
-  private Button?         _redo_btn       = null;
-  private SpinButton      _zoom;
-  private double          _zoom_factor    = 1.0;
-  private Granite.Widgets.ModeButton _list_types;
-  private FontButton      _fonts_name;
-  private FontButton      _fonts_note;
-  private Switch          _condensed;
-  private Switch          _show_tasks;
-  private Switch          _show_depth;
-  private Switch          _blank_rows;
-  private Switch          _markdown;
-  private Label           _stats_chars;
-  private Label           _stats_words;
-  private Label           _stats_rows;
-  private Label           _stats_ttotal;
-  private Label           _stats_topen;
-  private Label           _stats_tip;
-  private Label           _stats_tdone;
-  private bool            _debug                 = false;
-  private bool            _prefer_dark           = false;
+  private GLib.Settings               _settings;
+  private Revealer                    _header_revealer;
+  private Hdy.HeaderBar               _header;
+  private DynamicNotebook             _nb;
+  private Button                      _search_btn;
+  private Popover?                    _export      = null;
+  private Button?                     _undo_btn    = null;
+  private Button?                     _redo_btn    = null;
+  private SpinButton                  _zoom;
+  private double                      _zoom_factor = 1.0;
+  private Granite.Widgets.ModeButton  _list_types;
+  private FontButton                  _fonts_name;
+  private FontButton                  _fonts_note;
+  private Switch                      _condensed;
+  private Switch                      _show_tasks;
+  private Switch                      _show_depth;
+  private Switch                      _blank_rows;
+  private Switch                      _markdown;
+  private Label                       _stats_chars;
+  private Label                       _stats_words;
+  private Label                       _stats_rows;
+  private Label                       _stats_ttotal;
+  private Label                       _stats_topen;
+  private Label                       _stats_tip;
+  private Label                       _stats_tdone;
+  private bool                        _debug       = false;
+  private Box                         _themes;
   private HashMap<string,RadioButton> _theme_buttons;
 
   public GLib.Settings settings {
@@ -106,9 +103,6 @@ public class MainWindow : ApplicationWindow {
     /* Initialize variables */
     _theme_buttons = new HashMap<string,RadioButton>();
 
-    /* Handle any changes to the dark mode preference setting */
-    handle_prefer_dark_changes();
-
     var window_x = settings.get_int( "window-x" );
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
@@ -121,8 +115,16 @@ public class MainWindow : ApplicationWindow {
     /* Add the theme CSS */
     themes.add_css();
 
+    /* Listen for changes to the system dark mode */
+#if GRANITE_6_OR_NEWER
+    var granite_settings = Granite.Settings.get_default();
+    granite_settings.notify["prefers-color-scheme"].connect( () => {
+      update_themes();
+    });
+#endif
+
     /* Create the header bar */
-    _header = new HeaderBar();
+    _header = new Hdy.HeaderBar();
     _header.set_show_close_button( true );
     _header.get_style_context().add_class( "outliner-toolbar" );
     _header.get_style_context().add_class( "titlebar" );
@@ -140,8 +142,6 @@ public class MainWindow : ApplicationWindow {
       move( window_x, window_y );
     }
     set_default_size( window_w, window_h );
-    set_titlebar( _header_revealer );
-    set_border_width( 2 );
     destroy.connect( Gtk.main_quit );
 
     /* Allows the titlebar to be drawn without a large black border */
@@ -198,10 +198,18 @@ public class MainWindow : ApplicationWindow {
     add_stats_button();
     add_search_button();
 
+    var top_box = new Box( Orientation.VERTICAL, 0 );
+    top_box.pack_start( _header_revealer, false, true, 0 );
+    top_box.pack_start( _nb, true, true, 0 );
+
     /* Display the UI */
-    add( _nb );
+    add( top_box );
     show_all();
 
+  }
+
+  static construct {
+    Hdy.init();
   }
 
   /* Returns the OutlineTable from the given tab */
@@ -250,19 +258,6 @@ public class MainWindow : ApplicationWindow {
           info.set_revealed( false );
         }
       }
-    }
-  }
-
-  /* Handles any changes to the dark mode preference gsettings for the desktop */
-  private void handle_prefer_dark_changes() {
-    var lookup = SettingsSchemaSource.get_default().lookup( DESKTOP_SCHEMA, false );
-    if( lookup != null ) {
-      var desktop_settings = new GLib.Settings( DESKTOP_SCHEMA );
-      _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
-      desktop_settings.changed.connect(() => {
-        _prefer_dark = desktop_settings.get_boolean( DARK_KEY );
-        theme_changed( get_current_table( "handle_prefer_dark_changes" ) );
-      });
     }
   }
 
@@ -320,6 +315,7 @@ public class MainWindow : ApplicationWindow {
   public OutlineTable add_tab( string? fname, TabAddReason reason ) {
 
     var box = new Box( Orientation.VERTICAL, 0 );
+    box.border_width = 0;
 
     /* Create and pack the canvas */
     var ot = new OutlineTable( this, _settings );
@@ -680,13 +676,19 @@ public class MainWindow : ApplicationWindow {
     box.pack_start( zoom_box, false, false, 10 );
 
     /* Add theme selector */
-    var names     = new Array<string>();
     var theme_box = new Box( Orientation.HORIZONTAL, 0 );
     var theme_lbl = new Label( _( "Theme:" ) );
+    _themes = new Box( Orientation.HORIZONTAL, 0 );
     theme_box.pack_start( theme_lbl, false, false, 10 );
-    RadioButton? rb = null;
+    theme_box.pack_end(   _themes, false, false, 10 );
+    box.pack_start( theme_box, false, false, 10 );
+
+    var names = new Array<string>();
     themes.names( ref names );
-    for( int i=((int)names.length - 1); i>=0; i-- ) {
+
+    RadioButton? rb = null;
+
+    for( int i=0; i<names.length; i++ ) {
       var theme  = themes.get_theme( names.index( i ) );
       var button = new RadioButton.from_widget( rb );
       button.halign       = Align.CENTER;
@@ -699,12 +701,12 @@ public class MainWindow : ApplicationWindow {
         theme_changed( table );
       });
       _theme_buttons.set( theme.name, button );
-      theme_box.pack_end( button, false, false, 10 );
       if( rb == null ) {
         rb = button;
       }
     }
-    box.pack_start( theme_box, false, false, 10 );
+
+    update_themes();
 
     /* Add list type selector */
     var ltbox = new Box( Orientation.HORIZONTAL, 0 );
@@ -860,6 +862,38 @@ public class MainWindow : ApplicationWindow {
     var prop_popover = new Popover( null );
     prop_popover.add( box );
     prop_btn.popover = prop_popover;
+
+  }
+
+  /* Called whenever the themes need to be updated */
+  private void update_themes() {
+
+#if GRANITE_6_OR_NEWER
+    var settings = Granite.Settings.get_default();
+    var dark     = settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+    var hide     = true;
+#else
+    var dark     = false;
+    var hide     = false;
+#endif
+
+    /* Remove all of the themes */
+    _themes.get_children().foreach((entry) => {
+      _themes.remove( entry );
+    });
+
+    var names = new Array<string>();
+    themes.names( ref names );
+
+    for( int i=0; i<names.length; i++ ) {
+      var theme = themes.get_theme( names.index( i ) );
+      if( !hide || (theme.prefer_dark == dark) ) {
+        var button = _theme_buttons.get( theme.name );
+        _themes.pack_start( button, false, false, 10 );
+      }
+    }
+
+    _themes.show_all();
 
   }
 

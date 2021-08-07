@@ -22,18 +22,18 @@
 using Gdk;
 using Gtk;
 
-public class ThemeDefault : Theme {
+public class ThemeMild : Theme {
 
   /* Create the theme colors */
-  public ThemeDefault() {
+  public ThemeMild() {
 
-    name  = "default";
-    label = _( "Light" );
+    name  = "mild";
+    label = _( "Mild" );
 
     /* Generate the non-link colors */
     even               = get_color( "#ffffff" );
     odd                = get_color( "#cccccc" );
-    background         = get_color( "#ffffff" );
+    background         = get_color( "#fff9cc" );
     foreground         = get_color( "Black" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );
@@ -43,8 +43,8 @@ public class ThemeDefault : Theme {
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "Black" );
     symbol_color       = get_color( "#444444" );
-    note_foreground    = get_color( "Blue" );
-    note_background    = get_color( "#cdcdcd" );
+    note_foreground    = get_color( "Grey" );
+    note_background    = get_color( "#fff394" );
     attachable_color   = get_color( "#9bdb4d" );
     url                = get_color( "Blue" );
     tag                = get_color( "#c00000" );

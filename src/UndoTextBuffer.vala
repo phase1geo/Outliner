@@ -37,7 +37,8 @@ public class UndoTextBuffer : UndoBuffer {
   */
   private bool merge_with_last( UndoTextItem item ) {
     if( (_undo_buffer.length > 0) && (_redo_buffer.length == 0) && mergeable ) {
-      return( (_undo_buffer.index( _undo_buffer.length - 1 ) as UndoTextItem).merge( ct, item ) );
+      var it = _undo_buffer.index( _undo_buffer.length - 1 ) as UndoTextItem;
+      return( (it != null) && it.merge( ct, item ) );
     }
     mergeable = true;
     return( false );
@@ -95,8 +96,11 @@ public class UndoTextBuffer : UndoBuffer {
   /* Performs the next undo action in the buffer */
   public override void undo() {
     if( undoable() ) {
-      UndoItem item = _undo_buffer.index( _undo_buffer.length - 1 );
-      (item as UndoTextItem).undo_text( _table, ct );
+      var item      = _undo_buffer.index( _undo_buffer.length - 1 );
+      var text_item = item as UndoTextItem;
+      if( text_item != null ) {
+        text_item.undo_text( _table, ct );
+      }
       _undo_buffer.remove_index( _undo_buffer.length - 1 );
       _redo_buffer.append_val( item );
       mergeable = false;
@@ -107,8 +111,11 @@ public class UndoTextBuffer : UndoBuffer {
   /* Performs the next redo action in the buffer */
   public override void redo() {
     if( redoable() ) {
-      UndoItem item = _redo_buffer.index( _redo_buffer.length - 1 );
-      (item as UndoTextItem).redo_text( _table, ct );
+      var item      = _redo_buffer.index( _redo_buffer.length - 1 );
+      var text_item = item as UndoTextItem;
+      if( text_item != null ) {
+        text_item.redo_text( _table, ct );
+      }
       _redo_buffer.remove_index( _redo_buffer.length - 1 );
       _undo_buffer.append_val( item );
       mergeable = false;

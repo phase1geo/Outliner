@@ -39,13 +39,13 @@ if gtk_dep.version().version_compare('>=3.22.0')
   add_project_arguments(['--define=GTK322'], language: 'vala')
 endif
 
-# Add the math library
+# Add the math and Markdown libraries
 cc = meson.get_compiler('c')
-math_dep = cc.find_library('m', required: false)
-
-# Add the Markdown library
-cc = meson.get_compiler('c')
+math_dep    = cc.find_library('m', required: false)
 libmarkdown = cc.find_library('markdown', required: true)
+
+# Figure out if Granite will support some features
+granite = dependency('granite', version: '>=5.5.0', required: true)
 
 add_project_arguments([
         '--vapidir', join_paths(meson.current_source_dir(), 'vapi')
@@ -58,10 +58,11 @@ dependencies = [
     dependency('glib-2.0'),
     dependency('cairo'),
     dependency('gee-0.8'),
-    dependency('granite'),
+    granite,
     dependency('gtk+-3.0'),
     dependency('libxml-2.0'),
     dependency('webkit2gtk-4.0'),
+    dependency('libhandy-1'),
     libmarkdown,
     math_dep
 ]

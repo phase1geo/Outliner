@@ -574,6 +574,7 @@ public class OutlineTable : DrawingArea {
       switch( tag ) {
         case FormatTag.URL :  Utils.open_url( extra );       break;
         case FormatTag.TAG :  _tagger.tag_clicked( extra );  break;
+        default            :  break;
       }
       return( false );
     }
@@ -583,6 +584,7 @@ public class OutlineTable : DrawingArea {
       case EventType.BUTTON_PRESS        :  text.set_cursor_at_char( e.x, e.y, shift );  break;
       case EventType.DOUBLE_BUTTON_PRESS :  text.set_cursor_at_word( e.x, e.y, shift );  break;
       case EventType.TRIPLE_BUTTON_PRESS :  text.set_cursor_all( false );                break;
+      default                            :  break;
     }
 
     /* Sets the selected mode */
@@ -657,6 +659,7 @@ public class OutlineTable : DrawingArea {
     switch( _press_type ) {
       case EventType.BUTTON_PRESS        :  ct.set_cursor_at_char( x, y, true );  break;
       case EventType.DOUBLE_BUTTON_PRESS :  ct.set_cursor_at_word( x, y, true );  break;
+      default                            :  break;
     }
     queue_draw();
   }
@@ -923,6 +926,8 @@ public class OutlineTable : DrawingArea {
           case Key.Left      :  handle_control_left( shift );    break;
           case Key.Up        :  handle_control_up( shift );      break;
           case Key.Down      :  handle_control_down( shift );    break;
+          case Key.Home      :  handle_control_home( shift );    break;
+          case Key.End       :  handle_control_end( shift );     break;
           case Key.BackSpace :  handle_control_backspace();      break;
           case Key.Delete    :  handle_control_delete();         break;
           case Key.period    :  handle_control_period();         break;
@@ -962,8 +967,8 @@ public class OutlineTable : DrawingArea {
             case Key.ISO_Left_Tab :  handle_shift_tab();         break;
             case Key.Right        :  handle_right( shift );      break;
             case Key.Left         :  handle_left( shift );       break;
-            case Key.Home         :  handle_home();              break;
-            case Key.End          :  handle_end();               break;
+            case Key.Home         :  handle_home( shift );       break;
+            case Key.End          :  handle_end( shift );        break;
             case Key.Up           :  handle_up( shift );         break;
             case Key.Down         :  handle_down( shift );       break;
             case Key.Page_Up      :  handle_pageup();            break;
@@ -1828,7 +1833,7 @@ public class OutlineTable : DrawingArea {
   private void handle_control_up( bool shift ) {
     if( is_node_editable() ) {
       if( shift ) {
-        selected.name.selection_to_start();
+        selected.name.selection_to_start( false );
       } else {
         selected.name.move_cursor_to_start();
       }
@@ -1838,7 +1843,7 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
-        selected.note.selection_to_start();
+        selected.note.selection_to_start( false );
       } else {
         selected.note.move_cursor_to_start();
       }
@@ -1902,7 +1907,7 @@ public class OutlineTable : DrawingArea {
   private void handle_control_down( bool shift ) {
     if( is_node_editable() ) {
       if( shift ) {
-        selected.name.selection_to_end();
+        selected.name.selection_to_end( false );
       } else {
         selected.name.move_cursor_to_end();
       }
@@ -1912,7 +1917,7 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( is_note_editable() ) {
       if( shift ) {
-        selected.note.selection_to_end();
+        selected.note.selection_to_end( false );
       } else {
         selected.note.move_cursor_to_end();
       }
@@ -2097,16 +2102,74 @@ public class OutlineTable : DrawingArea {
     win.close_current_tab();
   }
 
-  /* Handles a Home keypress */
-  private void handle_home() {
+  /* Handles a Control-Home keypress */
+  private void handle_control_home( bool shift ) {
     if( is_node_editable() ) {
-      selected.name.move_cursor_to_start();
+      if( shift ) {
+        selected.name.selection_to_start( true );
+      } else {
+        selected.name.move_cursor_to_start();
+      }
       undo_text.mergeable = false;
       see( selected );
       _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
-      selected.note.move_cursor_to_start();
+      if( shift ) {
+        selected.note.selection_to_start( true );
+      } else {
+        selected.note.move_cursor_to_start();
+      }
+      undo_text.mergeable = false;
+      see( selected );
+      _im_context.reset();
+      queue_draw();
+    }
+  }
+
+  /* Handles a Home keypress */
+  private void handle_home( bool shift ) {
+    if( is_node_editable() ) {
+      if( shift ) {
+        selected.name.selection_to_linestart( true );
+      } else {
+        selected.name.move_cursor_to_linestart();
+      }
+      undo_text.mergeable = false;
+      see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_note_editable() ) {
+      if( shift ) {
+        selected.note.selection_to_linestart( true );
+      } else {
+        selected.note.move_cursor_to_linestart();
+      }
+      undo_text.mergeable = false;
+      see( selected );
+      _im_context.reset();
+      queue_draw();
+    }
+  }
+
+  /* Handles a Control-End keypress */
+  private void handle_control_end( bool shift ) {
+    if( is_node_editable() ) {
+      if( shift ) {
+        selected.name.selection_to_end( true );
+      } else {
+        selected.name.move_cursor_to_end();
+      }
+      undo_text.mergeable = false;
+      see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_note_editable() ) {
+      if( shift ) {
+        selected.note.selection_to_end( true );
+      } else {
+        selected.note.move_cursor_to_end();
+      }
       undo_text.mergeable = false;
       see( selected );
       _im_context.reset();
@@ -2115,15 +2178,23 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Handles an End keypress */
-  private void handle_end() {
+  private void handle_end( bool shift ) {
     if( is_node_editable() ) {
-      selected.name.move_cursor_to_end();
+      if( shift ) {
+        selected.name.selection_to_lineend( true );
+      } else {
+        selected.name.move_cursor_to_lineend();
+      }
       undo_text.mergeable = false;
       see( selected );
       _im_context.reset();
       queue_draw();
     } else if( is_note_editable() ) {
-      selected.note.move_cursor_to_end();
+      if( shift ) {
+        selected.note.selection_to_lineend( true );
+      } else {
+        selected.note.move_cursor_to_lineend();
+      }
       undo_text.mergeable = false;
       see( selected );
       _im_context.reset();
