@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-26 22:47-0500\n"
+"POT-Creation-Date: 2021-08-07 20:29-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,356 +124,427 @@ msgid "Printer support."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:86
-#: data/com.github.phase1geo.outliner.appdata.xml.in:107
-#: data/com.github.phase1geo.outliner.appdata.xml.in:143
-#: data/com.github.phase1geo.outliner.appdata.xml.in:169
+#: data/com.github.phase1geo.outliner.appdata.xml.in:115
+#: data/com.github.phase1geo.outliner.appdata.xml.in:136
+#: data/com.github.phase1geo.outliner.appdata.xml.in:172
+#: data/com.github.phase1geo.outliner.appdata.xml.in:198
 msgid "New"
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:88
+msgid "Added YAML Flatpak manifest file to meet elementary OS 6 requirements."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:89
+msgid "Added support for automatically handling system dark mode changes."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:90
+msgid "Added two new themes (one for light mode and one for dark mode)."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:91
+msgid "Added libhandy-1 support to comply with elementary OS look and feel."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:92
+msgid "Added Control-Shift-A text editing command to deselect all text."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:94
+#: data/com.github.phase1geo.outliner.appdata.xml.in:124
+#: data/com.github.phase1geo.outliner.appdata.xml.in:146
+#: data/com.github.phase1geo.outliner.appdata.xml.in:181
+#: data/com.github.phase1geo.outliner.appdata.xml.in:211
+msgid "Changes"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:96
+#: data/com.github.phase1geo.outliner.appdata.xml.in:126
+#: data/com.github.phase1geo.outliner.appdata.xml.in:156
+msgid "Updated Dutch translation (thanks to Heimen Stoffels)."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:97
+msgid "Removed JSON Flatpak manifest file."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:98
+msgid ""
+"Changed Home text editing command to move cursor to beginning of the current "
+"line."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:99
+msgid ""
+"Changed End text editing command to move cursor to end of the current line."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:100
+msgid ""
+"Added Control-Home/End text editing command to move cursor to beginning/"
+"ending of text."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:101
+msgid "Changed keyboard shortcut command from F1 to Control-?."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:102
+#: data/com.github.phase1geo.outliner.appdata.xml.in:184
+msgid "Updated keyboard shortcut cheatsheet."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:104
+#: data/com.github.phase1geo.outliner.appdata.xml.in:158
+#: data/com.github.phase1geo.outliner.appdata.xml.in:189
+#: data/com.github.phase1geo.outliner.appdata.xml.in:219
+msgid "Bug Fixes"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:106
+msgid ""
+"Fixed issue where entering Return on a collapsed row added a child row "
+"instead of a sibling row."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:107
+msgid ""
+"Fixed issue where adding a child node to a collapsed row did not expand the "
+"row."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:108
+msgid "Fixed default application support for .outliner files."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:109
+msgid ""
+"Fixed issue where opening a currently opened file would create two tabs."
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.appdata.xml.in:117
 msgid ""
 "Added menu accelerators for Export, Print and Shortcut Cheatsheet menu items."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:89
+#: data/com.github.phase1geo.outliner.appdata.xml.in:118
 msgid "Added support for showing notifications after export completes."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:90
+#: data/com.github.phase1geo.outliner.appdata.xml.in:119
 msgid ""
 "Added support for Menu or Shift-F10 keyboard shortcut for showing contextual "
 "menu."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:91
+#: data/com.github.phase1geo.outliner.appdata.xml.in:120
 msgid "Added support for displaying main rows without text as blank rows."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:92
+#: data/com.github.phase1geo.outliner.appdata.xml.in:121
 msgid "Added support for joining two rows."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:93
+#: data/com.github.phase1geo.outliner.appdata.xml.in:122
 msgid ""
 "Added support for hiding header bar and tab bar for focused writing mode."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:95
-#: data/com.github.phase1geo.outliner.appdata.xml.in:117
-#: data/com.github.phase1geo.outliner.appdata.xml.in:152
-#: data/com.github.phase1geo.outliner.appdata.xml.in:182
-msgid "Changes"
-msgstr ""
-
-#: data/com.github.phase1geo.outliner.appdata.xml.in:97
 #: data/com.github.phase1geo.outliner.appdata.xml.in:127
-msgid "Updated Dutch translation (thanks to Heimen Stoffels)."
-msgstr ""
-
-#: data/com.github.phase1geo.outliner.appdata.xml.in:98
 msgid "Improved look of menu accelerators."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:99
+#: data/com.github.phase1geo.outliner.appdata.xml.in:128
 msgid "Changing behavior of row split."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:100
+#: data/com.github.phase1geo.outliner.appdata.xml.in:129
 msgid "Updated shortcut cheatsheet."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:101
+#: data/com.github.phase1geo.outliner.appdata.xml.in:130
 msgid "Adding top margin to document for improved readability."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:109
+#: data/com.github.phase1geo.outliner.appdata.xml.in:138
 msgid "Added support for displaying/hiding row depth lines."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:110
+#: data/com.github.phase1geo.outliner.appdata.xml.in:139
 msgid ""
 "Added support for adding and highlighting row tags, including optional auto-"
 "completion support."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:111
+#: data/com.github.phase1geo.outliner.appdata.xml.in:140
 msgid "Added support for node filtering based on tags."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:112
+#: data/com.github.phase1geo.outliner.appdata.xml.in:141
 msgid "Added support for stack-based focus mode."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:113
+#: data/com.github.phase1geo.outliner.appdata.xml.in:142
 msgid "Added support for Markdown and new Markdown format toolbar."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:114
+#: data/com.github.phase1geo.outliner.appdata.xml.in:143
 msgid ""
 "Added tooltip when mouse cursor is over a group row expander which displays "
 "the number of subrows contained within it."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:115
+#: data/com.github.phase1geo.outliner.appdata.xml.in:144
 msgid ""
 "Added support for opening one or more files from the command-line or from a "
 "file browser."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:119
+#: data/com.github.phase1geo.outliner.appdata.xml.in:148
 msgid "Changed application icon (thanks to Nararyans R.I.)"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:120
+#: data/com.github.phase1geo.outliner.appdata.xml.in:149
 msgid "Changed default location of checkboxes to display to the right of rows."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:121
+#: data/com.github.phase1geo.outliner.appdata.xml.in:150
 msgid ""
 "Changed behavior of unindenting a row such that row order is no longer "
 "modified."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:122
+#: data/com.github.phase1geo.outliner.appdata.xml.in:151
 msgid ""
 "Changed behavior of the Return key when adding a new row from a group row "
 "such that the new row will be added to the group as the first row of that "
 "group."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:123
+#: data/com.github.phase1geo.outliner.appdata.xml.in:152
 msgid "Changed mouse cursor when it is over a checkbox."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:124
+#: data/com.github.phase1geo.outliner.appdata.xml.in:153
 msgid ""
 "Changed behavior of left and right keys on a group row to expand/collapse "
 "the tree one level at a time."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:125
+#: data/com.github.phase1geo.outliner.appdata.xml.in:154
 msgid ""
 "Assigned Shift-right and Shift-left to expand/collapse the entire hierarchy "
 "for a given group row."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:126
+#: data/com.github.phase1geo.outliner.appdata.xml.in:155
 msgid "Reorganized Node commands in keyboard shortcut cheatsheet."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:129
 #: data/com.github.phase1geo.outliner.appdata.xml.in:160
-#: data/com.github.phase1geo.outliner.appdata.xml.in:190
-msgid "Bug Fixes"
-msgstr ""
-
-#: data/com.github.phase1geo.outliner.appdata.xml.in:131
 msgid "Added missing keyboard shortcut for task toggling to cheatsheet."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:132
+#: data/com.github.phase1geo.outliner.appdata.xml.in:161
 msgid "Fixed issues with exporting supported XML-based filetypes."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:133
+#: data/com.github.phase1geo.outliner.appdata.xml.in:162
 msgid ""
 "Fixed display issue when a descendant node is selected and one of its "
 "ancestors is collapsed."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:134
+#: data/com.github.phase1geo.outliner.appdata.xml.in:163
 msgid ""
 "Fixed Save As window adding the .outliner prefix to a file that already has "
 "this prefix."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:135
+#: data/com.github.phase1geo.outliner.appdata.xml.in:164
 msgid "Fixed display issue that can occur when a group is deleted."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:136
+#: data/com.github.phase1geo.outliner.appdata.xml.in:165
 msgid "Fixed issues with undo/redo support for expanding/collapsing groups."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:137
+#: data/com.github.phase1geo.outliner.appdata.xml.in:166
 msgid "Fixed issue with pasting UTF8 strings from clipboard."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:145
+#: data/com.github.phase1geo.outliner.appdata.xml.in:174
 msgid "Added highlight for row that the mouse cursor is currently over."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:146
+#: data/com.github.phase1geo.outliner.appdata.xml.in:175
 msgid ""
 "Added support for row labeling for the purposes of moving and selecting rows."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:147
+#: data/com.github.phase1geo.outliner.appdata.xml.in:176
 msgid "Added support for changing document and application default fonts."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:148
+#: data/com.github.phase1geo.outliner.appdata.xml.in:177
 msgid "Added support for adding checkbox state to rows."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:149
+#: data/com.github.phase1geo.outliner.appdata.xml.in:178
 msgid "Added checkbox statistics to the statistics panel."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:150
+#: data/com.github.phase1geo.outliner.appdata.xml.in:179
 msgid "Added Org-Mode export mode."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:154
+#: data/com.github.phase1geo.outliner.appdata.xml.in:183
 msgid ""
 "When only row is deleted, a new row will be added and placed into edit mode."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:155
-msgid "Updated keyboard shortcut cheatsheet."
-msgstr ""
-
-#: data/com.github.phase1geo.outliner.appdata.xml.in:156
+#: data/com.github.phase1geo.outliner.appdata.xml.in:185
 msgid ""
 "Changed cursor and added tooltip when cursor is over URL and Control is held "
 "down."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:157
+#: data/com.github.phase1geo.outliner.appdata.xml.in:186
 msgid "Enhanced clipboard functionality."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:158
+#: data/com.github.phase1geo.outliner.appdata.xml.in:187
 msgid ""
 "Modified look of statistics panel to improve readability of display groups "
 "of information."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:162
+#: data/com.github.phase1geo.outliner.appdata.xml.in:191
 msgid "Fixed right margin for descendant rows."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:163
+#: data/com.github.phase1geo.outliner.appdata.xml.in:192
 msgid "Fixed exports to allow existing files to be overwritten."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:171
+#: data/com.github.phase1geo.outliner.appdata.xml.in:200
 msgid "Added support for row cloning."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:172
+#: data/com.github.phase1geo.outliner.appdata.xml.in:201
 msgid "Added French translation (thanks to Nathan Bonnemains)."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:173
+#: data/com.github.phase1geo.outliner.appdata.xml.in:202
 msgid "Added Dutch translation (thanks to Heimen Stoffels)."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:174
+#: data/com.github.phase1geo.outliner.appdata.xml.in:203
 msgid "Added support for subscript and superscript text formatting."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:175
+#: data/com.github.phase1geo.outliner.appdata.xml.in:204
 msgid "Added support for using input methods."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:176
+#: data/com.github.phase1geo.outliner.appdata.xml.in:205
 msgid "Added new keyboard shortcuts for selecting and moving rows."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:177
+#: data/com.github.phase1geo.outliner.appdata.xml.in:206
 msgid ""
 "Added new _H_ keyboard shortcut for positioning currently selected row at "
 "the top of the window."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:178
+#: data/com.github.phase1geo.outliner.appdata.xml.in:207
 msgid "Added keyboard shortcuts for deleting the next or previous word."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:179
+#: data/com.github.phase1geo.outliner.appdata.xml.in:208
 msgid "Added new selection submenu to contextual menu."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:180
+#: data/com.github.phase1geo.outliner.appdata.xml.in:209
 msgid "Added clear formatting button to format bar."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:184
+#: data/com.github.phase1geo.outliner.appdata.xml.in:213
 msgid "Removed support for the _m_ command."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:185
+#: data/com.github.phase1geo.outliner.appdata.xml.in:214
 msgid "Improved look of format bar, especially for dark themes."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:186
+#: data/com.github.phase1geo.outliner.appdata.xml.in:215
 msgid ""
 "Changed tab bar coloring to match the background color of the current tab."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:187
+#: data/com.github.phase1geo.outliner.appdata.xml.in:216
 msgid "Changed default filename from unnamed to be the translated name."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:188
+#: data/com.github.phase1geo.outliner.appdata.xml.in:217
 msgid "Improved undo/redo tooltips to look better in non-English translations."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:192
+#: data/com.github.phase1geo.outliner.appdata.xml.in:221
 msgid "Fixed issue with deleting a single character for multi-byte characters."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:193
+#: data/com.github.phase1geo.outliner.appdata.xml.in:222
 msgid "Fixed application screenshots."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:194
+#: data/com.github.phase1geo.outliner.appdata.xml.in:223
 msgid ""
 "Fixed application crash when the _a_ command used when selected row is a top-"
 "level row."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:195
+#: data/com.github.phase1geo.outliner.appdata.xml.in:224
 msgid "Fixed issues with showing or hiding a note."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:196
+#: data/com.github.phase1geo.outliner.appdata.xml.in:225
 msgid ""
 "Fixed _New Document_ plank command to open a new tab after loading "
 "application data."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:197
+#: data/com.github.phase1geo.outliner.appdata.xml.in:226
 msgid "Fixed theming issues when two tabs use different themes."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:198
+#: data/com.github.phase1geo.outliner.appdata.xml.in:227
 msgid "Fixed translation string issues (thanks to Nathan Bonnemains)."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:199
+#: data/com.github.phase1geo.outliner.appdata.xml.in:228
 msgid "Fixed text positioning issues when tags are added to text."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:200
+#: data/com.github.phase1geo.outliner.appdata.xml.in:229
 msgid "Fixed issues with making shortcut cheatsheet text translatable."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:201
+#: data/com.github.phase1geo.outliner.appdata.xml.in:230
 msgid "Fixed application crash when moving a row to the top of the document."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:202
+#: data/com.github.phase1geo.outliner.appdata.xml.in:231
 msgid "Fixed title of shortcut cheatsheet."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:203
+#: data/com.github.phase1geo.outliner.appdata.xml.in:232
 msgid ""
 "Fixed application crashes and incorrectly placed rows when moving them via "
 "the mouse."
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.appdata.xml.in:209
+#: data/com.github.phase1geo.outliner.appdata.xml.in:238
 msgid "Initial release!"
 msgstr ""

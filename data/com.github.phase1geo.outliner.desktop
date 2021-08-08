@@ -1,22 +1,30 @@
 [Desktop Entry]
+Name[fr]=Outliner
+Name[nl]=Outliner
 Name=Outliner
+GenericName[fr]=Outliner
+GenericName[nl]=Outliner
 GenericName=Outliner
+Comment[fr]=Organisez vos mots
+Comment[nl]=Orden je teksten
 Comment=Organize your words
 Categories=Office;WordProcessor;
 Exec=com.github.phase1geo.outliner %f
+Icon[fr]=com.github.phase1geo.outliner
+Icon[nl]=com.github.phase1geo.outliner
 Icon=com.github.phase1geo.outliner
 Terminal=false
 Type=Application
-
-
-
-
 MimeType=application/com.github.phase1geo.outliner;
 X-GNOME-Gettext-Domain=Outliner
 X-GNOME-UsesNotifications=true
+Keywords[fr]=plan;
+Keywords[nl]=overzicht;
 Keywords=outline;
 Actions=NewDocument;
 
 [Desktop Action NewDocument]
+Name[fr]=Nouveau document
+Name[nl]=Nieuw document
 Name=New Document
 Exec=com.github.phase1geo.outliner -n
