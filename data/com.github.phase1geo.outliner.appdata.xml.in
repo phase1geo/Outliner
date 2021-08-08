@@ -81,6 +81,35 @@
       <value key="x-appcenter-stripe">pk_live_wsAhF3dNEsmhB6oQIQknujgL00dBOT1gsG</value>
     </custom>
     <releases>
+      <release version="1.5.0" data="2021-08-08">
+        <description>
+          <p>New</p>
+          <ul>
+            <li>Added YAML Flatpak manifest file to meet elementary OS 6 requirements.</li>
+            <li>Added support for automatically handling system dark mode changes.</li>
+            <li>Added two new themes (one for light mode and one for dark mode).</li>
+            <li>Added libhandy-1 support to comply with elementary OS look and feel.</li>
+            <li>Added Control-Shift-A text editing command to deselect all text.</li>
+          </ul>
+          <p>Changes</p>
+          <ul>
+            <li>Updated Dutch translation (thanks to Heimen Stoffels).</li>
+            <li>Removed JSON Flatpak manifest file.</li>
+            <li>Changed Home text editing command to move cursor to beginning of the current line.</li>
+            <li>Changed End text editing command to move cursor to end of the current line.</li>
+            <li>Added Control-Home/End text editing command to move cursor to beginning/ending of text.</li>
+            <li>Changed keyboard shortcut command from F1 to Control-?.</li>
+            <li>Updated keyboard shortcut cheatsheet.</li>
+          </ul>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Fixed issue where entering Return on a collapsed row added a child row instead of a sibling row.</li>
+            <li>Fixed issue where adding a child node to a collapsed row did not expand the row.</li>
+            <li>Fixed default application support for .outliner files.</li>
+            <li>Fixed issue where opening a currently opened file would create two tabs.</li>
+          </ul>
+        </description>
+      </release>
       <release version="1.4.0" date="2020-10-16">
         <description>
           <p>New</p>
