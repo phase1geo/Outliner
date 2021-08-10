@@ -904,6 +904,17 @@ public class OutlineTable : DrawingArea {
 
   }
 
+    /*
+   Returns true if the following key was found to be pressed (regardless of
+   keyboard layout).
+  */
+  private bool has_key( uint[] kvs, uint key ) {
+    foreach( uint kv in kvs ) {
+      if( kv == key ) return( true );
+    }
+    return( false );
+  }
+
   /* Handles keypress events */
   private bool on_keypress( EventKey e ) {
 
@@ -911,121 +922,120 @@ public class OutlineTable : DrawingArea {
     var control = (bool)(e.state & ModifierType.CONTROL_MASK);
     var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
     var nomod   = !(control || shift);
+    var keymap     = Keymap.get_for_display( Display.get_default() );
+    KeymapKey[] ks = {};
+    uint[] kvs     = {};
+
+    keymap.get_entries_for_keycode( e.hardware_keycode, out ks, out kvs );
 
     /* If there is a current node or connection selected, operate on it */
     if( selected != null ) {
       if( control ) {
-        switch( e.keyval ) {
-          case Key.c         :  do_copy();                       break;
-          case Key.x         :  do_cut();                        break;
-          case Key.v         :  do_paste( false );               break;
-          case Key.V         :  do_paste( true );                break;
-          case Key.Return    :  handle_control_return( shift );  break;
-          case Key.Tab       :  handle_control_tab();            break;
-          case Key.Right     :  handle_control_right( shift );   break;
-          case Key.Left      :  handle_control_left( shift );    break;
-          case Key.Up        :  handle_control_up( shift );      break;
-          case Key.Down      :  handle_control_down( shift );    break;
-          case Key.Home      :  handle_control_home( shift );    break;
-          case Key.End       :  handle_control_end( shift );     break;
-          case Key.BackSpace :  handle_control_backspace();      break;
-          case Key.Delete    :  handle_control_delete();         break;
-          case Key.period    :  handle_control_period();         break;
-          case Key.slash     :  handle_control_slash();          break;
-          case Key.@1        :  handle_control_number( 0 );      break;
-          case Key.@2        :  handle_control_number( 1 );      break;
-          case Key.@3        :  handle_control_number( 2 );      break;
-          case Key.@4        :  handle_control_number( 3 );      break;
-          case Key.@5        :  handle_control_number( 4 );      break;
-          case Key.@6        :  handle_control_number( 5 );      break;
-          case Key.@7        :  handle_control_number( 6 );      break;
-          case Key.@8        :  handle_control_number( 7 );      break;
-          case Key.@9        :  handle_control_number( 8 );      break;
-          case Key.A         :  handle_control_a( true );        break;
-          case Key.B         :  handle_control_b( true );        break;
-          case Key.T         :  handle_control_t( true );        break;
-          case Key.backslash :  handle_control_backslash();      break;
-          case Key.a         :  handle_control_a( false );       break;
-          case Key.b         :  handle_control_b( false );       break;
-          case Key.d         :  handle_control_d();              break;
-          case Key.h         :  handle_control_h();              break;
-          case Key.i         :  handle_control_i();              break;
-          case Key.j         :  handle_control_j();              break;
-          case Key.k         :  handle_control_k();              break;
-          case Key.t         :  handle_control_t( false );       break;
-          case Key.u         :  handle_control_u();              break;
-          case Key.w         :  handle_control_w();              break;
-        }
+        if( !shift && has_key( kvs, Key.c ) )              { do_copy(); }
+        else if( !shift && has_key( kvs, Key.x ) )         { do_cut(); }
+        else if( !shift && has_key( kvs, Key.v ) )         { do_paste( false ); }
+        else if(  shift && has_key( kvs, Key.V ) )         { do_paste( true ); }
+        else if( has_key( kvs, Key.Return ) )              { handle_control_return( shift ); }
+        else if( has_key( kvs, Key.Tab ) )                 { handle_control_tab(); }
+        else if( has_key( kvs, Key.Right ) )               { handle_control_right( shift ); }
+        else if( has_key( kvs, Key.Left ) )                { handle_control_left( shift ); }
+        else if( has_key( kvs, Key.Up ) )                  { handle_control_up( shift ); }
+        else if( has_key( kvs, Key.Down ) )                { handle_control_down( shift ); }
+        else if( has_key( kvs, Key.Home ) )                { handle_control_home( shift ); }
+        else if( has_key( kvs, Key.End ) )                 { handle_control_end( shift ); }
+        else if( has_key( kvs, Key.BackSpace ) )           { handle_control_backspace(); }
+        else if( has_key( kvs, Key.Delete ) )              { handle_control_delete(); }
+        else if( !shift && has_key( kvs, Key.period ) )    { handle_control_period(); }
+        else if( !shift && has_key( kvs, Key.slash ) )     { handle_control_slash(); }
+        else if( !shift && has_key( kvs, Key.@1 ) )        { handle_control_number( 0 ); }
+        else if( !shift && has_key( kvs, Key.@2 ) )        { handle_control_number( 1 ); }
+        else if( !shift && has_key( kvs, Key.@3 ) )        { handle_control_number( 2 ); }
+        else if( !shift && has_key( kvs, Key.@4 ) )        { handle_control_number( 3 ); }
+        else if( !shift && has_key( kvs, Key.@5 ) )        { handle_control_number( 4 ); }
+        else if( !shift && has_key( kvs, Key.@6 ) )        { handle_control_number( 5 ); }
+        else if( !shift && has_key( kvs, Key.@7 ) )        { handle_control_number( 6 ); }
+        else if( !shift && has_key( kvs, Key.@8 ) )        { handle_control_number( 7 ); }
+        else if( !shift && has_key( kvs, Key.@9 ) )        { handle_control_number( 8 ); }
+        else if(  shift && has_key( kvs, Key.A ) )         { handle_control_a( true ); }
+        else if(  shift && has_key( kvs, Key.B ) )         { handle_control_b( true ); }
+        else if(  shift && has_key( kvs, Key.T ) )         { handle_control_t( true ); }
+        else if( !shift && has_key( kvs, Key.backslash ) ) { handle_control_backslash(); }
+        else if( !shift && has_key( kvs, Key.a ) )         { handle_control_a( false ); }
+        else if( !shift && has_key( kvs, Key.b ) )         { handle_control_b( false ); }
+        else if( !shift && has_key( kvs, Key.d ) )         { handle_control_d(); }
+        else if( !shift && has_key( kvs, Key.h ) )         { handle_control_h(); }
+        else if( !shift && has_key( kvs, Key.i ) )         { handle_control_i(); }
+        else if( !shift && has_key( kvs, Key.j ) )         { handle_control_j(); }
+        else if( !shift && has_key( kvs, Key.k ) )         { handle_control_k(); }
+        else if( !shift && has_key( kvs, Key.t ) )         { handle_control_t( false ); }
+        else if( !shift && has_key( kvs, Key.u ) )         { handle_control_u(); }
+        else if( !shift && has_key( kvs, Key.w ) )         { handle_control_w(); }
       } else if( nomod || shift ) {
         if( !insert_user_text( e.str ) ) {
-          switch( e.keyval ) {
-            case Key.BackSpace    :  handle_backspace();         break;
-            case Key.Delete       :  handle_delete();            break;
-            case Key.Escape       :  handle_escape();            break;
-            case Key.Return       :  handle_return( shift );     break;
-            case Key.Tab          :  handle_tab();               break;
-            case Key.ISO_Left_Tab :  handle_shift_tab();         break;
-            case Key.Right        :  handle_right( shift );      break;
-            case Key.Left         :  handle_left( shift );       break;
-            case Key.Home         :  handle_home( shift );       break;
-            case Key.End          :  handle_end( shift );        break;
-            case Key.Up           :  handle_up( shift );         break;
-            case Key.Down         :  handle_down( shift );       break;
-            case Key.Page_Up      :  handle_pageup();            break;
-            case Key.Page_Down    :  handle_pagedn();            break;
-            case Key.Control_L    :  handle_control( true );     break;
-            case Key.a            :  change_selected( node_parent( selected ) );  break;
-            case Key.B            :  change_selected( node_bottom() );  break;
-            case Key.c            :  change_selected( node_last_child( selected ) );  break;
-            case Key.e            :  edit_selected( true );  break;
-            case Key.E            :  edit_selected( false );  break;
-            case Key.f            :  focus_on_selected();  break;
-            case Key.h            :  unindent();  break;
-            case Key.H            :  place_at_top( selected );  break;
-            case Key.j            :  change_selected( node_next( selected ) );  break;
-            case Key.k            :  change_selected( node_previous( selected ) );  break;
-            case Key.l            :  indent();  break;
-            case Key.n            :  change_selected( node_next_sibling( selected ) );  break;
-            case Key.p            :  change_selected( node_previous_sibling( selected ) );  break;
-            case Key.t            :  rotate_task();  break;
-            case Key.T            :  change_selected( node_top() );  break;
-            case Key.numbersign   :  toggle_label();  break;
-            case Key.asterisk     :  clear_all_labels();  break;
-            case Key.@1           :  goto_label( 0 );  break;
-            case Key.@2           :  goto_label( 1 );  break;
-            case Key.@3           :  goto_label( 2 );  break;
-            case Key.@4           :  goto_label( 3 );  break;
-            case Key.@5           :  goto_label( 4 );  break;
-            case Key.@6           :  goto_label( 5 );  break;
-            case Key.@7           :  goto_label( 6 );  break;
-            case Key.@8           :  goto_label( 7 );  break;
-            case Key.@9           :  goto_label( 8 );  break;
-            case Key.at           :  tagger.show_add_ui();  break;
-            case Key.F10          :  if( shift ) show_contextual_menu( e );  break;
-            case Key.Menu         :  show_contextual_menu( e );  break;
-          }
+          if( has_key( kvs, Key.BackSpace ) )                 { handle_backspace(); }
+          else if( has_key( kvs, Key.Delete ) )               { handle_delete(); }
+          else if( has_key( kvs, Key.Escape ) )               { handle_escape(); }
+          else if( has_key( kvs, Key.Return ) )               { handle_return( shift ); }
+          else if( has_key( kvs, Key.Tab ) )                  { handle_tab(); }
+          else if( has_key( kvs, Key.ISO_Left_Tab ) )         { handle_shift_tab(); }
+          else if( has_key( kvs, Key.Right ) )                { handle_right( shift ); }
+          else if( has_key( kvs, Key.Left ) )                 { handle_left( shift ); }
+          else if( has_key( kvs, Key.Home ) )                 { handle_home( shift ); }
+          else if( has_key( kvs, Key.End ) )                  { handle_end( shift ); }
+          else if( has_key( kvs, Key.Up ) )                   { handle_up( shift ); }
+          else if( has_key( kvs, Key.Down ) )                 { handle_down( shift ); }
+          else if( has_key( kvs, Key.Page_Up ) )              { handle_pageup(); }
+          else if( has_key( kvs, Key.Page_Down ) )            { handle_pagedn(); }
+          else if( has_key( kvs, Key.Control_L ) )            { handle_control( true ); }
+          else if( !shift && has_key( kvs, Key.a ) )          { change_selected( node_parent( selected ) ); }
+          else if(  shift && has_key( kvs, Key.B ) )          { change_selected( node_bottom() ); }
+          else if( !shift && has_key( kvs, Key.c ) )          { change_selected( node_last_child( selected ) ); }
+          else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
+          else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
+          else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
+          else if( !shift && has_key( kvs, Key.h ) )          { unindent(); }
+          else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
+          else if( !shift && has_key( kvs, Key.j ) )          { change_selected( node_next( selected ) ); }
+          else if( !shift && has_key( kvs, Key.k ) )          { change_selected( node_previous( selected ) ); }
+          else if( !shift && has_key( kvs, Key.l ) )          { indent(); }
+          else if( !shift && has_key( kvs, Key.n ) )          { change_selected( node_next_sibling( selected ) ); }
+          else if( !shift && has_key( kvs, Key.p ) )          { change_selected( node_previous_sibling( selected ) ); }
+          else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
+          else if(  shift && has_key( kvs, Key.T ) )          { change_selected( node_top() ); }
+          else if(  shift && has_key( kvs, Key.numbersign ) ) { toggle_label(); }
+          else if(  shift && has_key( kvs, Key.asterisk ) )   { clear_all_labels(); }
+          else if( !shift && has_key( kvs, Key.@1 ) )         { goto_label( 0 ); }
+          else if( !shift && has_key( kvs, Key.@2 ) )         { goto_label( 1 ); }
+          else if( !shift && has_key( kvs, Key.@3 ) )         { goto_label( 2 ); }
+          else if( !shift && has_key( kvs, Key.@4 ) )         { goto_label( 3 ); }
+          else if( !shift && has_key( kvs, Key.@5 ) )         { goto_label( 4 ); }
+          else if( !shift && has_key( kvs, Key.@6 ) )         { goto_label( 5 ); }
+          else if( !shift && has_key( kvs, Key.@7 ) )         { goto_label( 6 ); }
+          else if( !shift && has_key( kvs, Key.@8 ) )         { goto_label( 7 ); }
+          else if( !shift && has_key( kvs, Key.@9 ) )         { goto_label( 8 ); }
+          else if(  shift && has_key( kvs, Key.at ) )         { tagger.show_add_ui(); }
+          else if( has_key( kvs, Key.F10 ) )                  { if( shift ) show_contextual_menu( e ); }
+          else if( has_key( kvs, Key.Menu ) )                 { show_contextual_menu( e ); }
         }
       }
     } else {
       if( !control ) {
-        switch( e.keyval ) {
-          case Key.asterisk  :  clear_all_labels();      break;
-          case Key.@1        :  goto_label( 0 );         break;
-          case Key.@2        :  goto_label( 1 );         break;
-          case Key.@3        :  goto_label( 2 );         break;
-          case Key.@4        :  goto_label( 3 );         break;
-          case Key.@5        :  goto_label( 4 );         break;
-          case Key.@6        :  goto_label( 5 );         break;
-          case Key.@7        :  goto_label( 6 );         break;
-          case Key.@8        :  goto_label( 7 );         break;
-          case Key.@9        :  goto_label( 8 );         break;
-          case Key.j         :  handle_down( shift );    break;
-          case Key.k         :  handle_up( shift );      break;
-          case Key.Up        :  handle_up( shift );      break;
-          case Key.Down      :  handle_down( shift );    break;
-          case Key.Control_L :  handle_control( true );  break;
-          case Key.Escape    :  handle_escape();         break;
-        }
+        if( shift && has_key( kvs, Key.asterisk ) ) { clear_all_labels(); }
+        else if( !shift && has_key( kvs, Key.@1 ) ) { goto_label( 0 ); }
+        else if( !shift && has_key( kvs, Key.@2 ) ) { goto_label( 1 ); }
+        else if( !shift && has_key( kvs, Key.@3 ) ) { goto_label( 2 ); }
+        else if( !shift && has_key( kvs, Key.@4 ) ) { goto_label( 3 ); }
+        else if( !shift && has_key( kvs, Key.@5 ) ) { goto_label( 4 ); }
+        else if( !shift && has_key( kvs, Key.@6 ) ) { goto_label( 5 ); }
+        else if( !shift && has_key( kvs, Key.@7 ) ) { goto_label( 6 ); }
+        else if( !shift && has_key( kvs, Key.@8 ) ) { goto_label( 7 ); }
+        else if( !shift && has_key( kvs, Key.@9 ) ) { goto_label( 8 ); }
+        else if( !shift && has_key( kvs, Key.j ) )  { handle_down( shift ); }
+        else if( !shift && has_key( kvs, Key.k ) )  { handle_up( shift ); }
+        else if( has_key( kvs, Key.Up ) )           { handle_up( shift ); }
+        else if( has_key( kvs, Key.Down ) )         { handle_down( shift ); }
+        else if( has_key( kvs, Key.Control_L ) )    { handle_control( true ); }
+        else if( has_key( kvs, Key.Escape ) )       { handle_escape(); }
       }
     }
 
