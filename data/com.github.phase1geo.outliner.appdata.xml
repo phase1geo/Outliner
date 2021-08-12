@@ -117,6 +117,23 @@
     <value key="x-appcenter-stripe">pk_live_wsAhF3dNEsmhB6oQIQknujgL00dBOT1gsG</value>
   </custom>
   <releases>
+    <release version="1.5.1" data="2021-08-12">
+      <description>
+        <p>Changes</p>
+        <p xml:lang="nl">Wijzigingen</p>
+        <p xml:lang="fr">Modifications</p>
+        <ul>
+          <li>Updated application screenshots for elementary OS 6.</li>
+        </ul>
+        <p>Bug Fixes</p>
+        <p xml:lang="nl">Foutoplossingen</p>
+        <p xml:lang="fr">Corrections de bugs</p>
+        <ul>
+          <li>Fixed issues with issuing commands on non-English keyboard layouts.</li>
+          <li>Fixed Flatpak permission options.</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.0" data="2021-08-08">
       <description>
         <p>New</p>

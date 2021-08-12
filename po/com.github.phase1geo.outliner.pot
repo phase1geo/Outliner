@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-07 20:29-0500\n"
+"POT-Creation-Date: 2021-08-12 18:59-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -632,11 +632,11 @@ msgstr ""
 msgid "%u subrows"
 msgstr ""
 
-#: src/OutlineTable.vala:2852
+#: src/OutlineTable.vala:2862
 msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr ""
 
-#: src/OutlineTable.vala:2880
+#: src/OutlineTable.vala:2890
 msgid "Hit the Escape key to exit."
 msgstr ""
 

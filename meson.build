@@ -1,5 +1,5 @@
 project('com.github.phase1geo.outliner', ['vala', 'c'],
-    version : '1.5.0',
+    version : '1.5.1',
     license: 'GPL-3.0'
 )
 
