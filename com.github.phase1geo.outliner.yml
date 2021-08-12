@@ -4,15 +4,9 @@ runtime-version: '6'
 sdk: io.elementary.Sdk
 command: com.github.phase1geo.outliner
 finish-args:
-  - '--filesystem=host'
-
+  - '--share=ipc'
   - '--socket=fallback-x11'
   - '--socket=wayland'
-    #- '--filesystem=xdg-run/dconf'
-    #- '--talk-name=org.gnome.SettingsDaemon'
-    #- '--talk-name=ca.desrt.dconf'
-    #- '--env=DCONF_USER_CONFIG_DIR=.config/dconf'
-
       # needed for perfers-color-scheme
   - '--system-talk-name=org.freedesktop.Accounts'
 
