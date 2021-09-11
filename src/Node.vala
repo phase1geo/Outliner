@@ -320,6 +320,7 @@ public class Node {
 
     position_text();
     update_width();
+    table_zoom_changed();
     table_markdown_changed();
 
     /* Detect any size changes by the drawing area */
@@ -370,6 +371,7 @@ public class Node {
 
     position_text();
     update_width();
+    table_zoom_changed();
     table_markdown_changed();
 
     /* Detect any size changes by the drawing area */
