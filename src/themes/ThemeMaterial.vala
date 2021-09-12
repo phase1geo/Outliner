@@ -38,7 +38,7 @@ public class ThemeMaterial : Theme {
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );
     nodesel_background = get_color( "#444444" );
-    nodesel_foreground = get_color( "Black" );
+    nodesel_foreground = get_color( "#eeeee" );
     textsel_background = get_color( "#64baff" );
     textsel_foreground = get_color( "White" );
     text_cursor        = get_color( "White" );

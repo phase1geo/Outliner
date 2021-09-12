@@ -53,7 +53,7 @@ public class UndoTextBackspace : UndoTextItem {
   /* Merges the given text item with the current only */
   public override bool merge( CanvasText ct, UndoTextItem item ) {
     if( (end_cursor == item.start_cursor) && (item.op == UndoTextOp.BACKSPACE) ) {
-      var delete = item as UndoTextDelete;
+      var delete = item as UndoTextBackspace;
       end_cursor = delete.end_cursor;
       text       = delete.text + text;
       start      = delete.start;
