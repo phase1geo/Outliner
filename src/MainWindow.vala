@@ -83,8 +83,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     { "action_shortcuts",     action_shortcuts },
     { "action_focus_mode",    action_focus_mode },
     { "action_reset_fonts",   action_reset_fonts },
-    { "action_zoom_in1",      action_zoom_in },
-    { "action_zoom_in2",      action_zoom_in },
+    { "action_zoom_in",       action_zoom_in },
     { "action_zoom_out",      action_zoom_out },
     { "action_zoom_actual",   action_zoom_actual }
   };
@@ -507,8 +506,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
     app.set_accels_for_action( "win.action_shortcuts",   { "<Control>question" } );
     app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
-    app.set_accels_for_action( "win.action_zoom_in1",    { "<Control>plus" } );
-    app.set_accels_for_action( "win.action_zoom_in2",    { "<Control>equal" } );
+    app.set_accels_for_action( "win.action_zoom_in",     { "<Control>plus", "<Control>equal" } );
     app.set_accels_for_action( "win.action_zoom_out",    { "<Control>minus" } );
     app.set_accels_for_action( "win.action_zoom_actual", { "<Control>0" } );
 
