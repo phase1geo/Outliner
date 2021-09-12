@@ -38,6 +38,7 @@ public class UndoTextDelete : UndoTextItem {
     ct.text.insert_text( start, text );
     ct.text.apply_tags( tags, start );
     ct.set_cursor_only( start_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 
@@ -45,6 +46,7 @@ public class UndoTextDelete : UndoTextItem {
   public override void redo_text( OutlineTable table, CanvasText ct ) {
     ct.text.remove_text( start, text.length );
     ct.set_cursor_only( end_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 

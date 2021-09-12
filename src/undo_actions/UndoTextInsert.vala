@@ -35,6 +35,7 @@ public class UndoTextInsert : UndoTextItem {
   public override void undo_text( OutlineTable table, CanvasText ct ) {
     ct.text.remove_text( start, text.length );
     ct.set_cursor_only( start_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 
@@ -42,6 +43,7 @@ public class UndoTextInsert : UndoTextItem {
   public override void redo_text( OutlineTable table, CanvasText ct ) {
     ct.text.insert_text( start, text );
     ct.set_cursor_only( end_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 

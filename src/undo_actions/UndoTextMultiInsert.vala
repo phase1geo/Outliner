@@ -41,6 +41,7 @@ public class UndoTextMultiInsert : UndoTextItem {
       ct.text.remove_text( insert.start, insert.text.length );
     }
     ct.set_cursor_only( start_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 
@@ -51,6 +52,7 @@ public class UndoTextMultiInsert : UndoTextItem {
       ct.text.insert_text( insert.start, insert.text );
     }
     ct.set_cursor_only( end_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 

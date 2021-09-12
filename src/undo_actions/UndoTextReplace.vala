@@ -40,6 +40,7 @@ public class UndoTextReplace : UndoTextItem {
     ct.text.replace_text( start, new_text.length, orig_text );
     ct.text.apply_tags( tags, start );
     ct.set_cursor_only( start_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 
@@ -47,6 +48,7 @@ public class UndoTextReplace : UndoTextItem {
   public override void redo_text( OutlineTable table, CanvasText ct ) {
     ct.text.replace_text( start, orig_text.length, new_text );
     ct.set_cursor_only( end_cursor );
+    ct.clear_selection();
     table.queue_draw();
   }
 

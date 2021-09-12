@@ -671,6 +671,7 @@ public class CanvasText : Object {
         var str  = text.text.slice( spos, epos );
         var tags = text.get_tags_in_range( spos, epos );
         set_cursor_only( _cursor - 1 );
+        clear_selection( "backspace" );
         text.remove_text( spos, (epos - spos) );
         undo_buffer.add_delete( spos, str, tags, cur );
       }
@@ -730,6 +731,7 @@ public class CanvasText : Object {
     var str  = text.text.slice( spos, epos );
     var tags = text.get_tags_in_range( spos, epos );
     set_cursor_only( startpos );
+    clear_selection( "delete_range" );
     text.remove_text( spos, (epos - spos) );
     undo_buffer.add_delete( spos, str, tags, cur );
   }
@@ -772,6 +774,7 @@ public class CanvasText : Object {
       var cpos = text.text.index_of_nth_char( _cursor );
       text.insert_text( cpos, s );
       set_cursor_only( _cursor + slen );
+      clear_selection( "insert" );
       undo_buffer.add_insert( cpos, s, cur );
     }
   }
@@ -802,6 +805,7 @@ public class CanvasText : Object {
         text.add_tag( (FormatTag)ttag.tag, (ttag.start + cpos), (ttag.end + cpos), ttag.extra );
       }
       set_cursor_only( _cursor + slen );
+      clear_selection( "insert_formatted_text" );
       undo_buffer.add_insert( cpos, t.text, cur );
     }
   }
