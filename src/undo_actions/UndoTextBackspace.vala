@@ -19,15 +19,15 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public class UndoTextDelete : UndoTextItem {
+public class UndoTextBackspace : UndoTextItem {
 
   public string             text  { private set; get; }
   public int                start { private set; get; }
   public Array<UndoTagInfo> tags  { private set; get; }
 
   /* Default constructor */
-  public UndoTextDelete( string text, int start, Array<UndoTagInfo> tags, int start_cursor, int end_cursor ) {
-    base( _( "text deletion" ), UndoTextOp.DELETE, start_cursor, end_cursor );
+  public UndoTextBackspace( string text, int start, Array<UndoTagInfo> tags, int start_cursor, int end_cursor ) {
+    base( _( "text deletion" ), UndoTextOp.BACKSPACE, start_cursor, end_cursor );
     this.text  = text;
     this.start = start;
     this.tags  = tags;
@@ -52,10 +52,10 @@ public class UndoTextDelete : UndoTextItem {
 
   /* Merges the given text item with the current only */
   public override bool merge( CanvasText ct, UndoTextItem item ) {
-    if( (end_cursor == item.start_cursor) && (item.op == UndoTextOp.DELETE) ) {
+    if( (end_cursor == item.start_cursor) && (item.op == UndoTextOp.BACKSPACE) ) {
       var delete = item as UndoTextDelete;
       end_cursor = delete.end_cursor;
-      text       = text + delete.text;
+      text       = delete.text + text;
       start      = delete.start;
       return( true );
     }

@@ -664,7 +664,7 @@ public class CanvasText : Object {
         set_cursor_only( _selstart );
         change_selection( null, _selstart, "backspace" );
         text.remove_text( spos, (epos - spos) );
-        undo_buffer.add_delete( spos, str, tags, cur );
+        undo_buffer.add_backspace( spos, str, tags, cur );
       } else {
         var spos = text.text.index_of_nth_char( _cursor - 1 );
         var epos = text.text.index_of_nth_char( _cursor );
@@ -673,7 +673,7 @@ public class CanvasText : Object {
         set_cursor_only( _cursor - 1 );
         clear_selection( "backspace" );
         text.remove_text( spos, (epos - spos) );
-        undo_buffer.add_delete( spos, str, tags, cur );
+        undo_buffer.add_backspace( spos, str, tags, cur );
       }
     }
   }
@@ -690,7 +690,7 @@ public class CanvasText : Object {
       var tags = text.get_tags_in_range( spos, epos );
       set_cursor_only( spos );
       text.remove_text( spos, (epos - spos) );
-      undo_buffer.add_delete( spos, str, tags, cur );
+      undo_buffer.add_backspace( spos, str, tags, cur );
       if( _selstart < wpos ) {
         change_selection( null, wpos, "backspace_word1" );
       } else if( _selend > cur ) {

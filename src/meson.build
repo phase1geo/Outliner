@@ -37,6 +37,7 @@ sources += files(
   'undo_actions/UndoNodeUnclone.vala',
   'undo_actions/UndoNodeUnindent.vala',
   'undo_actions/UndoReplaceAll.vala',
+  'undo_actions/UndoTextBackspace.vala',
   'undo_actions/UndoTextClearTags.vala',
   'undo_actions/UndoTextDelete.vala',
   'undo_actions/UndoTextInsert.vala',

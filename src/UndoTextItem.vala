@@ -22,6 +22,7 @@
 public enum UndoTextOp {
   INSERT = 0,
   DELETE,
+  BACKSPACE,
   REPLACE,
   TAGADD,
   TAGDEL,

@@ -68,6 +68,14 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
+  /* Call after text has been deleted */
+  public void add_backspace( int start, string orig_text, Array<UndoTagInfo>? tags, int start_cursor ) {
+    var item = new UndoTextBackspace( orig_text, start, tags, start_cursor, ct.cursor );
+    if( !merge_with_last( item ) ) {
+      add_item( item );
+    }
+  }
+
   /* Call after text has been replaced */
   public void add_replace( int start, string orig_text, string text, Array<UndoTagInfo>? tags, int start_cursor ) {
     var item = new UndoTextReplace( orig_text, text, start, tags, start_cursor, ct.cursor );
