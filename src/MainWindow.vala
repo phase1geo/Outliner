@@ -1,4 +1,4 @@
-   /*
+/*
 * Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
@@ -866,7 +866,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     /* Focus mode */
     var focus_mode = new ModelButton();
     focus_mode.get_child().destroy();
-    focus_mode.add( new Granite.AccelLabel( _( "Enter Focus Mode" ), "F2" ) );
+    focus_mode.add( new Granite.AccelLabel( _( "Enter Distraction-Free Mode" ), "F2" ) );
     focus_mode.action_name = "win.action_focus_mode";
     btn_box.pack_start( focus_mode, false, false, 5 );
 
