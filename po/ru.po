@@ -1,0 +1,1076 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the com.github.phase1geo.outliner package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Alexandre Prokoudine <alexandre.prokoudine@gmail.com>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: com.github.phase1geo.outliner\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-08-12 18:59-0500\n"
+"PO-Revision-Date: 2021-09-14 21:27+0300\n"
+"Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
+"Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"X-Generator: Gtranslator 40.0\n"
+
+#: src/exports/ExportMinder.vala:105
+msgid "To right"
+msgstr "Вправо"
+
+#: src/themes/ThemeDefault.vala:31
+msgid "Light"
+msgstr "Светлая"
+
+#: src/themes/ThemePrintColor.vala:31
+msgid "PrintColor"
+msgstr "Печать в цвете"
+
+#: src/themes/ThemePrintGrayscale.vala:31
+msgid "PrintGrayscale"
+msgstr "Печать в градациях серого"
+
+#: src/themes/ThemeSolarizedLight.vala:31
+msgid "Solarized Light"
+msgstr "Solarized светлая"
+
+#: src/themes/ThemeDark.vala:31
+msgid "Dark"
+msgstr "Тёмная"
+
+#: src/themes/ThemeSolarizedDark.vala:31
+msgid "Solarized Dark"
+msgstr "Solarized тёмная"
+
+#: src/undo_actions/UndoTextTagRemove.vala:31
+msgid "format tag remove"
+msgstr "удаление тега форматирования"
+
+#: src/undo_actions/UndoTextDelete.vala:30
+msgid "text deletion"
+msgstr "удаление текста"
+
+#: src/undo_actions/UndoNodeExpander.vala:29
+msgid "expander change"
+msgstr "разворачивание или сворачивание"
+
+#: src/undo_actions/UndoNodeInsert.vala:30
+msgid "insert item"
+msgstr "вставку объекта"
+
+#: src/undo_actions/UndoNodeName.vala:30
+msgid "title change"
+msgstr "смену заголовка"
+
+#: src/undo_actions/UndoNodeUnclone.vala:30
+msgid "unclone item"
+msgstr "расклонирование объекта"
+
+#: src/undo_actions/UndoTextReplace.vala:31
+msgid "text replacement"
+msgstr "замену текста"
+
+#: src/undo_actions/UndoNodeNote.vala:30
+msgid "note change"
+msgstr "правку примечания"
+
+#: src/undo_actions/UndoNodeMove.vala:32
+msgid "move item"
+msgstr "перемещение объекта"
+
+#: src/undo_actions/UndoNodeIndent.vala:28
+msgid "indent item"
+msgstr "отступ вправо"
+
+#: src/undo_actions/UndoTextTagAdd.vala:31
+msgid "format tag add"
+msgstr "вставку тега форматирования"
+
+#: src/undo_actions/UndoTextInsert.vala:29
+msgid "text insertion"
+msgstr "вставку текста"
+
+#: src/undo_actions/UndoTextClearTags.vala:30
+msgid "clear formatting"
+msgstr "очистку форматирования"
+
+#: src/undo_actions/UndoReplaceAll.vala:47
+msgid "replace all"
+msgstr "замену всего"
+
+#: src/undo_actions/UndoNodePaste.vala:30
+msgid "paste item"
+msgstr "вставку объекта"
+
+#: src/undo_actions/UndoNodeReplace.vala:28
+msgid "replace node"
+msgstr "замену узла"
+
+#: src/undo_actions/UndoNodeDelete.vala:31
+msgid "delete item"
+msgstr "удаление объекта"
+
+#: src/undo_actions/UndoNodeUnindent.vala:29
+msgid "unindent item"
+msgstr "отступ влево"
+
+#: src/undo_actions/UndoNodeCut.vala:30
+msgid "cut item"
+msgstr "вырезание объекта в буфер обмена"
+
+#: src/undo_actions/UndoNodeSplit.vala:32
+msgid "split item"
+msgstr "разделение объекта"
+
+#: src/Document.vala:67
+msgid "unnamed"
+msgstr "безымянный"
+
+#: src/DynamicNotebook.vala:234 src/DynamicNotebook.vala:258
+msgid "Close Tab"
+msgstr "Закрыть вкладку"
+
+#: src/DynamicNotebook.vala:261
+msgid "Open in a New Window"
+msgstr "Открыть в новом окне"
+
+#: src/DynamicNotebook.vala:262
+msgid "Duplicate"
+msgstr "Создать копию"
+
+#: src/DynamicNotebook.vala:314
+msgid "Close Other Tab"
+msgstr "Закрыть другую вкладку"
+
+#: src/DynamicNotebook.vala:314
+msgid "Close Other Tabs"
+msgstr "Закрыть остальные вкладки"
+
+#: src/DynamicNotebook.vala:485
+msgid "Clear All"
+msgstr "Стереть всё"
+
+#: src/DynamicNotebook.vala:767 src/DynamicNotebook.vala:798
+msgid "New Tab"
+msgstr "Создать вкладку"
+
+#: src/DynamicNotebook.vala:768
+msgid "Undo Close Tab"
+msgstr "Отменить закрытие вкладки"
+
+#: src/DynamicNotebook.vala:810
+msgid "Closed Tabs"
+msgstr "Закрытые вкладки"
+
+#: src/FormatBar.vala:60 src/NodeMenu.vala:64
+msgid "Copy"
+msgstr "Скопировать"
+
+#: src/FormatBar.vala:65 src/NodeMenu.vala:68
+msgid "Cut"
+msgstr "Вырезать"
+
+#: src/FormatBar.vala:71
+msgid "Bold"
+msgstr "Полужирный"
+
+#: src/FormatBar.vala:77
+msgid "Italic"
+msgstr "Наклонный"
+
+#: src/FormatBar.vala:83
+msgid "Underline"
+msgstr "Подчёркивание"
+
+#: src/FormatBar.vala:89
+msgid "Strikethrough"
+msgstr "Зачёркивание"
+
+#: src/FormatBar.vala:95
+msgid "Code Block"
+msgstr "Блок кода"
+
+#: src/FormatBar.vala:101
+msgid "Superscript"
+msgstr "Верхний индекс"
+
+#: src/FormatBar.vala:107
+msgid "Subscript"
+msgstr "Нижний индекс"
+
+#: src/FormatBar.vala:113
+msgid "Header"
+msgstr "Заголовок"
+
+#: src/FormatBar.vala:117 src/Node.vala:57
+msgid "None"
+msgstr "Нет"
+
+#: src/FormatBar.vala:130
+msgid "Apply Highlight Color"
+msgstr "Применить цвет выделения"
+
+#: src/FormatBar.vala:131
+msgid "Change Highlight Color"
+msgstr "Изменить цвет выделения"
+
+#: src/FormatBar.vala:135
+msgid "Apply Font Color"
+msgstr "Применить цвет шрифта"
+
+#: src/FormatBar.vala:136
+msgid "Change Font Color"
+msgstr "Изменить цвет шрифта"
+
+#: src/FormatBar.vala:142
+msgid "Link"
+msgstr "Ссылка"
+
+#: src/FormatBar.vala:147
+msgid "Clear all formatting"
+msgstr "Очистить форматирование"
+
+#: src/LinkEditor.vala:43
+msgid "URL:"
+msgstr "URL:"
+
+#: src/LinkEditor.vala:55
+msgid "Apply"
+msgstr "Применить"
+
+#: src/LinkEditor.vala:62 src/MainWindow.vala:972 src/MainWindow.vala:1012
+#: src/MainWindow.vala:1131 src/MainWindow.vala:1230
+msgid "Cancel"
+msgstr "Отмена"
+
+#: src/MainWindow.vala:138 src/MainWindow.vala:1134
+msgid "Outliner"
+msgstr "Outliner"
+
+#: src/MainWindow.vala:169 data/com.github.phase1geo.outliner.shortcuts.ui:21
+msgid "New File"
+msgstr "Создать документ"
+
+#: src/MainWindow.vala:174 src/MainWindow.vala:1012
+#: data/com.github.phase1geo.outliner.shortcuts.ui:28
+msgid "Open File"
+msgstr "Открыть документ"
+
+#: src/MainWindow.vala:179 data/com.github.phase1geo.outliner.shortcuts.ui:42
+msgid "Save File As"
+msgstr "Сохранить файл как"
+
+#: src/MainWindow.vala:184 src/UndoBuffer.vala:80
+msgid "Undo"
+msgstr "Отменить"
+
+#: src/MainWindow.vala:190 src/UndoBuffer.vala:86
+msgid "Redo"
+msgstr "Вернуть"
+
+#: src/MainWindow.vala:268
+msgid "Unnamed Document"
+msgstr "Безымянный документ"
+
+#: src/MainWindow.vala:522
+msgid "Search"
+msgstr "Найти"
+
+#: src/MainWindow.vala:533
+msgid "Statistics"
+msgstr "Статистика"
+
+#: src/MainWindow.vala:544
+msgid "<b>Text Statistics</b>"
+msgstr "<b>Статистика текста</b>"
+
+#: src/MainWindow.vala:548
+msgid "Characters:"
+msgstr "Символов:"
+
+#: src/MainWindow.vala:553
+msgid "Words:"
+msgstr "Слов:"
+
+#: src/MainWindow.vala:558
+msgid "Rows:"
+msgstr "Рядов:"
+
+#: src/MainWindow.vala:563
+msgid "<b>Checkbox Statistics</b>"
+msgstr "<b>Статистика по задачам</b>"
+
+#: src/MainWindow.vala:567
+msgid "Total:"
+msgstr "Всего:"
+
+#: src/MainWindow.vala:572
+msgid "Incomplete:"
+msgstr "Не завершено:"
+
+#: src/MainWindow.vala:577
+msgid "In Progress:"
+msgstr "В процессе:"
+
+#: src/MainWindow.vala:582
+msgid "Completed:"
+msgstr "Завершено:"
+
+#: src/MainWindow.vala:644 src/MainWindow.vala:1230
+msgid "Export"
+msgstr "Экспортировать"
+
+#: src/MainWindow.vala:653
+msgid "Export…"
+msgstr "Экспортировать…"
+
+#: src/MainWindow.vala:658
+msgid "Print…"
+msgstr "Печать…"
+
+#: src/MainWindow.vala:682
+msgid "Properties"
+msgstr "Свойства"
+
+#: src/MainWindow.vala:689
+msgid "Zoom (%):"
+msgstr "Масштаб (%):"
+
+#: src/MainWindow.vala:702
+msgid "Theme:"
+msgstr "Тема:"
+
+#: src/MainWindow.vala:735
+msgid "Enumeration Style:"
+msgstr "Стиль нумерации:"
+
+#: src/MainWindow.vala:751
+msgid "Row Font:"
+msgstr "Шрифт ряда:"
+
+#: src/MainWindow.vala:771
+msgid "Note Font:"
+msgstr "Шрифт примечания:"
+
+#: src/MainWindow.vala:791
+msgid "Condensed Mode:"
+msgstr "Компактный режим:"
+
+#: src/MainWindow.vala:804
+msgid "Show Checkboxes"
+msgstr "Показывать чекбоксы"
+
+#: src/MainWindow.vala:817
+msgid "Show Depth Lines"
+msgstr "Показывать линии вложенности"
+
+#: src/MainWindow.vala:830
+msgid "Enable Blank Rows"
+msgstr "Включить пустые ряды"
+
+#: src/MainWindow.vala:843
+msgid "Enable Markdown Highlighting"
+msgstr "Включить форматирование Markdown"
+
+#: src/MainWindow.vala:862
+msgid "Shortcuts Cheatsheet"
+msgstr "Справка по клавиатурным комбинациям"
+
+#: src/MainWindow.vala:869
+msgid "Enter Focus Mode"
+msgstr "Включить режим фокусировки"
+
+#: src/MainWindow.vala:875
+msgid "Reset Fonts to Defaults"
+msgstr "Вернуть исходные шрифты"
+
+#: src/MainWindow.vala:963
+msgid "Save current unnamed document?"
+msgstr "Сохранить текущий безымянный документ?"
+
+#: src/MainWindow.vala:964
+msgid "Changes will be permanently lost if not saved."
+msgstr "Если не сохранить документ, изменения будут утрачены навсегда."
+
+#: src/MainWindow.vala:969
+msgid "Discard Changes"
+msgstr "Отказаться от изменений"
+
+#: src/MainWindow.vala:975 src/MainWindow.vala:1131
+msgid "Save"
+msgstr "Сохранить"
+
+#: src/MainWindow.vala:1012
+msgid "Open"
+msgstr "Открыть"
+
+#: src/MainWindow.vala:1130
+msgid "Save File"
+msgstr "Сохранить документ"
+
+#: src/MainWindow.vala:1229
+msgid "Export As"
+msgstr "Экспортировать как"
+
+#: src/MainWindow.vala:1234
+msgid "HTML"
+msgstr "HTML"
+
+#: src/MainWindow.vala:1241
+msgid "Markdown"
+msgstr "Markdown"
+
+#: src/MainWindow.vala:1248
+msgid "Minder"
+msgstr "Minder"
+
+#: src/MainWindow.vala:1254
+msgid "OPML"
+msgstr "OPML"
+
+#: src/MainWindow.vala:1260
+msgid "Org-Mode"
+msgstr "Org-Mode"
+
+#: src/MainWindow.vala:1266
+msgid "PDF"
+msgstr "PDF"
+
+#: src/MainWindow.vala:1272
+msgid "PlainText"
+msgstr "Простой текст"
+
+#: src/MainWindow.vala:1300
+msgid "Outliner Export Completed"
+msgstr "Экспорт завершён"
+
+#: src/NodeMenu.vala:72
+msgid "Paste"
+msgstr "Вставить"
+
+#: src/NodeMenu.vala:76
+msgid "Paste and Replace"
+msgstr "Вставить и заменить"
+
+#: src/NodeMenu.vala:80
+msgid "Delete"
+msgstr "Удалить"
+
+#: src/NodeMenu.vala:83
+msgid "Clone"
+msgstr "Клонировать"
+
+#: src/NodeMenu.vala:87
+msgid "Copy As Clone"
+msgstr "Скопировать как клон"
+
+#: src/NodeMenu.vala:90
+msgid "Paste Clone"
+msgstr "Вставить клон"
+
+#: src/NodeMenu.vala:93
+msgid "Unclone"
+msgstr "Расклонировать"
+
+#: src/NodeMenu.vala:97 data/com.github.phase1geo.outliner.shortcuts.ui:225
+msgid "Edit Text"
+msgstr "Изменить текст"
+
+#: src/NodeMenu.vala:101 data/com.github.phase1geo.outliner.shortcuts.ui:239
+msgid "Edit Note"
+msgstr "Изменить примечание"
+
+#: src/NodeMenu.vala:104 src/NodeMenu.vala:321
+msgid "Show Note"
+msgstr "Показать примечание"
+
+#: src/NodeMenu.vala:107 data/com.github.phase1geo.outliner.shortcuts.ui:246
+msgid "Add Tag"
+msgstr "Добавить тег"
+
+#: src/NodeMenu.vala:111 data/com.github.phase1geo.outliner.shortcuts.ui:171
+msgid "Add Row Above"
+msgstr "Добавить ряд выше"
+
+#: src/NodeMenu.vala:115 data/com.github.phase1geo.outliner.shortcuts.ui:164
+msgid "Add Row Below"
+msgstr "Добавить ряд ниже"
+
+#: src/NodeMenu.vala:119
+msgid "Join To Row Above"
+msgstr "Объединить с рядом выше"
+
+#: src/NodeMenu.vala:123
+msgid "Indent"
+msgstr "Отступ вправо"
+
+#: src/NodeMenu.vala:127
+msgid "Unindent"
+msgstr "Отступ влево"
+
+#: src/NodeMenu.vala:130
+msgid "Expand Children"
+msgstr "Развернуть потомков"
+
+#: src/NodeMenu.vala:134
+msgid "Focus"
+msgstr "Режим фокусировки"
+
+#: src/NodeMenu.vala:137
+msgid "Select Row"
+msgstr "Выбрать ряд"
+
+#: src/NodeMenu.vala:142
+msgid "Select Row Above"
+msgstr "Выбрать ряд выше"
+
+#: src/NodeMenu.vala:146
+msgid "Select Row Below"
+msgstr "Выбрать ряд ниже"
+
+#: src/NodeMenu.vala:150
+msgid "Select Previous Sibling Row"
+msgstr "Выбрать предыдущий ряд-потомок"
+
+#: src/NodeMenu.vala:154
+msgid "Select Next Sibling Row"
+msgstr "Выбрать следующий ряд-потомок"
+
+#: src/NodeMenu.vala:158 data/com.github.phase1geo.outliner.shortcuts.ui:321
+msgid "Select Parent Row"
+msgstr "Выбрать родительский ряд"
+
+#: src/NodeMenu.vala:162
+msgid "Select Last Child Row"
+msgstr "Выбрать последний ряд-потомок"
+
+#: src/NodeMenu.vala:166
+msgid "Select First Row"
+msgstr "Выбрать первый ряд"
+
+#: src/NodeMenu.vala:170
+msgid "Select Last Row"
+msgstr "Выбрать последний ряд"
+
+#: src/NodeMenu.vala:173
+msgid "Select Labeled Row"
+msgstr "Выбрать ряд с меткой"
+
+#: src/NodeMenu.vala:177
+msgid "Labels"
+msgstr "Метки"
+
+#: src/NodeMenu.vala:182 src/NodeMenu.vala:304
+msgid "Add Label"
+msgstr "Добавить метку"
+
+#: src/NodeMenu.vala:185
+msgid "Move To Label"
+msgstr "Перенести в метку"
+
+#: src/NodeMenu.vala:189
+msgid "Clear All Labels"
+msgstr "Стереть все метки"
+
+#: src/NodeMenu.vala:254 src/NodeMenu.vala:262
+msgid "Label-"
+msgstr "Метка-"
+
+#: src/NodeMenu.vala:307
+msgid "Remove Label"
+msgstr "Снять метку"
+
+#: src/NodeMenu.vala:324
+msgid "Hide Note"
+msgstr "Скрыть примечание"
+
+#: src/NodeMenu.vala:328
+msgid "Hide Children"
+msgstr "Скрыть потомков"
+
+#: src/NodeMenu.vala:328
+msgid "Show Children"
+msgstr "Показать потомков"
+
+#: src/Node.vala:58
+msgid "Outline"
+msgstr "План"
+
+#: src/Node.vala:59
+msgid "Section"
+msgstr "Раздел"
+
+#: src/Node.vala:77
+msgid "No enumeration will be displayed"
+msgstr "План без нумерации"
+
+#: src/Node.vala:78
+msgid "Shows outline-like enumeration (ex., I., A., 1.)"
+msgstr "Показывать нумерацию как в плане (например, I., A., 1.)"
+
+#: src/Node.vala:79
+msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
+msgstr "Показывать нумерацию как в разделах (например, 2., 2.1., 2.1.3.)"
+
+#: src/OutlineTable.vala:705
+msgid "Exit Focus Mode"
+msgstr "Выйти из режима фокусировки"
+
+#: src/OutlineTable.vala:775
+msgid "Show note"
+msgstr "Показать примечание"
+
+#: src/OutlineTable.vala:775
+msgid "Hide note"
+msgstr "Скрыть примечание"
+
+#: src/OutlineTable.vala:779
+#, c-format
+msgid "%u subrows"
+msgstr "%u субрядов"
+
+#: src/OutlineTable.vala:2862
+msgid "In Focus Mode.  Hit the Escape key to exit."
+msgstr "В режиме фокусировки. Нажмите Escape для выхода."
+
+#: src/OutlineTable.vala:2890
+msgid "Hit the Escape key to exit."
+msgstr "Нажмите Escape, чтобы выйти"
+
+#: src/SearchBar.vala:94
+msgid "Find text…"
+msgstr "Найти текст…"
+
+#: src/SearchBar.vala:334
+msgid "Replace with…"
+msgstr "Заменить на…"
+
+#: src/SearchBar.vala:364
+msgid "Replace"
+msgstr "Заменить"
+
+#: src/SearchBar.vala:385
+msgid "Replace All"
+msgstr "Заменить все"
+
+#: src/UndoBuffer.vala:81
+msgid "Undo: "
+msgstr "Отменить: "
+
+#: src/UndoBuffer.vala:87
+msgid "Redo: "
+msgstr "Вернуть: "
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:6
+msgid "Outliner Shortcuts"
+msgstr "Клавиатурные комбинации Outliner"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:12
+msgid "General"
+msgstr "Общие"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:16
+msgid "File"
+msgstr "Документы"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:35
+msgid "Import File"
+msgstr "Импортировать документ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:49
+msgid "Export File"
+msgstr "Экспортировать документ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:56
+msgid "Print File"
+msgstr "Напечатать документ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:63
+msgid "Close File"
+msgstr "Закрыть документ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:72
+msgid "Undo/Redo"
+msgstr "Отмена/Возврат"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:76
+msgid "Undo Last Change"
+msgstr "Отменить последнее изменение"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:83
+msgid "Redo Last Undo"
+msgstr "Вернуть последнюю правку"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:92
+msgid "Zooming"
+msgstr "Масштаб"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:96
+msgid "Zoom In"
+msgstr "Приблизить"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:103
+msgid "Zoom Out"
+msgstr "Отдалить"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:110
+msgid "Zoom To Actual Size"
+msgstr "Масштаб 100%"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:119
+#: data/com.github.phase1geo.outliner.shortcuts.ui:758
+msgid "Miscellaneous"
+msgstr "Разное"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:123
+msgid "Search Text"
+msgstr "Искать текст"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:130
+msgid "Show Contextual Menu"
+msgstr "Показать контекстное меню"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:137
+msgid "Show Keyboard Shortcuts"
+msgstr "Показать клавиатурные комбинации"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:144
+msgid "Quit Application"
+msgstr "Завершить работу"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:156
+msgid "Row Commands"
+msgstr "Команды работы с рядами"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:160
+#: data/com.github.phase1geo.outliner.shortcuts.ui:427
+msgid "Creation/Deletion"
+msgstr "Создание и удаление"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:178
+msgid "Delete Row"
+msgstr "Удалить ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:187
+#: data/com.github.phase1geo.outliner.shortcuts.ui:655
+msgid "Clipboard"
+msgstr "Буфер обмена"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:191
+msgid "Copy Row"
+msgstr "Скопировать ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:198
+msgid "Cut Row"
+msgstr "Вырезать ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:205
+msgid "Paste Row Below"
+msgstr "Вставить как ряд ниже"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:212
+msgid "Paste Row Above"
+msgstr "Вставить как ряд выше"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:221
+msgid "Changing Current"
+msgstr "Правка выделенного"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:232
+msgid "Change Task State"
+msgstr "Изменить статус задачи"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:255
+msgid "Changing View"
+msgstr "Изменения в просмотре"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:259
+msgid "Expand One Subrow Level"
+msgstr "Развернуть ряд уровнем ниже"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:266
+msgid "Collapse One Subrow Level"
+msgstr "Свернуть ряд уровнем ниже"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:273
+msgid "Expand All Subrows"
+msgstr "Развернуть все вложенные ряды"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:280
+msgid "Collapse All Subrows"
+msgstr "Свернуть все вложенные ряды"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:287
+msgid "Add Current to Focus Stack"
+msgstr "Добавить выделенное к фокусировке"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:294
+msgid "Exit Focus View"
+msgstr "Прекратить просмотр фокусировки"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:301
+msgid "Go Back in Focus View Stack"
+msgstr "Перейти назад по сфокусированным объектам"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:308
+msgid "Go Forward in Focus View Stack"
+msgstr "Перейти вперёд по сфокусированным объектам"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:317
+msgid "Traversal"
+msgstr "Переходы"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:328
+msgid "Select Root Row"
+msgstr "Выбрать корневой ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:335
+msgid "Select Previous Row"
+msgstr "Выбрать предыдущий ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:342
+msgid "Select Next Row"
+msgstr "Выбрать следующий ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:349
+msgid "Select Row One Page Up"
+msgstr "Выбрать ряд страницей выше"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:356
+msgid "Select Row One Page Down"
+msgstr "Выбрать ряд страницей ниже"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:363
+msgid "Select Top-most Row"
+msgstr "Выбрать самый верхний ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:370
+msgid "Select Bottom-most Row"
+msgstr "Выбрать самый нижний ряд"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:379
+msgid "Row Movement"
+msgstr "Перемещение рядов"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:383
+msgid "Move Selected Group Up"
+msgstr "Переместить выбранную группу выше"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:390
+msgid "Move Selected Group Down"
+msgstr "Переместить выбранную группу ниже"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:397
+msgid "Move Selected Group To Top"
+msgstr "Переместить выбранную группу наверх"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:404
+msgid "Move Selected Group To Bottom"
+msgstr "Переместить выбранную группу вниз"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:411
+msgid "Join Row To Row Above"
+msgstr "Объединить ряд с рядом выше"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:423
+msgid "Label Commands"
+msgstr "Команды работы с метками"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:431
+msgid "Add/Remove Label"
+msgstr "Добавить или удалить метку"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:438
+msgid "Remove All Labels"
+msgstr "Снять все метки"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:447
+#: data/com.github.phase1geo.outliner.shortcuts.ui:682
+msgid "Selection"
+msgstr "Выделение"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:451
+msgid "Select Label-1 Row"
+msgstr "Выбрать ряд с меткой 1"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:458
+msgid "Select Label-2 Row"
+msgstr "Выбрать ряд с меткой 2"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:465
+msgid "Select Label-3 Row"
+msgstr "Выбрать ряд с меткой 3"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:472
+msgid "Select Label-4 Row"
+msgstr "Выбрать ряд с меткой 4"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:479
+msgid "Select Label-5 Row"
+msgstr "Выбрать ряд с меткой 5"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:486
+msgid "Select Label-6 Row"
+msgstr "Выбрать ряд с меткой 6"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:493
+msgid "Select Label-7 Row"
+msgstr "Выбрать ряд с меткой 7"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:500
+msgid "Select Label-8 Row"
+msgstr "Выбрать ряд с меткой 8"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:507
+msgid "Select Label-9 Row"
+msgstr "Выбрать ряд с меткой 9"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:516
+msgid "Move Row Into Labeled Row"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:520
+msgid "Move To Label-1 Row"
+msgstr "Переместить в ряд с меткой 1"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:527
+msgid "Move To Label-2 Row"
+msgstr "Переместить в ряд с меткой 2"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:534
+msgid "Move To Label-3 Row"
+msgstr "Переместить в ряд с меткой 3"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:541
+msgid "Move To Label-4 Row"
+msgstr "Переместить в ряд с меткой 4"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:548
+msgid "Move To Label-5 Row"
+msgstr "Переместить в ряд с меткой 5"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:555
+msgid "Move To Label-6 Row"
+msgstr "Переместить в ряд с меткой 6"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:562
+msgid "Move To Label-7 Row"
+msgstr "Переместить в ряд с меткой 7"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:569
+msgid "Move To Label-8 Row"
+msgstr "Переместить в ряд с меткой 8"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:576
+msgid "Move To Label-9 Row"
+msgstr "Переместить в ряд с меткой 9"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:588
+msgid "Text Editing"
+msgstr "Редактирование текста"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:593
+msgid "Cursor Movement"
+msgstr "Перемещение курсора"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:597
+msgid "Next Character"
+msgstr "Следующий символ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:604
+msgid "Previous Character"
+msgstr "Предыдущий символ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:611
+msgid "Next Word"
+msgstr "Следующее слово"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:618
+msgid "Previous Word"
+msgstr "Предыдущее слово"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:625
+msgid "Next Line"
+msgstr "Следующая строка"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:632
+msgid "Previous Line"
+msgstr "Предыдущая строка"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:639
+msgid "Start Of Text"
+msgstr "Начало текста"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:646
+msgid "End Of Text"
+msgstr "Конец текста"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:659
+msgid "Copy Selected Text"
+msgstr "Скопировать выделенный текст"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:666
+msgid "Cut Selected Text"
+msgstr "Вырезать выделенный текст"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:673
+msgid "Paste Text"
+msgstr "Вставить текст"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:686
+msgid "Select All"
+msgstr "Выбрать всё"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:693
+msgid "Deselect All"
+msgstr "Снять выделение"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:700
+msgid "Add Next Character"
+msgstr "Добавить следующий символ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:707
+msgid "Add Previous Character"
+msgstr "Добавить предыдущий символ"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:714
+msgid "Add Next Word"
+msgstr "Добавить следующее слово"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:721
+msgid "Add Previous Word"
+msgstr "Добавить предыдущее слово"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:728
+msgid "Add Next Line"
+msgstr "Добавить следующую строку"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:735
+msgid "Add Previous Line"
+msgstr "Добавить предыдущую строку"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:742
+msgid "Add Start Of Text"
+msgstr "Добавить начало текста"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:749
+msgid "Add End Of Text"
+msgstr "Добавить конец текста"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:762
+msgid "Show Emoji Picker"
+msgstr "Показать окно выбора эмотиконов"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:769
+msgid "Split Row at Cursor"
+msgstr "Разделить ряд по курсору"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:776
+msgid "End Editing"
+msgstr "Завершить редактирование"
