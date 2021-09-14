@@ -39,8 +39,7 @@ public class MainWindow : Hdy.ApplicationWindow {
   private Popover?                    _export      = null;
   private Button?                     _undo_btn    = null;
   private Button?                     _redo_btn    = null;
-  private SpinButton                  _zoom;
-  private double                      _zoom_factor = 1.0;
+  private ZoomWidget                  _zoom;
   private Granite.Widgets.ModeButton  _list_types;
   private FontButton                  _fonts_name;
   private FontButton                  _fonts_note;
@@ -683,17 +682,11 @@ public class MainWindow : Hdy.ApplicationWindow {
 
     var box = new Box( Orientation.VERTICAL, 0 );
 
-    var zoom_box = new Box( Orientation.HORIZONTAL, 0 );
-    var zoom_lbl = new Label( _( "Zoom (%):" ) );
+    _zoom = new ZoomWidget( 100, 225, 25 );
+    _zoom.margin = 10;
+    _zoom.zoom_changed.connect( zoom_changed );
 
-    _zoom = new SpinButton.with_range( 100, 225, 25 );
-    _zoom.set_value( 100 );
-    _zoom.value_changed.connect( zoom_changed );
-
-    zoom_box.pack_start( zoom_lbl, false, false, 10 );
-    zoom_box.pack_end( _zoom,      false, false, 10 );
-
-    box.pack_start( zoom_box, false, false, 10 );
+    box.pack_start( _zoom, false, false, 0 );
 
     /* Add theme selector */
     var theme_box = new Box( Orientation.HORIZONTAL, 0 );
@@ -919,15 +912,13 @@ public class MainWindow : Hdy.ApplicationWindow {
 
   /* Returns the current zoom factor */
   public double get_zoom_factor() {
-    return( _zoom_factor );
+    return( _zoom.factor );
   }
 
   /* Called whenever the user changes the zoom level */
-  private void zoom_changed() {
+  private void zoom_changed( double factor ) {
 
     var table = get_current_table( "zoom_changed" );
-
-    _zoom_factor = _zoom.get_value() / 100;
 
     table.zoom_changed();
     queue_draw();
@@ -1197,23 +1188,17 @@ public class MainWindow : Hdy.ApplicationWindow {
 
   /* Called when the user uses the Control-Plus/Equal shortcut */
   private void action_zoom_in() {
-    var value = (int)_zoom.get_value();
-    if( value < 225 ) {
-      _zoom.set_value( value + 25 );
-    }
+    _zoom.zoom_in();
   }
 
   /* Called when the user uses the Control-Minus shortcut */
   private void action_zoom_out() {
-    var value = (int)_zoom.get_value();
-    if( value > 100 ) {
-      _zoom.set_value( value - 25 );
-    }
+    _zoom.zoom_out();
   }
 
   /* Called when the user uses the Control-0 shortcut */
   private void action_zoom_actual() {
-    _zoom.set_value( 100 );
+    _zoom.zoom_actual();
   }
 
   /* Called when the user uses the Control-q keyboard shortcut */

@@ -71,5 +71,6 @@ sources += files(
   'UndoItem.vala',
   'UndoTextBuffer.vala',
   'UndoTextItem.vala',
-  'Utils.vala'
+  'Utils.vala',
+  'ZoomWidget.vala'
 )
