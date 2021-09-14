@@ -258,14 +258,14 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Indent Row</property>
-                <property name="accelerator">Tab</property>
+                <property name="accelerator">Tab &lt;ctrl&gt;Right</property>
                 <property name="visible">1</property>
               </object>
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Outdent Row</property>
-                <property name="accelerator">&lt;shift&gt;Tab</property>
+                <property name="accelerator">&lt;shift&gt;Tab &lt;ctrl&gt;Left</property>
                 <property name="visible">1</property>
               </object>
             </child>
