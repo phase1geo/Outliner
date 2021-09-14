@@ -976,8 +976,7 @@ public class OutlineTable : DrawingArea {
           else if( has_key( kvs, Key.Delete ) )               { handle_delete(); }
           else if( has_key( kvs, Key.Escape ) )               { handle_escape(); }
           else if( has_key( kvs, Key.Return ) )               { handle_return( shift ); }
-          else if( has_key( kvs, Key.Tab ) )                  { handle_tab(); }
-          else if( has_key( kvs, Key.ISO_Left_Tab ) )         { handle_shift_tab(); }
+          else if( has_key( kvs, Key.Tab ) )                  { handle_tab( shift ); }
           else if( has_key( kvs, Key.Right ) )                { handle_right( shift ); }
           else if( has_key( kvs, Key.Left ) )                 { handle_left( shift ); }
           else if( has_key( kvs, Key.Home ) )                 { handle_home( shift ); }
@@ -1543,23 +1542,20 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Handles a tab key hit when a node is selected */
-  private void handle_tab() {
-    if( is_node_editable() && _completion.shown ) {
+  private void handle_tab( bool shift ) {
+    if( is_node_editable() && _completion.shown && !shift ) {
       _completion.select();
       queue_draw();
-    } else if( selected != null ) {
-      indent();
-    }
-  }
-
-  /* Handles a shift tab keypress when a node is selected */
-  private void handle_shift_tab() {
-    if( is_note_editable() ) {
+    } else if( is_note_editable() && shift ) {
       selected.note.insert( "\t", undo_text );
       see( selected );
       queue_draw();
     } else if( selected != null ) {
-      unindent();
+      if( shift ) {
+        unindent();
+      } else {
+        indent();
+      }
     }
   }
 
@@ -1619,7 +1615,9 @@ public class OutlineTable : DrawingArea {
 
   /* Handles a Control-Right arrow keypress */
   private void handle_control_right( bool shift ) {
-    if( is_node_editable() ) {
+    if( is_node_selected() ) {
+      indent();
+    } else if( is_node_editable() ) {
       if( shift ) {
         selected.name.selection_by_word( 1 );
       } else {
@@ -1680,7 +1678,9 @@ public class OutlineTable : DrawingArea {
 
   /* Handles a Control-left arrow keypress */
   private void handle_control_left( bool shift ) {
-    if( is_node_editable() ) {
+    if( is_node_selected() ) {
+      unindent();
+    } else if( is_node_editable() ) {
       if( shift ) {
         selected.name.selection_by_word( -1 );
       } else {
