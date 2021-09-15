@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-12 18:59-0500\n"
+"POT-Creation-Date: 2021-09-14 19:40-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -241,209 +241,205 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/LinkEditor.vala:62 src/MainWindow.vala:972 src/MainWindow.vala:1012
-#: src/MainWindow.vala:1131 src/MainWindow.vala:1230
+#: src/LinkEditor.vala:62 src/MainWindow.vala:961 src/MainWindow.vala:1001
+#: src/MainWindow.vala:1120 src/MainWindow.vala:1213
 msgid "Cancel"
 msgstr ""
 
-#: src/MainWindow.vala:138 src/MainWindow.vala:1134
+#: src/MainWindow.vala:136 src/MainWindow.vala:1123
 msgid "Outliner"
 msgstr ""
 
-#: src/MainWindow.vala:169 data/com.github.phase1geo.outliner.shortcuts.ui:21
+#: src/MainWindow.vala:167 data/com.github.phase1geo.outliner.shortcuts.ui:21
 msgid "New File"
 msgstr ""
 
-#: src/MainWindow.vala:174 src/MainWindow.vala:1012
+#: src/MainWindow.vala:172 src/MainWindow.vala:1001
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr ""
 
-#: src/MainWindow.vala:179 data/com.github.phase1geo.outliner.shortcuts.ui:42
+#: src/MainWindow.vala:177 data/com.github.phase1geo.outliner.shortcuts.ui:42
 msgid "Save File As"
 msgstr ""
 
-#: src/MainWindow.vala:184 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:182 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr ""
 
-#: src/MainWindow.vala:190 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:188 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr ""
 
-#: src/MainWindow.vala:268
+#: src/MainWindow.vala:266
 msgid "Unnamed Document"
 msgstr ""
 
-#: src/MainWindow.vala:522
+#: src/MainWindow.vala:519
 msgid "Search"
 msgstr ""
 
-#: src/MainWindow.vala:533
+#: src/MainWindow.vala:530
 msgid "Statistics"
 msgstr ""
 
-#: src/MainWindow.vala:544
+#: src/MainWindow.vala:541
 msgid "<b>Text Statistics</b>"
 msgstr ""
 
-#: src/MainWindow.vala:548
+#: src/MainWindow.vala:545
 msgid "Characters:"
 msgstr ""
 
-#: src/MainWindow.vala:553
+#: src/MainWindow.vala:550
 msgid "Words:"
 msgstr ""
 
-#: src/MainWindow.vala:558
+#: src/MainWindow.vala:555
 msgid "Rows:"
 msgstr ""
 
-#: src/MainWindow.vala:563
+#: src/MainWindow.vala:560
 msgid "<b>Checkbox Statistics</b>"
 msgstr ""
 
-#: src/MainWindow.vala:567
+#: src/MainWindow.vala:564
 msgid "Total:"
 msgstr ""
 
-#: src/MainWindow.vala:572
+#: src/MainWindow.vala:569
 msgid "Incomplete:"
 msgstr ""
 
-#: src/MainWindow.vala:577
+#: src/MainWindow.vala:574
 msgid "In Progress:"
 msgstr ""
 
-#: src/MainWindow.vala:582
+#: src/MainWindow.vala:579
 msgid "Completed:"
 msgstr ""
 
-#: src/MainWindow.vala:644 src/MainWindow.vala:1230
+#: src/MainWindow.vala:641 src/MainWindow.vala:1213
 msgid "Export"
 msgstr ""
 
-#: src/MainWindow.vala:653
+#: src/MainWindow.vala:650
 msgid "Export…"
 msgstr ""
 
-#: src/MainWindow.vala:658
+#: src/MainWindow.vala:655
 msgid "Print…"
 msgstr ""
 
-#: src/MainWindow.vala:682
+#: src/MainWindow.vala:679
 msgid "Properties"
 msgstr ""
 
-#: src/MainWindow.vala:689
-msgid "Zoom (%):"
-msgstr ""
-
-#: src/MainWindow.vala:702
+#: src/MainWindow.vala:693
 msgid "Theme:"
 msgstr ""
 
-#: src/MainWindow.vala:735
+#: src/MainWindow.vala:726
 msgid "Enumeration Style:"
 msgstr ""
 
-#: src/MainWindow.vala:751
+#: src/MainWindow.vala:742
 msgid "Row Font:"
 msgstr ""
 
-#: src/MainWindow.vala:771
+#: src/MainWindow.vala:762
 msgid "Note Font:"
 msgstr ""
 
-#: src/MainWindow.vala:791
+#: src/MainWindow.vala:782
 msgid "Condensed Mode:"
 msgstr ""
 
-#: src/MainWindow.vala:804
+#: src/MainWindow.vala:795
 msgid "Show Checkboxes"
 msgstr ""
 
-#: src/MainWindow.vala:817
+#: src/MainWindow.vala:808
 msgid "Show Depth Lines"
 msgstr ""
 
-#: src/MainWindow.vala:830
+#: src/MainWindow.vala:821
 msgid "Enable Blank Rows"
 msgstr ""
 
-#: src/MainWindow.vala:843
+#: src/MainWindow.vala:834
 msgid "Enable Markdown Highlighting"
 msgstr ""
 
-#: src/MainWindow.vala:862
+#: src/MainWindow.vala:853
 msgid "Shortcuts Cheatsheet"
 msgstr ""
 
-#: src/MainWindow.vala:869
-msgid "Enter Focus Mode"
+#: src/MainWindow.vala:860
+msgid "Enter Distraction-Free Mode"
 msgstr ""
 
-#: src/MainWindow.vala:875
+#: src/MainWindow.vala:866
 msgid "Reset Fonts to Defaults"
 msgstr ""
 
-#: src/MainWindow.vala:963
+#: src/MainWindow.vala:952
 msgid "Save current unnamed document?"
 msgstr ""
 
-#: src/MainWindow.vala:964
+#: src/MainWindow.vala:953
 msgid "Changes will be permanently lost if not saved."
 msgstr ""
 
-#: src/MainWindow.vala:969
+#: src/MainWindow.vala:958
 msgid "Discard Changes"
 msgstr ""
 
-#: src/MainWindow.vala:975 src/MainWindow.vala:1131
+#: src/MainWindow.vala:964 src/MainWindow.vala:1120
 msgid "Save"
 msgstr ""
 
-#: src/MainWindow.vala:1012
+#: src/MainWindow.vala:1001
 msgid "Open"
 msgstr ""
 
-#: src/MainWindow.vala:1130
+#: src/MainWindow.vala:1119
 msgid "Save File"
 msgstr ""
 
-#: src/MainWindow.vala:1229
+#: src/MainWindow.vala:1212
 msgid "Export As"
 msgstr ""
 
-#: src/MainWindow.vala:1234
+#: src/MainWindow.vala:1217
 msgid "HTML"
 msgstr ""
 
-#: src/MainWindow.vala:1241
+#: src/MainWindow.vala:1224
 msgid "Markdown"
 msgstr ""
 
-#: src/MainWindow.vala:1248
+#: src/MainWindow.vala:1231
 msgid "Minder"
 msgstr ""
 
-#: src/MainWindow.vala:1254
+#: src/MainWindow.vala:1237
 msgid "OPML"
 msgstr ""
 
-#: src/MainWindow.vala:1260
+#: src/MainWindow.vala:1243
 msgid "Org-Mode"
 msgstr ""
 
-#: src/MainWindow.vala:1266
+#: src/MainWindow.vala:1249
 msgid "PDF"
 msgstr ""
 
-#: src/MainWindow.vala:1272
+#: src/MainWindow.vala:1255
 msgid "PlainText"
 msgstr ""
 
-#: src/MainWindow.vala:1300
+#: src/MainWindow.vala:1283
 msgid "Outliner Export Completed"
 msgstr ""
 
@@ -475,11 +471,11 @@ msgstr ""
 msgid "Unclone"
 msgstr ""
 
-#: src/NodeMenu.vala:97 data/com.github.phase1geo.outliner.shortcuts.ui:225
+#: src/NodeMenu.vala:97 data/com.github.phase1geo.outliner.shortcuts.ui:232
 msgid "Edit Text"
 msgstr ""
 
-#: src/NodeMenu.vala:101 data/com.github.phase1geo.outliner.shortcuts.ui:239
+#: src/NodeMenu.vala:101 data/com.github.phase1geo.outliner.shortcuts.ui:246
 msgid "Edit Note"
 msgstr ""
 
@@ -487,15 +483,15 @@ msgstr ""
 msgid "Show Note"
 msgstr ""
 
-#: src/NodeMenu.vala:107 data/com.github.phase1geo.outliner.shortcuts.ui:246
+#: src/NodeMenu.vala:107 data/com.github.phase1geo.outliner.shortcuts.ui:253
 msgid "Add Tag"
 msgstr ""
 
-#: src/NodeMenu.vala:111 data/com.github.phase1geo.outliner.shortcuts.ui:171
+#: src/NodeMenu.vala:111 data/com.github.phase1geo.outliner.shortcuts.ui:178
 msgid "Add Row Above"
 msgstr ""
 
-#: src/NodeMenu.vala:115 data/com.github.phase1geo.outliner.shortcuts.ui:164
+#: src/NodeMenu.vala:115 data/com.github.phase1geo.outliner.shortcuts.ui:171
 msgid "Add Row Below"
 msgstr ""
 
@@ -539,7 +535,7 @@ msgstr ""
 msgid "Select Next Sibling Row"
 msgstr ""
 
-#: src/NodeMenu.vala:158 data/com.github.phase1geo.outliner.shortcuts.ui:321
+#: src/NodeMenu.vala:158 data/com.github.phase1geo.outliner.shortcuts.ui:342
 msgid "Select Parent Row"
 msgstr ""
 
@@ -721,7 +717,7 @@ msgid "Zoom To Actual Size"
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:119
-#: data/com.github.phase1geo.outliner.shortcuts.ui:758
+#: data/com.github.phase1geo.outliner.shortcuts.ui:779
 msgid "Miscellaneous"
 msgstr ""
 
@@ -738,336 +734,348 @@ msgid "Show Keyboard Shortcuts"
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:144
+msgid "Toggle Distraction-Free Mode"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:151
 msgid "Quit Application"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:156
+#: data/com.github.phase1geo.outliner.shortcuts.ui:163
 msgid "Row Commands"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:160
-#: data/com.github.phase1geo.outliner.shortcuts.ui:427
+#: data/com.github.phase1geo.outliner.shortcuts.ui:167
+#: data/com.github.phase1geo.outliner.shortcuts.ui:448
 msgid "Creation/Deletion"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:178
+#: data/com.github.phase1geo.outliner.shortcuts.ui:185
 msgid "Delete Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:187
-#: data/com.github.phase1geo.outliner.shortcuts.ui:655
+#: data/com.github.phase1geo.outliner.shortcuts.ui:194
+#: data/com.github.phase1geo.outliner.shortcuts.ui:676
 msgid "Clipboard"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:191
+#: data/com.github.phase1geo.outliner.shortcuts.ui:198
 msgid "Copy Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:198
+#: data/com.github.phase1geo.outliner.shortcuts.ui:205
 msgid "Cut Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:205
+#: data/com.github.phase1geo.outliner.shortcuts.ui:212
 msgid "Paste Row Below"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:212
+#: data/com.github.phase1geo.outliner.shortcuts.ui:219
 msgid "Paste Row Above"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:221
+#: data/com.github.phase1geo.outliner.shortcuts.ui:228
 msgid "Changing Current"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:232
+#: data/com.github.phase1geo.outliner.shortcuts.ui:239
 msgid "Change Task State"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:255
+#: data/com.github.phase1geo.outliner.shortcuts.ui:260
+msgid "Indent Row"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:267
+msgid "Outdent Row"
+msgstr ""
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:276
 msgid "Changing View"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:259
+#: data/com.github.phase1geo.outliner.shortcuts.ui:280
 msgid "Expand One Subrow Level"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:266
+#: data/com.github.phase1geo.outliner.shortcuts.ui:287
 msgid "Collapse One Subrow Level"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:273
+#: data/com.github.phase1geo.outliner.shortcuts.ui:294
 msgid "Expand All Subrows"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:280
+#: data/com.github.phase1geo.outliner.shortcuts.ui:301
 msgid "Collapse All Subrows"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:287
+#: data/com.github.phase1geo.outliner.shortcuts.ui:308
 msgid "Add Current to Focus Stack"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:294
+#: data/com.github.phase1geo.outliner.shortcuts.ui:315
 msgid "Exit Focus View"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:301
+#: data/com.github.phase1geo.outliner.shortcuts.ui:322
 msgid "Go Back in Focus View Stack"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:308
+#: data/com.github.phase1geo.outliner.shortcuts.ui:329
 msgid "Go Forward in Focus View Stack"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:317
+#: data/com.github.phase1geo.outliner.shortcuts.ui:338
 msgid "Traversal"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:328
+#: data/com.github.phase1geo.outliner.shortcuts.ui:349
 msgid "Select Root Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:335
+#: data/com.github.phase1geo.outliner.shortcuts.ui:356
 msgid "Select Previous Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:342
+#: data/com.github.phase1geo.outliner.shortcuts.ui:363
 msgid "Select Next Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:349
+#: data/com.github.phase1geo.outliner.shortcuts.ui:370
 msgid "Select Row One Page Up"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:356
+#: data/com.github.phase1geo.outliner.shortcuts.ui:377
 msgid "Select Row One Page Down"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:363
+#: data/com.github.phase1geo.outliner.shortcuts.ui:384
 msgid "Select Top-most Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:370
+#: data/com.github.phase1geo.outliner.shortcuts.ui:391
 msgid "Select Bottom-most Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:379
+#: data/com.github.phase1geo.outliner.shortcuts.ui:400
 msgid "Row Movement"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:383
+#: data/com.github.phase1geo.outliner.shortcuts.ui:404
 msgid "Move Selected Group Up"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:390
+#: data/com.github.phase1geo.outliner.shortcuts.ui:411
 msgid "Move Selected Group Down"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:397
+#: data/com.github.phase1geo.outliner.shortcuts.ui:418
 msgid "Move Selected Group To Top"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:404
+#: data/com.github.phase1geo.outliner.shortcuts.ui:425
 msgid "Move Selected Group To Bottom"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:411
+#: data/com.github.phase1geo.outliner.shortcuts.ui:432
 msgid "Join Row To Row Above"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:423
+#: data/com.github.phase1geo.outliner.shortcuts.ui:444
 msgid "Label Commands"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:431
+#: data/com.github.phase1geo.outliner.shortcuts.ui:452
 msgid "Add/Remove Label"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:438
+#: data/com.github.phase1geo.outliner.shortcuts.ui:459
 msgid "Remove All Labels"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:447
-#: data/com.github.phase1geo.outliner.shortcuts.ui:682
+#: data/com.github.phase1geo.outliner.shortcuts.ui:468
+#: data/com.github.phase1geo.outliner.shortcuts.ui:703
 msgid "Selection"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:451
+#: data/com.github.phase1geo.outliner.shortcuts.ui:472
 msgid "Select Label-1 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:458
+#: data/com.github.phase1geo.outliner.shortcuts.ui:479
 msgid "Select Label-2 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:465
+#: data/com.github.phase1geo.outliner.shortcuts.ui:486
 msgid "Select Label-3 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:472
+#: data/com.github.phase1geo.outliner.shortcuts.ui:493
 msgid "Select Label-4 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:479
+#: data/com.github.phase1geo.outliner.shortcuts.ui:500
 msgid "Select Label-5 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:486
+#: data/com.github.phase1geo.outliner.shortcuts.ui:507
 msgid "Select Label-6 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:493
+#: data/com.github.phase1geo.outliner.shortcuts.ui:514
 msgid "Select Label-7 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:500
+#: data/com.github.phase1geo.outliner.shortcuts.ui:521
 msgid "Select Label-8 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:507
+#: data/com.github.phase1geo.outliner.shortcuts.ui:528
 msgid "Select Label-9 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:516
+#: data/com.github.phase1geo.outliner.shortcuts.ui:537
 msgid "Move Row Into Labeled Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:520
+#: data/com.github.phase1geo.outliner.shortcuts.ui:541
 msgid "Move To Label-1 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:527
+#: data/com.github.phase1geo.outliner.shortcuts.ui:548
 msgid "Move To Label-2 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:534
+#: data/com.github.phase1geo.outliner.shortcuts.ui:555
 msgid "Move To Label-3 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:541
+#: data/com.github.phase1geo.outliner.shortcuts.ui:562
 msgid "Move To Label-4 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:548
+#: data/com.github.phase1geo.outliner.shortcuts.ui:569
 msgid "Move To Label-5 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:555
+#: data/com.github.phase1geo.outliner.shortcuts.ui:576
 msgid "Move To Label-6 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:562
+#: data/com.github.phase1geo.outliner.shortcuts.ui:583
 msgid "Move To Label-7 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:569
+#: data/com.github.phase1geo.outliner.shortcuts.ui:590
 msgid "Move To Label-8 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:576
+#: data/com.github.phase1geo.outliner.shortcuts.ui:597
 msgid "Move To Label-9 Row"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:588
+#: data/com.github.phase1geo.outliner.shortcuts.ui:609
 msgid "Text Editing"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:593
+#: data/com.github.phase1geo.outliner.shortcuts.ui:614
 msgid "Cursor Movement"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:597
+#: data/com.github.phase1geo.outliner.shortcuts.ui:618
 msgid "Next Character"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:604
+#: data/com.github.phase1geo.outliner.shortcuts.ui:625
 msgid "Previous Character"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:611
+#: data/com.github.phase1geo.outliner.shortcuts.ui:632
 msgid "Next Word"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:618
+#: data/com.github.phase1geo.outliner.shortcuts.ui:639
 msgid "Previous Word"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:625
+#: data/com.github.phase1geo.outliner.shortcuts.ui:646
 msgid "Next Line"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:632
+#: data/com.github.phase1geo.outliner.shortcuts.ui:653
 msgid "Previous Line"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:639
+#: data/com.github.phase1geo.outliner.shortcuts.ui:660
 msgid "Start Of Text"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:646
+#: data/com.github.phase1geo.outliner.shortcuts.ui:667
 msgid "End Of Text"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:659
+#: data/com.github.phase1geo.outliner.shortcuts.ui:680
 msgid "Copy Selected Text"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:666
+#: data/com.github.phase1geo.outliner.shortcuts.ui:687
 msgid "Cut Selected Text"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:673
+#: data/com.github.phase1geo.outliner.shortcuts.ui:694
 msgid "Paste Text"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:686
+#: data/com.github.phase1geo.outliner.shortcuts.ui:707
 msgid "Select All"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:693
+#: data/com.github.phase1geo.outliner.shortcuts.ui:714
 msgid "Deselect All"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:700
+#: data/com.github.phase1geo.outliner.shortcuts.ui:721
 msgid "Add Next Character"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:707
+#: data/com.github.phase1geo.outliner.shortcuts.ui:728
 msgid "Add Previous Character"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:714
+#: data/com.github.phase1geo.outliner.shortcuts.ui:735
 msgid "Add Next Word"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:721
+#: data/com.github.phase1geo.outliner.shortcuts.ui:742
 msgid "Add Previous Word"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:728
+#: data/com.github.phase1geo.outliner.shortcuts.ui:749
 msgid "Add Next Line"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:735
+#: data/com.github.phase1geo.outliner.shortcuts.ui:756
 msgid "Add Previous Line"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:742
+#: data/com.github.phase1geo.outliner.shortcuts.ui:763
 msgid "Add Start Of Text"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:749
+#: data/com.github.phase1geo.outliner.shortcuts.ui:770
 msgid "Add End Of Text"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:762
+#: data/com.github.phase1geo.outliner.shortcuts.ui:783
 msgid "Show Emoji Picker"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:769
+#: data/com.github.phase1geo.outliner.shortcuts.ui:790
 msgid "Split Row at Cursor"
 msgstr ""
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:776
+#: data/com.github.phase1geo.outliner.shortcuts.ui:797
 msgid "End Editing"
 msgstr ""
