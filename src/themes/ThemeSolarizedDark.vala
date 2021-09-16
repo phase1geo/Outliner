@@ -33,15 +33,17 @@ public class ThemeSolarizedDark : Theme {
     /* Generate the non-link colors */
     even               = get_color( "#002B36" );
     odd                = get_color( "#002B36" );
-    background         = get_color( "#002B36" );  // Done
-    foreground         = get_color( "#93A1A1" );  // Done
+    background         = get_color( "#002B36" );
+    foreground         = get_color( "#93A1A1" );
+    title_background   = get_color( "#002B36" );
+    title_foreground   = get_color( "#93A1A1" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "#000000" );
-    nodesel_background = get_color( "#8cd5ff" );  // Done
-    nodesel_foreground = get_color( "#000000" );  // Done
-    textsel_background = get_color( "#64baff" );  // Done
-    textsel_foreground = get_color( "White" );  // Done
-    text_cursor        = get_color( "#93A1A1" );  // Done
+    nodesel_background = get_color( "#8cd5ff" );
+    nodesel_foreground = get_color( "#000000" );
+    textsel_background = get_color( "#64baff" );
+    textsel_foreground = get_color( "White" );
+    text_cursor        = get_color( "#93A1A1" );
     symbol_color       = get_color( "#B58900" );
     note_foreground    = get_color( "#f37329" );
     note_background    = get_color( "#001b26" );

@@ -80,6 +80,7 @@ public class OutlineTable : DrawingArea {
   private bool            _filtered   = false;
   private Node?           _focus_node = null;
   private bool            _in_focus_exit = false;
+  private CanvasText?     _title         = null;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -249,7 +250,7 @@ public class OutlineTable : DrawingArea {
       return( _tagger );
     }
   }
-  public int top_margin      { get; private set; default = 60; }
+  public int top_margin      { get; private set; default = 30; }
   public bool tasks_on_right { get; private set; default = true; }
 
   /* Allocate static parsers */
@@ -318,7 +319,7 @@ public class OutlineTable : DrawingArea {
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
       if( root.children.length > 0 ) {
-        root.children.index( 0 ).y = top_margin;
+        root.children.index( 0 ).y = (_title.posy + _title.height + 10);  // top_margin;
         root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
       }
       show_tasks_changed();
@@ -534,6 +535,11 @@ public class OutlineTable : DrawingArea {
     return( (selected != null) && (selected.mode == NodeMode.NOTEEDIT) );
   }
 
+  /* Returns true if the title is editable */
+  public bool is_title_editable() {
+    return( (_title != null) && _title.edit );
+  }
+
   /* Returns true if the currently selected node is joinable */
   public bool is_node_joinable() {
     return( is_node_selected() && (selected.get_previous_node() != null) );
@@ -619,6 +625,15 @@ public class OutlineTable : DrawingArea {
       } else {
         _active           = clicked;
         _active_to_select = true;
+      }
+    } else if( _title.is_within( x, y ) ) {
+      var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
+      _title.edit = true;
+      switch( e.type ) {
+        case EventType.BUTTON_PRESS        :  _title.set_cursor_at_char( e.x, e.y, shift );  break;
+        case EventType.DOUBLE_BUTTON_PRESS :  _title.set_cursor_at_word( e.x, e.y, shift );  break;
+        case EventType.TRIPLE_BUTTON_PRESS :  _title.set_cursor_all( false );                break;
+        default                            :  break;
       }
     } else {
       selected = null;
@@ -802,6 +817,8 @@ public class OutlineTable : DrawingArea {
         if( orig_over != current.over_note_icon ) {
           queue_draw();
         }
+      } else if( _title.is_within( e.x, e.y ) ) {
+        set_cursor( text_cursor );
       } else {
         set_cursor( null );
       }
@@ -1399,6 +1416,10 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      _title.backspace( undo_text );
+      _im_context.reset();
+      queue_draw();
     } else if( selected != null ) {
       delete_current_node();
     }
@@ -1413,6 +1434,9 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_editable() ) {
       selected.note.backspace_word( undo_text );
       see( selected );
+      queue_draw();
+    } else if( is_title_editable() ) {
+      _title.backspace_word( undo_text );
       queue_draw();
     } else if( is_node_joinable() ) {
       join_row();
@@ -1431,6 +1455,10 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      _title.delete( undo_text );
+      _im_context.reset();
+      queue_draw();
     } else if( selected != null ) {
       delete_current_node();
     }
@@ -1446,6 +1474,9 @@ public class OutlineTable : DrawingArea {
       selected.note.delete_word( undo_text );
       see( selected );
       queue_draw();
+    } else if( is_title_editable() ) {
+      _title.delete_word( undo_text );
+      queue_draw();
     }
   }
 
@@ -1460,6 +1491,8 @@ public class OutlineTable : DrawingArea {
         queue_draw();
         changed();
       }
+    } else if( is_title_editable() ) {
+      _title.edit = false;
     } else if( root.alpha < 1.0 ) {
       focus_leave();
     }
@@ -1480,6 +1513,9 @@ public class OutlineTable : DrawingArea {
         _completion.select();
         queue_draw();
       }
+    } else if( is_title_editable() ) {
+      _title.edit = false;
+      queue_draw();
     } else if( selected != null ) {
       if( (selected.children.length > 0) && selected.expanded ) {
         add_child_node( 0 );
@@ -1538,6 +1574,9 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_editable() ) {
       selected.note.insert( "\n", undo_text );
       queue_draw();
+    } else if( is_title_editable() ) {
+      _title.insert( "\n", undo_text );
+      queue_draw();
     }
   }
 
@@ -1549,6 +1588,9 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_editable() && shift ) {
       selected.note.insert( "\t", undo_text );
       see( selected );
+      queue_draw();
+    } else if( is_title_editable() && shift ) {
+      _title.insert( "\t", undo_text );
       queue_draw();
     } else if( selected != null ) {
       if( shift ) {
@@ -1568,6 +1610,9 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_editable() ) {
       selected.note.insert( "\t", undo_text );
       see( selected );
+      queue_draw();
+    } else if( is_title_editable() ) {
+      _title.insert( "\t", undo_text );
       queue_draw();
     }
   }
@@ -1592,6 +1637,15 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_by_char( 1 );
+      } else {
+        _title.move_cursor( 1 );
+      }
+      undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
@@ -1635,6 +1689,15 @@ public class OutlineTable : DrawingArea {
       undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_by_word( 1 );
+      } else {
+        _title.move_cursor_by_word( 1 );
+      }
+      undo_text.mergeable = false;
+      _im_context.reset();
+      queue_draw();
     }
   }
 
@@ -1658,6 +1721,15 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        selected.note.selection_by_char( -1 );
+      } else {
+        selected.note.move_cursor( -1 );
+      }
+      undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
@@ -1700,6 +1772,15 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_by_word( -1 );
+      } else {
+        _title.move_cursor_by_word( -1 );
+      }
+      undo_text.mergeable = false;
+      _im_context.reset();
+      queue_draw();
     }
   }
 
@@ -1727,6 +1808,15 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_vertically( -1 );
+      } else {
+        _title.move_cursor_vertically( -1 );
+      }
+      undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
@@ -1861,6 +1951,15 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_to_start( false );
+      } else {
+        _title.move_cursor_to_start();
+      }
+      undo_text.mergeable = false;
+      _im_context.reset();
+      queue_draw();
     } else if( selected != null ) {
       if( shift ) {
         // TBD
@@ -1894,6 +1993,15 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_vertically( 1 );
+      } else {
+        _title.move_cursor_vertically( 1 );
+      }
+      undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
     } else if( selected != null ) {
@@ -1935,6 +2043,15 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_to_end( false );
+      } else {
+        _title.move_cursor_to_end();
+      }
+      undo_text.mergeable = false;
+      _im_context.reset();
+      queue_draw();
     } else if( selected != null ) {
       if( shift ) {
         // TBD
@@ -1958,6 +2075,11 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      _title.set_cursor_all( false );
+      undo_text.mergeable = false;
+      _im_context.reset();
+      queue_draw();
     }
   }
 
@@ -1973,6 +2095,11 @@ public class OutlineTable : DrawingArea {
       selected.note.clear_selection();
       undo_text.mergeable = false;
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      _title.clear_selection();
+      undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
     }
@@ -2004,6 +2131,8 @@ public class OutlineTable : DrawingArea {
       insert_emoji( selected.name );
     } else if( is_note_editable() ) {
       insert_emoji( selected.note );
+    } else if( is_title_editable() ) {
+      insert_emoji( _title );
     }
   }
 
@@ -2025,6 +2154,14 @@ public class OutlineTable : DrawingArea {
         selected.note.set_cursor_all( false );
       }
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.set_cursor_none();
+      } else {
+        _title.set_cursor_all( false );
+      }
       _im_context.reset();
       queue_draw();
     } else if( is_node_selected() ) {
@@ -2142,6 +2279,15 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_to_start( true );
+      } else {
+        _title.move_cursor_to_start();
+      }
+      undo_text.mergeable = false;
+      _im_context.reset();
+      queue_draw();
     }
   }
 
@@ -2165,6 +2311,15 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_to_linestart( true );
+      } else {
+        _title.move_cursor_to_linestart();
+      }
+      undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
     }
@@ -2192,6 +2347,15 @@ public class OutlineTable : DrawingArea {
       see( selected );
       _im_context.reset();
       queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_to_end( true );
+      } else {
+        _title.move_cursor_to_end();
+      }
+      undo_text.mergeable = false;
+      _im_context.reset();
+      queue_draw();
     }
   }
 
@@ -2215,6 +2379,15 @@ public class OutlineTable : DrawingArea {
       }
       undo_text.mergeable = false;
       see( selected );
+      _im_context.reset();
+      queue_draw();
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.selection_to_lineend( true );
+      } else {
+        _title.move_cursor_to_lineend();
+      }
+      undo_text.mergeable = false;
       _im_context.reset();
       queue_draw();
     }
@@ -2265,6 +2438,7 @@ public class OutlineTable : DrawingArea {
     insert_user_text( str );
   }
 
+  /* Inserts user text for the editable CanvasText widget */
   private bool insert_user_text( string str ) {
     if( !str.get_char( 0 ).isprint() ) return( false );
     if( is_node_editable() ) {
@@ -2274,6 +2448,9 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_editable() ) {
       selected.note.insert( str, undo_text );
       see( selected );
+      queue_draw();
+    } else if( is_title_editable() ) {
+      _title.insert( str, undo_text );
       queue_draw();
     } else {
       return( false );
@@ -2295,6 +2472,9 @@ public class OutlineTable : DrawingArea {
     } else if( is_note_editable() ) {
       retrieve_surrounding_in_text( selected.note );
       return( true );
+    } else if( is_title_editable() ) {
+      retrieve_surrounding_in_text( _title );
+      return( true );
     }
     return( false );
   }
@@ -2315,6 +2495,9 @@ public class OutlineTable : DrawingArea {
       return( true );
     } else if( is_note_editable() ) {
       delete_surrounding_in_text( selected.note, offset, nchars );
+      return( true );
+    } else if( is_title_editable() ) {
+      delete_surrounding_in_text( _title, offset, nchars );
       return( true );
     }
     return( false );
@@ -2532,18 +2715,65 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  private void title_resized() {
+    if( root.children.length > 0 ) {
+      root.children.index( 0 ).y = (_title.posy + _title.height + 10);  // top_margin;
+      root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
+      queue_draw();
+    }
+  }
+
+  private void create_title() {
+
+    _title = new CanvasText.with_text( this, get_allocated_width(), _( "Title" ) );
+    _title.posy = top_margin;
+    _title.set_font( null, 30 );
+    _title.set_alignment( Pango.Alignment.CENTER );
+    _title.resized.connect( title_resized );
+
+    title_resized();
+
+  }
+
+  private bool window_size_changed( EventConfigure e ) {
+
+    /* Get the width of the table */
+    int w, h;
+    win.get_size( out w, out h );
+
+    var rmargin = 20;
+
+    /* Update our width information */
+    _title.max_width = w - (_title.posx + rmargin);
+
+    return( false );
+
+  }
+
   /* Creates a new, unnamed document */
   public void initialize_for_new() {
 
     /* Initialize variables */
     _press_type = EventType.NOTHING;
 
-    /* Create the main idea node */
-    var node = new Node( this );
-    insert_node( root, node, 0 );
-    set_node_mode( selected, NodeMode.EDITABLE );
+    Idle.add(() => {
 
-    queue_draw();
+      /* Create the title */
+      create_title();
+
+      /* Handle any window size changes */
+      win.configure_event.connect( window_size_changed );
+
+      /* Create the main idea node */
+      var node = new Node( this );
+      insert_node( root, node, 0 );
+      set_node_mode( selected, NodeMode.EDITABLE );
+
+      queue_draw();
+
+      return( false );
+
+    });
 
   }
 
@@ -2731,6 +2961,10 @@ public class OutlineTable : DrawingArea {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
+          case "title"  :
+            create_title();
+            _title.load( it );
+            break;
           case "theme"  :  load_theme( it );  break;
           case "nodes"  :  load_nodes( it );  break;
           case "labels" :  _labels.load( this, it );  break;
@@ -2788,6 +3022,10 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "markdown",         _markdown.to_string() );
     n->set_prop( "blank-rows",       _blank_rows.to_string() );
 
+    if( _title != null ) {
+      n->add_child( _title.save( "title" ) );
+    }
+
     n->add_child( save_theme() );
     n->add_child( save_nodes() );
     n->add_child( _labels.save() );
@@ -2839,6 +3077,10 @@ public class OutlineTable : DrawingArea {
       changed();
     } else if( is_note_editable() ) {
       selected.note.insert( replace, undo_text );
+      queue_draw();
+      changed();
+    } else if( is_title_editable() ) {
+      _title.insert( replace, undo_text );
       queue_draw();
       changed();
     }
@@ -3136,6 +3378,9 @@ public class OutlineTable : DrawingArea {
 
   /* Draws all of the root node trees */
   public void draw_all( Context ctx ) {
+    if( _title != null ) {
+      _title.draw( ctx, _theme, _theme.title_foreground, 1.0, _draw_options.use_theme );
+    }
     root.draw_tree( ctx, _theme, _draw_options );
     if( (selected != null) && !selected.hidden ) {
       selected.draw( ctx, _theme, _draw_options );

@@ -35,6 +35,8 @@ public class ThemePrintColor : Theme {
     odd                = get_color( "#cccccc" );
     background         = get_color( "#ffffff" );
     foreground         = get_color( "Black" );
+    title_background   = get_color( "#ffffff" );
+    title_foreground   = get_color( "Black" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );
     nodesel_background = get_color( "#64baff" );

@@ -35,6 +35,8 @@ public class ThemeMaterial : Theme {
     odd                = get_color( "#cccccc" );
     background         = get_color( "#121212" );
     foreground         = get_color( "#eeeee" );
+    title_background   = get_color( "#121212" );
+    title_foreground   = get_color( "#eeeee" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );
     nodesel_background = get_color( "#444444" );

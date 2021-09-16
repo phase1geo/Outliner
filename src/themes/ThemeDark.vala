@@ -35,6 +35,8 @@ public class ThemeDark : Theme {
     odd                = get_color( "#444444" );
     background         = get_color( "#333333" );
     foreground         = get_color( "#e0e0e0" );
+    title_background   = get_color( "#333333" );
+    title_foreground   = get_color( "#e0e0e0" );
     root_background    = get_color( "#d4d4d4" );
     root_foreground    = get_color( "Black" );
     nodesel_background = get_color( "#64baff" );
