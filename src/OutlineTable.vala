@@ -92,7 +92,7 @@ public class OutlineTable : DrawingArea {
       return( _title );
     }
   }
-  public Node?          selected {
+  public Node? selected {
     get {
       return( _selected );
     }
@@ -256,7 +256,7 @@ public class OutlineTable : DrawingArea {
       return( _tagger );
     }
   }
-  public int top_margin      { get; private set; default = 30; }
+  public int top_margin      { get; private set; default = 45; }
   public bool tasks_on_right { get; private set; default = true; }
 
   /* Allocate static parsers */
