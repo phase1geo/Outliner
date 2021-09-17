@@ -41,6 +41,7 @@ public class MainWindow : Hdy.ApplicationWindow {
   private Button?                     _redo_btn    = null;
   private ZoomWidget                  _zoom;
   private Granite.Widgets.ModeButton  _list_types;
+  private FontButton                  _fonts_title;
   private FontButton                  _fonts_name;
   private FontButton                  _fonts_note;
   private Switch                      _condensed;
@@ -670,6 +671,33 @@ public class MainWindow : Hdy.ApplicationWindow {
 
   }
 
+  /* Returns the font box for the given target type */
+  private Box create_font_box( FontTarget target, string label, ref FontButton? fbtn ) {
+
+    var box = new Box( Orientation.HORIZONTAL, 0 );
+    var lbl = new Label( "%s:".printf( label ) );
+    var btn = new FontButton();
+    btn.show_style = false;
+    btn.set_filter_func( (family, face) => {
+      var fd     = face.describe();
+      var weight = fd.get_weight();
+      var style  = fd.get_style();
+      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+    });
+    btn.font_set.connect(() => {
+      var table = get_current_table();
+      table.change_font( target, btn.get_font_family().get_name(), (btn.get_font_size() / Pango.SCALE) );
+    });
+
+    box.pack_start( lbl,  false, false, 10 );
+    box.pack_end(   btn, false, false, 10 );
+
+    fbtn = btn;
+
+    return( box );
+
+  }
+
   /* Adds the property functionality */
   private void add_properties_button() {
 
@@ -737,45 +765,17 @@ public class MainWindow : Hdy.ApplicationWindow {
     ltbox.pack_end(   _list_types, false, false, 10 );
     box.pack_start( ltbox, false, false, 10 );
 
-    /* Add row font selection button */
-    var f1box = new Box( Orientation.HORIZONTAL, 0 );
-    var f1lbl = new Label( _( "Row Font:" ) );
-    _fonts_name = new FontButton();
-    _fonts_name.show_style = false;
-    _fonts_name.set_filter_func( (family, face) => {
-      var fd     = face.describe();
-      var weight = fd.get_weight();
-      var style  = fd.get_style();
-      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
-    });
-    _fonts_name.font_set.connect(() => {
-      var table = get_current_table();
-      table.change_name_font( _fonts_name.get_font_family().get_name(), (_fonts_name.get_font_size() / Pango.SCALE) );
-    });
-
-    f1box.pack_start( f1lbl,   false, false, 10 );
-    f1box.pack_end(   _fonts_name, false, false, 10 );
-    box.pack_start( f1box, false, false, 10 );
+    /* Add title font selection button */
+    var title_font = create_font_box( FontTarget.TITLE, _( "Title Font" ), ref _fonts_title );
+    box.pack_start( title_font, false, false, 10 );
 
     /* Add row font selection button */
-    var f2box = new Box( Orientation.HORIZONTAL, 0 );
-    var f2lbl = new Label( _( "Note Font:" ) );
-    _fonts_note = new FontButton();
-    _fonts_note.show_style = false;
-    _fonts_note.set_filter_func( (family, face) => {
-      var fd     = face.describe();
-      var weight = fd.get_weight();
-      var style  = fd.get_style();
-      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
-    });
-    _fonts_note.font_set.connect(() => {
-      var table = get_current_table();
-      table.change_note_font( _fonts_note.get_font_family().get_name(), (_fonts_note.get_font_size() / Pango.SCALE) );
-    });
+    var row_font = create_font_box( FontTarget.NAME, _( "Row Font" ), ref _fonts_name );
+    box.pack_start( row_font, false, false, 10 );
 
-    f2box.pack_start( f2lbl,       false, false, 10 );
-    f2box.pack_end(   _fonts_note, false, false, 10 );
-    box.pack_start( f2box, false, false, 10 );
+    /* Add row font selection button */
+    var note_font = create_font_box( FontTarget.NOTE, _( "Note Font" ), ref _fonts_note );
+    box.pack_start( note_font, false, false, 10 );
 
     /* Add condensed mode switch */
     var cbox = new Box( Orientation.HORIZONTAL, 0 );
@@ -1100,16 +1100,22 @@ public class MainWindow : Hdy.ApplicationWindow {
 
   /* Called whenever the tab is changed to update the current document's font information */
   private void do_fonts_changed( OutlineTable ot ) {
-    var name_fd = _fonts_name.get_font_desc();
-    var note_fd = _fonts_note.get_font_desc();
+    var title_fd = _fonts_title.get_font_desc();
+    var name_fd  = _fonts_name.get_font_desc();
+    var note_fd  = _fonts_note.get_font_desc();
+    if( ot.title_font_family != null ) {
+      title_fd.set_family( ot.title_font_family );
+    }
     if( ot.name_font_family != null ) {
       name_fd.set_family( ot.name_font_family );
     }
     if( ot.note_font_family != null ) {
-      name_fd.set_family( ot.note_font_family );
+      note_fd.set_family( ot.note_font_family );
     }
+    title_fd.set_size( (int)(ot.title_font_size * Pango.SCALE) );
     name_fd.set_size( (int)(ot.name_font_size * Pango.SCALE) );
     note_fd.set_size( (int)(ot.note_font_size * Pango.SCALE) );
+    _fonts_title.set_font_desc( title_fd );
     _fonts_name.set_font_desc( name_fd );
     _fonts_note.set_font_desc( note_fd );
   }
@@ -1362,15 +1368,18 @@ public class MainWindow : Hdy.ApplicationWindow {
   /* Called whenever the user selects the reset fonts button in the properties popover */
   private void action_reset_fonts() {
 
-    var table       = get_current_table( "action_reset_fonts" );
-    var name_family = _settings.get_string( "default-row-font-family" );
-    var note_family = _settings.get_string( "default-note-font-family" );
-    var name_size   = _settings.get_int( "default-row-font-size" );
-    var note_size   = _settings.get_int( "default-note-font-size" );
+    var table        = get_current_table( "action_reset_fonts" );
+    var title_family = _settings.get_string( "default-title-font-family" );
+    var name_family  = _settings.get_string( "default-row-font-family" );
+    var note_family  = _settings.get_string( "default-note-font-family" );
+    var title_size   = _settings.get_int( "default-title-font-size" );
+    var name_size    = _settings.get_int( "default-row-font-size" );
+    var note_size    = _settings.get_int( "default-note-font-size" );
 
     /* Update the table */
-    table.change_name_font( name_family, name_size );
-    table.change_note_font( note_family, note_size );
+    table.change_font( FontTarget.TITLE, title_family, title_size );
+    table.change_font( FontTarget.NAME,  name_family, name_size );
+    table.change_font( FontTarget.NOTE,  note_family, note_size );
 
     /* Update the UI */
     do_fonts_changed( table );

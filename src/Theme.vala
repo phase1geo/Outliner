@@ -30,6 +30,8 @@ public class Theme : Object {
   public    RGBA   odd                { protected set; get; }
   public    RGBA   background         { protected set; get; }
   public    RGBA   foreground         { protected set; get; }
+  public    RGBA   title_background   { protected set; get; }
+  public    RGBA   title_foreground   { protected set; get; }
   public    RGBA   root_background    { protected set; get; }
   public    RGBA   root_foreground    { protected set; get; }
   public    RGBA   nodesel_background { protected set; get; }

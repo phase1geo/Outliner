@@ -87,6 +87,10 @@ public class CanvasText : Object {
         _edit = value;
         if( !_edit ) {
           clear_selection( "edit" );
+        } else {
+          var last = text.text.char_count();
+          change_selection( last, last, "edit" );
+          set_cursor_only( last );
         }
         update_size( true );
       }
@@ -206,6 +210,11 @@ public class CanvasText : Object {
     update_size( true );
   }
 
+  /* Sets the alignment to the given type */
+  public void set_alignment( Pango.Alignment alignment ) {
+    _pango_layout.set_alignment( alignment );
+  }
+
   /* Returns true if the text is currently wrapped */
   public bool is_wrapped() {
     return( _pango_layout.is_wrapped() );
@@ -213,7 +222,12 @@ public class CanvasText : Object {
 
   /* Returns true if the given cursor coordinates lies within this node */
   public bool is_within( double x, double y ) {
-    return( Utils.is_within_bounds( x, y, posx, posy, _width, _height ) );
+    var x_pos = posx;
+    if( _pango_layout.get_alignment() == Pango.Alignment.CENTER ) {
+      var rect = _pango_layout.index_to_pos( 0 );
+      x_pos = rect.x / Pango.SCALE;
+    }
+    return( Utils.is_within_bounds( x, y, x_pos, posy, _width, _height ) );
   }
 
   /*

@@ -61,6 +61,16 @@
       <summary>When exporting to HTML, use ul output styling instead of ol</summary>
       <description>When exporting to HTML, use ul output styling instead of ol</description>
     </key>
+    <key name="default-title-font-family" type="s">
+      <default>"Sans"</default>
+      <summary>Default font family to use for the document title</summary>
+      <description>Default font family to use for the document title</description>
+    </key>
+    <key name="default-title-font-size" type="i">
+      <default>30</default>
+      <summary>Default font size to use for the document title</summary>
+      <description>Default font size to use for the document title</description>
+    </key>
     <key name="default-row-font-family" type="s">
       <default>"Sans"</default>
       <summary>Default font family to use for new document rows</summary>
