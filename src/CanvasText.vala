@@ -87,6 +87,10 @@ public class CanvasText : Object {
         _edit = value;
         if( !_edit ) {
           clear_selection( "edit" );
+        } else {
+          var last = text.text.char_count();
+          change_selection( last, last, "edit" );
+          set_cursor_only( last );
         }
         update_size( true );
       }
@@ -218,12 +222,10 @@ public class CanvasText : Object {
 
   /* Returns true if the given cursor coordinates lies within this node */
   public bool is_within( double x, double y ) {
-    stdout.printf( "is_within, x: %g, y: %g, posx: %g, posy: %g, width: %g, height: %g\n", x, y, posx, posy, _width, _height );
     var x_pos = posx;
     if( _pango_layout.get_alignment() == Pango.Alignment.CENTER ) {
       var rect = _pango_layout.index_to_pos( 0 );
       x_pos = rect.x / Pango.SCALE;
-      stdout.printf( "  x_pos: %g\n", x_pos );
     }
     return( Utils.is_within_bounds( x, y, x_pos, posy, _width, _height ) );
   }
@@ -982,8 +984,6 @@ public class CanvasText : Object {
       attrs.change( (owned)alpha_attr );
       layout.set_attributes( attrs );
     }
-
-    stdout.printf( "posx: %g, posy: %g\n", posx, posy );
 
     /* Output the text */
     ctx.move_to( posx, posy );

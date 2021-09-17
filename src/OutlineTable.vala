@@ -57,6 +57,7 @@ public class OutlineTable : DrawingArea {
   private FormatBar?      _format_bar    = null;
   private bool?           _show_format   = null;
   private CanvasText      _orig_text;
+  private CanvasText      _orig_title    = null;
   private Node?           _move_parent   = null;
   private int             _move_index    = -1;
   private NodeMenu        _node_menu;
@@ -86,6 +87,11 @@ public class OutlineTable : DrawingArea {
   public Document       document    { get { return( _doc ); } }
   public UndoBuffer     undo_buffer { get; set; }
   public UndoTextBuffer undo_text   { get; set; }
+  public CanvasText     title {
+    get {
+      return( _title );
+    }
+  }
   public Node?          selected {
     get {
       return( _selected );
@@ -319,7 +325,7 @@ public class OutlineTable : DrawingArea {
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
       if( root.children.length > 0 ) {
-        root.children.index( 0 ).y = (_title.posy + _title.height + 10);  // top_margin;
+        root.children.index( 0 ).y = (_title != null) ? (_title.posy + _title.height + 10) : top_margin;
         root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
       }
       show_tasks_changed();
@@ -333,6 +339,7 @@ public class OutlineTable : DrawingArea {
 
     /* Allocate memory for the canvas text prior to editing for undo purposes */
     _orig_text = new CanvasText( this, 0 );
+    _orig_title = new CanvasText( this, 0 );
 
     /* Allocate memory for the undo buffer */
     undo_buffer = new UndoBuffer( this );
@@ -436,6 +443,31 @@ public class OutlineTable : DrawingArea {
         // _im_context.commit.disconnect( handle_im_commit );
       }
       node.mode = mode;
+    }
+  }
+
+  /* Called whenever we want to change the editable nature of the document title */
+  public void set_title_editable( bool edit ) {
+    if( _title == null )  return;
+    if( _title.edit != edit ) {
+      if( _title.edit && undo_text.undoable() ) {
+        undo_buffer.add_item( new UndoTitleChange( this, _orig_title ) );
+        undo_text.clear();
+        undo_text.ct = null;
+        _im_context.focus_out();
+        changed();
+      }
+      if( edit ) {
+        _orig_title.copy( _title );
+        undo_text.ct = _title;
+        update_im_cursor( _title );
+        _im_context.focus_in();
+        _tagger.preedit_load_tags( _title.text );
+      } else {
+        _tagger.postedit_load_tags( _title.text );
+        _im_context.focus_out();
+      }
+      _title.edit = edit;
     }
   }
 
@@ -628,7 +660,7 @@ public class OutlineTable : DrawingArea {
       }
     } else if( _title.is_within( x, y ) ) {
       var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
-      _title.edit = true;
+      set_title_editable( true );
       switch( e.type ) {
         case EventType.BUTTON_PRESS        :  _title.set_cursor_at_char( e.x, e.y, shift );  break;
         case EventType.DOUBLE_BUTTON_PRESS :  _title.set_cursor_at_word( e.x, e.y, shift );  break;
@@ -817,7 +849,7 @@ public class OutlineTable : DrawingArea {
         if( orig_over != current.over_note_icon ) {
           queue_draw();
         }
-      } else if( _title.is_within( e.x, e.y ) ) {
+      } else if( (_title != null) && _title.is_within( e.x, e.y ) ) {
         set_cursor( text_cursor );
       } else {
         set_cursor( null );
@@ -884,7 +916,6 @@ public class OutlineTable : DrawingArea {
         }
       } else if( _active != null ) {
         selected = _active;
-        set_node_mode( selected, NodeMode.SELECTED );
         queue_draw();
       }
 
@@ -946,7 +977,7 @@ public class OutlineTable : DrawingArea {
     keymap.get_entries_for_keycode( e.hardware_keycode, out ks, out kvs );
 
     /* If there is a current node or connection selected, operate on it */
-    if( selected != null ) {
+    if( (selected != null) || is_title_editable() ) {
       if( control ) {
         if( !shift && has_key( kvs, Key.c ) )              { do_copy(); }
         else if( !shift && has_key( kvs, Key.x ) )         { do_cut(); }
@@ -1492,7 +1523,7 @@ public class OutlineTable : DrawingArea {
         changed();
       }
     } else if( is_title_editable() ) {
-      _title.edit = false;
+      set_title_editable( false );
     } else if( root.alpha < 1.0 ) {
       focus_leave();
     }
@@ -1514,7 +1545,9 @@ public class OutlineTable : DrawingArea {
         queue_draw();
       }
     } else if( is_title_editable() ) {
-      _title.edit = false;
+      set_title_editable( false );
+      selected = root.get_last_node();
+      set_node_mode( selected, NodeMode.EDITABLE );
       queue_draw();
     } else if( selected != null ) {
       if( (selected.children.length > 0) && selected.expanded ) {
@@ -1589,8 +1622,14 @@ public class OutlineTable : DrawingArea {
       selected.note.insert( "\t", undo_text );
       see( selected );
       queue_draw();
-    } else if( is_title_editable() && shift ) {
-      _title.insert( "\t", undo_text );
+    } else if( is_title_editable() ) {
+      if( shift ) {
+        _title.insert( "\t", undo_text );
+      } else {
+        set_title_editable( false );
+        selected = root.get_last_node();
+        set_node_mode( selected, NodeMode.EDITABLE );
+      }
       queue_draw();
     } else if( selected != null ) {
       if( shift ) {
@@ -1725,9 +1764,9 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     } else if( is_title_editable() ) {
       if( shift ) {
-        selected.note.selection_by_char( -1 );
+        _title.selection_by_char( -1 );
       } else {
-        selected.note.move_cursor( -1 );
+        _title.move_cursor( -1 );
       }
       undo_text.mergeable = false;
       _im_context.reset();
@@ -2723,7 +2762,7 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  private void create_title() {
+  private void create_title( bool edit ) {
 
     _title = new CanvasText.with_text( this, get_allocated_width(), _( "Title" ) );
     _title.posy = top_margin;
@@ -2732,6 +2771,11 @@ public class OutlineTable : DrawingArea {
     _title.resized.connect( title_resized );
 
     title_resized();
+
+    if( edit ) {
+      set_title_editable( true );
+      _title.set_cursor_all( false );
+    }
 
   }
 
@@ -2758,16 +2802,16 @@ public class OutlineTable : DrawingArea {
 
     Idle.add(() => {
 
-      /* Create the title */
-      create_title();
-
       /* Handle any window size changes */
       win.configure_event.connect( window_size_changed );
 
       /* Create the main idea node */
       var node = new Node( this );
       insert_node( root, node, 0 );
-      set_node_mode( selected, NodeMode.EDITABLE );
+      selected = null;
+
+      /* Create the title */
+      create_title( true );
 
       queue_draw();
 
@@ -2962,7 +3006,7 @@ public class OutlineTable : DrawingArea {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
           case "title"  :
-            create_title();
+            create_title( false );
             _title.load( it );
             break;
           case "theme"  :  load_theme( it );  break;

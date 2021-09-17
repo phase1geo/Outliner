@@ -45,6 +45,7 @@ sources += files(
   'undo_actions/UndoTextReplace.vala',
   'undo_actions/UndoTextTagAdd.vala',
   'undo_actions/UndoTextTagRemove.vala',
+  'undo_actions/UndoTitleChange.vala',
 
   'Application.vala',
   'CanvasText.vala',
