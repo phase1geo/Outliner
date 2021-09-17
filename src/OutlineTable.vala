@@ -30,6 +30,12 @@ using Gee;
 */
 public delegate bool NodeFilterFunc( Node node );
 
+public enum FontTarget {
+  NAME,  /* Specifies that the font changes target all node names */
+  NOTE,  /* Specifies that the font changes target all node notes */
+  TITLE  /* Specifies that the font changes the document title */
+}
+
 public class OutlineTable : DrawingArea {
 
   private const CursorType click_cursor   = CursorType.HAND2;
@@ -67,6 +73,8 @@ public class OutlineTable : DrawingArea {
   private NodeListType    _list_type     = NodeListType.NONE;
   private Node            _clone         = null;
   private NodeLabels      _labels;
+  private string          _title_family;
+  private int             _title_size;
   private string          _name_family;
   private int             _name_size;
   private string          _note_family;
@@ -169,6 +177,16 @@ public class OutlineTable : DrawingArea {
   public NodeLabels labels {
     get {
       return( _labels );
+    }
+  }
+  public string? title_font_family {
+    get {
+      return( (_title_family == "") ? null : _title_family );
+    }
+  }
+  public int title_font_size {
+    get {
+      return( _title_size );
     }
   }
   public string? name_font_family {
@@ -310,8 +328,10 @@ public class OutlineTable : DrawingArea {
     get_style_context().add_class( "canvas" );
 
     /* Initialize font and other property information from gsettings */
+    _title_family  = settings.get_string( "default-title-font-family" );
     _name_family   = settings.get_string( "default-row-font-family" );
     _note_family   = settings.get_string( "default-note-font-family" );
+    _title_size    = settings.get_int( "default-title-font-size" );
     _name_size     = settings.get_int( "default-row-font-size" );
     _note_size     = settings.get_int( "default-note-font-size" );
     _show_tasks    = settings.get_boolean( "default-show-tasks" );
@@ -405,7 +425,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Called whenever we want to change the current selected node's mode */
-  public void set_node_mode( Node node, NodeMode mode ) {
+  public void set_node_mode( Node? node, NodeMode mode ) {
     if( node == null ) return;
     if( node.mode != mode ) {
       if( (node.mode == NodeMode.EDITABLE) && undo_text.undoable() ) {
@@ -434,6 +454,7 @@ public class OutlineTable : DrawingArea {
           if( mode == NodeMode.EDITABLE ) {
             _tagger.preedit_load_tags( node.name.text );
           }
+          set_title_editable( false );
         }
       } else if( (node.mode == NodeMode.EDITABLE) || (node.mode == NodeMode.NOTEEDIT) ) {
         if( node.mode == NodeMode.EDITABLE ) {
@@ -463,6 +484,7 @@ public class OutlineTable : DrawingArea {
         update_im_cursor( _title );
         _im_context.focus_in();
         _tagger.preedit_load_tags( _title.text );
+        set_node_mode( selected, NodeMode.NONE );
       } else {
         _tagger.postedit_load_tags( _title.text );
         _im_context.focus_out();
@@ -676,7 +698,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Changes the name font of the document to the given value */
-  public void change_name_font( string? family = null, int? size = null ) {
+  private void change_name_font( string? family = null, int? size = null ) {
     if( family != null ) {
       _name_family = family;
     }
@@ -689,7 +711,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Changes the note font of the document to the given value */
-  public void change_note_font( string? family = null, int? size = null ) {
+  private void change_note_font( string? family = null, int? size = null ) {
     if( family != null ) {
       _note_family = family;
     }
@@ -699,6 +721,29 @@ public class OutlineTable : DrawingArea {
     root.change_note_font( family, size );
     queue_draw();
     changed();
+  }
+
+  /* Changes the note font of the document to the given value */
+  private void change_title_font( string? family = null, int? size = null ) {
+    if( family != null ) {
+      _title_family = family;
+    }
+    if( size != null ) {
+      _title_size = size;
+    }
+    var zoom_factor = win.get_zoom_factor();
+    _title.set_font( family, size, zoom_factor );
+    queue_draw();
+    changed();
+  }
+
+  /* Called to change the font of the given type */
+  public void change_font( FontTarget target, string? family = null, int? size = null ) {
+    switch( target ) {
+      case FontTarget.NAME  :  change_name_font( family, size );  break;
+      case FontTarget.NOTE  :  change_note_font( family, size );  break;
+      case FontTarget.TITLE :  change_title_font( family, size );  break;
+    }
   }
 
   /* Changes the text selection for the specified canvas text element */
@@ -2766,7 +2811,7 @@ public class OutlineTable : DrawingArea {
 
     _title = new CanvasText.with_text( this, get_allocated_width(), _( "Title" ) );
     _title.posy = top_margin;
-    _title.set_font( null, 30 );
+    _title.set_font( _title_family, _title_size );
     _title.set_alignment( Pango.Alignment.CENTER );
     _title.resized.connect( title_resized );
 
@@ -2962,6 +3007,16 @@ public class OutlineTable : DrawingArea {
       _list_type = NodeListType.parse( lt );
     }
 
+    var iff = n->get_prop( "title-font-family" );
+    if( iff != null ) {
+      _title_family = iff;
+    }
+
+    var ifs = n->get_prop( "title-font-size" );
+    if( ifs != null ) {
+      _title_size = int.parse( ifs );
+    }
+
     var mff = n->get_prop( "name-font-family" );
     if( mff != null ) {
       _name_family = mff;
@@ -3054,17 +3109,19 @@ public class OutlineTable : DrawingArea {
   /* Saves the table information to the given XML node */
   public void save( Xml.Node* n ) {
 
-    n->set_prop( "condensed",        _condensed.to_string() );
-    n->set_prop( "listtype",         list_type.to_string() );
-    n->set_prop( "version",          Outliner.version );
-    n->set_prop( "name-font-family", _name_family );
-    n->set_prop( "name-font-size",   _name_size.to_string() );
-    n->set_prop( "note-font-family", _note_family );
-    n->set_prop( "note-font-size",   _note_size.to_string() );
-    n->set_prop( "show-tasks",       _show_tasks.to_string() );
-    n->set_prop( "show-depth",       _show_depth.to_string() );
-    n->set_prop( "markdown",         _markdown.to_string() );
-    n->set_prop( "blank-rows",       _blank_rows.to_string() );
+    n->set_prop( "condensed",         _condensed.to_string() );
+    n->set_prop( "listtype",          list_type.to_string() );
+    n->set_prop( "version",           Outliner.version );
+    n->set_prop( "title-font-family", _title_family );
+    n->set_prop( "title-font-size",   _title_size.to_string() );
+    n->set_prop( "name-font-family",  _name_family );
+    n->set_prop( "name-font-size",    _name_size.to_string() );
+    n->set_prop( "note-font-family",  _note_family );
+    n->set_prop( "note-font-size",    _note_size.to_string() );
+    n->set_prop( "show-tasks",        _show_tasks.to_string() );
+    n->set_prop( "show-depth",        _show_depth.to_string() );
+    n->set_prop( "markdown",          _markdown.to_string() );
+    n->set_prop( "blank-rows",        _blank_rows.to_string() );
 
     if( _title != null ) {
       n->add_child( _title.save( "title" ) );
