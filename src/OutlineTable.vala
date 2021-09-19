@@ -560,10 +560,8 @@ public class OutlineTable : DrawingArea {
 
   /* Positions the scrolled window such that the given node is placed at the top */
   public void place_at_top( Node node ) {
-
     var sw = parent.parent.parent as ScrolledWindow;
     sw.vadjustment.value = node.y;
-
   }
 
   /* Internal see command that is called after this has been resized */
@@ -639,6 +637,9 @@ public class OutlineTable : DrawingArea {
       return( false );
     }
 
+    /* Sets the selected mode */
+    set_node_mode( selected, select_mode );
+
     /* Set the cursor or selection */
     switch( e.type ) {
       case EventType.BUTTON_PRESS        :  text.set_cursor_at_char( e.x, e.y, shift );  break;
@@ -646,9 +647,6 @@ public class OutlineTable : DrawingArea {
       case EventType.TRIPLE_BUTTON_PRESS :  text.set_cursor_all( false );                break;
       default                            :  break;
     }
-
-    /* Sets the selected mode */
-    set_node_mode( selected, select_mode );
 
     return( true );
 
@@ -2824,6 +2822,10 @@ public class OutlineTable : DrawingArea {
 
   }
 
+  /*
+   Called whenever the window size is changed.  Adjusts the title text
+   field to match the window width.
+  */
   private bool window_size_changed( EventConfigure e ) {
 
     /* Get the width of the table */
