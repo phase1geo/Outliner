@@ -1019,7 +1019,7 @@ public class FormattedText {
   /* Replaces all matched search text with the given string */
   public void replace_all( string str, ref UndoTextReplaceAll undo ) {
     var matches = new Array<UndoTagInfo>();
-    _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, 0, _text.char_count(), ref matches );
+    _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, 0, _text.length, ref matches );
     for( int i=0; i<matches.length; i++ ) {
       var match = matches.index( i );
       undo.add_tags( match.start, get_tags_in_range( match.start, match.end ) );

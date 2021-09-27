@@ -109,7 +109,7 @@ public class ExportUtils {
   public static string export( FormattedText text, ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
 
     /* Create the tree version and create an ordered list of tags */
-    var tags     = text.get_tags_in_range( 0, text.text.char_count() );
+    var tags     = text.get_tags_in_range( 0, text.text.length );
     var root     = new TagTreeItem( null, null );
     var pos_tags = new Array<PosTag>();
     for( int i=0; i<tags.length; i++ ) {
@@ -133,7 +133,9 @@ public class ExportUtils {
       start = pos_tag.pos;
     }
 
-    return( str + encode_func( text.text.slice( start, text.text.char_count() ) ) );
+    str += encode_func( text.text.slice( start, text.text.length ) );
+
+    return( str );
 
   }
 
