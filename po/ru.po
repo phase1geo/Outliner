@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 19:40-0500\n"
+"POT-Creation-Date: 2021-09-27 12:12-0500\n"
 "PO-Revision-Date: 2021-09-14 21:27+0300\n"
 "Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
@@ -23,6 +23,14 @@ msgstr ""
 #: src/exports/ExportMinder.vala:105
 msgid "To right"
 msgstr "Вправо"
+
+#: src/themes/ThemeMaterial.vala:31
+msgid "Material"
+msgstr ""
+
+#: src/themes/ThemeMild.vala:31
+msgid "Mild"
+msgstr ""
 
 #: src/themes/ThemeDefault.vala:31
 msgid "Light"
@@ -53,6 +61,7 @@ msgid "format tag remove"
 msgstr "удаление тега форматирования"
 
 #: src/undo_actions/UndoTextDelete.vala:30
+#: src/undo_actions/UndoTextBackspace.vala:30
 msgid "text deletion"
 msgstr "удаление текста"
 
@@ -93,6 +102,7 @@ msgid "format tag add"
 msgstr "вставку тега форматирования"
 
 #: src/undo_actions/UndoTextInsert.vala:29
+#: src/undo_actions/UndoTextMultiInsert.vala:33
 msgid "text insertion"
 msgstr "вставку текста"
 
@@ -127,6 +137,15 @@ msgstr "вырезание объекта в буфер обмена"
 #: src/undo_actions/UndoNodeSplit.vala:32
 msgid "split item"
 msgstr "разделение объекта"
+
+#: src/undo_actions/UndoNodeJoin.vala:33
+msgid "join rows"
+msgstr ""
+
+#: src/undo_actions/UndoTitleChange.vala:29
+#, fuzzy
+msgid "document title change"
+msgstr "смену заголовка"
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -245,113 +264,120 @@ msgid "Apply"
 msgstr "Применить"
 
 #: src/LinkEditor.vala:62 src/MainWindow.vala:961 src/MainWindow.vala:1001
-#: src/MainWindow.vala:1120 src/MainWindow.vala:1213
+#: src/MainWindow.vala:1126 src/MainWindow.vala:1219
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/MainWindow.vala:136 src/MainWindow.vala:1123
+#: src/MainWindow.vala:137 src/MainWindow.vala:1129
 msgid "Outliner"
 msgstr "Outliner"
 
-#: src/MainWindow.vala:167 data/com.github.phase1geo.outliner.shortcuts.ui:21
+#: src/MainWindow.vala:168 data/com.github.phase1geo.outliner.shortcuts.ui:21
 msgid "New File"
 msgstr "Создать документ"
 
-#: src/MainWindow.vala:172 src/MainWindow.vala:1001
+#: src/MainWindow.vala:173 src/MainWindow.vala:1001
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr "Открыть документ"
 
-#: src/MainWindow.vala:177 data/com.github.phase1geo.outliner.shortcuts.ui:42
+#: src/MainWindow.vala:178 data/com.github.phase1geo.outliner.shortcuts.ui:42
 msgid "Save File As"
 msgstr "Сохранить файл как"
 
-#: src/MainWindow.vala:182 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:183 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr "Отменить"
 
-#: src/MainWindow.vala:188 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:189 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr "Вернуть"
 
-#: src/MainWindow.vala:266
+#: src/MainWindow.vala:267
 msgid "Unnamed Document"
 msgstr "Безымянный документ"
 
-#: src/MainWindow.vala:519
+#: src/MainWindow.vala:520
 msgid "Search"
 msgstr "Найти"
 
-#: src/MainWindow.vala:530
+#: src/MainWindow.vala:531
 msgid "Statistics"
 msgstr "Статистика"
 
-#: src/MainWindow.vala:541
+#: src/MainWindow.vala:542
 msgid "<b>Text Statistics</b>"
 msgstr "<b>Статистика текста</b>"
 
-#: src/MainWindow.vala:545
+#: src/MainWindow.vala:546
 msgid "Characters:"
 msgstr "Символов:"
 
-#: src/MainWindow.vala:550
+#: src/MainWindow.vala:551
 msgid "Words:"
 msgstr "Слов:"
 
-#: src/MainWindow.vala:555
+#: src/MainWindow.vala:556
 msgid "Rows:"
 msgstr "Рядов:"
 
-#: src/MainWindow.vala:560
+#: src/MainWindow.vala:561
 msgid "<b>Checkbox Statistics</b>"
 msgstr "<b>Статистика по задачам</b>"
 
-#: src/MainWindow.vala:564
+#: src/MainWindow.vala:565
 msgid "Total:"
 msgstr "Всего:"
 
-#: src/MainWindow.vala:569
+#: src/MainWindow.vala:570
 msgid "Incomplete:"
 msgstr "Не завершено:"
 
-#: src/MainWindow.vala:574
+#: src/MainWindow.vala:575
 msgid "In Progress:"
 msgstr "В процессе:"
 
-#: src/MainWindow.vala:579
+#: src/MainWindow.vala:580
 msgid "Completed:"
 msgstr "Завершено:"
 
-#: src/MainWindow.vala:641 src/MainWindow.vala:1213
+#: src/MainWindow.vala:642 src/MainWindow.vala:1219
 msgid "Export"
 msgstr "Экспортировать"
 
-#: src/MainWindow.vala:650
+#: src/MainWindow.vala:651
 msgid "Export…"
 msgstr "Экспортировать…"
 
-#: src/MainWindow.vala:655
+#: src/MainWindow.vala:656
 msgid "Print…"
 msgstr "Печать…"
 
-#: src/MainWindow.vala:679
+#: src/MainWindow.vala:707
 msgid "Properties"
 msgstr "Свойства"
 
-#: src/MainWindow.vala:693
+#: src/MainWindow.vala:721
 msgid "Theme:"
 msgstr "Тема:"
 
-#: src/MainWindow.vala:726
+#: src/MainWindow.vala:754
 msgid "Enumeration Style:"
 msgstr "Стиль нумерации:"
 
-#: src/MainWindow.vala:742
-msgid "Row Font:"
+#: src/MainWindow.vala:769
+#, fuzzy
+msgid "Title Font"
+msgstr "Шрифт примечания:"
+
+#: src/MainWindow.vala:773
+#, fuzzy
+msgid "Row Font"
 msgstr "Шрифт ряда:"
 
-#: src/MainWindow.vala:762
-msgid "Note Font:"
+#: src/MainWindow.vala:777
+#, fuzzy
+msgid "Note Font"
 msgstr "Шрифт примечания:"
 
 #: src/MainWindow.vala:782
@@ -398,7 +424,7 @@ msgstr "Если не сохранить документ, изменения б
 msgid "Discard Changes"
 msgstr "Отказаться от изменений"
 
-#: src/MainWindow.vala:964 src/MainWindow.vala:1120
+#: src/MainWindow.vala:964 src/MainWindow.vala:1126
 msgid "Save"
 msgstr "Сохранить"
 
@@ -406,43 +432,43 @@ msgstr "Сохранить"
 msgid "Open"
 msgstr "Открыть"
 
-#: src/MainWindow.vala:1119
+#: src/MainWindow.vala:1125
 msgid "Save File"
 msgstr "Сохранить документ"
 
-#: src/MainWindow.vala:1212
+#: src/MainWindow.vala:1218
 msgid "Export As"
 msgstr "Экспортировать как"
 
-#: src/MainWindow.vala:1217
+#: src/MainWindow.vala:1223
 msgid "HTML"
 msgstr "HTML"
 
-#: src/MainWindow.vala:1224
+#: src/MainWindow.vala:1230
 msgid "Markdown"
 msgstr "Markdown"
 
-#: src/MainWindow.vala:1231
+#: src/MainWindow.vala:1237
 msgid "Minder"
 msgstr "Minder"
 
-#: src/MainWindow.vala:1237
+#: src/MainWindow.vala:1243
 msgid "OPML"
 msgstr "OPML"
 
-#: src/MainWindow.vala:1243
+#: src/MainWindow.vala:1249
 msgid "Org-Mode"
 msgstr "Org-Mode"
 
-#: src/MainWindow.vala:1249
+#: src/MainWindow.vala:1255
 msgid "PDF"
 msgstr "PDF"
 
-#: src/MainWindow.vala:1255
+#: src/MainWindow.vala:1261
 msgid "PlainText"
 msgstr "Простой текст"
 
-#: src/MainWindow.vala:1283
+#: src/MainWindow.vala:1289
 msgid "Outliner Export Completed"
 msgstr "Экспорт завершён"
 
@@ -486,7 +512,8 @@ msgstr "Изменить примечание"
 msgid "Show Note"
 msgstr "Показать примечание"
 
-#: src/NodeMenu.vala:107 data/com.github.phase1geo.outliner.shortcuts.ui:253
+#: src/NodeMenu.vala:107 src/Tagger.vala:131
+#: data/com.github.phase1geo.outliner.shortcuts.ui:253
 msgid "Add Tag"
 msgstr "Добавить тег"
 
@@ -614,28 +641,32 @@ msgstr "Показывать нумерацию как в плане (напри
 msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr "Показывать нумерацию как в разделах (например, 2., 2.1., 2.1.3.)"
 
-#: src/OutlineTable.vala:705
+#: src/OutlineTable.vala:795
 msgid "Exit Focus Mode"
 msgstr "Выйти из режима фокусировки"
 
-#: src/OutlineTable.vala:775
+#: src/OutlineTable.vala:865
 msgid "Show note"
 msgstr "Показать примечание"
 
-#: src/OutlineTable.vala:775
+#: src/OutlineTable.vala:865
 msgid "Hide note"
 msgstr "Скрыть примечание"
 
-#: src/OutlineTable.vala:779
+#: src/OutlineTable.vala:869
 #, c-format
 msgid "%u subrows"
 msgstr "%u субрядов"
 
-#: src/OutlineTable.vala:2862
+#: src/OutlineTable.vala:2810
+msgid "Title"
+msgstr ""
+
+#: src/OutlineTable.vala:3207
 msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr "В режиме фокусировки. Нажмите Escape для выхода."
 
-#: src/OutlineTable.vala:2890
+#: src/OutlineTable.vala:3235
 msgid "Hit the Escape key to exit."
 msgstr "Нажмите Escape, чтобы выйти"
 
@@ -655,6 +686,11 @@ msgstr "Заменить"
 msgid "Replace All"
 msgstr "Заменить все"
 
+#: src/Tagger.vala:69
+#, c-format
+msgid "Nodes are currently filtered by tag @%s."
+msgstr ""
+
 #: src/UndoBuffer.vala:81
 msgid "Undo: "
 msgstr "Отменить: "
@@ -662,6 +698,19 @@ msgstr "Отменить: "
 #: src/UndoBuffer.vala:87
 msgid "Redo: "
 msgstr "Вернуть: "
+
+#: src/ZoomWidget.vala:92 data/com.github.phase1geo.outliner.shortcuts.ui:103
+msgid "Zoom Out"
+msgstr "Отдалить"
+
+#: src/ZoomWidget.vala:97
+#, fuzzy
+msgid "Zoom Actual"
+msgstr "Масштаб 100%"
+
+#: src/ZoomWidget.vala:102 data/com.github.phase1geo.outliner.shortcuts.ui:96
+msgid "Zoom In"
+msgstr "Приблизить"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:6
 msgid "Outliner Shortcuts"
@@ -706,14 +755,6 @@ msgstr "Вернуть последнюю правку"
 #: data/com.github.phase1geo.outliner.shortcuts.ui:92
 msgid "Zooming"
 msgstr "Масштаб"
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:96
-msgid "Zoom In"
-msgstr "Приблизить"
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:103
-msgid "Zoom Out"
-msgstr "Отдалить"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:110
 msgid "Zoom To Actual Size"

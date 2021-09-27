@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 19:40-0500\n"
+"POT-Creation-Date: 2021-09-27 12:12-0500\n"
 "PO-Revision-Date: 2020-10-18 12:18+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: \n"
@@ -21,6 +21,14 @@ msgstr ""
 #: src/exports/ExportMinder.vala:105
 msgid "To right"
 msgstr "Naar rechts"
+
+#: src/themes/ThemeMaterial.vala:31
+msgid "Material"
+msgstr ""
+
+#: src/themes/ThemeMild.vala:31
+msgid "Mild"
+msgstr ""
 
 #: src/themes/ThemeDefault.vala:31
 #, fuzzy
@@ -52,6 +60,7 @@ msgid "format tag remove"
 msgstr "opmaaklabel verwijderen"
 
 #: src/undo_actions/UndoTextDelete.vala:30
+#: src/undo_actions/UndoTextBackspace.vala:30
 msgid "text deletion"
 msgstr "tekst wissen"
 
@@ -92,6 +101,7 @@ msgid "format tag add"
 msgstr "opmaaklabel toevoegen"
 
 #: src/undo_actions/UndoTextInsert.vala:29
+#: src/undo_actions/UndoTextMultiInsert.vala:33
 msgid "text insertion"
 msgstr "tekst invoegen"
 
@@ -126,6 +136,15 @@ msgstr "item knippen"
 #: src/undo_actions/UndoNodeSplit.vala:32
 msgid "split item"
 msgstr "item splitsen"
+
+#: src/undo_actions/UndoNodeJoin.vala:33
+msgid "join rows"
+msgstr ""
+
+#: src/undo_actions/UndoTitleChange.vala:29
+#, fuzzy
+msgid "document title change"
+msgstr "titel aanpassen"
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -244,113 +263,120 @@ msgid "Apply"
 msgstr "Toepassen"
 
 #: src/LinkEditor.vala:62 src/MainWindow.vala:961 src/MainWindow.vala:1001
-#: src/MainWindow.vala:1120 src/MainWindow.vala:1213
+#: src/MainWindow.vala:1126 src/MainWindow.vala:1219
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/MainWindow.vala:136 src/MainWindow.vala:1123
+#: src/MainWindow.vala:137 src/MainWindow.vala:1129
 msgid "Outliner"
 msgstr "Outliner"
 
-#: src/MainWindow.vala:167 data/com.github.phase1geo.outliner.shortcuts.ui:21
+#: src/MainWindow.vala:168 data/com.github.phase1geo.outliner.shortcuts.ui:21
 msgid "New File"
 msgstr "Nieuw bestand"
 
-#: src/MainWindow.vala:172 src/MainWindow.vala:1001
+#: src/MainWindow.vala:173 src/MainWindow.vala:1001
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr "Bestand openen"
 
-#: src/MainWindow.vala:177 data/com.github.phase1geo.outliner.shortcuts.ui:42
+#: src/MainWindow.vala:178 data/com.github.phase1geo.outliner.shortcuts.ui:42
 msgid "Save File As"
 msgstr "Bestand opslaan als"
 
-#: src/MainWindow.vala:182 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:183 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr "Ongedaan maken"
 
-#: src/MainWindow.vala:188 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:189 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr "Opnieuw uitvoeren"
 
-#: src/MainWindow.vala:266
+#: src/MainWindow.vala:267
 msgid "Unnamed Document"
 msgstr "Naamloos document"
 
-#: src/MainWindow.vala:519
+#: src/MainWindow.vala:520
 msgid "Search"
 msgstr "Zoeken"
 
-#: src/MainWindow.vala:530
+#: src/MainWindow.vala:531
 msgid "Statistics"
 msgstr "Statistieken"
 
-#: src/MainWindow.vala:541
+#: src/MainWindow.vala:542
 msgid "<b>Text Statistics</b>"
 msgstr "<b>Tekststatistieken</b>"
 
-#: src/MainWindow.vala:545
+#: src/MainWindow.vala:546
 msgid "Characters:"
 msgstr "Aantal tekens:"
 
-#: src/MainWindow.vala:550
+#: src/MainWindow.vala:551
 msgid "Words:"
 msgstr "Aantal woorden:"
 
-#: src/MainWindow.vala:555
+#: src/MainWindow.vala:556
 msgid "Rows:"
 msgstr "Aantal rijen:"
 
-#: src/MainWindow.vala:560
+#: src/MainWindow.vala:561
 msgid "<b>Checkbox Statistics</b>"
 msgstr "<b>Aankruisvakstatistieken</b>"
 
-#: src/MainWindow.vala:564
+#: src/MainWindow.vala:565
 msgid "Total:"
 msgstr "Totaal:"
 
-#: src/MainWindow.vala:569
+#: src/MainWindow.vala:570
 msgid "Incomplete:"
 msgstr "Onvoltooid:"
 
-#: src/MainWindow.vala:574
+#: src/MainWindow.vala:575
 msgid "In Progress:"
 msgstr "In uitvoering:"
 
-#: src/MainWindow.vala:579
+#: src/MainWindow.vala:580
 msgid "Completed:"
 msgstr "Voltooid:"
 
-#: src/MainWindow.vala:641 src/MainWindow.vala:1213
+#: src/MainWindow.vala:642 src/MainWindow.vala:1219
 msgid "Export"
 msgstr "Exporteren"
 
-#: src/MainWindow.vala:650
+#: src/MainWindow.vala:651
 msgid "Export…"
 msgstr "Exporteren…"
 
-#: src/MainWindow.vala:655
+#: src/MainWindow.vala:656
 msgid "Print…"
 msgstr "Afdrukken…"
 
-#: src/MainWindow.vala:679
+#: src/MainWindow.vala:707
 msgid "Properties"
 msgstr "Eigenschappen"
 
-#: src/MainWindow.vala:693
+#: src/MainWindow.vala:721
 msgid "Theme:"
 msgstr "Thema:"
 
-#: src/MainWindow.vala:726
+#: src/MainWindow.vala:754
 msgid "Enumeration Style:"
 msgstr "Opsommingstijl:"
 
-#: src/MainWindow.vala:742
-msgid "Row Font:"
+#: src/MainWindow.vala:769
+#, fuzzy
+msgid "Title Font"
+msgstr "Aantekeninglettertype:"
+
+#: src/MainWindow.vala:773
+#, fuzzy
+msgid "Row Font"
 msgstr "Rijlettertype:"
 
-#: src/MainWindow.vala:762
-msgid "Note Font:"
+#: src/MainWindow.vala:777
+#, fuzzy
+msgid "Note Font"
 msgstr "Aantekeninglettertype:"
 
 #: src/MainWindow.vala:782
@@ -397,7 +423,7 @@ msgstr "Als je dat niet doet, gaan alle aanpassingen permanent verloren."
 msgid "Discard Changes"
 msgstr "Aanpassingen verwerpen"
 
-#: src/MainWindow.vala:964 src/MainWindow.vala:1120
+#: src/MainWindow.vala:964 src/MainWindow.vala:1126
 msgid "Save"
 msgstr "Opslaan"
 
@@ -405,43 +431,43 @@ msgstr "Opslaan"
 msgid "Open"
 msgstr "Openen"
 
-#: src/MainWindow.vala:1119
+#: src/MainWindow.vala:1125
 msgid "Save File"
 msgstr "Bestand opslaan"
 
-#: src/MainWindow.vala:1212
+#: src/MainWindow.vala:1218
 msgid "Export As"
 msgstr "Exporteren als"
 
-#: src/MainWindow.vala:1217
+#: src/MainWindow.vala:1223
 msgid "HTML"
 msgstr "HTML"
 
-#: src/MainWindow.vala:1224
+#: src/MainWindow.vala:1230
 msgid "Markdown"
 msgstr "Markdown"
 
-#: src/MainWindow.vala:1231
+#: src/MainWindow.vala:1237
 msgid "Minder"
 msgstr "Minder"
 
-#: src/MainWindow.vala:1237
+#: src/MainWindow.vala:1243
 msgid "OPML"
 msgstr "OPML"
 
-#: src/MainWindow.vala:1243
+#: src/MainWindow.vala:1249
 msgid "Org-Mode"
 msgstr "Org-modus"
 
-#: src/MainWindow.vala:1249
+#: src/MainWindow.vala:1255
 msgid "PDF"
 msgstr "PDF"
 
-#: src/MainWindow.vala:1255
+#: src/MainWindow.vala:1261
 msgid "PlainText"
 msgstr "Platte tekst"
 
-#: src/MainWindow.vala:1283
+#: src/MainWindow.vala:1289
 msgid "Outliner Export Completed"
 msgstr "Outliner-export voltooid"
 
@@ -485,7 +511,8 @@ msgstr "Aantekening aanpassen"
 msgid "Show Note"
 msgstr "Aantekening tonen"
 
-#: src/NodeMenu.vala:107 data/com.github.phase1geo.outliner.shortcuts.ui:253
+#: src/NodeMenu.vala:107 src/Tagger.vala:131
+#: data/com.github.phase1geo.outliner.shortcuts.ui:253
 msgid "Add Tag"
 msgstr "Label toevoegen"
 
@@ -613,28 +640,32 @@ msgstr "Toont opsommingen met contour (bijv.: I., A., 1.)"
 msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr "Toont sectie-opsommingen (bijv. 2., 2.1., 2.1.3)"
 
-#: src/OutlineTable.vala:705
+#: src/OutlineTable.vala:795
 msgid "Exit Focus Mode"
 msgstr "Focusmodus verlaten"
 
-#: src/OutlineTable.vala:775
+#: src/OutlineTable.vala:865
 msgid "Show note"
 msgstr "Aantekening tonen"
 
-#: src/OutlineTable.vala:775
+#: src/OutlineTable.vala:865
 msgid "Hide note"
 msgstr "Aantekening verbergen"
 
-#: src/OutlineTable.vala:779
+#: src/OutlineTable.vala:869
 #, c-format
 msgid "%u subrows"
 msgstr "%u onderliggende rijen"
 
-#: src/OutlineTable.vala:2862
+#: src/OutlineTable.vala:2810
+msgid "Title"
+msgstr ""
+
+#: src/OutlineTable.vala:3207
 msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr "Focusmodus ingeschakeld.  Druk op Escape om te verlaten."
 
-#: src/OutlineTable.vala:2890
+#: src/OutlineTable.vala:3235
 msgid "Hit the Escape key to exit."
 msgstr "Druk op Escape om te verlaten."
 
@@ -654,6 +685,11 @@ msgstr "Vervangen"
 msgid "Replace All"
 msgstr "Alles vervangen"
 
+#: src/Tagger.vala:69
+#, c-format
+msgid "Nodes are currently filtered by tag @%s."
+msgstr ""
+
 #: src/UndoBuffer.vala:81
 msgid "Undo: "
 msgstr "Ongedaan maken: "
@@ -661,6 +697,19 @@ msgstr "Ongedaan maken: "
 #: src/UndoBuffer.vala:87
 msgid "Redo: "
 msgstr "Opnieuw uitvoeren: "
+
+#: src/ZoomWidget.vala:92 data/com.github.phase1geo.outliner.shortcuts.ui:103
+msgid "Zoom Out"
+msgstr "Uitzoomen"
+
+#: src/ZoomWidget.vala:97
+#, fuzzy
+msgid "Zoom Actual"
+msgstr "Zoomen naar ware grootte"
+
+#: src/ZoomWidget.vala:102 data/com.github.phase1geo.outliner.shortcuts.ui:96
+msgid "Zoom In"
+msgstr "Inzoomen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:6
 msgid "Outliner Shortcuts"
@@ -705,14 +754,6 @@ msgstr "Recentste aanpassing opnieuw uitvoeren"
 #: data/com.github.phase1geo.outliner.shortcuts.ui:92
 msgid "Zooming"
 msgstr "Zoomen"
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:96
-msgid "Zoom In"
-msgstr "Inzoomen"
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:103
-msgid "Zoom Out"
-msgstr "Uitzoomen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:110
 msgid "Zoom To Actual Size"

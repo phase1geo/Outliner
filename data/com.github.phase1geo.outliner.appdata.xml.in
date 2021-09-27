@@ -81,6 +81,31 @@
       <value key="x-appcenter-stripe">pk_live_wsAhF3dNEsmhB6oQIQknujgL00dBOT1gsG</value>
     </custom>
     <releases>
+      <release version="1.6.0" data="2021-09-29">
+        <description>
+          <p>New</p>
+          <ul>
+            <li>Added support for Control-right (indent) and Control-left (outdent) keyboard shortcuts.</li>
+            <li>Added Russian translation (thanks to Alexandre Prokoudine).</li>
+            <li>Added support for document titles.</li>
+          </ul>
+          <p>Changes</p>
+          <ul>
+            <li>Improved foreground color of selected rows for improved readability.</li>
+            <li>Changed window focus mode to distraction-free mode to avoid confusion with row focus mode and to improve understandability of this feature.</li>
+            <li>Optimized code for handling zoom-in functionality.</li>
+            <li>Replaced zoom UI with new UI to make this more consistent with other elementary apps.</li>
+          </ul>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Fixed text size issue when adding a new row when the zoom level is not 100%.</li>
+            <li>Fixed issues with text being incorrectly selected when words are deleted.</li>
+            <li>Fixed issue with undo'ing forward deleted text.</li>
+            <li>Added missing keyboard shortcuts for row indent/outdent.</li>
+            <li>Fixed issue with exporting to Markdown when "Enable Markdown" setting is off.</li>
+          </ul>
+        </description>
+      </release>
       <release version="1.5.1" data="2021-08-12">
         <description>
           <p>Changes</p>

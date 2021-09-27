@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 19:40-0500\n"
+"POT-Creation-Date: 2021-09-27 12:12-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,14 @@ msgstr ""
 
 #: src/exports/ExportMinder.vala:105
 msgid "To right"
+msgstr ""
+
+#: src/themes/ThemeMaterial.vala:31
+msgid "Material"
+msgstr ""
+
+#: src/themes/ThemeMild.vala:31
+msgid "Mild"
 msgstr ""
 
 #: src/themes/ThemeDefault.vala:31
@@ -50,6 +58,7 @@ msgid "format tag remove"
 msgstr ""
 
 #: src/undo_actions/UndoTextDelete.vala:30
+#: src/undo_actions/UndoTextBackspace.vala:30
 msgid "text deletion"
 msgstr ""
 
@@ -90,6 +99,7 @@ msgid "format tag add"
 msgstr ""
 
 #: src/undo_actions/UndoTextInsert.vala:29
+#: src/undo_actions/UndoTextMultiInsert.vala:33
 msgid "text insertion"
 msgstr ""
 
@@ -123,6 +133,14 @@ msgstr ""
 
 #: src/undo_actions/UndoNodeSplit.vala:32
 msgid "split item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeJoin.vala:33
+msgid "join rows"
+msgstr ""
+
+#: src/undo_actions/UndoTitleChange.vala:29
+msgid "document title change"
 msgstr ""
 
 #: src/Document.vala:67
@@ -242,113 +260,117 @@ msgid "Apply"
 msgstr ""
 
 #: src/LinkEditor.vala:62 src/MainWindow.vala:961 src/MainWindow.vala:1001
-#: src/MainWindow.vala:1120 src/MainWindow.vala:1213
+#: src/MainWindow.vala:1126 src/MainWindow.vala:1219
 msgid "Cancel"
 msgstr ""
 
-#: src/MainWindow.vala:136 src/MainWindow.vala:1123
+#: src/MainWindow.vala:137 src/MainWindow.vala:1129
 msgid "Outliner"
 msgstr ""
 
-#: src/MainWindow.vala:167 data/com.github.phase1geo.outliner.shortcuts.ui:21
+#: src/MainWindow.vala:168 data/com.github.phase1geo.outliner.shortcuts.ui:21
 msgid "New File"
 msgstr ""
 
-#: src/MainWindow.vala:172 src/MainWindow.vala:1001
+#: src/MainWindow.vala:173 src/MainWindow.vala:1001
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr ""
 
-#: src/MainWindow.vala:177 data/com.github.phase1geo.outliner.shortcuts.ui:42
+#: src/MainWindow.vala:178 data/com.github.phase1geo.outliner.shortcuts.ui:42
 msgid "Save File As"
 msgstr ""
 
-#: src/MainWindow.vala:182 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:183 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr ""
 
-#: src/MainWindow.vala:188 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:189 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr ""
 
-#: src/MainWindow.vala:266
+#: src/MainWindow.vala:267
 msgid "Unnamed Document"
 msgstr ""
 
-#: src/MainWindow.vala:519
+#: src/MainWindow.vala:520
 msgid "Search"
 msgstr ""
 
-#: src/MainWindow.vala:530
+#: src/MainWindow.vala:531
 msgid "Statistics"
 msgstr ""
 
-#: src/MainWindow.vala:541
+#: src/MainWindow.vala:542
 msgid "<b>Text Statistics</b>"
 msgstr ""
 
-#: src/MainWindow.vala:545
+#: src/MainWindow.vala:546
 msgid "Characters:"
 msgstr ""
 
-#: src/MainWindow.vala:550
+#: src/MainWindow.vala:551
 msgid "Words:"
 msgstr ""
 
-#: src/MainWindow.vala:555
+#: src/MainWindow.vala:556
 msgid "Rows:"
 msgstr ""
 
-#: src/MainWindow.vala:560
+#: src/MainWindow.vala:561
 msgid "<b>Checkbox Statistics</b>"
 msgstr ""
 
-#: src/MainWindow.vala:564
+#: src/MainWindow.vala:565
 msgid "Total:"
 msgstr ""
 
-#: src/MainWindow.vala:569
+#: src/MainWindow.vala:570
 msgid "Incomplete:"
 msgstr ""
 
-#: src/MainWindow.vala:574
+#: src/MainWindow.vala:575
 msgid "In Progress:"
 msgstr ""
 
-#: src/MainWindow.vala:579
+#: src/MainWindow.vala:580
 msgid "Completed:"
 msgstr ""
 
-#: src/MainWindow.vala:641 src/MainWindow.vala:1213
+#: src/MainWindow.vala:642 src/MainWindow.vala:1219
 msgid "Export"
 msgstr ""
 
-#: src/MainWindow.vala:650
+#: src/MainWindow.vala:651
 msgid "Export…"
 msgstr ""
 
-#: src/MainWindow.vala:655
+#: src/MainWindow.vala:656
 msgid "Print…"
 msgstr ""
 
-#: src/MainWindow.vala:679
+#: src/MainWindow.vala:707
 msgid "Properties"
 msgstr ""
 
-#: src/MainWindow.vala:693
+#: src/MainWindow.vala:721
 msgid "Theme:"
 msgstr ""
 
-#: src/MainWindow.vala:726
+#: src/MainWindow.vala:754
 msgid "Enumeration Style:"
 msgstr ""
 
-#: src/MainWindow.vala:742
-msgid "Row Font:"
+#: src/MainWindow.vala:769
+msgid "Title Font"
 msgstr ""
 
-#: src/MainWindow.vala:762
-msgid "Note Font:"
+#: src/MainWindow.vala:773
+msgid "Row Font"
+msgstr ""
+
+#: src/MainWindow.vala:777
+msgid "Note Font"
 msgstr ""
 
 #: src/MainWindow.vala:782
@@ -395,7 +417,7 @@ msgstr ""
 msgid "Discard Changes"
 msgstr ""
 
-#: src/MainWindow.vala:964 src/MainWindow.vala:1120
+#: src/MainWindow.vala:964 src/MainWindow.vala:1126
 msgid "Save"
 msgstr ""
 
@@ -403,43 +425,43 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: src/MainWindow.vala:1119
+#: src/MainWindow.vala:1125
 msgid "Save File"
 msgstr ""
 
-#: src/MainWindow.vala:1212
+#: src/MainWindow.vala:1218
 msgid "Export As"
 msgstr ""
 
-#: src/MainWindow.vala:1217
+#: src/MainWindow.vala:1223
 msgid "HTML"
 msgstr ""
 
-#: src/MainWindow.vala:1224
+#: src/MainWindow.vala:1230
 msgid "Markdown"
 msgstr ""
 
-#: src/MainWindow.vala:1231
+#: src/MainWindow.vala:1237
 msgid "Minder"
 msgstr ""
 
-#: src/MainWindow.vala:1237
+#: src/MainWindow.vala:1243
 msgid "OPML"
 msgstr ""
 
-#: src/MainWindow.vala:1243
+#: src/MainWindow.vala:1249
 msgid "Org-Mode"
 msgstr ""
 
-#: src/MainWindow.vala:1249
+#: src/MainWindow.vala:1255
 msgid "PDF"
 msgstr ""
 
-#: src/MainWindow.vala:1255
+#: src/MainWindow.vala:1261
 msgid "PlainText"
 msgstr ""
 
-#: src/MainWindow.vala:1283
+#: src/MainWindow.vala:1289
 msgid "Outliner Export Completed"
 msgstr ""
 
@@ -483,7 +505,8 @@ msgstr ""
 msgid "Show Note"
 msgstr ""
 
-#: src/NodeMenu.vala:107 data/com.github.phase1geo.outliner.shortcuts.ui:253
+#: src/NodeMenu.vala:107 src/Tagger.vala:131
+#: data/com.github.phase1geo.outliner.shortcuts.ui:253
 msgid "Add Tag"
 msgstr ""
 
@@ -611,28 +634,32 @@ msgstr ""
 msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr ""
 
-#: src/OutlineTable.vala:705
+#: src/OutlineTable.vala:795
 msgid "Exit Focus Mode"
 msgstr ""
 
-#: src/OutlineTable.vala:775
+#: src/OutlineTable.vala:865
 msgid "Show note"
 msgstr ""
 
-#: src/OutlineTable.vala:775
+#: src/OutlineTable.vala:865
 msgid "Hide note"
 msgstr ""
 
-#: src/OutlineTable.vala:779
+#: src/OutlineTable.vala:869
 #, c-format
 msgid "%u subrows"
 msgstr ""
 
-#: src/OutlineTable.vala:2862
+#: src/OutlineTable.vala:2810
+msgid "Title"
+msgstr ""
+
+#: src/OutlineTable.vala:3207
 msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr ""
 
-#: src/OutlineTable.vala:2890
+#: src/OutlineTable.vala:3235
 msgid "Hit the Escape key to exit."
 msgstr ""
 
@@ -652,12 +679,29 @@ msgstr ""
 msgid "Replace All"
 msgstr ""
 
+#: src/Tagger.vala:69
+#, c-format
+msgid "Nodes are currently filtered by tag @%s."
+msgstr ""
+
 #: src/UndoBuffer.vala:81
 msgid "Undo: "
 msgstr ""
 
 #: src/UndoBuffer.vala:87
 msgid "Redo: "
+msgstr ""
+
+#: src/ZoomWidget.vala:92 data/com.github.phase1geo.outliner.shortcuts.ui:103
+msgid "Zoom Out"
+msgstr ""
+
+#: src/ZoomWidget.vala:97
+msgid "Zoom Actual"
+msgstr ""
+
+#: src/ZoomWidget.vala:102 data/com.github.phase1geo.outliner.shortcuts.ui:96
+msgid "Zoom In"
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:6
@@ -702,14 +746,6 @@ msgstr ""
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:92
 msgid "Zooming"
-msgstr ""
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:96
-msgid "Zoom In"
-msgstr ""
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:103
-msgid "Zoom Out"
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:110

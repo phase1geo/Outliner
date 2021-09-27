@@ -1,5 +1,7 @@
 src/exports/ExportMinder.vala
 
+src/themes/ThemeMaterial.vala
+src/themes/ThemeMild.vala
 src/themes/ThemeDefault.vala
 src/themes/ThemePrintColor.vala
 src/themes/ThemePrintGrayscale.vala
@@ -9,12 +11,12 @@ src/themes/ThemeSolarizedDark.vala
 
 src/undo_actions/UndoTextTagRemove.vala
 src/undo_actions/UndoTextDelete.vala
+src/undo_actions/UndoTextBackspace.vala
 src/undo_actions/UndoNodeExpander.vala
 src/undo_actions/UndoNodeInsert.vala
 src/undo_actions/UndoNodeName.vala
 src/undo_actions/UndoNodeUnclone.vala
 src/undo_actions/UndoTextReplace.vala
-src/undo_actions/UndoNodeUnclone.vala
 src/undo_actions/UndoNodeNote.vala
 src/undo_actions/UndoNodeMove.vala
 src/undo_actions/UndoNodeIndent.vala
@@ -28,6 +30,9 @@ src/undo_actions/UndoNodeDelete.vala
 src/undo_actions/UndoNodeUnindent.vala
 src/undo_actions/UndoNodeCut.vala
 src/undo_actions/UndoNodeSplit.vala
+src/undo_actions/UndoTextMultiInsert.vala
+src/undo_actions/UndoNodeJoin.vala
+src/undo_actions/UndoTitleChange.vala
 
 src/Document.vala
 src/DynamicNotebook.vala
@@ -38,6 +43,8 @@ src/NodeMenu.vala
 src/Node.vala
 src/OutlineTable.vala
 src/SearchBar.vala
+src/Tagger.vala
 src/UndoBuffer.vala
+src/ZoomWidget.vala
 
 data/com.github.phase1geo.outliner.shortcuts.ui
