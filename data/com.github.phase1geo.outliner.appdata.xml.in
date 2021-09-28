@@ -100,9 +100,9 @@
           <ul>
             <li>Fixed text size issue when adding a new row when the zoom level is not 100%.</li>
             <li>Fixed issues with text being incorrectly selected when words are deleted.</li>
-            <li>Fixed issue with undo'ing forward deleted text.</li>
+            <li>Fixed issue with undoing forward deleted text.</li>
             <li>Added missing keyboard shortcuts for row indent/outdent.</li>
-            <li>Fixed issue with exporting to Markdown when "Enable Markdown" setting is off.</li>
+            <li>Fixed issue with exporting to Markdown when Enable Markdown setting is off.</li>
           </ul>
         </description>
       </release>

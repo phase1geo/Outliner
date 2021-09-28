@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-27 12:12-0500\n"
+"POT-Creation-Date: 2021-09-27 22:17-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -196,7 +196,7 @@ msgid ""
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:103
-msgid "Fixed issue with undo'ing forward deleted text."
+msgid "Fixed issue with undoing forward deleted text."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:104
@@ -205,8 +205,7 @@ msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:105
 msgid ""
-"Fixed issue with exporting to Markdown when \"Enable Markdown\" setting is "
-"off."
+"Fixed issue with exporting to Markdown when Enable Markdown setting is off."
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.appdata.xml.in:113
