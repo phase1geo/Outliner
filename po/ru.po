@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-27 22:17-0500\n"
-"PO-Revision-Date: 2021-09-14 21:27+0300\n"
+"PO-Revision-Date: 2021-09-30 00:54+0300\n"
 "Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
 "Language: ru\n"
@@ -26,11 +26,11 @@ msgstr "Вправо"
 
 #: src/themes/ThemeMaterial.vala:31
 msgid "Material"
-msgstr ""
+msgstr "Material"
 
 #: src/themes/ThemeMild.vala:31
 msgid "Mild"
-msgstr ""
+msgstr "Мягкая"
 
 #: src/themes/ThemeDefault.vala:31
 msgid "Light"
@@ -140,12 +140,11 @@ msgstr "разделение объекта"
 
 #: src/undo_actions/UndoNodeJoin.vala:33
 msgid "join rows"
-msgstr ""
+msgstr "объединение рядов"
 
 #: src/undo_actions/UndoTitleChange.vala:29
-#, fuzzy
 msgid "document title change"
-msgstr "смену заголовка"
+msgstr "смену названия документа"
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -366,19 +365,16 @@ msgid "Enumeration Style:"
 msgstr "Стиль нумерации:"
 
 #: src/MainWindow.vala:769
-#, fuzzy
 msgid "Title Font"
-msgstr "Шрифт примечания:"
+msgstr "Шрифт названия документа"
 
 #: src/MainWindow.vala:773
-#, fuzzy
 msgid "Row Font"
-msgstr "Шрифт ряда:"
+msgstr "Шрифт ряда"
 
 #: src/MainWindow.vala:777
-#, fuzzy
 msgid "Note Font"
-msgstr "Шрифт примечания:"
+msgstr "Шрифт примечания"
 
 #: src/MainWindow.vala:782
 msgid "Condensed Mode:"
@@ -406,7 +402,7 @@ msgstr "Справка по клавиатурным комбинациям"
 
 #: src/MainWindow.vala:860
 msgid "Enter Distraction-Free Mode"
-msgstr ""
+msgstr "Режим без отвлекающих факторов"
 
 #: src/MainWindow.vala:866
 msgid "Reset Fonts to Defaults"
@@ -660,7 +656,7 @@ msgstr "%u субрядов"
 
 #: src/OutlineTable.vala:2810
 msgid "Title"
-msgstr ""
+msgstr "Название"
 
 #: src/OutlineTable.vala:3207
 msgid "In Focus Mode.  Hit the Escape key to exit."
@@ -689,7 +685,7 @@ msgstr "Заменить все"
 #: src/Tagger.vala:69
 #, c-format
 msgid "Nodes are currently filtered by tag @%s."
-msgstr ""
+msgstr "Примечания фильтруются сейчас по тегу @%s."
 
 #: src/UndoBuffer.vala:81
 msgid "Undo: "
@@ -704,7 +700,6 @@ msgid "Zoom Out"
 msgstr "Отдалить"
 
 #: src/ZoomWidget.vala:97
-#, fuzzy
 msgid "Zoom Actual"
 msgstr "Масштаб 100%"
 
@@ -779,7 +774,7 @@ msgstr "Показать клавиатурные комбинации"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:144
 msgid "Toggle Distraction-Free Mode"
-msgstr ""
+msgstr "Переключить режим без отвлекающих факторов"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:151
 msgid "Quit Application"
@@ -828,14 +823,12 @@ msgid "Change Task State"
 msgstr "Изменить статус задачи"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:260
-#, fuzzy
 msgid "Indent Row"
 msgstr "Отступ вправо"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:267
-#, fuzzy
 msgid "Outdent Row"
-msgstr "Вырезать ряд"
+msgstr "Отступ влево"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:276
 msgid "Changing View"
