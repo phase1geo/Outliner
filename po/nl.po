@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-27 22:17-0500\n"
-"PO-Revision-Date: 2020-10-18 12:18+0200\n"
-"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
+"PO-Revision-Date: 2021-09-30 14:26+0200\n"
+"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/exports/ExportMinder.vala:105
@@ -24,16 +24,15 @@ msgstr "Naar rechts"
 
 #: src/themes/ThemeMaterial.vala:31
 msgid "Material"
-msgstr ""
+msgstr "Material"
 
 #: src/themes/ThemeMild.vala:31
 msgid "Mild"
-msgstr ""
+msgstr "Mild"
 
 #: src/themes/ThemeDefault.vala:31
-#, fuzzy
 msgid "Light"
-msgstr "Naar rechts"
+msgstr "Licht"
 
 #: src/themes/ThemePrintColor.vala:31
 msgid "PrintColor"
@@ -139,10 +138,9 @@ msgstr "item splitsen"
 
 #: src/undo_actions/UndoNodeJoin.vala:33
 msgid "join rows"
-msgstr ""
+msgstr "rijen samenvoegen"
 
 #: src/undo_actions/UndoTitleChange.vala:29
-#, fuzzy
 msgid "document title change"
 msgstr "titel aanpassen"
 
@@ -365,19 +363,16 @@ msgid "Enumeration Style:"
 msgstr "Opsommingstijl:"
 
 #: src/MainWindow.vala:769
-#, fuzzy
 msgid "Title Font"
-msgstr "Aantekeninglettertype:"
+msgstr "Titellettertype"
 
 #: src/MainWindow.vala:773
-#, fuzzy
 msgid "Row Font"
-msgstr "Rijlettertype:"
+msgstr "Rijlettertype"
 
 #: src/MainWindow.vala:777
-#, fuzzy
 msgid "Note Font"
-msgstr "Aantekeninglettertype:"
+msgstr "Aantekeninglettertype"
 
 #: src/MainWindow.vala:782
 msgid "Condensed Mode:"
@@ -405,7 +400,7 @@ msgstr "Sneltoetsoverzicht"
 
 #: src/MainWindow.vala:860
 msgid "Enter Distraction-Free Mode"
-msgstr ""
+msgstr "Afleidingsvrije modus starten"
 
 #: src/MainWindow.vala:866
 msgid "Reset Fonts to Defaults"
@@ -659,7 +654,7 @@ msgstr "%u onderliggende rijen"
 
 #: src/OutlineTable.vala:2810
 msgid "Title"
-msgstr ""
+msgstr "Naam"
 
 #: src/OutlineTable.vala:3207
 msgid "In Focus Mode.  Hit the Escape key to exit."
@@ -688,7 +683,7 @@ msgstr "Alles vervangen"
 #: src/Tagger.vala:69
 #, c-format
 msgid "Nodes are currently filtered by tag @%s."
-msgstr ""
+msgstr "Knopen worden momenteel gefilterd op ‘@%s’."
 
 #: src/UndoBuffer.vala:81
 msgid "Undo: "
@@ -703,7 +698,6 @@ msgid "Zoom Out"
 msgstr "Uitzoomen"
 
 #: src/ZoomWidget.vala:97
-#, fuzzy
 msgid "Zoom Actual"
 msgstr "Zoomen naar ware grootte"
 
@@ -774,11 +768,11 @@ msgstr "Rechtermuisknopmenu tonen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:137
 msgid "Show Keyboard Shortcuts"
-msgstr ""
+msgstr "Sneltoetsen tonen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:144
 msgid "Toggle Distraction-Free Mode"
-msgstr ""
+msgstr "Afleidingsvrije modus aan/uit"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:151
 msgid "Quit Application"
@@ -827,14 +821,12 @@ msgid "Change Task State"
 msgstr "Taakstatus aanpassen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:260
-#, fuzzy
 msgid "Indent Row"
-msgstr "Inspringen"
+msgstr "Rij inspringen"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:267
-#, fuzzy
 msgid "Outdent Row"
-msgstr "Rij knippen"
+msgstr "Rij inspringen ongedaan maken"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:276
 msgid "Changing View"
@@ -1074,14 +1066,12 @@ msgid "Paste Text"
 msgstr "Tekst plakken"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:707
-#, fuzzy
 msgid "Select All"
-msgstr "Rij selecteren"
+msgstr "Alles selecteren"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:714
-#, fuzzy
 msgid "Deselect All"
-msgstr "Alles vervangen"
+msgstr "Niets selecteren"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:721
 msgid "Add Next Character"
