@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-27 22:17-0500\n"
+"POT-Creation-Date: 2021-09-30 23:05-0500\n"
 "PO-Revision-Date: 2020-04-10 21:50+0200\n"
 "Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
 "Language-Team: none\n"
@@ -16,137 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: src/exports/ExportMinder.vala:105
-msgid "To right"
-msgstr "Vers la droite"
-
-#: src/themes/ThemeMaterial.vala:31
-msgid "Material"
-msgstr ""
-
-#: src/themes/ThemeMild.vala:31
-msgid "Mild"
-msgstr ""
-
-#: src/themes/ThemeDefault.vala:31
-#, fuzzy
-msgid "Light"
-msgstr "Vers la droite"
-
-#: src/themes/ThemePrintColor.vala:31
-#, fuzzy
-msgid "PrintColor"
-msgstr "Imprimer"
-
-#: src/themes/ThemePrintGrayscale.vala:31
-msgid "PrintGrayscale"
-msgstr ""
-
-#: src/themes/ThemeSolarizedLight.vala:31
-msgid "Solarized Light"
-msgstr "Solarized Light"
-
-#: src/themes/ThemeDark.vala:31
-msgid "Dark"
-msgstr "Sombre"
-
-#: src/themes/ThemeSolarizedDark.vala:31
-msgid "Solarized Dark"
-msgstr "Solarized Dark"
-
-#: src/undo_actions/UndoTextTagRemove.vala:31
-msgid "format tag remove"
-msgstr "retrait de style"
-
-#: src/undo_actions/UndoTextDelete.vala:30
-#: src/undo_actions/UndoTextBackspace.vala:30
-msgid "text deletion"
-msgstr "suppression de texte"
-
-#: src/undo_actions/UndoNodeExpander.vala:29
-msgid "expander change"
-msgstr "extension/réduction de ligne"
-
-#: src/undo_actions/UndoNodeInsert.vala:30
-msgid "insert item"
-msgstr "insertion de texte"
-
-#: src/undo_actions/UndoNodeName.vala:30
-msgid "title change"
-msgstr "modification de titre"
-
-#: src/undo_actions/UndoNodeUnclone.vala:30
-#, fuzzy
-msgid "unclone item"
-msgstr "désindenter l'élément"
-
-#: src/undo_actions/UndoTextReplace.vala:31
-msgid "text replacement"
-msgstr "remplacement de texte"
-
-#: src/undo_actions/UndoNodeNote.vala:30
-msgid "note change"
-msgstr "modification de note"
-
-#: src/undo_actions/UndoNodeMove.vala:32
-msgid "move item"
-msgstr "déplacement d'élément"
-
-#: src/undo_actions/UndoNodeIndent.vala:28
-msgid "indent item"
-msgstr "indentation d'élément"
-
-#: src/undo_actions/UndoTextTagAdd.vala:31
-msgid "format tag add"
-msgstr "ajout de style"
-
-#: src/undo_actions/UndoTextInsert.vala:29
-#: src/undo_actions/UndoTextMultiInsert.vala:33
-msgid "text insertion"
-msgstr "insertion de texte"
-
-#: src/undo_actions/UndoTextClearTags.vala:30
-msgid "clear formatting"
-msgstr ""
-
-#: src/undo_actions/UndoReplaceAll.vala:47
-msgid "replace all"
-msgstr "tout remplacer"
-
-#: src/undo_actions/UndoNodePaste.vala:30
-msgid "paste item"
-msgstr "coller l'élément"
-
-#: src/undo_actions/UndoNodeReplace.vala:28
-#, fuzzy
-msgid "replace node"
-msgstr "tout remplacer"
-
-#: src/undo_actions/UndoNodeDelete.vala:31
-msgid "delete item"
-msgstr "supprimer l'élément"
-
-#: src/undo_actions/UndoNodeUnindent.vala:29
-msgid "unindent item"
-msgstr "désindenter l'élément"
-
-#: src/undo_actions/UndoNodeCut.vala:30
-msgid "cut item"
-msgstr "couper l'élément"
-
-#: src/undo_actions/UndoNodeSplit.vala:32
-msgid "split item"
-msgstr "diviser l'élément"
-
-#: src/undo_actions/UndoNodeJoin.vala:33
-msgid "join rows"
-msgstr ""
-
-#: src/undo_actions/UndoTitleChange.vala:29
-#, fuzzy
-msgid "document title change"
-msgstr "modification de titre"
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -187,6 +56,10 @@ msgstr "Annuler la fermeture de l'onglet"
 #: src/DynamicNotebook.vala:810
 msgid "Closed Tabs"
 msgstr "Onglets fermés"
+
+#: src/exports/ExportMinder.vala:105
+msgid "To right"
+msgstr "Vers la droite"
 
 #: src/FormatBar.vala:60 src/NodeMenu.vala:64
 msgid "Copy"
@@ -703,6 +576,133 @@ msgstr "Tout remplacer"
 msgid "Nodes are currently filtered by tag @%s."
 msgstr ""
 
+#: src/themes/ThemeDark.vala:31
+msgid "Dark"
+msgstr "Sombre"
+
+#: src/themes/ThemeDefault.vala:31
+#, fuzzy
+msgid "Light"
+msgstr "Vers la droite"
+
+#: src/themes/ThemeMaterial.vala:31
+msgid "Material"
+msgstr ""
+
+#: src/themes/ThemeMild.vala:31
+msgid "Mild"
+msgstr ""
+
+#: src/themes/ThemePrintColor.vala:31
+#, fuzzy
+msgid "PrintColor"
+msgstr "Imprimer"
+
+#: src/themes/ThemePrintGrayscale.vala:31
+msgid "PrintGrayscale"
+msgstr ""
+
+#: src/themes/ThemeSolarizedDark.vala:31
+msgid "Solarized Dark"
+msgstr "Solarized Dark"
+
+#: src/themes/ThemeSolarizedLight.vala:31
+msgid "Solarized Light"
+msgstr "Solarized Light"
+
+#: src/undo_actions/UndoNodeCut.vala:30
+msgid "cut item"
+msgstr "couper l'élément"
+
+#: src/undo_actions/UndoNodeDelete.vala:31
+msgid "delete item"
+msgstr "supprimer l'élément"
+
+#: src/undo_actions/UndoNodeExpander.vala:29
+msgid "expander change"
+msgstr "extension/réduction de ligne"
+
+#: src/undo_actions/UndoNodeIndent.vala:28
+msgid "indent item"
+msgstr "indentation d'élément"
+
+#: src/undo_actions/UndoNodeInsert.vala:30
+msgid "insert item"
+msgstr "insertion de texte"
+
+#: src/undo_actions/UndoNodeJoin.vala:33
+msgid "join rows"
+msgstr ""
+
+#: src/undo_actions/UndoNodeMove.vala:32
+msgid "move item"
+msgstr "déplacement d'élément"
+
+#: src/undo_actions/UndoNodeName.vala:30
+msgid "title change"
+msgstr "modification de titre"
+
+#: src/undo_actions/UndoNodeNote.vala:30
+msgid "note change"
+msgstr "modification de note"
+
+#: src/undo_actions/UndoNodePaste.vala:30
+msgid "paste item"
+msgstr "coller l'élément"
+
+#: src/undo_actions/UndoNodeReplace.vala:28
+#, fuzzy
+msgid "replace node"
+msgstr "tout remplacer"
+
+#: src/undo_actions/UndoNodeSplit.vala:32
+msgid "split item"
+msgstr "diviser l'élément"
+
+#: src/undo_actions/UndoNodeUnclone.vala:30
+#, fuzzy
+msgid "unclone item"
+msgstr "désindenter l'élément"
+
+#: src/undo_actions/UndoNodeUnindent.vala:29
+msgid "unindent item"
+msgstr "désindenter l'élément"
+
+#: src/undo_actions/UndoReplaceAll.vala:47
+msgid "replace all"
+msgstr "tout remplacer"
+
+#: src/undo_actions/UndoTextBackspace.vala:30
+#: src/undo_actions/UndoTextDelete.vala:30
+msgid "text deletion"
+msgstr "suppression de texte"
+
+#: src/undo_actions/UndoTextClearTags.vala:30
+msgid "clear formatting"
+msgstr ""
+
+#: src/undo_actions/UndoTextInsert.vala:29
+#: src/undo_actions/UndoTextMultiInsert.vala:33
+msgid "text insertion"
+msgstr "insertion de texte"
+
+#: src/undo_actions/UndoTextReplace.vala:31
+msgid "text replacement"
+msgstr "remplacement de texte"
+
+#: src/undo_actions/UndoTextTagAdd.vala:31
+msgid "format tag add"
+msgstr "ajout de style"
+
+#: src/undo_actions/UndoTextTagRemove.vala:31
+msgid "format tag remove"
+msgstr "retrait de style"
+
+#: src/undo_actions/UndoTitleChange.vala:29
+#, fuzzy
+msgid "document title change"
+msgstr "modification de titre"
+
 #: src/UndoBuffer.vala:81
 msgid "Undo: "
 msgstr "Annuler : "
@@ -946,8 +946,9 @@ msgid "Move Selected Group To Bottom"
 msgstr "Déplacer le groupe sélectionné en bas"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:432
+#, fuzzy
 msgid "Join Row To Row Above"
-msgstr ""
+msgstr "Ajouter une ligne au dessus"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:444
 #, fuzzy
@@ -959,8 +960,9 @@ msgid "Add/Remove Label"
 msgstr ""
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:459
+#, fuzzy
 msgid "Remove All Labels"
-msgstr ""
+msgstr "Tout fermer"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:468
 #: data/com.github.phase1geo.outliner.shortcuts.ui:703
@@ -1013,44 +1015,54 @@ msgid "Select Label-9 Row"
 msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:537
+#, fuzzy
 msgid "Move Row Into Labeled Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:541
+#, fuzzy
 msgid "Move To Label-1 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:548
+#, fuzzy
 msgid "Move To Label-2 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:555
+#, fuzzy
 msgid "Move To Label-3 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:562
+#, fuzzy
 msgid "Move To Label-4 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:569
+#, fuzzy
 msgid "Move To Label-5 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:576
+#, fuzzy
 msgid "Move To Label-6 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:583
+#, fuzzy
 msgid "Move To Label-7 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:590
+#, fuzzy
 msgid "Move To Label-8 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:597
+#, fuzzy
 msgid "Move To Label-9 Row"
-msgstr ""
+msgstr "Sélectionner la dernière ligne"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:609
 msgid "Text Editing"

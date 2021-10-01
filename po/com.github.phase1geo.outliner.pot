@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-27 22:17-0500\n"
+"POT-Creation-Date: 2021-09-30 23:05-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,132 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: src/exports/ExportMinder.vala:105
-msgid "To right"
-msgstr ""
-
-#: src/themes/ThemeMaterial.vala:31
-msgid "Material"
-msgstr ""
-
-#: src/themes/ThemeMild.vala:31
-msgid "Mild"
-msgstr ""
-
-#: src/themes/ThemeDefault.vala:31
-msgid "Light"
-msgstr ""
-
-#: src/themes/ThemePrintColor.vala:31
-msgid "PrintColor"
-msgstr ""
-
-#: src/themes/ThemePrintGrayscale.vala:31
-msgid "PrintGrayscale"
-msgstr ""
-
-#: src/themes/ThemeSolarizedLight.vala:31
-msgid "Solarized Light"
-msgstr ""
-
-#: src/themes/ThemeDark.vala:31
-msgid "Dark"
-msgstr ""
-
-#: src/themes/ThemeSolarizedDark.vala:31
-msgid "Solarized Dark"
-msgstr ""
-
-#: src/undo_actions/UndoTextTagRemove.vala:31
-msgid "format tag remove"
-msgstr ""
-
-#: src/undo_actions/UndoTextDelete.vala:30
-#: src/undo_actions/UndoTextBackspace.vala:30
-msgid "text deletion"
-msgstr ""
-
-#: src/undo_actions/UndoNodeExpander.vala:29
-msgid "expander change"
-msgstr ""
-
-#: src/undo_actions/UndoNodeInsert.vala:30
-msgid "insert item"
-msgstr ""
-
-#: src/undo_actions/UndoNodeName.vala:30
-msgid "title change"
-msgstr ""
-
-#: src/undo_actions/UndoNodeUnclone.vala:30
-msgid "unclone item"
-msgstr ""
-
-#: src/undo_actions/UndoTextReplace.vala:31
-msgid "text replacement"
-msgstr ""
-
-#: src/undo_actions/UndoNodeNote.vala:30
-msgid "note change"
-msgstr ""
-
-#: src/undo_actions/UndoNodeMove.vala:32
-msgid "move item"
-msgstr ""
-
-#: src/undo_actions/UndoNodeIndent.vala:28
-msgid "indent item"
-msgstr ""
-
-#: src/undo_actions/UndoTextTagAdd.vala:31
-msgid "format tag add"
-msgstr ""
-
-#: src/undo_actions/UndoTextInsert.vala:29
-#: src/undo_actions/UndoTextMultiInsert.vala:33
-msgid "text insertion"
-msgstr ""
-
-#: src/undo_actions/UndoTextClearTags.vala:30
-msgid "clear formatting"
-msgstr ""
-
-#: src/undo_actions/UndoReplaceAll.vala:47
-msgid "replace all"
-msgstr ""
-
-#: src/undo_actions/UndoNodePaste.vala:30
-msgid "paste item"
-msgstr ""
-
-#: src/undo_actions/UndoNodeReplace.vala:28
-msgid "replace node"
-msgstr ""
-
-#: src/undo_actions/UndoNodeDelete.vala:31
-msgid "delete item"
-msgstr ""
-
-#: src/undo_actions/UndoNodeUnindent.vala:29
-msgid "unindent item"
-msgstr ""
-
-#: src/undo_actions/UndoNodeCut.vala:30
-msgid "cut item"
-msgstr ""
-
-#: src/undo_actions/UndoNodeSplit.vala:32
-msgid "split item"
-msgstr ""
-
-#: src/undo_actions/UndoNodeJoin.vala:33
-msgid "join rows"
-msgstr ""
-
-#: src/undo_actions/UndoTitleChange.vala:29
-msgid "document title change"
-msgstr ""
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -181,6 +55,10 @@ msgstr ""
 
 #: src/DynamicNotebook.vala:810
 msgid "Closed Tabs"
+msgstr ""
+
+#: src/exports/ExportMinder.vala:105
+msgid "To right"
 msgstr ""
 
 #: src/FormatBar.vala:60 src/NodeMenu.vala:64
@@ -682,6 +560,128 @@ msgstr ""
 #: src/Tagger.vala:69
 #, c-format
 msgid "Nodes are currently filtered by tag @%s."
+msgstr ""
+
+#: src/themes/ThemeDark.vala:31
+msgid "Dark"
+msgstr ""
+
+#: src/themes/ThemeDefault.vala:31
+msgid "Light"
+msgstr ""
+
+#: src/themes/ThemeMaterial.vala:31
+msgid "Material"
+msgstr ""
+
+#: src/themes/ThemeMild.vala:31
+msgid "Mild"
+msgstr ""
+
+#: src/themes/ThemePrintColor.vala:31
+msgid "PrintColor"
+msgstr ""
+
+#: src/themes/ThemePrintGrayscale.vala:31
+msgid "PrintGrayscale"
+msgstr ""
+
+#: src/themes/ThemeSolarizedDark.vala:31
+msgid "Solarized Dark"
+msgstr ""
+
+#: src/themes/ThemeSolarizedLight.vala:31
+msgid "Solarized Light"
+msgstr ""
+
+#: src/undo_actions/UndoNodeCut.vala:30
+msgid "cut item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeDelete.vala:31
+msgid "delete item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeExpander.vala:29
+msgid "expander change"
+msgstr ""
+
+#: src/undo_actions/UndoNodeIndent.vala:28
+msgid "indent item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeInsert.vala:30
+msgid "insert item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeJoin.vala:33
+msgid "join rows"
+msgstr ""
+
+#: src/undo_actions/UndoNodeMove.vala:32
+msgid "move item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeName.vala:30
+msgid "title change"
+msgstr ""
+
+#: src/undo_actions/UndoNodeNote.vala:30
+msgid "note change"
+msgstr ""
+
+#: src/undo_actions/UndoNodePaste.vala:30
+msgid "paste item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeReplace.vala:28
+msgid "replace node"
+msgstr ""
+
+#: src/undo_actions/UndoNodeSplit.vala:32
+msgid "split item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeUnclone.vala:30
+msgid "unclone item"
+msgstr ""
+
+#: src/undo_actions/UndoNodeUnindent.vala:29
+msgid "unindent item"
+msgstr ""
+
+#: src/undo_actions/UndoReplaceAll.vala:47
+msgid "replace all"
+msgstr ""
+
+#: src/undo_actions/UndoTextBackspace.vala:30
+#: src/undo_actions/UndoTextDelete.vala:30
+msgid "text deletion"
+msgstr ""
+
+#: src/undo_actions/UndoTextClearTags.vala:30
+msgid "clear formatting"
+msgstr ""
+
+#: src/undo_actions/UndoTextInsert.vala:29
+#: src/undo_actions/UndoTextMultiInsert.vala:33
+msgid "text insertion"
+msgstr ""
+
+#: src/undo_actions/UndoTextReplace.vala:31
+msgid "text replacement"
+msgstr ""
+
+#: src/undo_actions/UndoTextTagAdd.vala:31
+msgid "format tag add"
+msgstr ""
+
+#: src/undo_actions/UndoTextTagRemove.vala:31
+msgid "format tag remove"
+msgstr ""
+
+#: src/undo_actions/UndoTitleChange.vala:29
+msgid "document title change"
 msgstr ""
 
 #: src/UndoBuffer.vala:81

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-27 22:17-0500\n"
+"POT-Creation-Date: 2021-09-30 23:05-0500\n"
 "PO-Revision-Date: 2021-09-30 14:26+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -17,132 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: src/exports/ExportMinder.vala:105
-msgid "To right"
-msgstr "Naar rechts"
-
-#: src/themes/ThemeMaterial.vala:31
-msgid "Material"
-msgstr "Material"
-
-#: src/themes/ThemeMild.vala:31
-msgid "Mild"
-msgstr "Mild"
-
-#: src/themes/ThemeDefault.vala:31
-msgid "Light"
-msgstr "Licht"
-
-#: src/themes/ThemePrintColor.vala:31
-msgid "PrintColor"
-msgstr "Afdrukken in kleur"
-
-#: src/themes/ThemePrintGrayscale.vala:31
-msgid "PrintGrayscale"
-msgstr "Afdrukken in zwart-wit"
-
-#: src/themes/ThemeSolarizedLight.vala:31
-msgid "Solarized Light"
-msgstr "Gesolariseerd (licht)"
-
-#: src/themes/ThemeDark.vala:31
-msgid "Dark"
-msgstr "Donker"
-
-#: src/themes/ThemeSolarizedDark.vala:31
-msgid "Solarized Dark"
-msgstr "Gesolariseerd (donker)"
-
-#: src/undo_actions/UndoTextTagRemove.vala:31
-msgid "format tag remove"
-msgstr "opmaaklabel verwijderen"
-
-#: src/undo_actions/UndoTextDelete.vala:30
-#: src/undo_actions/UndoTextBackspace.vala:30
-msgid "text deletion"
-msgstr "tekst wissen"
-
-#: src/undo_actions/UndoNodeExpander.vala:29
-msgid "expander change"
-msgstr "uitklappen aanpassen"
-
-#: src/undo_actions/UndoNodeInsert.vala:30
-msgid "insert item"
-msgstr "item invoegen"
-
-#: src/undo_actions/UndoNodeName.vala:30
-msgid "title change"
-msgstr "titel aanpassen"
-
-#: src/undo_actions/UndoNodeUnclone.vala:30
-msgid "unclone item"
-msgstr "item niet meer klonen"
-
-#: src/undo_actions/UndoTextReplace.vala:31
-msgid "text replacement"
-msgstr "tekst vervangen"
-
-#: src/undo_actions/UndoNodeNote.vala:30
-msgid "note change"
-msgstr "aantekening aanpassen"
-
-#: src/undo_actions/UndoNodeMove.vala:32
-msgid "move item"
-msgstr "item verplaatsen"
-
-#: src/undo_actions/UndoNodeIndent.vala:28
-msgid "indent item"
-msgstr "item inspringen"
-
-#: src/undo_actions/UndoTextTagAdd.vala:31
-msgid "format tag add"
-msgstr "opmaaklabel toevoegen"
-
-#: src/undo_actions/UndoTextInsert.vala:29
-#: src/undo_actions/UndoTextMultiInsert.vala:33
-msgid "text insertion"
-msgstr "tekst invoegen"
-
-#: src/undo_actions/UndoTextClearTags.vala:30
-msgid "clear formatting"
-msgstr "opmaak wissen"
-
-#: src/undo_actions/UndoReplaceAll.vala:47
-msgid "replace all"
-msgstr "alles vervangen"
-
-#: src/undo_actions/UndoNodePaste.vala:30
-msgid "paste item"
-msgstr "item plakken"
-
-#: src/undo_actions/UndoNodeReplace.vala:28
-msgid "replace node"
-msgstr "knoop vervangen"
-
-#: src/undo_actions/UndoNodeDelete.vala:31
-msgid "delete item"
-msgstr "item verwijderen"
-
-#: src/undo_actions/UndoNodeUnindent.vala:29
-msgid "unindent item"
-msgstr "item niet inspringen"
-
-#: src/undo_actions/UndoNodeCut.vala:30
-msgid "cut item"
-msgstr "item knippen"
-
-#: src/undo_actions/UndoNodeSplit.vala:32
-msgid "split item"
-msgstr "item splitsen"
-
-#: src/undo_actions/UndoNodeJoin.vala:33
-msgid "join rows"
-msgstr "rijen samenvoegen"
-
-#: src/undo_actions/UndoTitleChange.vala:29
-msgid "document title change"
-msgstr "titel aanpassen"
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -183,6 +57,10 @@ msgstr "Gesloten tabblad heropenen"
 #: src/DynamicNotebook.vala:810
 msgid "Closed Tabs"
 msgstr "Gesloten tabbladen"
+
+#: src/exports/ExportMinder.vala:105
+msgid "To right"
+msgstr "Naar rechts"
 
 #: src/FormatBar.vala:60 src/NodeMenu.vala:64
 msgid "Copy"
@@ -684,6 +562,128 @@ msgstr "Alles vervangen"
 #, c-format
 msgid "Nodes are currently filtered by tag @%s."
 msgstr "Knopen worden momenteel gefilterd op ‘@%s’."
+
+#: src/themes/ThemeDark.vala:31
+msgid "Dark"
+msgstr "Donker"
+
+#: src/themes/ThemeDefault.vala:31
+msgid "Light"
+msgstr "Licht"
+
+#: src/themes/ThemeMaterial.vala:31
+msgid "Material"
+msgstr "Material"
+
+#: src/themes/ThemeMild.vala:31
+msgid "Mild"
+msgstr "Mild"
+
+#: src/themes/ThemePrintColor.vala:31
+msgid "PrintColor"
+msgstr "Afdrukken in kleur"
+
+#: src/themes/ThemePrintGrayscale.vala:31
+msgid "PrintGrayscale"
+msgstr "Afdrukken in zwart-wit"
+
+#: src/themes/ThemeSolarizedDark.vala:31
+msgid "Solarized Dark"
+msgstr "Gesolariseerd (donker)"
+
+#: src/themes/ThemeSolarizedLight.vala:31
+msgid "Solarized Light"
+msgstr "Gesolariseerd (licht)"
+
+#: src/undo_actions/UndoNodeCut.vala:30
+msgid "cut item"
+msgstr "item knippen"
+
+#: src/undo_actions/UndoNodeDelete.vala:31
+msgid "delete item"
+msgstr "item verwijderen"
+
+#: src/undo_actions/UndoNodeExpander.vala:29
+msgid "expander change"
+msgstr "uitklappen aanpassen"
+
+#: src/undo_actions/UndoNodeIndent.vala:28
+msgid "indent item"
+msgstr "item inspringen"
+
+#: src/undo_actions/UndoNodeInsert.vala:30
+msgid "insert item"
+msgstr "item invoegen"
+
+#: src/undo_actions/UndoNodeJoin.vala:33
+msgid "join rows"
+msgstr "rijen samenvoegen"
+
+#: src/undo_actions/UndoNodeMove.vala:32
+msgid "move item"
+msgstr "item verplaatsen"
+
+#: src/undo_actions/UndoNodeName.vala:30
+msgid "title change"
+msgstr "titel aanpassen"
+
+#: src/undo_actions/UndoNodeNote.vala:30
+msgid "note change"
+msgstr "aantekening aanpassen"
+
+#: src/undo_actions/UndoNodePaste.vala:30
+msgid "paste item"
+msgstr "item plakken"
+
+#: src/undo_actions/UndoNodeReplace.vala:28
+msgid "replace node"
+msgstr "knoop vervangen"
+
+#: src/undo_actions/UndoNodeSplit.vala:32
+msgid "split item"
+msgstr "item splitsen"
+
+#: src/undo_actions/UndoNodeUnclone.vala:30
+msgid "unclone item"
+msgstr "item niet meer klonen"
+
+#: src/undo_actions/UndoNodeUnindent.vala:29
+msgid "unindent item"
+msgstr "item niet inspringen"
+
+#: src/undo_actions/UndoReplaceAll.vala:47
+msgid "replace all"
+msgstr "alles vervangen"
+
+#: src/undo_actions/UndoTextBackspace.vala:30
+#: src/undo_actions/UndoTextDelete.vala:30
+msgid "text deletion"
+msgstr "tekst wissen"
+
+#: src/undo_actions/UndoTextClearTags.vala:30
+msgid "clear formatting"
+msgstr "opmaak wissen"
+
+#: src/undo_actions/UndoTextInsert.vala:29
+#: src/undo_actions/UndoTextMultiInsert.vala:33
+msgid "text insertion"
+msgstr "tekst invoegen"
+
+#: src/undo_actions/UndoTextReplace.vala:31
+msgid "text replacement"
+msgstr "tekst vervangen"
+
+#: src/undo_actions/UndoTextTagAdd.vala:31
+msgid "format tag add"
+msgstr "opmaaklabel toevoegen"
+
+#: src/undo_actions/UndoTextTagRemove.vala:31
+msgid "format tag remove"
+msgstr "opmaaklabel verwijderen"
+
+#: src/undo_actions/UndoTitleChange.vala:29
+msgid "document title change"
+msgstr "titel aanpassen"
 
 #: src/UndoBuffer.vala:81
 msgid "Undo: "

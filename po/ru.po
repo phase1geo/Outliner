@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-27 22:17-0500\n"
+"POT-Creation-Date: 2021-09-30 23:05-0500\n"
 "PO-Revision-Date: 2021-09-30 00:54+0300\n"
 "Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
@@ -19,132 +19,6 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "X-Generator: Gtranslator 40.0\n"
-
-#: src/exports/ExportMinder.vala:105
-msgid "To right"
-msgstr "Вправо"
-
-#: src/themes/ThemeMaterial.vala:31
-msgid "Material"
-msgstr "Material"
-
-#: src/themes/ThemeMild.vala:31
-msgid "Mild"
-msgstr "Мягкая"
-
-#: src/themes/ThemeDefault.vala:31
-msgid "Light"
-msgstr "Светлая"
-
-#: src/themes/ThemePrintColor.vala:31
-msgid "PrintColor"
-msgstr "Печать в цвете"
-
-#: src/themes/ThemePrintGrayscale.vala:31
-msgid "PrintGrayscale"
-msgstr "Печать в градациях серого"
-
-#: src/themes/ThemeSolarizedLight.vala:31
-msgid "Solarized Light"
-msgstr "Solarized светлая"
-
-#: src/themes/ThemeDark.vala:31
-msgid "Dark"
-msgstr "Тёмная"
-
-#: src/themes/ThemeSolarizedDark.vala:31
-msgid "Solarized Dark"
-msgstr "Solarized тёмная"
-
-#: src/undo_actions/UndoTextTagRemove.vala:31
-msgid "format tag remove"
-msgstr "удаление тега форматирования"
-
-#: src/undo_actions/UndoTextDelete.vala:30
-#: src/undo_actions/UndoTextBackspace.vala:30
-msgid "text deletion"
-msgstr "удаление текста"
-
-#: src/undo_actions/UndoNodeExpander.vala:29
-msgid "expander change"
-msgstr "разворачивание или сворачивание"
-
-#: src/undo_actions/UndoNodeInsert.vala:30
-msgid "insert item"
-msgstr "вставку объекта"
-
-#: src/undo_actions/UndoNodeName.vala:30
-msgid "title change"
-msgstr "смену заголовка"
-
-#: src/undo_actions/UndoNodeUnclone.vala:30
-msgid "unclone item"
-msgstr "расклонирование объекта"
-
-#: src/undo_actions/UndoTextReplace.vala:31
-msgid "text replacement"
-msgstr "замену текста"
-
-#: src/undo_actions/UndoNodeNote.vala:30
-msgid "note change"
-msgstr "правку примечания"
-
-#: src/undo_actions/UndoNodeMove.vala:32
-msgid "move item"
-msgstr "перемещение объекта"
-
-#: src/undo_actions/UndoNodeIndent.vala:28
-msgid "indent item"
-msgstr "отступ вправо"
-
-#: src/undo_actions/UndoTextTagAdd.vala:31
-msgid "format tag add"
-msgstr "вставку тега форматирования"
-
-#: src/undo_actions/UndoTextInsert.vala:29
-#: src/undo_actions/UndoTextMultiInsert.vala:33
-msgid "text insertion"
-msgstr "вставку текста"
-
-#: src/undo_actions/UndoTextClearTags.vala:30
-msgid "clear formatting"
-msgstr "очистку форматирования"
-
-#: src/undo_actions/UndoReplaceAll.vala:47
-msgid "replace all"
-msgstr "замену всего"
-
-#: src/undo_actions/UndoNodePaste.vala:30
-msgid "paste item"
-msgstr "вставку объекта"
-
-#: src/undo_actions/UndoNodeReplace.vala:28
-msgid "replace node"
-msgstr "замену узла"
-
-#: src/undo_actions/UndoNodeDelete.vala:31
-msgid "delete item"
-msgstr "удаление объекта"
-
-#: src/undo_actions/UndoNodeUnindent.vala:29
-msgid "unindent item"
-msgstr "отступ влево"
-
-#: src/undo_actions/UndoNodeCut.vala:30
-msgid "cut item"
-msgstr "вырезание объекта в буфер обмена"
-
-#: src/undo_actions/UndoNodeSplit.vala:32
-msgid "split item"
-msgstr "разделение объекта"
-
-#: src/undo_actions/UndoNodeJoin.vala:33
-msgid "join rows"
-msgstr "объединение рядов"
-
-#: src/undo_actions/UndoTitleChange.vala:29
-msgid "document title change"
-msgstr "смену названия документа"
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -185,6 +59,10 @@ msgstr "Отменить закрытие вкладки"
 #: src/DynamicNotebook.vala:810
 msgid "Closed Tabs"
 msgstr "Закрытые вкладки"
+
+#: src/exports/ExportMinder.vala:105
+msgid "To right"
+msgstr "Вправо"
 
 #: src/FormatBar.vala:60 src/NodeMenu.vala:64
 msgid "Copy"
@@ -686,6 +564,128 @@ msgstr "Заменить все"
 #, c-format
 msgid "Nodes are currently filtered by tag @%s."
 msgstr "Примечания фильтруются сейчас по тегу @%s."
+
+#: src/themes/ThemeDark.vala:31
+msgid "Dark"
+msgstr "Тёмная"
+
+#: src/themes/ThemeDefault.vala:31
+msgid "Light"
+msgstr "Светлая"
+
+#: src/themes/ThemeMaterial.vala:31
+msgid "Material"
+msgstr "Material"
+
+#: src/themes/ThemeMild.vala:31
+msgid "Mild"
+msgstr "Мягкая"
+
+#: src/themes/ThemePrintColor.vala:31
+msgid "PrintColor"
+msgstr "Печать в цвете"
+
+#: src/themes/ThemePrintGrayscale.vala:31
+msgid "PrintGrayscale"
+msgstr "Печать в градациях серого"
+
+#: src/themes/ThemeSolarizedDark.vala:31
+msgid "Solarized Dark"
+msgstr "Solarized тёмная"
+
+#: src/themes/ThemeSolarizedLight.vala:31
+msgid "Solarized Light"
+msgstr "Solarized светлая"
+
+#: src/undo_actions/UndoNodeCut.vala:30
+msgid "cut item"
+msgstr "вырезание объекта в буфер обмена"
+
+#: src/undo_actions/UndoNodeDelete.vala:31
+msgid "delete item"
+msgstr "удаление объекта"
+
+#: src/undo_actions/UndoNodeExpander.vala:29
+msgid "expander change"
+msgstr "разворачивание или сворачивание"
+
+#: src/undo_actions/UndoNodeIndent.vala:28
+msgid "indent item"
+msgstr "отступ вправо"
+
+#: src/undo_actions/UndoNodeInsert.vala:30
+msgid "insert item"
+msgstr "вставку объекта"
+
+#: src/undo_actions/UndoNodeJoin.vala:33
+msgid "join rows"
+msgstr "объединение рядов"
+
+#: src/undo_actions/UndoNodeMove.vala:32
+msgid "move item"
+msgstr "перемещение объекта"
+
+#: src/undo_actions/UndoNodeName.vala:30
+msgid "title change"
+msgstr "смену заголовка"
+
+#: src/undo_actions/UndoNodeNote.vala:30
+msgid "note change"
+msgstr "правку примечания"
+
+#: src/undo_actions/UndoNodePaste.vala:30
+msgid "paste item"
+msgstr "вставку объекта"
+
+#: src/undo_actions/UndoNodeReplace.vala:28
+msgid "replace node"
+msgstr "замену узла"
+
+#: src/undo_actions/UndoNodeSplit.vala:32
+msgid "split item"
+msgstr "разделение объекта"
+
+#: src/undo_actions/UndoNodeUnclone.vala:30
+msgid "unclone item"
+msgstr "расклонирование объекта"
+
+#: src/undo_actions/UndoNodeUnindent.vala:29
+msgid "unindent item"
+msgstr "отступ влево"
+
+#: src/undo_actions/UndoReplaceAll.vala:47
+msgid "replace all"
+msgstr "замену всего"
+
+#: src/undo_actions/UndoTextBackspace.vala:30
+#: src/undo_actions/UndoTextDelete.vala:30
+msgid "text deletion"
+msgstr "удаление текста"
+
+#: src/undo_actions/UndoTextClearTags.vala:30
+msgid "clear formatting"
+msgstr "очистку форматирования"
+
+#: src/undo_actions/UndoTextInsert.vala:29
+#: src/undo_actions/UndoTextMultiInsert.vala:33
+msgid "text insertion"
+msgstr "вставку текста"
+
+#: src/undo_actions/UndoTextReplace.vala:31
+msgid "text replacement"
+msgstr "замену текста"
+
+#: src/undo_actions/UndoTextTagAdd.vala:31
+msgid "format tag add"
+msgstr "вставку тега форматирования"
+
+#: src/undo_actions/UndoTextTagRemove.vala:31
+msgid "format tag remove"
+msgstr "удаление тега форматирования"
+
+#: src/undo_actions/UndoTitleChange.vala:29
+msgid "document title change"
+msgstr "смену названия документа"
 
 #: src/UndoBuffer.vala:81
 msgid "Undo: "
