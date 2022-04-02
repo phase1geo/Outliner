@@ -60,6 +60,8 @@ public class MainWindow : Hdy.ApplicationWindow {
   private Box                         _themes;
   private HashMap<string,RadioButton> _theme_buttons;
 
+  private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
+
   public GLib.Settings settings {
     get {
       return( _settings );
@@ -164,28 +166,28 @@ public class MainWindow : Hdy.ApplicationWindow {
     _nb.get_style_context().add_class( Gtk.STYLE_CLASS_INLINE_TOOLBAR );
 
     /* Create title toolbar */
-    var new_btn = new Button.from_icon_name( "document-new", IconSize.LARGE_TOOLBAR );
+    var new_btn = new Button.from_icon_name( get_icon_name( "document-new" ), get_icon_size() );
     new_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "New File" ), "<Control>n" ) );
     new_btn.clicked.connect( do_new_file );
     _header.pack_start( new_btn );
 
-    var open_btn = new Button.from_icon_name( "document-open", IconSize.LARGE_TOOLBAR );
+    var open_btn = new Button.from_icon_name( get_icon_name( "document-open" ), get_icon_size() );
     open_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Open File" ), "<Control>o" ) );
     open_btn.clicked.connect( do_open_file );
     _header.pack_start( open_btn );
 
-    var save_btn = new Button.from_icon_name( "document-save-as", IconSize.LARGE_TOOLBAR );
+    var save_btn = new Button.from_icon_name( get_icon_name( "document-save-as" ), get_icon_size() );
     save_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Save File As" ), "<Control><Shift>s" ) );
     save_btn.clicked.connect( do_save_as_file );
     _header.pack_start( save_btn );
 
-    _undo_btn = new Button.from_icon_name( "edit-undo", IconSize.LARGE_TOOLBAR );
+    _undo_btn = new Button.from_icon_name( get_icon_name( "edit-undo" ), get_icon_size() );
     _undo_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Undo" ), "<Control>z" ) );
     _undo_btn.set_sensitive( false );
     _undo_btn.clicked.connect( do_undo );
     _header.pack_start( _undo_btn );
 
-    _redo_btn = new Button.from_icon_name( "edit-redo", IconSize.LARGE_TOOLBAR );
+    _redo_btn = new Button.from_icon_name( get_icon_name( "edit-redo" ), get_icon_size() );
     _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Redo" ), "<Control><Shift>z" ) );
     _redo_btn.set_sensitive( false );
     _redo_btn.clicked.connect( do_redo );
@@ -209,6 +211,16 @@ public class MainWindow : Hdy.ApplicationWindow {
 
   static construct {
     Hdy.init();
+  }
+
+  /* Returns the name of the icon to use for a headerbar icon */
+  private string get_icon_name( string icon_name ) {
+    return( "%s%s".printf( icon_name, (on_elementary ? "" : "-symbolic") ) );
+  }
+
+  /* Returns the size of the icon to use for a headerbar icon */
+  private IconSize get_icon_size() {
+    return( on_elementary ? IconSize.LARGE_TOOLBAR : IconSize.SMALL_TOOLBAR );
   }
 
   /* Returns the OutlineTable from the given tab */
@@ -516,7 +528,7 @@ public class MainWindow : Hdy.ApplicationWindow {
   private void add_search_button() {
 
     /* Create the menu button */
-    _search_btn = new Button.from_icon_name( "edit-find", IconSize.LARGE_TOOLBAR );
+    _search_btn = new Button.from_icon_name( get_icon_name( "edit-find" ), get_icon_size() );
     _search_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Search" ), "<Control>f" ) );
     _search_btn.clicked.connect( toggle_search_bar );
     _header.pack_end( _search_btn );
@@ -527,7 +539,7 @@ public class MainWindow : Hdy.ApplicationWindow {
   private void add_stats_button() {
 
     var stats_btn = new MenuButton();
-    stats_btn.set_image( new Image.from_icon_name( "org.gnome.PowerStats", IconSize.LARGE_TOOLBAR ) );
+    stats_btn.set_image( new Image.from_icon_name( "org.gnome.PowerStats", get_icon_size() ) );
     stats_btn.set_tooltip_markup( _( "Statistics" ) );
     stats_btn.clicked.connect( stats_clicked );
 
@@ -638,7 +650,7 @@ public class MainWindow : Hdy.ApplicationWindow {
 
     /* Create the menu button */
     var menu_btn = new MenuButton();
-    menu_btn.image = new Image.from_icon_name( "document-export", IconSize.LARGE_TOOLBAR );
+    menu_btn.image = new Image.from_icon_name( (on_elementary ? "document-export" : "document-send-symbolic"), get_icon_size() );
     menu_btn.tooltip_text = _( "Export" );
 
     _header.pack_end( menu_btn );
@@ -703,7 +715,7 @@ public class MainWindow : Hdy.ApplicationWindow {
 
     /* Add the button */
     var prop_btn = new MenuButton();
-    prop_btn.set_image( new Image.from_icon_name( "open-menu", IconSize.LARGE_TOOLBAR ) );
+    prop_btn.set_image( new Image.from_icon_name( get_icon_name( "open-menu" ), get_icon_size() ) );
     prop_btn.set_tooltip_text( _( "Properties" ) );
     prop_btn.clicked.connect( properties_clicked );
     _header.pack_end( prop_btn );
