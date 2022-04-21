@@ -3074,6 +3074,11 @@ public class OutlineTable : DrawingArea {
       }
     }
 
+    /* Adjust the nodes if we have a title */
+    if( _title != null ) {
+      title_resized();
+    }
+
     /* Update the size of this widget */
     Timeout.add( 50, resize_table );
 
@@ -3477,6 +3482,14 @@ public class OutlineTable : DrawingArea {
       ctx.line_to( (width - 35), 35 );
       ctx.stroke();
     }
+  }
+
+  /* Draws the document suitable for printing */
+  public void print_all( Context ctx, bool include_title, Theme theme, NodeDrawOptions draw_options ) {
+    if( include_title && (_title != null) ) {
+      _title.draw( ctx, theme, theme.title_foreground, 1.0, draw_options.use_theme );
+    }
+    root.draw_tree( ctx, theme, draw_options );
   }
 
   /* Draws all of the root node trees */

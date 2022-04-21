@@ -136,5 +136,15 @@
       <summary>Specifies the current state of focused writing mode.</summary>
       <description>Specifies the current state of focused writing mode.</description>
     </key>
+    <key name="print-settings" type="a{sv}">
+      <default>[]</default>
+      <summary>Printer settings used in the last print invocation</summary>
+      <description>Printer settings used in the last print invocation</description>
+    </key>
+    <key name="page-setup" type="a{sv}">
+      <default>[]</default>
+      <summary>Printer page setup used in the last print invocation</summary>
+      <description>Printer page setup used in the last print invocation</description>
+    </key>
   </schema>
 </schemalist>

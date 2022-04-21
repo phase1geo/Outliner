@@ -1,4 +1,4 @@
-/*
+ /*
 * Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
@@ -47,11 +47,10 @@ public class ExportPrint : Object {
     _draw_options.show_expander  = _table.list_type == NodeListType.NONE;
     _draw_options.use_theme      = true;
 
-    var settings = new PrintSettings();
-
-    _op.set_print_settings( settings );
-    // _op.set_unit( Unit.POINTS );
-    _op.set_unit( Unit.NONE );
+    _op.print_settings     = new PrintSettings.from_gvariant( Outliner.settings.get_value( "print-settings" ) );
+    _op.default_page_setup = new PageSetup.from_gvariant( Outliner.settings.get_value( "page-setup" ) );
+    _op.unit               = Unit.NONE;
+    _op.embed_page_setup   = true;
 
     /* Connect to the draw_page signal */
     _op.begin_print.connect( begin_print );
@@ -61,8 +60,8 @@ public class ExportPrint : Object {
       var res = _op.run( PrintOperationAction.PRINT_DIALOG, main );
       switch( res ) {
         case PrintOperationResult.APPLY :
-          settings = _op.get_print_settings();
-          // Save the settings to a file - settings.to_file( fname );
+          Outliner.settings.set_value( "print-settings", _op.print_settings.to_gvariant() );
+          Outliner.settings.set_value( "page-setup",     _op.default_page_setup.to_gvariant() );
           break;
         case PrintOperationResult.ERROR :
           /* TBD - Display the print error */
@@ -85,6 +84,8 @@ public class ExportPrint : Object {
     var page_size    = (int)(((10.0 / 11.0) * context.get_height()) / sf);
     var node         = _table.root.get_next_node();
     var last_node    = node;
+
+    _boundaries.append_val( include_size );
 
     while( node != null ) {
       if( node.on_page_boundary( page_size, out include_size ) ) {
@@ -122,7 +123,7 @@ public class ExportPrint : Object {
     ctx.clip();
 
     /* Draw all of the nodes */
-    _table.root.draw_tree( ctx, theme, _draw_options );
+    _table.print_all( ctx, (page_nr == 0), theme, _draw_options );
 
   }
 
