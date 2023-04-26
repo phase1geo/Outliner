@@ -17,14 +17,16 @@ gresource = gnome.compile_resources(
     source_dir: 'data',
 )
 
-conf = configuration_data()
-conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
-configure_file(output: 'config.h', configuration: conf)
-config_h_dir = include_directories('.')
+add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()), language:'c')
 
-c_args = [
-  '-include', 'config.h',
-]
+config_data = configuration_data()
+config_data.set_quoted('LOCALEDIR', get_option('prefix') / get_option('localedir'))
+config_data.set_quoted('GETTEXT_PACKAGE', meson.project_name())
+config_file = configure_file(
+    input: 'src/Config.vala.in',
+    output: '@BASENAME@',
+    configuration: config_data
+)
 
 sources = files()
 
@@ -69,8 +71,8 @@ dependencies = [
 
 e = executable('com.github.phase1geo.outliner',
     sources,
+    config_file,
     gresource,
-    c_args: c_args,
     dependencies: dependencies,
     vala_args: [
         meson.source_root() + '/vapi/libmarkdown.vapi'
