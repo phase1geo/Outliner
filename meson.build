@@ -50,7 +50,8 @@ libmarkdown = cc.find_library('markdown', required: true)
 granite = dependency('granite', version: '>=5.5.0', required: true)
 
 add_project_arguments([
-        '--vapidir', join_paths(meson.current_source_dir(), 'vapi')
+        '--vapidir', join_paths(meson.current_source_dir(), 'vapi'),
+        '--disable-warnings'
     ],
     language: 'vala',
 )
