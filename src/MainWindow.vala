@@ -59,12 +59,18 @@ public class MainWindow : Hdy.ApplicationWindow {
   private bool                        _debug       = false;
   private Box                         _themes;
   private HashMap<string,RadioButton> _theme_buttons;
+  private Exports                     _exports;
 
   private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
 
   public GLib.Settings settings {
     get {
       return( _settings );
+    }
+  }
+  public Exports exports {
+    get {
+      return( _exports );
     }
   }
 
@@ -108,6 +114,9 @@ public class MainWindow : Hdy.ApplicationWindow {
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
+
+    /* Create the exports and load it */
+    _exports = new Exports();
 
     var focus_mode = settings.get_boolean( "focus-mode" );
 
@@ -1311,7 +1320,7 @@ public class MainWindow : Hdy.ApplicationWindow {
    If a valid suffix is found, return the filename without modification; otherwise,
    returns the filename with the extension added.
   */
-  private string repair_filename( string fname, string[] extensions ) {
+  public string repair_filename( string fname, string[] extensions ) {
     foreach (string ext in extensions) {
       if( fname.has_suffix( ext ) ) {
         return( fname );
