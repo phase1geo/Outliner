@@ -21,17 +21,21 @@
 
 using GLib;
 
-public class ExportMinder : Object {
+public class ExportMinder : Export {
 
   private static int id = 0;
 
+  /* Constructor */
+  public ExportMinder() {
+    base( "minder", _( "Minder" ), {".minder"}, true, true, false );
+  }
+
   /* Exports the given drawing area to the file of the given name */
-  public static bool export( string fname, OutlineTable table ) {
+  public override bool export( string fname, OutlineTable table ) {
     id = 0;
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* root = new Xml.Node( null, "minder" );
     root->add_child( export_theme() );
-    root->add_child( export_drawarea() );
     root->add_child( export_nodes( table ) );
     doc->set_root_element( root );
     doc->save_format_file( fname, 1 );
@@ -39,22 +43,14 @@ public class ExportMinder : Object {
     return( true );
   }
 
-  private static Xml.Node* export_theme() {
+  private Xml.Node* export_theme() {
     Xml.Node* theme = new Xml.Node( null, "theme" );
     theme->set_prop( "name",  "Default" );
     theme->set_prop( "index", "0" );
     return( theme );
   }
 
-  private static Xml.Node* export_drawarea() {
-    Xml.Node* da = new Xml.Node( null, "drawarea" );
-    da->set_prop( "x", "0.0" );
-    da->set_prop( "y", "0.0" );
-    da->set_prop( "scale", "1" );
-    return( da );
-  }
-
-  private static Xml.Node* export_nodes( OutlineTable table ) {
+  private Xml.Node* export_nodes( OutlineTable table ) {
     Xml.Node* nodes = new Xml.Node( null, "nodes" );
     Xml.Node* root  = export_root_node( table );
     if( table.root.children.length > 0 ) {
@@ -69,7 +65,7 @@ public class ExportMinder : Object {
     return( nodes );
   }
 
-  private static Xml.Node* export_root_node( OutlineTable table ) {
+  private Xml.Node* export_root_node( OutlineTable table ) {
     Xml.Node* root = new Xml.Node( null, "node" );
     Xml.Node* name = new Xml.Node( null, "nodename" );
     name->add_content( table.document.label );
@@ -79,7 +75,7 @@ public class ExportMinder : Object {
     return( root );
   }
 
-  private static Xml.Node* export_node( Node node ) {
+  private Xml.Node* export_node( Node node ) {
     Xml.Node* n = new Xml.Node( null, "node" );
     export_node_properties( n, node );
     n->add_child( export_node_style() );
@@ -96,7 +92,7 @@ public class ExportMinder : Object {
     return( n );
   }
 
-  private static void export_node_properties( Xml.Node* n, Node? node ) {
+  private void export_node_properties( Xml.Node* n, Node? node ) {
     var next_id = id++;
     n->set_prop( "id", next_id.to_string() );
     n->set_prop( "maxwidth", "200" );
@@ -108,7 +104,7 @@ public class ExportMinder : Object {
     }
   }
 
-  private static Xml.Node* export_node_style() {
+  private Xml.Node* export_node_style() {
     Xml.Node* style = new Xml.Node( null, "style" );
     style->set_prop( "linktype",        "curved" );
     style->set_prop( "linkwidth",       "4" );
@@ -125,7 +121,7 @@ public class ExportMinder : Object {
     return( style );
   }
 
-  private static Xml.Node* export_node_formatting( Node node ) {
+  private Xml.Node* export_node_formatting( Node node ) {
     Xml.Node* formatting = new Xml.Node( null, "formatting" );
     var       text       = node.name.text;
     var       end        = text.text.char_count();
@@ -147,13 +143,13 @@ public class ExportMinder : Object {
     return( formatting );
   }
 
-  private static Xml.Node* export_node_name( Node node ) {
+  private Xml.Node* export_node_name( Node node ) {
     Xml.Node* name = new Xml.Node( null, "nodename" );
     name->add_content( node.name.text.text );
     return( name );
   }
 
-  private static Xml.Node* export_node_note( Node node ) {
+  private Xml.Node* export_node_note( Node node ) {
     Xml.Node* note = new Xml.Node( null, "nodenote" );
     note->add_content( node.note.text.text );
     return( note );
@@ -165,7 +161,7 @@ public class ExportMinder : Object {
    Reads the contents of an OPML file and creates a new document based on
    the stored information.
   */
-  public static bool import( string fname, OutlineTable table ) {
+  public override bool import( string fname, OutlineTable table ) {
 
     /* Read in the contents of the Minder file */
     var doc = Xml.Parser.read_file( fname, null, Xml.ParserOption.HUGE );
@@ -188,7 +184,7 @@ public class ExportMinder : Object {
   }
 
   /* Parses the given top-level nodes */
-  private static void import_nodes( Xml.Node* nodes, OutlineTable table ) {
+  private void import_nodes( Xml.Node* nodes, OutlineTable table ) {
     for( Xml.Node* it=nodes->children; it!=null; it=it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
         table.root.add_child( import_node( it, table ) );
@@ -197,7 +193,7 @@ public class ExportMinder : Object {
   }
 
   /* Parses the given text node and stores it to the CanvasText item */
-  private static void import_node_text( Xml.Node* n, CanvasText ct, Array<UndoTagInfo>? tags ) {
+  private void import_node_text( Xml.Node* n, CanvasText ct, Array<UndoTagInfo>? tags ) {
 
     /* Let's convert the text from Markdown */
     var html = Utils.markdown_to_html( n->get_content(), "div" );
@@ -215,7 +211,7 @@ public class ExportMinder : Object {
   }
 
   /* Parses the given urllink tag and saves the information as a URL */
-  private static void import_text_link( Xml.Node* ul, CanvasText ct, Array<UndoTagInfo> formatting ) {
+  private void import_text_link( Xml.Node* ul, CanvasText ct, Array<UndoTagInfo> formatting ) {
 
     var url   = "";
     var start = -1;
@@ -243,7 +239,7 @@ public class ExportMinder : Object {
   }
 
   /* Parses the node formatting tag */
-  private static void import_node_formatting( Xml.Node* f, CanvasText ct, Array<UndoTagInfo> formatting ) {
+  private void import_node_formatting( Xml.Node* f, CanvasText ct, Array<UndoTagInfo> formatting ) {
 
     for( Xml.Node* it=f->children; it!= null; it=it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
@@ -256,7 +252,7 @@ public class ExportMinder : Object {
   }
 
   /* Imports all Minder information useful for the node */
-  private static Node import_node( Xml.Node* n, OutlineTable table ) {
+  private Node import_node( Xml.Node* n, OutlineTable table ) {
 
     var node       = new Node( table );
     var formatting = new Array<UndoTagInfo>();

@@ -20,32 +20,58 @@
 */
 
 using GLib;
+using Gtk;
 
-public class ExportRTF : Object {
+public class ExportRTF : Export {
+
+  /* Constructor */
+  public ExportRTF() {
+    base( "rtf", _( "RTF" ), {".rtf"}, true, false, false );
+  }
+
+  /* Add settings for Org Mode */
+  public override void add_settings( Grid grid ) {
+    add_setting_bool( "use-ul", grid, _( "Use unordered lists" ), _( "Export using unordered lists" ), true );
+  }
+
+  /* Save the settings */
+  public override void save_settings( Xml.Node* node ) {
+    var value = get_bool( "use-ul" );
+    node->set_prop( "use-ul", value.to_string() );
+  }
+
+  /* Load the settings */
+  public override void load_settings( Xml.Node* node ) {
+    var q = node->get_prop( "use-ul" );
+    if( q != null ) {
+      var value = bool.parse( q );
+      set_bool( "use-ul", value );
+    }
+  }
 
   /* Exports the given drawing area to the file of the given name */
-  public static bool export( string fname, OutlineTable table, bool use_ul ) {
+  public override bool export( string fname, OutlineTable table ) {
     var file = File.new_for_path( fname );
     try {
       var os = file.create( FileCreateFlags.PRIVATE );
-      export_main( os, table, use_ul );
+      export_main( os, table );
     } catch( Error e ) {
       return( false );
     }
     return( true );
   }
 
-  private static void export_main( FileOutputStream os, OutlineTable table, bool use_ul ) {
+  private void export_main( FileOutputStream os, OutlineTable table ) {
     try {
       os.write( "{\\rtf1\\ansi{\\fonttbl\\f0\\fswiss Helvetica;}\\f0\\pard ".data );
       for( int i=0; i<table.root.children.length; i++ ) {
-        export_node( os, table.root.children.index( i ), use_ul );
+        export_node( os, table.root.children.index( i ) );
       }
       os.write( "}".data );
     } catch( Error e ) {}
   }
 
-  public static string from_text( FormattedText text ) {
+  public string from_text( FormattedText text ) {
     ExportUtils.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
         case FormatTag.BOLD       :  return( "\\b" );
@@ -95,16 +121,16 @@ public class ExportRTF : Object {
   }
 
   /* Traverses the node tree exporting XML nodes in OPML format */
-  private static void export_node( FileOutputStream os, Node node, bool use_ul ) {
+  private void export_node( FileOutputStream os, Node node ) {
     if( node.children.length > 0 ) {
       for( int i=0; i<node.children.length; i++ ) {
-        export_node( os, node.children.index( i ), use_ul );
+        export_node( os, node.children.index( i ) );
       }
     }
   }
 
   /*
-  private static Xml.Node* export_node( Node node, bool use_ul ) {
+  private Xml.Node* export_node( FileOutputStream os, Node node ) {
     string    ul_syms[3] = {"disc", "circle", "square"};
     string    ol_syms[5] = {"I", "A", "1", "a", "i"};
     Xml.Node* li         = new Xml.Node( null, "li" );
@@ -113,7 +139,8 @@ public class ExportRTF : Object {
       li->add_child( make_div( "note", node.note.text ) );
     }
     if( node.children.length > 0 ) {
-      Xml.Node* list = new Xml.Node( null, (use_ul ? "ul" : "ol") );
+      var       use_ul = get_bool( "use-ul" );
+      Xml.Node* list   = new Xml.Node( null, (use_ul ? "ul" : "ol") );
       if( use_ul ) {
         int sym_index = node.depth % 3;
         list->set_prop( "style", "list-style-type:%s".printf( ul_syms[sym_index] ) );
@@ -123,7 +150,7 @@ public class ExportRTF : Object {
       }
       li->add_child( list );
       for( int i=0; i<node.children.length; i++ ) {
-        list->add_child( export_node( node.children.index( i ), use_ul ) );
+        list->add_child( export_node( os, node.children.index( i ) ) );
       }
     }
     return( li );

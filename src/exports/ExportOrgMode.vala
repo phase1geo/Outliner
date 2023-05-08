@@ -20,11 +20,49 @@
 */
 
 using GLib;
+using Gtk;
 
-public class ExportOrgMode : Object {
+public class ExportOrgMode : Export {
+
+  /* Constructor */
+  public ExportOrgMode() {
+    base( "org-mode", _( "Org-Mode" ), {".org"}, true, false, false );
+  }
+
+  /* Add settings for Org Mode */
+  public override void add_settings( Grid grid ) {
+    add_setting_bool( "indent-mode", grid, _( "Indent Mode" ), _( "Export using indentation spaces" ), true );
+  }
+
+  /* Save the settings */
+  public override void save_settings( Xml.Node* node ) {
+    var value = get_bool( "indent-mode" );
+    node->set_prop( "indent-mode", value.to_string() );
+  }
+
+  /* Load the settings */
+  public override void load_settings( Xml.Node* node ) {
+    var q = node->get_prop( "indent-mode" );
+    if( q != null ) {
+      var value = bool.parse( q );
+      set_bool( "indent-mode", value );
+    }
+  }
+
+  private string sprefix() {
+    return( get_bool( "indent-mode" ) ? "  " : "*" );
+  }
+
+  private string wrap( string prefix ) {
+    return( get_bool( "indent-mode" ) ? (prefix + " ") : "" );
+  }
+
+  private string linestart( string prefix ) {
+    return( get_bool( "indent-mode" ) ? (prefix + "  ") : "" );
+  }
 
   /* Exports the given drawing area to the file of the given name */
-  public static bool export( string fname, OutlineTable table ) {
+  public override bool export( string fname, OutlineTable table ) {
     var  file   = File.new_for_path( fname );
     bool retval = true;
     try {
@@ -37,10 +75,10 @@ public class ExportOrgMode : Object {
   }
 
   /* Draws each of the top-level nodes */
-  private static void export_top_nodes( FileOutputStream os, OutlineTable table ) {
+  private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
     var nodes = table.root.children;
     for( int i=0; i<nodes.length; i++ ) {
-      export_node( os, table, nodes.index( i ), "" );
+      export_node( os, table, nodes.index( i ), sprefix() );
     }
   }
 
@@ -74,7 +112,7 @@ public class ExportOrgMode : Object {
   }
 
   /* Draws the given node and its children to the output stream */
-  private static void export_node( FileOutputStream os, OutlineTable table, Node node, string prefix = "  " ) {
+  private void export_node( FileOutputStream os, OutlineTable table, Node node, string prefix = "  " ) {
 
     try {
 
@@ -87,7 +125,7 @@ public class ExportOrgMode : Object {
       }
 
       var name = new FormattedText.copy_clean( table, node.name.text );
-      title += from_text( name ) + "\n";
+      title += from_text( name ).replace( "\n", wrap( prefix ) ) + "\n";
 
       os.write( title.data );
 
@@ -101,7 +139,7 @@ public class ExportOrgMode : Object {
 
       var children = node.children;
       for( int i=0; i<children.length; i++ ) {
-        export_node( os, table, children.index( i ), prefix + "  " );
+        export_node( os, table, children.index( i ), prefix + sprefix() );
       }
 
     } catch( Error e ) {
@@ -113,7 +151,9 @@ public class ExportOrgMode : Object {
   //----------------------------------------------------------------------------
 
   /* Imports an Org-Mode file and display it in the given outline table */
-  public static void import( string fname, OutlineTable table ) {
+  public override bool import( string fname, OutlineTable table ) {
+
+    return( false );
 
   }
 

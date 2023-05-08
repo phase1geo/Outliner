@@ -20,14 +20,33 @@
 */
 
 using GLib;
+using Gtk;
 
 public class ExportHTML : Export {
 
-  private bool _use_ul = true;
-
   /* Constructor */
   public ExportHTML() {
-    base( "HTML", _( "HTML" ), {".htm", ".html"}, true, false, false );
+    base( "html", _( "HTML" ), {".htm", ".html"}, true, false, false );
+  }
+
+  /* Add settings for Org Mode */
+  public override void add_settings( Grid grid ) {
+    add_setting_bool( "use-ul", grid, _( "Use unordered lists" ), _( "Export using unordered lists" ), true );
+  }
+
+  /* Save the settings */
+  public override void save_settings( Xml.Node* node ) {
+    var value = get_bool( "use-ul" );
+    node->set_prop( "use-ul", value.to_string() );
+  }
+
+  /* Load the settings */
+  public override void load_settings( Xml.Node* node ) {
+    var q = node->get_prop( "use-ul" );
+    if( q != null ) {
+      var value = bool.parse( q );
+      set_bool( "use-ul", value );
+    }
   }
 
   /* Exports the given drawing area to the file of the given name */
@@ -51,9 +70,10 @@ public class ExportHTML : Export {
 
   /* Generates the body for the document */
   private Xml.Node* export_body( OutlineTable table ) {
+    var use_ul     = get_bool( "use-ul" );
     Xml.Node* body = new Xml.Node( null, "body" );
-    Xml.Node* list = new Xml.Node( null, (_use_ul ? "ul" : "ol") );
-    if( _use_ul ) {
+    Xml.Node* list = new Xml.Node( null, (use_ul ? "ul" : "ol") );
+    if( use_ul ) {
       list->set_prop( "style", "list-style-type:disc;" );
     } else {
       list->set_prop( "type", "I" );
@@ -124,8 +144,9 @@ public class ExportHTML : Export {
       li->add_child( make_div( "note", note ) );
     }
     if( node.children.length > 0 ) {
-      Xml.Node* list = new Xml.Node( null, (_use_ul ? "ul" : "ol") );
-      if( _use_ul ) {
+      var       use_ul = get_bool( "use-ul" );
+      Xml.Node* list   = new Xml.Node( null, (use_ul ? "ul" : "ol") );
+      if( use_ul ) {
         int sym_index = node.depth % 3;
         list->set_prop( "style", "list-style-type:%s".printf( ul_syms[sym_index] ) );
       } else {

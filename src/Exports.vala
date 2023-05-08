@@ -35,7 +35,7 @@ public class Exports {
     add( new ExportOPML(), save_settings );
     add( new ExportOrgMode(), save_settings );
     add( new ExportPDF(), save_settings );
-    add( new ExportRTF(), save_settings );
+    // add( new ExportRTF(), save_settings );
     add( new ExportText(), save_settings );
 
   }

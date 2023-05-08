@@ -21,10 +21,15 @@
 
 using GLib;
 
-public class ExportText : Object {
+public class ExportText : Export {
+
+  /* Constructor */
+  public ExportText() {
+    base( "text", _( "PlainText" ), {".txt"}, true, false, false );
+  }
 
   /* Exports the given drawing area to the file of the given name */
-  public static bool export( string fname, OutlineTable table ) {
+  public override bool export( string fname, OutlineTable table ) {
     var  file   = File.new_for_path( fname );
     bool retval = true;
     try {
@@ -37,7 +42,7 @@ public class ExportText : Object {
   }
 
   /* Draws each of the top-level nodes */
-  private static void export_top_nodes( FileOutputStream os, OutlineTable table ) {
+  private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
 
     try {
 
@@ -59,7 +64,7 @@ public class ExportText : Object {
   }
 
   /* Draws the given node and its children to the output stream */
-  private static void export_node( FileOutputStream os, OutlineTable table, Node node, string prefix = "        " ) {
+  private void export_node( FileOutputStream os, OutlineTable table, Node node, string prefix = "        " ) {
 
     try {
 
