@@ -61,6 +61,7 @@ public class MainWindow : Hdy.ApplicationWindow {
   private HashMap<string,RadioButton> _theme_buttons;
   private Exports                     _exports;
   private Exporter                    _exporter;
+  private UnicodeInsert               _unicoder;
 
   private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
 
@@ -72,6 +73,11 @@ public class MainWindow : Hdy.ApplicationWindow {
   public Exports exports {
     get {
       return( _exports );
+    }
+  }
+  public UnicodeInsert unicoder {
+    get {
+      return( _unicoder );
     }
   }
 
@@ -118,6 +124,9 @@ public class MainWindow : Hdy.ApplicationWindow {
 
     /* Create the exports and load it */
     _exports = new Exports();
+
+    /* Unicoder */
+    _unicoder = new UnicodeInsert();
 
     var focus_mode = settings.get_boolean( "focus-mode" );
 
