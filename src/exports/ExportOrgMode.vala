@@ -76,6 +76,10 @@ public class ExportOrgMode : Export {
 
   /* Draws each of the top-level nodes */
   private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
+    if( table.title != null ) {
+      var title = "* " + table.title.text.text + "\n\n";
+      os.write( title.data );
+    }
     var nodes = table.root.children;
     for( int i=0; i<nodes.length; i++ ) {
       export_node( os, table, nodes.index( i ), sprefix() );
@@ -131,7 +135,7 @@ public class ExportOrgMode : Export {
 
       if( node.note.text.text != "" ) {
         var note = new FormattedText.copy_clean( table, node.note.text );
-        var str  = "\n" + from_text( note ).replace( "\n", "\n%s  ".printf( prefix ) ) + "\n";
+        var str  = "\n" + linestart( prefix ) + from_text( note ).replace( "\n", "\n" + linestart( prefix ) ) + "\n";
         os.write( str.data );
       }
 
