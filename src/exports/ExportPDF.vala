@@ -21,10 +21,15 @@
 
 using Cairo;
 
-public class ExportPDF : Object {
+public class ExportPDF : Export {
+
+  /* Constructor */
+  public ExportPDF() {
+    base( "pdf", _( "PDF" ), {".pdf"}, true, false, false );
+  }
 
   /* Default constructor */
-  public static void export( string fname, OutlineTable table ) {
+  public override bool export( string fname, OutlineTable table ) {
 
     /* Get the width and height of the page */
     double page_width  = 8.5 * 72;
@@ -49,6 +54,8 @@ public class ExportPDF : Object {
 
     /* Draw the page to the PDF file */
     context.show_page();
+
+    return( true );
 
   }
 

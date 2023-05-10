@@ -345,7 +345,7 @@ public class OutlineTable : DrawingArea {
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
       if( root.children.length > 0 ) {
-        root.children.index( 0 ).y = (_title != null) ? (_title.posy + _title.height + 10) : top_margin;
+        root.children.index( 0 ).y = get_top_row_y();
         root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
       }
       show_tasks_changed();
@@ -491,6 +491,11 @@ public class OutlineTable : DrawingArea {
       }
       _title.edit = edit;
     }
+  }
+
+  /* Returns the y position of the first row in the table (excluding the title) */
+  public double get_top_row_y() {
+    return( (_title != null) ? (_title.posy + _title.height + 10) : top_margin );
   }
 
   public void get_window_ys( out int top, out int bottom ) {
@@ -2799,7 +2804,7 @@ public class OutlineTable : DrawingArea {
 
   private void title_resized() {
     if( root.children.length > 0 ) {
-      root.children.index( 0 ).y = (_title.posy + _title.height + 10);  // top_margin;
+      root.children.index( 0 ).y = get_top_row_y();
       root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
       queue_draw();
     }

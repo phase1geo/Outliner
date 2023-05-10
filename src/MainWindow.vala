@@ -59,12 +59,19 @@ public class MainWindow : Hdy.ApplicationWindow {
   private bool                        _debug       = false;
   private Box                         _themes;
   private HashMap<string,RadioButton> _theme_buttons;
+  private Exports                     _exports;
+  private Exporter                    _exporter;
 
   private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
 
   public GLib.Settings settings {
     get {
       return( _settings );
+    }
+  }
+  public Exports exports {
+    get {
+      return( _exports );
     }
   }
 
@@ -80,7 +87,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     { "action_redo",          action_redo },
     { "action_search",        action_search },
     { "action_quit",          action_quit },
-    { "action_export",        action_export },
+    // { "action_export",        action_export },
     { "action_print",         action_print },
     { "action_shortcuts",     action_shortcuts },
     { "action_focus_mode",    action_focus_mode },
@@ -108,6 +115,9 @@ public class MainWindow : Hdy.ApplicationWindow {
     var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
+
+    /* Create the exports and load it */
+    _exports = new Exports();
 
     var focus_mode = settings.get_boolean( "focus-mode" );
 
@@ -514,7 +524,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     app.set_accels_for_action( "win.action_redo",        { "<Control><Shift>z" } );
     app.set_accels_for_action( "win.action_search",      { "<Control>f" } );
     app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
-    app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
+    // app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
     app.set_accels_for_action( "win.action_shortcuts",   { "<Control>question" } );
     app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
@@ -656,12 +666,13 @@ public class MainWindow : Hdy.ApplicationWindow {
     _header.pack_end( menu_btn );
 
     /* Create export menu */
-    var box = new Box( Orientation.VERTICAL, 5 );
+    _exporter = new Exporter( this );
+    _exporter.export_done.connect(() => {
+      Utils.hide_popover( menu_btn.popover );
+    });
 
-    var export = new ModelButton();
-    export.get_child().destroy();
-    export.add( new Granite.AccelLabel( _( "Export…" ), "<Control>e" ) );
-    export.action_name = "win.action_export";
+    /* Create export menu */
+    var box = new Box( Orientation.VERTICAL, 5 );
 
     var print = new ModelButton();
     print.get_child().destroy();
@@ -670,7 +681,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     print.set_sensitive( false );
 
     box.margin = 5;
-    box.pack_start( export, false, true );
+    box.pack_start( _exporter, false, true );
     box.pack_start( new Separator( Orientation.HORIZONTAL ), false, true );
     box.pack_start( print,  false, true );
     box.show_all();
@@ -1018,15 +1029,16 @@ public class MainWindow : Hdy.ApplicationWindow {
     filter.add_pattern( "*.outliner" );
     dialog.add_filter( filter );
 
-    filter = new FileFilter();
-    filter.set_filter_name( "Minder" );
-    filter.add_pattern( "*.minder" );
-    dialog.add_filter( filter );
-
-    filter = new FileFilter();
-    filter.set_filter_name( "OPML" );
-    filter.add_pattern( "*.opml" );
-    dialog.add_filter( filter );
+    for( int i=0; i<exports.length(); i++ ) {
+      if( exports.index( i ).importable ) {
+        filter = new FileFilter();
+        filter.set_filter_name( exports.index( i ).label );
+        foreach( string extension in exports.index( i ).extensions ) {
+          filter.add_pattern( "*" + extension );
+        }
+        dialog.add_filter( filter );
+      }
+    }
 
     if( dialog.run() == ResponseType.ACCEPT ) {
       open_file( dialog.get_filename() );
@@ -1046,19 +1058,22 @@ public class MainWindow : Hdy.ApplicationWindow {
       update_title( table );
       table.document.load();
       return( true );
-    } else if( fname.has_suffix( ".opml" ) ||
-               fname.has_suffix( ".minder" ) ) {
-      var rname = fname.slice( 0, fname.last_index_of( "." ) ) + ".outliner";
-      var table = add_tab_conditionally( rname, TabAddReason.IMPORT );
-      update_title( table );
-      if( fname.has_suffix( ".opml" ) ) {
-        ExportOPML.import( fname, table );
-      } else if( fname.has_suffix( ".minder" ) ) {
-        ExportMinder.import( fname, table );
+    } else {
+      for( int i=0; i<exports.length(); i++ ) {
+        if( exports.index( i ).importable ) {
+          string new_fname;
+          if( exports.index( i ).filename_matches( fname, out new_fname ) ) {
+            new_fname += ".outliner";
+            var table = add_tab_conditionally( new_fname, TabAddReason.IMPORT );
+            update_title( table );
+            if( exports.index( i ).import( fname, table ) ) {
+              save_tab_state( _nb.current );
+              return( true );
+            }
+            close_current_tab();
+          }
+        }
       }
-      table.queue_draw();
-      table.changed();
-      return( true );
     }
     return( false );
   }
@@ -1224,94 +1239,12 @@ public class MainWindow : Hdy.ApplicationWindow {
     destroy();
   }
 
-  /* Exports the model to various formats */
-  private void action_export() {
-
-    FileChooserDialog dialog = new FileChooserDialog( _( "Export As" ), this, FileChooserAction.SAVE,
-      _( "Cancel" ), ResponseType.CANCEL, _( "Export" ), ResponseType.ACCEPT );
-
-    /* HTML */
-    FileFilter html_filter = new FileFilter();
-    html_filter.set_filter_name( _( "HTML" ) );
-    html_filter.add_pattern( "*.html" );
-    html_filter.add_pattern( "*.htm" );
-    dialog.add_filter( html_filter );
-
-    /* Markdown */
-    FileFilter md_filter = new FileFilter();
-    md_filter.set_filter_name( _( "Markdown" ) );
-    md_filter.add_pattern( "*.md" );
-    md_filter.add_pattern( "*.markdown" );
-    dialog.add_filter( md_filter );
-
-    /* Minder */
-    FileFilter minder_filter = new FileFilter();
-    minder_filter.set_filter_name( _( "Minder" ) );
-    minder_filter.add_pattern( "*.minder" );
-    dialog.add_filter( minder_filter );
-
-    /* OPML */
-    FileFilter opml_filter = new FileFilter();
-    opml_filter.set_filter_name( _( "OPML" ) );
-    opml_filter.add_pattern( "*.opml" );
-    dialog.add_filter( opml_filter );
-
-    /* Org-Mode */
-    FileFilter org_filter = new FileFilter();
-    org_filter.set_filter_name( _( "Org-Mode" ) );
-    org_filter.add_pattern( "*.org" );
-    dialog.add_filter( org_filter );
-
-    /* PDF */
-    FileFilter pdf_filter = new FileFilter();
-    pdf_filter.set_filter_name( _( "PDF" ) );
-    pdf_filter.add_pattern( "*.pdf" );
-    dialog.add_filter( pdf_filter );
-
-    /* PlainText */
-    FileFilter txt_filter = new FileFilter();
-    txt_filter.set_filter_name( _( "PlainText" ) );
-    txt_filter.add_pattern( "*.txt" );
-    dialog.add_filter( txt_filter );
-
-    if( dialog.run() == ResponseType.ACCEPT ) {
-
-      var fname  = dialog.get_filename();
-      var filter = dialog.get_filter();
-      var table  = get_current_table( "action_export" );
-      var use_ul = _settings.get_boolean( "export-html-use-ul-style" );
-
-      if( html_filter == filter ) {
-        ExportHTML.export( fname = repair_filename( fname, {".html", ".htm"} ), table, use_ul );
-      } else if( md_filter == filter ) {
-        ExportMarkdown.export( fname = repair_filename( fname, {".md", ".markdown"} ), table );
-      } else if( minder_filter == filter ) {
-        ExportMinder.export( fname = repair_filename( fname, {".minder"} ), table );
-      } else if( opml_filter == filter ) {
-        ExportOPML.export( fname = repair_filename( fname, {".opml"} ), table );
-      } else if( org_filter == filter ) {
-        ExportOrgMode.export( fname = repair_filename( fname, {".org"} ), table );
-      } else if( pdf_filter == filter ) {
-        ExportPDF.export( fname = repair_filename( fname, {".pdf"} ), table );
-      } else if( txt_filter == filter ) {
-        ExportText.export( fname = repair_filename( fname, {".txt"} ), table );
-      }
-
-      /* Send a notification */
-      notification( _( "Outliner Export Completed" ), fname );
-
-    }
-
-    dialog.close();
-
-  }
-
   /*
    Checks the given filename to see if it contains any of the given suffixes.
    If a valid suffix is found, return the filename without modification; otherwise,
    returns the filename with the extension added.
   */
-  private string repair_filename( string fname, string[] extensions ) {
+  public string repair_filename( string fname, string[] extensions ) {
     foreach (string ext in extensions) {
       if( fname.has_suffix( ext ) ) {
         return( fname );

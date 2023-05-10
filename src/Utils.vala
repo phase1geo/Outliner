@@ -158,6 +158,17 @@ public class Utils {
     return( -1 );
   }
 
+  /* Returns the rootname of the given filename */
+  public static string rootname( string filename ) {
+    var basename = GLib.Path.get_basename( filename );
+    var parts    = basename.split( "." );
+    if( parts.length > 2 ) {
+      return( string.joinv( ".", parts[0:parts.length-1] ) );
+    } else {
+      return( parts[0] );
+    }
+  }
+
   /* Show the specified popover */
   public static void show_popover( Popover popover ) {
 #if GTK322
@@ -174,6 +185,18 @@ public class Utils {
 #else
     popover.hide();
 #endif
+  }
+
+  public static void set_chooser_folder( FileChooser chooser ) {
+    var dir = Outliner.settings.get_string( "last-directory" );
+    if( dir != "" ) {
+      chooser.set_current_folder( dir );
+    }
+  }
+
+  public static void store_chooser_folder( string file, bool is_dir ) {
+    var dir = is_dir ? file : GLib.Path.get_dirname( file );
+    Outliner.settings.set_string( "last-directory", dir );
   }
 
 }

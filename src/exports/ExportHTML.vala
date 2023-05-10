@@ -20,15 +20,41 @@
 */
 
 using GLib;
+using Gtk;
 
-public class ExportHTML : Object {
+public class ExportHTML : Export {
+
+  /* Constructor */
+  public ExportHTML() {
+    base( "html", _( "HTML" ), {".htm", ".html"}, true, false, false );
+  }
+
+  /* Add settings for Org Mode */
+  public override void add_settings( Grid grid ) {
+    add_setting_bool( "use-ul", grid, _( "Use unordered lists" ), _( "Export using unordered lists" ), true );
+  }
+
+  /* Save the settings */
+  public override void save_settings( Xml.Node* node ) {
+    var value = get_bool( "use-ul" );
+    node->set_prop( "use-ul", value.to_string() );
+  }
+
+  /* Load the settings */
+  public override void load_settings( Xml.Node* node ) {
+    var q = node->get_prop( "use-ul" );
+    if( q != null ) {
+      var value = bool.parse( q );
+      set_bool( "use-ul", value );
+    }
+  }
 
   /* Exports the given drawing area to the file of the given name */
-  public static bool export( string fname, OutlineTable table, bool use_ul ) {
+  public override bool export( string fname, OutlineTable table ) {
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* html = new Xml.Node( null, "html" );
     html->add_child( export_head( Path.get_basename( fname ) ) );
-    html->add_child( export_body( table, use_ul ) );
+    html->add_child( export_body( table ) );
     doc->set_root_element( html );
     doc->save_format_file( fname, 1 );
     delete doc;
@@ -36,14 +62,15 @@ public class ExportHTML : Object {
   }
 
   /* Generates the header for the document */
-  private static Xml.Node* export_head( string? title ) {
+  private Xml.Node* export_head( string? title ) {
     Xml.Node* head = new Xml.Node( null, "head" );
     head->new_text_child( null, "title", (title ?? "Outline") );
     return( head );
   }
 
   /* Generates the body for the document */
-  private static Xml.Node* export_body( OutlineTable table, bool use_ul ) {
+  private Xml.Node* export_body( OutlineTable table ) {
+    var use_ul     = get_bool( "use-ul" );
     Xml.Node* body = new Xml.Node( null, "body" );
     Xml.Node* list = new Xml.Node( null, (use_ul ? "ul" : "ol") );
     if( use_ul ) {
@@ -52,7 +79,7 @@ public class ExportHTML : Object {
       list->set_prop( "type", "I" );
     }
     for( int i=0; i<table.root.children.length; i++ ) {
-      list->add_child( export_node( table, table.root.children.index( i ), use_ul ) );
+      list->add_child( export_node( table, table.root.children.index( i ) ) );
     }
     body->add_child( list );
     return( body );
@@ -97,7 +124,7 @@ public class ExportHTML : Object {
     return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
-  private static Xml.Node* make_div( string div_class, FormattedText text ) {
+  private Xml.Node* make_div( string div_class, FormattedText text ) {
     var      html = "<div class=\"" + div_class + "\">" + from_text( text ) + "</div>";
     Xml.Doc* doc  = Xml.Parser.parse_memory( html, html.length );
     var      node = doc->get_root_element()->copy( 1 );
@@ -106,7 +133,7 @@ public class ExportHTML : Object {
   }
 
   /* Traverses the node tree exporting XML nodes in OPML format */
-  private static Xml.Node* export_node( OutlineTable table, Node node, bool use_ul ) {
+  private Xml.Node* export_node( OutlineTable table, Node node ) {
     string    ul_syms[3] = {"disc", "circle", "square"};
     string    ol_syms[5] = {"I", "A", "1", "a", "i"};
     Xml.Node* li         = new Xml.Node( null, "li" );
@@ -117,7 +144,8 @@ public class ExportHTML : Object {
       li->add_child( make_div( "note", note ) );
     }
     if( node.children.length > 0 ) {
-      Xml.Node* list = new Xml.Node( null, (use_ul ? "ul" : "ol") );
+      var       use_ul = get_bool( "use-ul" );
+      Xml.Node* list   = new Xml.Node( null, (use_ul ? "ul" : "ol") );
       if( use_ul ) {
         int sym_index = node.depth % 3;
         list->set_prop( "style", "list-style-type:%s".printf( ul_syms[sym_index] ) );
@@ -127,7 +155,7 @@ public class ExportHTML : Object {
       }
       li->add_child( list );
       for( int i=0; i<node.children.length; i++ ) {
-        list->add_child( export_node( table, node.children.index( i ), use_ul ) );
+        list->add_child( export_node( table, node.children.index( i ) ) );
       }
     }
     return( li );

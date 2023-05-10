@@ -21,10 +21,14 @@
 
 using GLib;
 
-public class ExportOPML : Object {
+public class ExportOPML : Export {
+
+  public ExportOPML() {
+    base( "opml", _( "OPML" ), {".opml"}, true, true, false );
+  }
 
   /* Exports the given drawing area to the file of the given name */
-  public static bool export( string fname, OutlineTable table ) {
+  public override bool export( string fname, OutlineTable table ) {
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* opml = new Xml.Node( null, "opml" );
     string    expand_state;
@@ -39,7 +43,7 @@ public class ExportOPML : Object {
   }
 
   /* Generates the header for the document */
-  private static Xml.Node* export_head( string? title, string expand_state ) {
+  private Xml.Node* export_head( string? title, string expand_state ) {
     Xml.Node* head = new Xml.Node( null, "head" );
     var now  = new DateTime.now_local();
     head->new_text_child( null, "title", (title ?? "Mind Map") );
@@ -51,7 +55,7 @@ public class ExportOPML : Object {
   }
 
   /* Generates the body for the document */
-  private static Xml.Node* export_body( OutlineTable table, out string expand_state ) {
+  private Xml.Node* export_body( OutlineTable table, out string expand_state ) {
     Xml.Node*  body    = new Xml.Node( null, "body" );
     Array<int> estate  = new Array<int>();
     for( int i=0; i<table.root.children.length; i++ ) {
@@ -68,7 +72,7 @@ public class ExportOPML : Object {
   }
 
   /* Traverses the node tree exporting XML nodes in OPML format */
-  private static Xml.Node* export_node( OutlineTable table, Node node, ref Array<int> expand_state ) {
+  private Xml.Node* export_node( OutlineTable table, Node node, ref Array<int> expand_state ) {
 
     Xml.Node* n = new Xml.Node( null, "outline" );
 
@@ -109,7 +113,7 @@ public class ExportOPML : Object {
    Reads the contents of an OPML file and creates a new document based on
    the stored information.
   */
-  public static bool import( string fname, OutlineTable table ) {
+  public override bool import( string fname, OutlineTable table ) {
 
     /* Read in the contents of the OPML file */
     var doc = Xml.Parser.read_file( fname, null, Xml.ParserOption.HUGE );
@@ -140,7 +144,7 @@ public class ExportOPML : Object {
   }
 
   /* Parses the OPML head block for information that we will use */
-  private static void import_header( Xml.Node* n, ref Array<int>? expand_state ) {
+  private void import_header( Xml.Node* n, ref Array<int>? expand_state ) {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "expansionState") ) {
         if( (it->children != null) && (it->children->type == Xml.ElementType.TEXT_NODE) ) {
@@ -156,7 +160,7 @@ public class ExportOPML : Object {
   }
 
   /* Imports the OPML data, creating a mind map */
-  public static void import_body( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state) {
+  public void import_body( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state) {
 
     /* Clear the existing nodes */
     table.root.children.remove_range( 0, table.root.children.length );
@@ -172,7 +176,7 @@ public class ExportOPML : Object {
   }
 
   /* Main method for importing an OPML <outline> into a node */
-  public static Node import_node( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state ) {
+  public Node import_node( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state ) {
 
     Node node = new Node( table );
 
@@ -217,6 +221,5 @@ public class ExportOPML : Object {
     return( node );
 
   }
-
 
 }

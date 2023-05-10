@@ -26,6 +26,16 @@
       <summary>Name of the last edited file</summary>
       <description>Name of the last edited file (or the empty string if an unnamed file was last edited).</description>
     </key>
+    <key name="last-directory" type="s">
+      <default>""</default>
+      <summary>Last used directory in open/save file dialog</summary>
+      <description>Stores last used directory in the open/save dialog and uses it when open/save is later invoked</description>
+    </key>
+    <key name="last-export" type="s">
+      <default>"markdown"</default>
+      <summary>Last used export</summary>
+      <description>Stores last used export and uses it when it is later invoked</description>
+    </key>
     <key name="search-opt-titles" type="b">
       <default>true</default>
       <summary>Search option for node titles</summary>
@@ -55,11 +65,6 @@
       <default>true</default>
       <summary>Search option for non-task nodes</summary>
       <description>Specifies whether non-task nodes should be searched or not</description>
-    </key>
-    <key name="export-html-use-ul-style" type="b">
-      <default>false</default>
-      <summary>When exporting to HTML, use ul output styling instead of ol</summary>
-      <description>When exporting to HTML, use ul output styling instead of ol</description>
     </key>
     <key name="default-title-font-family" type="s">
       <default>"Sans"</default>
