@@ -1062,7 +1062,7 @@ public class Node {
 
     child.depth  = this.depth + 1;
     child.x      = 0;
-    child.y      = (prev == null) ? _ot.top_margin : prev.last_y;
+    child.y      = (prev == null) ? _ot.get_top_row_y() : prev.last_y;
 
     /* Re-draw all nodes */
     child.adjust_nodes( child.last_y, false, "add_child" );
