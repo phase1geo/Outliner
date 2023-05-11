@@ -305,12 +305,14 @@ public class Node {
     _name = new CanvasText( ot, ot.get_allocated_width() );
     _name.text.add_parser( ot.tagger_parser );
     _name.text.add_parser( ot.unicode_parser );
+    _name.text.add_parser( ot.url_parser );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
 
     _note = new CanvasText( ot, ot.get_allocated_width() );
     _note.text.add_parser( ot.unicode_parser );
+    _note.text.add_parser( ot.url_parser );
     _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );

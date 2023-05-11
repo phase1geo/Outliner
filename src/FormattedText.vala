@@ -758,7 +758,7 @@ public class FormattedText {
   /* Adds the given parser */
   public void add_parser( TextParser parser ) {
     _parsers.append_val( parser );
-    parse();
+    parse( 0 );
     changed();
   }
 
@@ -767,7 +767,7 @@ public class FormattedText {
     for( int i=0; i<_parsers.length; i++ ) {
       if( _parsers.index( i ) == parser ) {
         _parsers.remove_index( i );
-        parse( true );
+        parse( 0, true );
         changed();
         return;
       }
@@ -794,7 +794,7 @@ public class FormattedText {
     foreach( TagInfo f in _formats) {
       f.adjust( index, str.length );
     }
-    parse();
+    parse( index + str.length );
     changed();
   }
 
@@ -813,7 +813,7 @@ public class FormattedText {
       f.remove_tag( index, (index + chars) );
       f.adjust( index, ((0 - chars) + str.length) );
     }
-    parse();
+    parse( index + str.length );
     changed();
   }
 
@@ -824,7 +824,7 @@ public class FormattedText {
       f.remove_tag( index, (index + chars) );
       f.adjust( index, (0 - chars) );
     }
-    parse();
+    parse( index );
     changed();
   }
 
@@ -1033,7 +1033,7 @@ public class FormattedText {
   }
 
   /* If there are text parsers associated with this text, run them */
-  private void parse( bool force_clear = false ) {
+  private void parse( int cursor, bool force_clear = false ) {
     if( (_parsers.length > 0) || force_clear ) {
       for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
         if( !save_tag( (FormatTag)i ) ) {
@@ -1042,7 +1042,7 @@ public class FormattedText {
       }
     }
     for( int i=0; i<_parsers.length; i++ ) {
-      _parsers.index( i ).parse( this );
+      _parsers.index( i ).parse( this, cursor );
     }
   }
 
@@ -1091,7 +1091,7 @@ public class FormattedText {
         }
       }
     }
-    parse();
+    parse( 0 );
     changed();
   }
 

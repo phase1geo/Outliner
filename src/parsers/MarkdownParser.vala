@@ -33,12 +33,12 @@ public class MarkdownParser : TextParser {
     add_regex( "^(#{1,6})[^#].*$", highlight_header );
 
     /* Lists */
-    add_regex( "^\\s*(\\*|\\+|\\-|[0-9]+\\.)\\s", (text, match) => {
+    add_regex( "^\\s*(\\*|\\+|\\-|[0-9]+\\.)\\s", (text, match, cursor) => {
       add_tag( text, match, 1, FormatTag.COLOR, _ot.get_theme().markdown_listitem.to_string() );
     });
 
     /* Code */
-    add_regex( "(`)([^`]+)(`)", (text, match) => {
+    add_regex( "(`)([^`]+)(`)", (text, match, cursor) => {
       make_grey( text, match, 1 );
       add_tag( text, match, 2, FormatTag.CODE );
       make_grey( text, match, 3 );
@@ -63,36 +63,36 @@ public class MarkdownParser : TextParser {
     add_tag( text, match, paren, FormatTag.SYNTAX );
   }
 
-  private void highlight_header( FormattedText text, MatchInfo match ) {
+  private void highlight_header( FormattedText text, MatchInfo match, int cursor ) {
     make_grey( text, match, 1 );
     add_tag( text, match, 0, FormatTag.HEADER, get_text( match, 1 ).length.to_string() );
   }
 
-  private void highlight_bold( FormattedText text, MatchInfo match ) {
+  private void highlight_bold( FormattedText text, MatchInfo match, int cursor ) {
     make_grey( text, match, 1 );
     add_tag( text, match, 2, FormatTag.BOLD );
     make_grey( text, match, 3 );
   }
 
-  private void highlight_italics( FormattedText text, MatchInfo match ) {
+  private void highlight_italics( FormattedText text, MatchInfo match, int cursor ) {
     make_grey( text, match, 1 );
     add_tag( text, match, 2, FormatTag.ITALICS );
     make_grey( text, match, 3 );
   }
 
-  private void highlight_url1( FormattedText text, MatchInfo match ) {
+  private void highlight_url1( FormattedText text, MatchInfo match, int cursor ) {
     make_grey( text, match, 1 );
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 4 ) );
     make_grey( text, match, 3 );
   }
 
-  private void highlight_url2( FormattedText text, MatchInfo match ) {
+  private void highlight_url2( FormattedText text, MatchInfo match, int cursor ) {
     make_grey( text, match, 1 );
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 2 ) );
     make_grey( text, match, 5 );
   }
 
-  private void highlight_url3( FormattedText text, MatchInfo match ) {
+  private void highlight_url3( FormattedText text, MatchInfo match, int cursor ) {
     make_grey( text, match, 1 );
     add_tag( text, match, 2, FormatTag.URL, get_text( match, 2 ) );
     make_grey( text, match, 4 );

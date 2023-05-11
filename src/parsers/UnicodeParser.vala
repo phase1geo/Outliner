@@ -36,7 +36,7 @@ public class UnicodeParser : TextParser {
   }
 
   /* Highlights the given tag */
-  private void handle_code( FormattedText text, MatchInfo match ) {
+  private void handle_code( FormattedText text, MatchInfo match, int cursor ) {
 
     var tag = get_text( match, 0 );
 
@@ -50,7 +50,6 @@ public class UnicodeParser : TextParser {
       match.fetch_pos( 0, out start, out end );
 
       /* If the cursor is at the end of the tag, display the auto-completer */
-      var cursor = _ot.selected.name.cursor;
       if( (start <= cursor) && (cursor <= end) ) {
         _ot.show_auto_completion( _ot.win.unicoder.get_matches( tag ), start, end );
       }
@@ -60,11 +59,11 @@ public class UnicodeParser : TextParser {
   }
 
   /* Handles hiding the auto-completion window */
-  private void handle_nocode( FormattedText text, MatchInfo match ) {
+  private void handle_nocode( FormattedText text, MatchInfo match, int cursor ) {
     if( (_ot.selected != null) && (_ot.selected.name.text == text) ) {
       int start, end;
       match.fetch_pos( 0, out start, out end );
-      if( _ot.selected.name.cursor == start ) {
+      if( cursor == end ) {
         _ot.hide_auto_completion();
       }
     }

@@ -21,7 +21,7 @@
 
 public class TextParser {
 
-  public delegate void TextMatchCallback( FormattedText text, MatchInfo match_info );
+  public delegate void TextMatchCallback( FormattedText text, MatchInfo match_info, int cursor );
 
   private struct ReCallback {
     Regex             re;
@@ -66,7 +66,7 @@ public class TextParser {
   }
 
   /* Called to parse the text within the given FormattedText element */
-  public void parse( FormattedText text ) {
+  public void parse( FormattedText text, int cursor ) {
     for( int i=0; i<_res.length; i++ ) {
       MatchInfo matches;
       var       start = 0;
@@ -75,7 +75,7 @@ public class TextParser {
           int start_pos, end_pos;
           matches.fetch_pos( 0, out start_pos, out end_pos );
           start = end_pos;
-          _res.index( i ).func( text, matches );
+          _res.index( i ).func( text, matches, cursor );
         }
       } catch( RegexError e ) {}
     }

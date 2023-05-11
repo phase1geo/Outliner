@@ -32,7 +32,7 @@ public class UrlParser : TextParser {
   }
 
   /* Add the URL link */
-  private void highlight_url( FormattedText text, MatchInfo match ) {
+  private void highlight_url( FormattedText text, MatchInfo match, int cursor ) {
     add_tag( text, match, 0, FormatTag.URL, get_text( match, 0 ) );
   }
 
