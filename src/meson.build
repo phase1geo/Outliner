@@ -11,6 +11,7 @@ sources += files(
 
   'parsers/MarkdownParser.vala',
   'parsers/TaggerParser.vala',
+  'parsers/UnicodeParser.vala',
   'parsers/UrlParser.vala',
 
   'themes/ThemeDark.vala',
@@ -75,6 +76,7 @@ sources += files(
   'UndoItem.vala',
   'UndoTextBuffer.vala',
   'UndoTextItem.vala',
+  'UnicodeInsert.vala',
   'Utils.vala',
   'ZoomWidget.vala'
 )
