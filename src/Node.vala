@@ -1106,7 +1106,7 @@ public class Node {
     var prev  = node.get_previous_node();
     var index = node.index();
 
-    node.adjust_nodes( ((prev == null) ? 0 : prev.last_y), true, "remove_child" );
+    node.adjust_nodes( ((prev == null) ? _ot.get_top_row_y() : prev.last_y), true, "remove_child" );
     children.remove_index( index );
     node.parent = null;
 
@@ -1243,7 +1243,7 @@ public class Node {
       children.index( i ).set_condensed( condensed );
     }
     if( is_root() ) {
-      adjust_nodes( 0, false, "set_condensed" );
+      adjust_nodes( _ot.get_top_row_y(), false, "set_condensed" );
     }
   }
 
