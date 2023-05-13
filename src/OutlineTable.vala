@@ -86,6 +86,8 @@ public class OutlineTable : DrawingArea {
   private TextCompletion  _completion;
   private bool            _markdown;
   private bool            _blank_rows;
+	private bool            _auto_sizing;
+	private int             _auto_size_depth = 1;
   private bool            _filtered   = false;
   private Node?           _focus_node = null;
   private bool            _in_focus_exit = false;
@@ -269,6 +271,25 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+	public bool auto_sizing {
+		get {
+			return( _auto_sizing );
+		}
+		set {
+			if( _auto_sizing != value ) {
+				_auto_sizing = value;
+        stdout.printf( "Auto-size changed\n" );
+        auto_size_changed();
+				queue_draw();
+				changed();
+			}
+		}
+	}
+	public int auto_size_depth {
+		get {
+			return( _auto_size_depth );
+		}
+	}
   public Tagger tagger {
     get {
       return( _tagger );
@@ -291,6 +312,7 @@ public class OutlineTable : DrawingArea {
   public signal void cursor_changed();
   public signal void show_tasks_changed();
   public signal void markdown_changed();
+  public signal void auto_size_changed();
   public signal void focus_mode( string? msg );
   public signal void nodes_filtered( string? msg );
 
@@ -330,18 +352,20 @@ public class OutlineTable : DrawingArea {
     get_style_context().add_class( "canvas" );
 
     /* Initialize font and other property information from gsettings */
-    _title_family  = settings.get_string( "default-title-font-family" );
-    _name_family   = settings.get_string( "default-row-font-family" );
-    _note_family   = settings.get_string( "default-note-font-family" );
-    _title_size    = settings.get_int( "default-title-font-size" );
-    _name_size     = settings.get_int( "default-row-font-size" );
-    _note_size     = settings.get_int( "default-note-font-size" );
-    _show_tasks    = settings.get_boolean( "default-show-tasks" );
-    _show_depth    = settings.get_boolean( "default-show-depth" );
-    _markdown      = settings.get_boolean( "default-markdown-enabled" );
-    _blank_rows    = settings.get_boolean( "enable-blank-rows" );
-    tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
-    _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
+    _title_family    = settings.get_string( "default-title-font-family" );
+    _name_family     = settings.get_string( "default-row-font-family" );
+    _note_family     = settings.get_string( "default-note-font-family" );
+    _title_size      = settings.get_int( "default-title-font-size" );
+    _name_size       = settings.get_int( "default-row-font-size" );
+    _note_size       = settings.get_int( "default-note-font-size" );
+    _show_tasks      = settings.get_boolean( "default-show-tasks" );
+    _show_depth      = settings.get_boolean( "default-show-depth" );
+    _markdown        = settings.get_boolean( "default-markdown-enabled" );
+    _blank_rows      = settings.get_boolean( "enable-blank-rows" );
+		_auto_sizing     = settings.get_boolean( "enable-auto-sizing" );
+		_auto_size_depth = settings.get_int( "auto-sizing-depth" );
+    tasks_on_right   = settings.get_boolean( "checkboxes-on-right" );
+    _min_depth       = settings.get_boolean( "minimum-depth-line-display" );
 
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
@@ -3066,6 +3090,11 @@ public class OutlineTable : DrawingArea {
       _blank_rows = bool.parse( br );
     }
 
+		var ah = n->get_prop( "auto-sizing" );
+		if( ah != null ) {
+			_auto_sizing = bool.parse( ah );
+		}
+
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
@@ -3136,6 +3165,7 @@ public class OutlineTable : DrawingArea {
     n->set_prop( "show-depth",        _show_depth.to_string() );
     n->set_prop( "markdown",          _markdown.to_string() );
     n->set_prop( "blank-rows",        _blank_rows.to_string() );
+		n->set_prop( "auto-sizing",       _auto_sizing.to_string() );
 
     if( _title != null ) {
       n->add_child( _title.save( "title" ) );

@@ -154,7 +154,7 @@ public class FormattedText {
         extra = n->get_prop( "extra" );
       }
       public static int compare( void* x, void* y ) {
-     		 FormattedRange** x1 = (FormattedRange**)x;
+        FormattedRange** x1 = (FormattedRange**)x;
        	FormattedRange** y1 = (FormattedRange**)y;
         return( (int)((*x1)->start > (*y1)->start) - (int)((*x1)->start < (*y1)->start) );
       }
@@ -667,6 +667,7 @@ public class FormattedText {
       return( _text );
     }
   }
+	public int header_depth { set; get; default = 0; }
 
   /* Default copy constructor */
   public FormattedText( OutlineTable table ) {
@@ -926,11 +927,15 @@ public class FormattedText {
    Returns the Pango attribute list to apply to the Pango layout.  This
    method should only be called if tags_exist returns true.
   */
-  public AttrList get_attributes() {
+  public AttrList get_attributes( int add_header_depth = -1 ) {
     var attrs = new AttrList();
     for( int i=0; i<FormatTag.LENGTH; i++ ) {
       _formats[i].get_attributes( _attr_tags[i], ref attrs );
     }
+		if( (header_depth >= 1) && (header_depth <= 6) ) {
+			var header = new HeaderInfo();
+      header.add_attrs( ref attrs, 0, text.length, "%d".printf( header_depth ) );
+		}
     return( attrs );
   }
 

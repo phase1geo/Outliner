@@ -251,9 +251,12 @@ public class Node {
       return( _depth );
     }
     set {
-      _depth = value;
-      for( int i=0; i<children.length; i++ ) {
-        children.index( i ).depth = _depth + 1;
+      if( _depth != value ) {
+        _depth = value;
+        auto_size();
+        for( int i=0; i<children.length; i++ ) {
+          children.index( i ).depth = _depth + 1;
+        }
       }
     }
   }
@@ -333,6 +336,7 @@ public class Node {
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
     ot.markdown_changed.connect( table_markdown_changed );
+    ot.auto_size_changed.connect( table_auto_size_changed );
 
   }
 
@@ -384,6 +388,7 @@ public class Node {
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
     ot.markdown_changed.connect( table_markdown_changed );
+    ot.auto_size_changed.connect( table_auto_size_changed );
 
   }
 
@@ -394,6 +399,7 @@ public class Node {
     _ot.theme_changed.disconnect( table_theme_changed );
     _ot.show_tasks_changed.disconnect( update_height_from_resize );
     _ot.markdown_changed.disconnect( table_markdown_changed );
+    _ot.auto_size_changed.disconnect( table_auto_size_changed );
   }
 
   /* Create the note icon pixbuf if we need to */
@@ -439,6 +445,24 @@ public class Node {
     } else {
       _name.text.remove_parser( _ot.markdown_parser );
       _note.text.remove_parser( _ot.markdown_parser );
+    }
+  }
+
+  /* Handle any changes to the auto-size setting */
+  private void table_auto_size_changed() {
+    auto_size();
+  }
+
+  /* Update the header_depth of the name text to match our depth if auto-sizing is enabled */
+  private void auto_size() {
+    var orig_depth = name.text.header_depth;
+    if( _ot.auto_sizing && (_depth <= _ot.auto_size_depth) ) {
+      name.text.header_depth = _depth;
+    } else {
+      name.text.header_depth = 0;
+    }
+    if( orig_depth != name.text.header_depth ) {
+      name.update_size();
     }
   }
 

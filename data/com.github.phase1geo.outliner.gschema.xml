@@ -136,6 +136,16 @@
       <summary>Specifies if main rows without subrows that contain no text are drawn as blank rows.</summary>
       <description>Specifies if main rows without subrows that contain no text are drawn as blank rows.</description>
     </key>
+		<key name="enable-auto-sizing" type="b">
+			<default>false</default>
+			<summary>Specifies if row font sizes should be based off the depth of the row.</summary>
+			<description>Specifies if row font sizes should be based off the depth of the row.</description>
+		</key>
+		<key name="auto-sizing-depth" type="i">
+			<default>3</default>
+			<summary>Specifies the deepest row depth that will be auto-sized if enable-auto-sizing is enabled.</summary>
+			<description>Specifies the deepest row depth that will be auto-sized if enable-auto-sizing is enabled.</description>
+		</key>
     <key name="focus-mode" type="b">
       <default>false</default>
       <summary>Specifies the current state of focused writing mode.</summary>
