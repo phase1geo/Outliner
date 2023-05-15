@@ -96,6 +96,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     { "action_quit",          action_quit },
     // { "action_export",        action_export },
     { "action_print",         action_print },
+    { "action_preferences",   action_preferences },
     { "action_shortcuts",     action_shortcuts },
     { "action_focus_mode",    action_focus_mode },
     { "action_reset_fonts",   action_reset_fonts },
@@ -536,6 +537,7 @@ public class MainWindow : Hdy.ApplicationWindow {
     app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
     // app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
+    app.set_accels_for_action( "win.action_preferences", { "<Control>period" } );
     app.set_accels_for_action( "win.action_shortcuts",   { "<Control>question" } );
     app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
     app.set_accels_for_action( "win.action_zoom_in",     { "<Control>plus", "<Control>equal" } );
@@ -892,6 +894,13 @@ public class MainWindow : Hdy.ApplicationWindow {
     box.pack_start( new Separator( Orientation.HORIZONTAL ) );
 
     var btn_box = new Box( Orientation.VERTICAL, 0 );
+
+    /* Add button to access preferences */
+    var prefs = new ModelButton();
+    prefs.get_child().destroy();
+    prefs.add( new Granite.AccelLabel( _( "Preferences" ), "<Control>period" ) );
+    prefs.action_name = "win.action_preferences";
+    btn_box.pack_start( prefs, false, false, 5 );
 
     /* Add button to display shortcuts */
     var shortcuts = new ModelButton();
@@ -1294,6 +1303,12 @@ public class MainWindow : Hdy.ApplicationWindow {
     _auto_sizing.state   = table.auto_sizing;
     _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
+  }
+
+  /* Displays the preferences window */
+  private void action_preferences() {
+    var prefs = new Preferences( this, _settings );
+    prefs.show_all();
   }
 
   /* Displays the shortcuts cheatsheet */

@@ -66,6 +66,7 @@ sources += files(
   'NodeLabels.vala',
   'NodeMenu.vala',
   'OutlineTable.vala',
+  'Preferences.vala',
   'SearchBar.vala',
   'Tagger.vala',
   'TextCompletion.vala',
