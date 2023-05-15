@@ -111,6 +111,11 @@
       <summary>Minimizes the drawing of depth lines (when enabled)</summary>
       <description>Only draws depth lines (when enabled) in cases where a row has a sibling row below it</description>
     </key>
+    <key name="auto-parse-embedded-urls" type="b">
+      <default>true</default>
+      <summary>Specifies if embedded URLs should be automatically highlighted.</summary>
+      <description>Specifies if embedded URLs should be automatically highlighted.</description>
+    </key>
     <key name="default-markdown-enabled" type="b">
       <default>false</default>
       <summary>Default state of the markdown indicator for new documents</summary>
@@ -120,6 +125,11 @@
       <default>true</default>
       <summary>Controls the display of the auto-completer when adding tags</summary>
       <description>Controls the display of the auto-completer when adding tags</description>
+    </key>
+    <key name="default-unicode-enabled" type="b">
+      <default>true</default>
+      <summary>Default enable for unicode insertion</summary>
+      <description>If this mode is enabled, entering a backslash will display a unicode auto-completer</description>
     </key>
     <key name="max-auto-completion-items" type="i">
       <default>10</default>
@@ -150,6 +160,11 @@
       <default>false</default>
       <summary>Specifies the current state of focused writing mode.</summary>
       <description>Specifies the current state of focused writing mode.</description>
+    </key>
+    <key name="default-theme" type="s">
+      <default>"default"</default>
+      <summary>Specifies the name of the default theme to use when creating new mind maps.</summary>
+      <description>Specifies the name of the default theme to use when creating new mind maps.</description>
     </key>
     <key name="print-settings" type="a{sv}">
       <default>[]</default>
