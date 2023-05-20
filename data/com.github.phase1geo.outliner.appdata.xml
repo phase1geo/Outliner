@@ -156,7 +156,7 @@
         </ul>
       </description>
     </release>
-    <release version="1.6.0" data="2021-09-29">
+    <release version="1.6.0" date="2021-09-29">
       <description>
         <p>New</p>
         <p xml:lang="nl">Nieuw</p>
@@ -187,7 +187,7 @@
         </ul>
       </description>
     </release>
-    <release version="1.5.1" data="2021-08-12">
+    <release version="1.5.1" date="2021-08-12">
       <description>
         <p>Changes</p>
         <p xml:lang="nl">Wijzigingen</p>
@@ -204,7 +204,7 @@
         </ul>
       </description>
     </release>
-    <release version="1.5.0" data="2021-08-08">
+    <release version="1.5.0" date="2021-08-08">
       <description>
         <p>New</p>
         <p xml:lang="nl">Nieuw</p>
