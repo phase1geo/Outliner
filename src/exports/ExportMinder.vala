@@ -57,7 +57,9 @@ public class ExportMinder : Export {
       Xml.Node* root_nodes = new Xml.Node( null, "nodes" );
       for( int i=0; i<table.root.children.length; i++ ) {
         var node = table.root.children.index( i );
-        root_nodes->add_child( export_node( node ) );
+        if( !node.draw_as_blank() ) {
+          root_nodes->add_child( export_node( node ) );
+        }
       }
       root->add_child( root_nodes );
     }
@@ -68,7 +70,7 @@ public class ExportMinder : Export {
   private Xml.Node* export_root_node( OutlineTable table ) {
     Xml.Node* root = new Xml.Node( null, "node" );
     Xml.Node* name = new Xml.Node( null, "nodename" );
-    name->add_content( table.document.label );
+    name->add_content( table.title.text.text );
     export_node_properties( root, null );
     root->add_child( export_node_style() );
     root->add_child( name );
