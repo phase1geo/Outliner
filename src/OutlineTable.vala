@@ -85,6 +85,7 @@ public class OutlineTable : DrawingArea {
   private Tagger          _tagger;
   private TextCompletion  _completion;
   private bool            _markdown;
+  private bool            _parse_urls;
   private bool            _blank_rows;
 	private bool            _auto_sizing;
 	private int             _auto_size_depth = 1;
@@ -259,6 +260,19 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
+  public bool parse_urls {
+    get {
+      return( _parse_urls );
+    }
+    set {
+      if( _parse_urls != value ) {
+        _parse_urls = value;
+        parse_urls_changed();
+        queue_draw();
+        changed();
+      }
+    }
+  }
   public bool blank_rows {
     get {
       return( _blank_rows );
@@ -278,7 +292,6 @@ public class OutlineTable : DrawingArea {
 		set {
 			if( _auto_sizing != value ) {
 				_auto_sizing = value;
-        stdout.printf( "Auto-size changed\n" );
         auto_size_changed();
 				queue_draw();
 				changed();
@@ -312,6 +325,7 @@ public class OutlineTable : DrawingArea {
   public signal void cursor_changed();
   public signal void show_tasks_changed();
   public signal void markdown_changed();
+  public signal void parse_urls_changed();
   public signal void auto_size_changed();
   public signal void focus_mode( string? msg );
   public signal void nodes_filtered( string? msg );
@@ -366,10 +380,13 @@ public class OutlineTable : DrawingArea {
 		_auto_size_depth = settings.get_int( "auto-sizing-depth" );
     tasks_on_right   = settings.get_boolean( "checkboxes-on-right" );
     _min_depth       = settings.get_boolean( "minimum-depth-line-display" );
+    _parse_urls      = settings.get_boolean( "auto-parse-embedded-urls" );
 
     /* Handle any changes made to the settings that we don't want to poll on */
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
+      _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
+      parse_urls     = settings.get_boolean( "auto-parse-embedded-urls" );
       if( root.children.length > 0 ) {
         root.children.index( 0 ).y = get_top_row_y();
         root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
@@ -379,7 +396,7 @@ public class OutlineTable : DrawingArea {
     });
 
     /* Set the default theme */
-    var init_theme = MainWindow.themes.get_theme( "solarized_dark" );
+    var init_theme = MainWindow.themes.get_theme( settings.get_string( "default-theme" ) );
     _hilite_color = Utils.color_from_rgba( init_theme.hilite );
     set_theme( init_theme );
 
@@ -3040,36 +3057,6 @@ public class OutlineTable : DrawingArea {
       _list_type = NodeListType.parse( lt );
     }
 
-    var iff = n->get_prop( "title-font-family" );
-    if( iff != null ) {
-      _title_family = iff;
-    }
-
-    var ifs = n->get_prop( "title-font-size" );
-    if( ifs != null ) {
-      _title_size = int.parse( ifs );
-    }
-
-    var mff = n->get_prop( "name-font-family" );
-    if( mff != null ) {
-      _name_family = mff;
-    }
-
-    var mfs = n->get_prop( "name-font-size" );
-    if( mfs != null ) {
-      _name_size = int.parse( mfs );
-    }
-
-    var tff = n->get_prop( "note-font-family" );
-    if( tff != null ) {
-      _note_family = tff;
-    }
-
-    var tfs = n->get_prop( "note-font-size" );
-    if( tfs != null ) {
-      _note_size = int.parse( tfs );
-    }
-
     var t = n->get_prop( "show-tasks" );
     if( t != null ) {
       _show_tasks = bool.parse( t );
@@ -3152,20 +3139,14 @@ public class OutlineTable : DrawingArea {
   /* Saves the table information to the given XML node */
   public void save( Xml.Node* n ) {
 
-    n->set_prop( "condensed",         _condensed.to_string() );
-    n->set_prop( "listtype",          list_type.to_string() );
-    n->set_prop( "version",           Outliner.version );
-    n->set_prop( "title-font-family", _title_family );
-    n->set_prop( "title-font-size",   _title_size.to_string() );
-    n->set_prop( "name-font-family",  _name_family );
-    n->set_prop( "name-font-size",    _name_size.to_string() );
-    n->set_prop( "note-font-family",  _note_family );
-    n->set_prop( "note-font-size",    _note_size.to_string() );
-    n->set_prop( "show-tasks",        _show_tasks.to_string() );
-    n->set_prop( "show-depth",        _show_depth.to_string() );
-    n->set_prop( "markdown",          _markdown.to_string() );
-    n->set_prop( "blank-rows",        _blank_rows.to_string() );
-		n->set_prop( "auto-sizing",       _auto_sizing.to_string() );
+    n->set_prop( "version",     Outliner.version );
+    n->set_prop( "condensed",   _condensed.to_string() );
+    n->set_prop( "listtype",    list_type.to_string() );
+    n->set_prop( "show-tasks",  _show_tasks.to_string() );
+    n->set_prop( "show-depth",  _show_depth.to_string() );
+    n->set_prop( "markdown",    _markdown.to_string() );
+    n->set_prop( "blank-rows",  _blank_rows.to_string() );
+		n->set_prop( "auto-sizing", _auto_sizing.to_string() );
 
     if( _title != null ) {
       n->add_child( _title.save( "title" ) );

@@ -26,7 +26,7 @@ public class TaggerParser : TextParser {
   /* Default constructor */
   public TaggerParser( OutlineTable ot ) {
 
-    base( "Tagger" );
+    base( "Tagger", 2 );
 
     _ot = ot;
 

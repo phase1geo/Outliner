@@ -23,7 +23,7 @@ public class UrlParser : TextParser {
 
   /* Default constructor */
   public UrlParser() {
-    base( "URL" );
+    base( "URL", 4 );
 
     /* Links */
     add_regex( "((mailto:)?[a-z0-9.-]+@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)", highlight_url );
