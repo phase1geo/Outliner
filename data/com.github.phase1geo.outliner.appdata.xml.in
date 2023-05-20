@@ -81,6 +81,39 @@
       <value key="x-appcenter-stripe">pk_live_wsAhF3dNEsmhB6oQIQknujgL00dBOT1gsG</value>
     </custom>
     <releases>
+      <release version="1.7.0" date="2023-05-20">
+        <description>
+          <p>New</p>
+          <ul>
+            <li>Added support for inputting Unicode characters using backslash character and auto-completer.</li>
+            <li>Added support for parsing URLs in row text and notes which are Control-clickable to open them.</li>
+            <li>Added support for row text auto-sizing feature.</li>
+            <li>Added new preferences dialog.</li>
+          </ul>
+          <p>Changes</p>
+          <ul>
+            <li>Updated Dutch translation (thanks to @Vistaus)</li>
+            <li>Removed Accounts service from Flatpak manifest.</li>
+            <li>Upgraded Flatpak SDK from 6 to 7.2.</li>
+            <li>Upgraded webkit2gtk package from 4.0 to 4.1.</li>
+            <li>Added home directory permissions by default to Flatpak.</li>
+            <li>Removed header bar coloring.</li>
+            <li>Improved icons for non-elementary systems.</li>
+            <li>Improved print dialog and output.</li>
+            <li>Disabling compile warnings.</li>
+            <li>Improved export UI and added export options.</li>
+            <li>Improved Minder export output.</li>
+          </ul>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Fixed issues with application not displaying translations properly for Flatpak.</li>
+            <li>Fixed layout issues with top row of table which could obfuscate the title.</li>
+            <li>Fixed issues with Org-Mode export output when indent mode is enabled.</li>
+            <li>Fixed text editing and undo/redo issues with Unicode characters.</li>
+            <li>Fixed issue with text rendering when Markdown parser is disabled.</li>
+          </ul>
+        </description>
+      </release>
       <release version="1.6.0" data="2021-09-29">
         <description>
           <p>New</p>
