@@ -329,6 +329,7 @@ public class Node {
     update_width();
     table_zoom_changed();
     table_markdown_changed();
+    table_parse_urls_changed();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
@@ -336,6 +337,7 @@ public class Node {
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
     ot.markdown_changed.connect( table_markdown_changed );
+    ot.parse_urls_changed.connect( table_parse_urls_changed );
     ot.auto_size_changed.connect( table_auto_size_changed );
 
   }
@@ -381,6 +383,7 @@ public class Node {
     update_width();
     table_zoom_changed();
     table_markdown_changed();
+    table_parse_urls_changed();
 
     /* Detect any size changes by the drawing area */
     ot.win.configure_event.connect( window_size_changed );
@@ -388,6 +391,7 @@ public class Node {
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
     ot.markdown_changed.connect( table_markdown_changed );
+    ot.parse_urls_changed.connect( table_parse_urls_changed );
     ot.auto_size_changed.connect( table_auto_size_changed );
 
   }
@@ -399,6 +403,7 @@ public class Node {
     _ot.theme_changed.disconnect( table_theme_changed );
     _ot.show_tasks_changed.disconnect( update_height_from_resize );
     _ot.markdown_changed.disconnect( table_markdown_changed );
+    _ot.parse_urls_changed.disconnect( table_parse_urls_changed );
     _ot.auto_size_changed.disconnect( table_auto_size_changed );
   }
 
@@ -445,6 +450,17 @@ public class Node {
     } else {
       _name.text.remove_parser( _ot.markdown_parser );
       _note.text.remove_parser( _ot.markdown_parser );
+    }
+  }
+
+  /* Handle any changes to the URL parser */
+  private void table_parse_urls_changed() {
+    if( _ot.parse_urls ) {
+      _name.text.add_parser( _ot.url_parser );
+      _note.text.add_parser( _ot.url_parser );
+    } else {
+      _name.text.remove_parser( _ot.url_parser );
+      _note.text.remove_parser( _ot.url_parser );
     }
   }
 

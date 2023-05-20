@@ -99,7 +99,6 @@ public class MainWindow : Hdy.ApplicationWindow {
     { "action_preferences",   action_preferences },
     { "action_shortcuts",     action_shortcuts },
     { "action_focus_mode",    action_focus_mode },
-    { "action_reset_fonts",   action_reset_fonts },
     { "action_zoom_in",       action_zoom_in },
     { "action_zoom_out",      action_zoom_out },
     { "action_zoom_actual",   action_zoom_actual }
@@ -307,7 +306,6 @@ public class MainWindow : Hdy.ApplicationWindow {
   private void tab_changed( Tab tab ) {
     var ot = get_table( tab );
     do_buffer_changed( ot.undo_buffer );
-    do_fonts_changed( ot );
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
@@ -706,33 +704,6 @@ public class MainWindow : Hdy.ApplicationWindow {
 
   }
 
-  /* Returns the font box for the given target type */
-  private Box create_font_box( FontTarget target, string label, ref FontButton? fbtn ) {
-
-    var box = new Box( Orientation.HORIZONTAL, 0 );
-    var lbl = new Label( "%s:".printf( label ) );
-    var btn = new FontButton();
-    btn.show_style = false;
-    btn.set_filter_func( (family, face) => {
-      var fd     = face.describe();
-      var weight = fd.get_weight();
-      var style  = fd.get_style();
-      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
-    });
-    btn.font_set.connect(() => {
-      var table = get_current_table();
-      table.change_font( target, btn.get_font_family().get_name(), (btn.get_font_size() / Pango.SCALE) );
-    });
-
-    box.pack_start( lbl,  false, false, 10 );
-    box.pack_end(   btn, false, false, 10 );
-
-    fbtn = btn;
-
-    return( box );
-
-  }
-
   /* Adds the property functionality */
   private void add_properties_button() {
 
@@ -799,18 +770,6 @@ public class MainWindow : Hdy.ApplicationWindow {
     ltbox.pack_start( ltlbl,       false, false, 10 );
     ltbox.pack_end(   _list_types, false, false, 10 );
     box.pack_start( ltbox, false, false, 10 );
-
-    /* Add title font selection button */
-    var title_font = create_font_box( FontTarget.TITLE, _( "Title Font" ), ref _fonts_title );
-    box.pack_start( title_font, false, false, 10 );
-
-    /* Add row font selection button */
-    var row_font = create_font_box( FontTarget.NAME, _( "Row Font" ), ref _fonts_name );
-    box.pack_start( row_font, false, false, 10 );
-
-    /* Add row font selection button */
-    var note_font = create_font_box( FontTarget.NOTE, _( "Note Font" ), ref _fonts_note );
-    box.pack_start( note_font, false, false, 10 );
 
     /* Add condensed mode switch */
     var cbox = new Box( Orientation.HORIZONTAL, 0 );
@@ -915,12 +874,6 @@ public class MainWindow : Hdy.ApplicationWindow {
     focus_mode.add( new Granite.AccelLabel( _( "Enter Distraction-Free Mode" ), "F2" ) );
     focus_mode.action_name = "win.action_focus_mode";
     btn_box.pack_start( focus_mode, false, false, 5 );
-
-    /* Font reset */
-    var reset_fonts = new ModelButton();
-    reset_fonts.text = _( "Reset Fonts to Defaults" );
-    reset_fonts.action_name = "win.action_reset_fonts";
-    btn_box.pack_start( reset_fonts, false, false, 5 );
 
     box.pack_start( btn_box, false, false, 0 );
 
@@ -1157,28 +1110,6 @@ public class MainWindow : Hdy.ApplicationWindow {
     _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.redo_tooltip(), "<Control><Shift>z" ) );
   }
 
-  /* Called whenever the tab is changed to update the current document's font information */
-  private void do_fonts_changed( OutlineTable ot ) {
-    var title_fd = _fonts_title.get_font_desc();
-    var name_fd  = _fonts_name.get_font_desc();
-    var note_fd  = _fonts_note.get_font_desc();
-    if( ot.title_font_family != null ) {
-      title_fd.set_family( ot.title_font_family );
-    }
-    if( ot.name_font_family != null ) {
-      name_fd.set_family( ot.name_font_family );
-    }
-    if( ot.note_font_family != null ) {
-      note_fd.set_family( ot.note_font_family );
-    }
-    title_fd.set_size( (int)(ot.title_font_size * Pango.SCALE) );
-    name_fd.set_size( (int)(ot.name_font_size * Pango.SCALE) );
-    note_fd.set_size( (int)(ot.note_font_size * Pango.SCALE) );
-    _fonts_title.set_font_desc( title_fd );
-    _fonts_name.set_font_desc( name_fd );
-    _fonts_note.set_font_desc( note_fd );
-  }
-
   /* Allow the user to select a filename to save the document as */
   public bool save_file( OutlineTable ot ) {
     FileChooserDialog dialog = new FileChooserDialog( _( "Save File" ), this, FileChooserAction.SAVE,
@@ -1346,27 +1277,6 @@ public class MainWindow : Hdy.ApplicationWindow {
     _header_revealer.reveal_child = !enable;
     _nb.tab_bar_behavior   = enable ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
     _settings.set_boolean( "focus-mode", enable );
-
-  }
-
-  /* Called whenever the user selects the reset fonts button in the properties popover */
-  private void action_reset_fonts() {
-
-    var table        = get_current_table( "action_reset_fonts" );
-    var title_family = _settings.get_string( "default-title-font-family" );
-    var name_family  = _settings.get_string( "default-row-font-family" );
-    var note_family  = _settings.get_string( "default-note-font-family" );
-    var title_size   = _settings.get_int( "default-title-font-size" );
-    var name_size    = _settings.get_int( "default-row-font-size" );
-    var note_size    = _settings.get_int( "default-note-font-size" );
-
-    /* Update the table */
-    table.change_font( FontTarget.TITLE, title_family, title_size );
-    table.change_font( FontTarget.NAME,  name_family, name_size );
-    table.change_font( FontTarget.NOTE,  note_family, note_size );
-
-    /* Update the UI */
-    do_fonts_changed( table );
 
   }
 

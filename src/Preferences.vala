@@ -1,4 +1,4 @@
- /*
+/*
 * Copyright (c) 2018 (https://github.com/phase1geo/Minder)
 *
 * This program is free software; you can redistribute it and/or
@@ -88,11 +88,11 @@ public class Preferences : Gtk.Dialog {
     grid.attach( make_switch( "default-markdown-enabled" ), 1, row );
     row++;
 
-    grid.attach( make_label( _( "Enable Unicode input by default" ) ), 0, row );
+    grid.attach( make_label( _( "Enable Unicode input" ) ), 0, row );
     grid.attach( make_switch( "default-unicode-enabled" ), 1, row );
     row++;
 
-    grid.attach( make_label( _( "Enable tag auto-completion by default" ) ), 0, row );
+    grid.attach( make_label( _( "Enable tag auto-completion" ) ), 0, row );
     grid.attach( make_switch( "enable-tag-auto-completion" ), 1, row );
     row++;
 
@@ -121,19 +121,19 @@ public class Preferences : Gtk.Dialog {
     grid.attach( make_themes(), 1, row, 2 );
     row++;
 
-    grid.attach( make_label( _( "Default title font" ) ), 0, row );
+    grid.attach( make_label( _( "Title font" ) ), 0, row );
     grid.attach( make_font( FontTarget.TITLE, "default-title-font-family", "default-title-font-size" ), 1, row );
     row++;
 
-    grid.attach( make_label( _( "Default row font" ) ), 0, row );
+    grid.attach( make_label( _( "Row font" ) ), 0, row );
     grid.attach( make_font( FontTarget.NAME, "default-row-font-family", "default-row-font-size" ), 1, row );
     row++;
-    
-    grid.attach( make_label( _( "Default note font" ) ), 0, row );
+
+    grid.attach( make_label( _( "Note font" ) ), 0, row );
     grid.attach( make_font( FontTarget.NOTE, "default-note-font-family", "default-note-font-size" ), 1, row );
     row++;
 
-    grid.attach( make_label( _( "Position checkbox on right" ) ), 0, row );
+    grid.attach( make_label( _( "Position checkboxes on right" ) ), 0, row );
     grid.attach( make_switch( "checkboxes-on-right" ), 1, row );
     row++;
 
@@ -196,12 +196,13 @@ public class Preferences : Gtk.Dialog {
       var style  = fd.get_style();
       return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
     });
+    btn.set_font( _settings.get_string( family_setting ) + " " + _settings.get_int( size_setting ).to_string() );
     btn.font_set.connect(() => {
       var table = _win.get_current_table();
       table.change_font( target, btn.get_font_family().get_name(), (btn.get_font_size() / Pango.SCALE) );
+      _settings.set_string( family_setting, btn.get_font_family().get_name() );
+      _settings.set_int( size_setting, (btn.get_font_size() / Pango.SCALE) );
     });
-    _settings.bind( family_setting, btn, "font_family", SettingsBindFlags.DEFAULT );
-    _settings.bind( size_setting,   btn, "font_size",   SettingsBindFlags.DEFAULT );
     return( btn );
   }
 

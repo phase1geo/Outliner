@@ -29,6 +29,7 @@ public class TextParser {
   }
 
   private string             _name;
+  private int                _id;
   private Array<ReCallback?> _res;
 
   public string name {
@@ -36,10 +37,16 @@ public class TextParser {
       return( _name );
     }
   }
+  public int id {
+    get {
+      return( _id );
+    }
+  }
 
   /* Default constructor */
-  public TextParser( string name ) {
+  public TextParser( string name, int id ) {
     _name = name;
+    _id   = id;
     _res  = new Array<ReCallback?>();
   }
 
@@ -57,7 +64,7 @@ public class TextParser {
   protected void add_tag( FormattedText text, MatchInfo matches, int paren, FormatTag tag, string? extra = null ) {
     int start, end;
     matches.fetch_pos( paren, out start, out end );
-    text.add_tag( tag, start, end, extra );
+    text.add_tag( tag, start, end, extra, _id );
   }
 
   /* Helper function that returns the matched string */
@@ -88,12 +95,12 @@ public class TextParser {
 
   /* This is called when the associated FormatBar button is clicked */
   public virtual void insert_tag( CanvasText ct, FormatTag tag, int start_pos, int end_pos, UndoTextBuffer undo_buffer, string? extra = null ) {
-    ct.text.add_tag( tag, start_pos, end_pos, extra );
+    ct.text.add_tag( tag, start_pos, end_pos, extra, _id );
   }
 
   /* This is called when the associated FormatBar button is unclicked */
   public virtual void remove_all_tags( CanvasText ct, int start_pos, int end_pos, UndoTextBuffer undo_buffer ) {
-    ct.text.remove_all_tags( start_pos, end_pos );
+    ct.text.remove_all_tags( start_pos, end_pos, _id );
   }
 
 }

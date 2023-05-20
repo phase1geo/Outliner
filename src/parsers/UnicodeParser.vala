@@ -26,7 +26,7 @@ public class UnicodeParser : TextParser {
   /* Default constructor */
   public UnicodeParser( OutlineTable ot ) {
 
-    base( "Unicode" );
+    base( "Unicode", 3 );
 
     _ot = ot;
 

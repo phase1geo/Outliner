@@ -25,7 +25,7 @@ public class MarkdownParser : TextParser {
 
   /* Default constructor */
   public MarkdownParser( OutlineTable ot ) {
-    base( "Markdown" );
+    base( "Markdown", 1 );
 
     _ot = ot;
 
