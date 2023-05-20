@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-30 23:05-0500\n"
+"POT-Creation-Date: 2023-05-20 00:51-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,8 +57,86 @@ msgstr ""
 msgid "Closed Tabs"
 msgstr ""
 
-#: src/exports/ExportMinder.vala:105
+#: src/Exporter.vala:43
+msgid "Export…"
+msgstr ""
+
+#: src/Exporter.vala:44
+msgid "Export With Current Settings"
+msgstr ""
+
+#: src/Exporter.vala:110
+msgid "Export Options"
+msgstr ""
+
+#: src/Exporter.vala:131
+#, c-format
+msgid "Export As %s"
+msgstr ""
+
+#: src/Exporter.vala:132 src/LinkEditor.vala:62 src/MainWindow.vala:969
+#: src/MainWindow.vala:1009 src/MainWindow.vala:1116
+msgid "Cancel"
+msgstr ""
+
+#: src/Exporter.vala:132 src/MainWindow.vala:674
+msgid "Export"
+msgstr ""
+
+#: src/Exporter.vala:158
+msgid "Minder Export Completed"
+msgstr ""
+
+#: src/exports/ExportHTML.vala:29
+msgid "HTML"
+msgstr ""
+
+#: src/exports/ExportHTML.vala:34 src/exports/ExportRTF.vala:34
+msgid "Use unordered lists"
+msgstr ""
+
+#: src/exports/ExportHTML.vala:34 src/exports/ExportRTF.vala:34
+msgid "Export using unordered lists"
+msgstr ""
+
+#: src/exports/ExportMarkdown.vala:28
+msgid "Markdown"
+msgstr ""
+
+#: src/exports/ExportMinder.vala:30
+msgid "Minder"
+msgstr ""
+
+#: src/exports/ExportMinder.vala:103
 msgid "To right"
+msgstr ""
+
+#: src/exports/ExportOPML.vala:27
+msgid "OPML"
+msgstr ""
+
+#: src/exports/ExportOrgMode.vala:29
+msgid "Org-Mode"
+msgstr ""
+
+#: src/exports/ExportOrgMode.vala:34
+msgid "Indent Mode"
+msgstr ""
+
+#: src/exports/ExportOrgMode.vala:34
+msgid "Export using indentation spaces"
+msgstr ""
+
+#: src/exports/ExportPDF.vala:28
+msgid "PDF"
+msgstr ""
+
+#: src/exports/ExportRTF.vala:29
+msgid "RTF"
+msgstr ""
+
+#: src/exports/ExportText.vala:28
+msgid "PlainText"
 msgstr ""
 
 #: src/FormatBar.vala:60 src/NodeMenu.vala:64
@@ -137,210 +215,153 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/LinkEditor.vala:62 src/MainWindow.vala:961 src/MainWindow.vala:1001
-#: src/MainWindow.vala:1126 src/MainWindow.vala:1219
-msgid "Cancel"
-msgstr ""
-
-#: src/MainWindow.vala:137 src/MainWindow.vala:1129
+#: src/MainWindow.vala:159 src/MainWindow.vala:1119
 msgid "Outliner"
 msgstr ""
 
-#: src/MainWindow.vala:168 data/com.github.phase1geo.outliner.shortcuts.ui:21
+#: src/MainWindow.vala:190 data/com.github.phase1geo.outliner.shortcuts.ui:21
 msgid "New File"
 msgstr ""
 
-#: src/MainWindow.vala:173 src/MainWindow.vala:1001
+#: src/MainWindow.vala:195 src/MainWindow.vala:1009
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr ""
 
-#: src/MainWindow.vala:178 data/com.github.phase1geo.outliner.shortcuts.ui:42
+#: src/MainWindow.vala:200 data/com.github.phase1geo.outliner.shortcuts.ui:42
 msgid "Save File As"
 msgstr ""
 
-#: src/MainWindow.vala:183 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:205 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr ""
 
-#: src/MainWindow.vala:189 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:211 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr ""
 
-#: src/MainWindow.vala:267
+#: src/MainWindow.vala:299
 msgid "Unnamed Document"
 msgstr ""
 
-#: src/MainWindow.vala:520
+#: src/MainWindow.vala:552
 msgid "Search"
 msgstr ""
 
-#: src/MainWindow.vala:531
+#: src/MainWindow.vala:563
 msgid "Statistics"
 msgstr ""
 
-#: src/MainWindow.vala:542
+#: src/MainWindow.vala:574
 msgid "<b>Text Statistics</b>"
 msgstr ""
 
-#: src/MainWindow.vala:546
+#: src/MainWindow.vala:578
 msgid "Characters:"
 msgstr ""
 
-#: src/MainWindow.vala:551
+#: src/MainWindow.vala:583
 msgid "Words:"
 msgstr ""
 
-#: src/MainWindow.vala:556
+#: src/MainWindow.vala:588
 msgid "Rows:"
 msgstr ""
 
-#: src/MainWindow.vala:561
+#: src/MainWindow.vala:593
 msgid "<b>Checkbox Statistics</b>"
 msgstr ""
 
-#: src/MainWindow.vala:565
+#: src/MainWindow.vala:597
 msgid "Total:"
 msgstr ""
 
-#: src/MainWindow.vala:570
+#: src/MainWindow.vala:602
 msgid "Incomplete:"
 msgstr ""
 
-#: src/MainWindow.vala:575
+#: src/MainWindow.vala:607
 msgid "In Progress:"
 msgstr ""
 
-#: src/MainWindow.vala:580
+#: src/MainWindow.vala:612
 msgid "Completed:"
 msgstr ""
 
-#: src/MainWindow.vala:642 src/MainWindow.vala:1219
-msgid "Export"
-msgstr ""
-
-#: src/MainWindow.vala:651
-msgid "Export…"
-msgstr ""
-
-#: src/MainWindow.vala:656
+#: src/MainWindow.vala:689
 msgid "Print…"
 msgstr ""
 
-#: src/MainWindow.vala:707
+#: src/MainWindow.vala:713
 msgid "Properties"
 msgstr ""
 
-#: src/MainWindow.vala:721
+#: src/MainWindow.vala:727
 msgid "Theme:"
 msgstr ""
 
-#: src/MainWindow.vala:754
+#: src/MainWindow.vala:760
 msgid "Enumeration Style:"
 msgstr ""
 
-#: src/MainWindow.vala:769
-msgid "Title Font"
-msgstr ""
-
-#: src/MainWindow.vala:773
-msgid "Row Font"
-msgstr ""
-
-#: src/MainWindow.vala:777
-msgid "Note Font"
-msgstr ""
-
-#: src/MainWindow.vala:782
+#: src/MainWindow.vala:776
 msgid "Condensed Mode:"
 msgstr ""
 
-#: src/MainWindow.vala:795
+#: src/MainWindow.vala:789
 msgid "Show Checkboxes"
 msgstr ""
 
-#: src/MainWindow.vala:808
+#: src/MainWindow.vala:802
 msgid "Show Depth Lines"
 msgstr ""
 
-#: src/MainWindow.vala:821
+#: src/MainWindow.vala:815
 msgid "Enable Blank Rows"
 msgstr ""
 
-#: src/MainWindow.vala:834
+#: src/MainWindow.vala:828
+msgid "Enable Header Auto-Sizing"
+msgstr ""
+
+#: src/MainWindow.vala:841
 msgid "Enable Markdown Highlighting"
 msgstr ""
 
-#: src/MainWindow.vala:853
+#: src/MainWindow.vala:860 src/Preferences.vala:36
+msgid "Preferences"
+msgstr ""
+
+#: src/MainWindow.vala:867
 msgid "Shortcuts Cheatsheet"
 msgstr ""
 
-#: src/MainWindow.vala:860
+#: src/MainWindow.vala:874
 msgid "Enter Distraction-Free Mode"
 msgstr ""
 
-#: src/MainWindow.vala:866
-msgid "Reset Fonts to Defaults"
-msgstr ""
-
-#: src/MainWindow.vala:952
+#: src/MainWindow.vala:960
 msgid "Save current unnamed document?"
 msgstr ""
 
-#: src/MainWindow.vala:953
+#: src/MainWindow.vala:961
 msgid "Changes will be permanently lost if not saved."
 msgstr ""
 
-#: src/MainWindow.vala:958
+#: src/MainWindow.vala:966
 msgid "Discard Changes"
 msgstr ""
 
-#: src/MainWindow.vala:964 src/MainWindow.vala:1126
+#: src/MainWindow.vala:972 src/MainWindow.vala:1116
 msgid "Save"
 msgstr ""
 
-#: src/MainWindow.vala:1001
+#: src/MainWindow.vala:1009
 msgid "Open"
 msgstr ""
 
-#: src/MainWindow.vala:1125
+#: src/MainWindow.vala:1115
 msgid "Save File"
-msgstr ""
-
-#: src/MainWindow.vala:1218
-msgid "Export As"
-msgstr ""
-
-#: src/MainWindow.vala:1223
-msgid "HTML"
-msgstr ""
-
-#: src/MainWindow.vala:1230
-msgid "Markdown"
-msgstr ""
-
-#: src/MainWindow.vala:1237
-msgid "Minder"
-msgstr ""
-
-#: src/MainWindow.vala:1243
-msgid "OPML"
-msgstr ""
-
-#: src/MainWindow.vala:1249
-msgid "Org-Mode"
-msgstr ""
-
-#: src/MainWindow.vala:1255
-msgid "PDF"
-msgstr ""
-
-#: src/MainWindow.vala:1261
-msgid "PlainText"
-msgstr ""
-
-#: src/MainWindow.vala:1289
-msgid "Outliner Export Completed"
 msgstr ""
 
 #: src/NodeMenu.vala:72
@@ -383,7 +404,7 @@ msgstr ""
 msgid "Show Note"
 msgstr ""
 
-#: src/NodeMenu.vala:107 src/Tagger.vala:131
+#: src/NodeMenu.vala:107 src/Tagger.vala:132
 #: data/com.github.phase1geo.outliner.shortcuts.ui:253
 msgid "Add Tag"
 msgstr ""
@@ -512,33 +533,119 @@ msgstr ""
 msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr ""
 
-#: src/OutlineTable.vala:795
+#: src/OutlineTable.vala:843
 msgid "Exit Focus Mode"
 msgstr ""
 
-#: src/OutlineTable.vala:865
+#: src/OutlineTable.vala:913
 msgid "Show note"
 msgstr ""
 
-#: src/OutlineTable.vala:865
+#: src/OutlineTable.vala:913
 msgid "Hide note"
 msgstr ""
 
-#: src/OutlineTable.vala:869
+#: src/OutlineTable.vala:917
 #, c-format
 msgid "%u subrows"
 msgstr ""
 
-#: src/OutlineTable.vala:2810
+#: src/OutlineTable.vala:2858
 msgid "Title"
 msgstr ""
 
-#: src/OutlineTable.vala:3207
+#: src/OutlineTable.vala:3230
 msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr ""
 
-#: src/OutlineTable.vala:3235
+#: src/OutlineTable.vala:3258
 msgid "Hit the Escape key to exit."
+msgstr ""
+
+#: src/Preferences.vala:47
+msgid "Behavior"
+msgstr ""
+
+#: src/Preferences.vala:48
+msgid "Appearance"
+msgstr ""
+
+#: src/Preferences.vala:61
+msgid "Close"
+msgstr ""
+
+#: src/Preferences.vala:77
+msgid "Minimize displayed depth lines"
+msgstr ""
+
+#: src/Preferences.vala:79
+msgid ""
+"Only draws depth lines (when enabled) in cases where a row has a sibling row "
+"below it."
+msgstr ""
+
+#: src/Preferences.vala:82
+msgid "Automatically make embedded URLs into links"
+msgstr ""
+
+#: src/Preferences.vala:84
+msgid "Specifies if embedded URLs should be automatically highlighted."
+msgstr ""
+
+#: src/Preferences.vala:87
+msgid "Enable Markdown syntax by default"
+msgstr ""
+
+#: src/Preferences.vala:91
+msgid "Enable Unicode input"
+msgstr ""
+
+#: src/Preferences.vala:95
+msgid "Enable tag auto-completion"
+msgstr ""
+
+#: src/Preferences.vala:99
+msgid "Maximum auto-completion items shown"
+msgstr ""
+
+#: src/Preferences.vala:115
+msgid "Hide themes not matching visual style"
+msgstr ""
+
+#: src/Preferences.vala:120
+msgid "Default theme"
+msgstr ""
+
+#: src/Preferences.vala:124
+msgid "Title font"
+msgstr ""
+
+#: src/Preferences.vala:128
+msgid "Row font"
+msgstr ""
+
+#: src/Preferences.vala:132
+msgid "Note font"
+msgstr ""
+
+#: src/Preferences.vala:136
+msgid "Position checkboxes on right"
+msgstr ""
+
+#: src/Preferences.vala:140
+msgid "Enable blank rows by default"
+msgstr ""
+
+#: src/Preferences.vala:144
+msgid "Enable row auto-sizing by default"
+msgstr ""
+
+#: src/Preferences.vala:146
+msgid "Automatically size row fonts based on row depth."
+msgstr ""
+
+#: src/Preferences.vala:149
+msgid "Auto-size rows up to depth"
 msgstr ""
 
 #: src/SearchBar.vala:94

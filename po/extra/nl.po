@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-30 23:05-0500\n"
+"POT-Creation-Date: 2023-05-20 00:51-0500\n"
 "PO-Revision-Date: 2020-10-18 12:17+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: \n"
@@ -28,10 +28,6 @@ msgstr "Outliner"
 #: data/com.github.phase1geo.outliner.appdata.xml.in:8
 msgid "Organize your words"
 msgstr "Orden je teksten"
-
-#: data/com.github.phase1geo.outliner.desktop.in:8
-msgid "com.github.phase1geo.outliner"
-msgstr "com.github.phase1geo.outliner"
 
 #: data/com.github.phase1geo.outliner.desktop.in:14
 msgid "outline;"
@@ -699,3 +695,6 @@ msgstr ""
 #: data/com.github.phase1geo.outliner.appdata.xml.in:276
 msgid "Initial release!"
 msgstr "Initiële uitgave!"
+
+#~ msgid "com.github.phase1geo.outliner"
+#~ msgstr "com.github.phase1geo.outliner"
