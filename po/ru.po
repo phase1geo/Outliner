@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-20 22:10-0500\n"
-"PO-Revision-Date: 2021-09-30 00:54+0300\n"
+"PO-Revision-Date: 2023-05-21 10:26+0200\n"
 "Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
 "Language: ru\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
-"X-Generator: Gtranslator 40.0\n"
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: src/Document.vala:67
 msgid "unnamed"
@@ -66,17 +66,16 @@ msgstr "Экспортировать…"
 
 #: src/Exporter.vala:44
 msgid "Export With Current Settings"
-msgstr ""
+msgstr "Экспортировать с текущими параметрами"
 
 #: src/Exporter.vala:110
-#, fuzzy
 msgid "Export Options"
-msgstr "Экспортировать как"
+msgstr "Параметры экспорта"
 
 #: src/Exporter.vala:131
-#, fuzzy, c-format
+#, c-format
 msgid "Export As %s"
-msgstr "Экспортировать как"
+msgstr "Экспортировать как %s"
 
 #: src/Exporter.vala:132 src/LinkEditor.vala:62 src/MainWindow.vala:969
 #: src/MainWindow.vala:1009 src/MainWindow.vala:1116
@@ -88,9 +87,8 @@ msgid "Export"
 msgstr "Экспортировать"
 
 #: src/Exporter.vala:158
-#, fuzzy
 msgid "Minder Export Completed"
-msgstr "Экспорт завершён"
+msgstr "Экспорт в файл Minder завершён"
 
 #: src/exports/ExportHTML.vala:29
 msgid "HTML"
@@ -98,11 +96,11 @@ msgstr "HTML"
 
 #: src/exports/ExportHTML.vala:34 src/exports/ExportRTF.vala:34
 msgid "Use unordered lists"
-msgstr ""
+msgstr "Использовать маркированные списки"
 
 #: src/exports/ExportHTML.vala:34 src/exports/ExportRTF.vala:34
 msgid "Export using unordered lists"
-msgstr ""
+msgstr "Экспортировать как маркированные списки"
 
 #: src/exports/ExportMarkdown.vala:28
 msgid "Markdown"
@@ -125,13 +123,12 @@ msgid "Org-Mode"
 msgstr "Org-Mode"
 
 #: src/exports/ExportOrgMode.vala:34
-#, fuzzy
 msgid "Indent Mode"
-msgstr "Отступ вправо"
+msgstr "Режим отступа"
 
 #: src/exports/ExportOrgMode.vala:34
 msgid "Export using indentation spaces"
-msgstr ""
+msgstr "Экспортировать с отступами пробелами"
 
 #: src/exports/ExportPDF.vala:28
 msgid "PDF"
@@ -139,7 +136,7 @@ msgstr "PDF"
 
 #: src/exports/ExportRTF.vala:29
 msgid "RTF"
-msgstr ""
+msgstr "RTF"
 
 #: src/exports/ExportText.vala:28
 msgid "PlainText"
@@ -328,7 +325,7 @@ msgstr "Включить пустые ряды"
 
 #: src/MainWindow.vala:828
 msgid "Enable Header Auto-Sizing"
-msgstr ""
+msgstr "Включить автоподбор размера заголовка"
 
 #: src/MainWindow.vala:841
 msgid "Enable Markdown Highlighting"
@@ -336,7 +333,7 @@ msgstr "Включить форматирование Markdown"
 
 #: src/MainWindow.vala:860 src/Preferences.vala:36
 msgid "Preferences"
-msgstr ""
+msgstr "Параметры"
 
 #: src/MainWindow.vala:867
 msgid "Shortcuts Cheatsheet"
@@ -570,94 +567,90 @@ msgstr "Нажмите Escape, чтобы выйти"
 
 #: src/Preferences.vala:47
 msgid "Behavior"
-msgstr ""
+msgstr "Поведение"
 
 #: src/Preferences.vala:48
 msgid "Appearance"
-msgstr ""
+msgstr "Внешний вид"
 
 #: src/Preferences.vala:61
-#, fuzzy
 msgid "Close"
-msgstr "Закрыть вкладку"
+msgstr "Закрыть"
 
 #: src/Preferences.vala:77
 msgid "Minimize displayed depth lines"
-msgstr ""
+msgstr "Ограничить число показываемой вложенности"
 
 #: src/Preferences.vala:79
 msgid ""
 "Only draws depth lines (when enabled) in cases where a row has a sibling row "
 "below it."
 msgstr ""
+"Рисовать линии вложенности (когда включены) только когда есть заметки-потомки"
 
 #: src/Preferences.vala:82
 msgid "Automatically make embedded URLs into links"
-msgstr ""
+msgstr "Превращать встроенные URL в ссылки"
 
 #: src/Preferences.vala:84
 msgid "Specifies if embedded URLs should be automatically highlighted."
-msgstr ""
+msgstr "Подсвечивать ли встроенные URL"
 
 #: src/Preferences.vala:87
 msgid "Enable Markdown syntax by default"
-msgstr ""
+msgstr "Включить синтаксис Markdown по умолчанию"
 
 #: src/Preferences.vala:91
 msgid "Enable Unicode input"
-msgstr ""
+msgstr "Включить ввод Unicode"
 
 #: src/Preferences.vala:95
 msgid "Enable tag auto-completion"
-msgstr ""
+msgstr "Включить автозаполнение меток"
 
 #: src/Preferences.vala:99
 msgid "Maximum auto-completion items shown"
-msgstr ""
+msgstr "Как много вариантов автоподсказки показывать"
 
 #: src/Preferences.vala:115
 msgid "Hide themes not matching visual style"
-msgstr ""
+msgstr "Скрывать темы, которые не соответствуют визуальному стилю"
 
 #: src/Preferences.vala:120
 msgid "Default theme"
-msgstr ""
+msgstr "Тема по умолчанию"
 
 #: src/Preferences.vala:124
-#, fuzzy
 msgid "Title font"
 msgstr "Шрифт названия документа"
 
 #: src/Preferences.vala:128
-#, fuzzy
 msgid "Row font"
 msgstr "Шрифт ряда"
 
 #: src/Preferences.vala:132
-#, fuzzy
 msgid "Note font"
-msgstr "Шрифт примечания"
+msgstr "Шрифт заметки"
 
 #: src/Preferences.vala:136
 msgid "Position checkboxes on right"
-msgstr ""
+msgstr "Показывать переключатели готовности справа"
 
 #: src/Preferences.vala:140
-#, fuzzy
 msgid "Enable blank rows by default"
-msgstr "Включить пустые ряды"
+msgstr "Включить пустые ряды по умолчанию"
 
 #: src/Preferences.vala:144
 msgid "Enable row auto-sizing by default"
-msgstr ""
+msgstr "Включить автоподбор размера рядов"
 
 #: src/Preferences.vala:146
 msgid "Automatically size row fonts based on row depth."
-msgstr ""
+msgstr "Подбирать кегль шрифта для рядов по степени вложенности"
 
 #: src/Preferences.vala:149
 msgid "Auto-size rows up to depth"
-msgstr ""
+msgstr "Автоматически подбирать размер рядов по степени вложенности"
 
 #: src/SearchBar.vala:94
 msgid "Find text…"
