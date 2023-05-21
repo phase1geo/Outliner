@@ -96,6 +96,7 @@
           <p>Changes</p>
           <ul>
             <li>Updated Dutch translation (thanks to @Vistaus)</li>
+            <li>Updated Russian translation (thanks to @Prokoudine)</li>
             <li>Removed Accounts service from Flatpak manifest.</li>
             <li>Upgraded Flatpak SDK from 6 to 7.2.</li>
             <li>Upgraded webkit2gtk package from 4.0 to 4.1.</li>
