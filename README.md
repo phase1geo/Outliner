@@ -39,7 +39,7 @@ These dependencies must be present before building:
  - `libgranite-dev`
  - `libgtk-3-dev`
  - `libxml2-dev`
- - `libwebkit2gtk-4.0-dev`
+ - `libwebkit2gtk-4.1-dev`
  - `libmarkdown2-dev`
 
 Use the App script to simplify installation by running `./app install-deps`
