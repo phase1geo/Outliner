@@ -70,7 +70,7 @@ public class ExportMinder : Export {
   private Xml.Node* export_root_node( OutlineTable table ) {
     Xml.Node* root = new Xml.Node( null, "node" );
     Xml.Node* name = new Xml.Node( null, "nodename" );
-    name->add_content( table.title.text.text );
+    name->add_content( (table.title != null) ? table.title.text.text : table.document.label );
     export_node_properties( root, null );
     root->add_child( export_node_style() );
     root->add_child( name );
