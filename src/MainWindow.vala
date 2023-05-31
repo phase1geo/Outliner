@@ -337,7 +337,7 @@ public class MainWindow : Hdy.ApplicationWindow {
   /* Called whenever the user clicks on the close button and the tab is unnamed */
   private bool close_tab_requested( Tab tab ) {
     var ot  = get_table( tab );
-    var ret = ot.document.is_saved() || show_save_warning( ot );
+    var ret = (_nb.n_tabs > 1) && (ot.document.is_saved() || show_save_warning( ot ));
     return( ret );
   }
 
