@@ -22,7 +22,7 @@
 using Gtk;
 using GLib;
 
-public class Outliner : Granite.Application {
+public class Outliner : Gtk.Application {
 
   private static bool          show_version = false;
   private static bool          new_file     = false;

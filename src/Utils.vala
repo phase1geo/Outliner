@@ -59,22 +59,6 @@ public class Utils {
   }
 
   /*
-   Adds the given accelerator label to the given menu item.
-  */
-  public static void add_accel_label( Gtk.MenuItem item, uint key, Gdk.ModifierType mods ) {
-
-    /* Convert the menu item to an accelerator label */
-    AccelLabel? label = item.get_child() as AccelLabel;
-
-    if( label == null ) return;
-
-    /* Add the accelerator to the label */
-    label.set_accel( key, mods );
-    label.refetch();
-
-  }
-
-  /*
    Checks the given string to see if it is a match to the given pattern.  If
    it is, the matching portion of the string appended to the list of matches.
   */
