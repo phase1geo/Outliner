@@ -53,6 +53,8 @@ public class NodeMenu : Gtk.PopoverMenu {
     { "action_select_last_child_node",   action_select_last_child_node },
     { "action_select_first_node",        action_select_first_node },
     { "action_select_last_node",         action_select_last_node },
+    { "action_select_label",             action_select_label, "s" },
+    { "action_move_to_label",            action_move_to_label, "s" },
   };
 
   public NodeMenu( Gtk.Application app, OutlineTable ot ) {
@@ -150,31 +152,10 @@ public class NodeMenu : Gtk.PopoverMenu {
     /* Populate the select and move label submenus */
     for( int i=0; i<9; i++ ) {
 
-      var lbl_value  = i + 1;
-      var index      = i;
-      var move_name  = _( "Label-%d" ).printf( lbl_value );
-      var move_accel = "<Control>%d".printf( lbl_value );
-      var sel_name   = _( "Label-%d" ).printf( lbl_value );
-      var sel_accel  = "%d".printf( lbl_value );
+      var name = _( "Label-%d" ).printf( i + 1 );
 
-      select_label_menu.append( sel_name, "node.action_select_label('%s')".printf( index.to_string() ) );
-      move_label_menu.append( move_name, "node.action_move_to_label('%s')".printf( index.to_string() ) );
-
-      var move_item = new Gtk.CheckMenuItem();
-      move_item.add( new Granite.AccelLabel( _( "Label-" ) + lbl_value.to_string(), "<Control>" + lbl_value.to_string() ) );
-      move_item.activate.connect(() => {
-        _ot.handle_control_number( index );
-      });
-      lbl_movemenu.add( move_item );
-      _move_labels.append_val( move_item );
-
-      var sel_item = new Gtk.MenuItem();
-      sel_item.add( new Granite.AccelLabel( _( "Label-" ) + lbl_value.to_string(), lbl_value.to_string() ) );
-      sel_item.activate.connect(() => {
-        select_label( index );
-      });
-      lbl_selmenu.add( sel_item );
-      _select_labels.append_val( sel_item );
+      select_label_menu.append( name, "node.action_select_label('%d')".printf( i ) );
+      move_label_menu.append( name, "node.action_move_to_label('%d')".printf( i ) );
 
     }
 
@@ -208,6 +189,11 @@ public class NodeMenu : Gtk.PopoverMenu {
     app.set_accels_for_action( "node.action_select_first_node",        { "<Shift>t" } );
     app.set_accels_for_action( "node.action_select_last_node",         { "<Shift>b" } );
     app.set_accels_for_action( "node.action_toggle_label",             { "numbersign" } );
+    
+    for( int i=0; i<9; i++ ) {
+      app.set_accels_for_action( "node.action_select_label('%d')".printf( i ), { "%d".printf( i + 1 ) } );
+      app.set_accels_for_action( "node.action_move_to_label('%d')".printf( i ), { "<control>%d".print( i + 1 ) } );
+    }
 
   }
 
@@ -243,8 +229,8 @@ public class NodeMenu : Gtk.PopoverMenu {
 
     for( int i=0; i<9; i++ ) {
       var node = _ot.labels.get_node( i );
-      action_set_enabled( "node.action_move_to_label('%s')".printf( i ), (node != null) );
-      action_set_enabled( "node.action_select_label('%s')".printf( i ),  (node != null) );
+      action_set_enabled( "node.action_move_to_label('%d')".printf( i ), (node != null) );
+      action_set_enabled( "node.action_select_label('%d')".printf( i ),  (node != null) );
     }
 
     if( _ot.selected.hide_note ) {
@@ -403,6 +389,12 @@ public class NodeMenu : Gtk.PopoverMenu {
   private void action_select_label( SimpleAction action, Variant? variant ) {
     var index = int.parse( variant.get_string() );
     _ot.goto_label( index );
+  }
+  
+  /* Moves the current row to the given label */
+  private void action_move_to_label( SimpleAction action, Variant? variant ) {
+    var index = int.parse( variant.get_string() );
+    _ot.handle_control_number( index );
   }
 
   /* Clears all of the set labels */
