@@ -33,47 +33,55 @@ public class LinkEditor : Popover {
   /* Default constructor */
   public LinkEditor( OutlineTable ot ) {
 
-    _ot         = ot;
-    relative_to = ot;
-
-    var box   = new Box( Orientation.VERTICAL, 5 );
-    box.border_width = 5;
+    _ot = ot;
 
     var ebox  = new Box( Orientation.HORIZONTAL, 5 );
     var lbl   = new Label( _( "URL:" ) );
-    _entry = new Entry();
-    _entry.width_chars = 50;
-    _entry.input_purpose = InputPurpose.URL;
+    _entry = new Entry() {
+      halign = Align.FILL,
+      width_chars = 50,
+      input_purpose = InputPurpose.URL
+    };
     _entry.activate.connect(() => {
       _apply.activate();
     });
     _entry.changed.connect( check_entry );
 
-    ebox.pack_start( lbl,    false, false );
-    ebox.pack_start( _entry, true,  false );
+    ebox.append( lbl );
+    ebox.append( _entry );
 
-    _apply = new Button.with_label( _( "Apply" ) );
-    _apply.get_style_context().add_class( STYLE_CLASS_SUGGESTED_ACTION );
+    _apply = new Button.with_label( _( "Apply" ) ) {
+      halign = Align.END
+    };
+    _apply.get_style_context().add_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
     _apply.clicked.connect(() => {
       set_url();
       show_popover( false );
     });
 
-    var cancel = new Button.with_label( _( "Cancel" ) );
+    var cancel = new Button.with_label( _( "Cancel" ) ) {
+      halign = Align.END
+    };
     cancel.clicked.connect(() => {
       _text.clear_selection();
       show_popover( false );
     });
 
     var bbox = new Box( Orientation.HORIZONTAL, 5 );
-    bbox.pack_end( _apply, false, false );
-    bbox.pack_end( cancel, false, false );
+    bbox.append( _apply );
+    bbox.append( cancel );
 
-    box.pack_start( ebox, false, true );
-    box.pack_start( bbox, false, true );
-    box.show_all();
+    var box = new Box( Orientation.VERTICAL, 5 ) {
+      margin_start  = 5,
+      margin_end    = 5,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
 
-    add( box );
+    box.append( ebox );
+    box.append( bbox );
+
+    child = box;
 
   }
 

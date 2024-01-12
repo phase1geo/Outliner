@@ -47,151 +47,163 @@ public class FormatBar : Gtk.Popover {
 
     _table = table;
 
-    relative_to = table;
-    modal       = false;
-
     _link_editor = new LinkEditor( table );
 
-    var box = new Box( Orientation.HORIZONTAL, 0 );
-    box.border_width = 5;
+    var box = new Box( Orientation.HORIZONTAL, 0 ) {
+      margin_start  = 5,
+      margin_end    = 5,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
 
-    _copy = new Button.from_icon_name( "edit-copy-symbolic", IconSize.SMALL_TOOLBAR );
-    _copy.relief = ReliefStyle.NONE;
-    _copy.set_tooltip_markup( Utils.tooltip_with_accel( _( "Copy" ), "<Control>c" ) );
+    _copy = new Button.from_icon_name( "edit-copy-symbolic" ) {
+      has_frame = false,
+      tooltip_markup = Utils.tooltip_with_accel( _( "Copy" ), "<Control>c" )
+    };
     _copy.clicked.connect( handle_copy );
 
-    _cut = new Button.from_icon_name( "edit-cut-symbolic", IconSize.SMALL_TOOLBAR );
-    _cut.relief = ReliefStyle.NONE;
-    _cut.set_tooltip_markup( Utils.tooltip_with_accel( _( "Cut" ), "<Control>x" ) );
+    _cut = new Button.from_icon_name( "edit-cut-symbolic" ) {
+      has_frame = false,
+      tooltip_markup = Utils.tooltip_with_accel( _( "Cut" ), "<Control>x" )
+    };
     _cut.clicked.connect( handle_cut );
 
-    _bold = new ToggleButton();
-    add_markup( _bold, "<b>B</b>" );
-    _bold.relief = ReliefStyle.NONE;
-    _bold.set_tooltip_markup( Utils.tooltip_with_accel( _( "Bold" ), "<Control>b" ) );
+    _bold = new ToggleButton() {
+      has_frame = false,
+      tooltip_markup = Utils.tooltip_with_accel( _( "Bold" ), "<Control>b" )
+    };
+    add_markup( _bold, true, "<b>B</b>" );
     _bold.toggled.connect( handle_bold );
 
-    _italics = new ToggleButton();
-    add_markup( _italics, "<i>I</i>" );
-    _italics.relief = ReliefStyle.NONE;
-    _italics.set_tooltip_markup( Utils.tooltip_with_accel( _( "Italic" ), "<Control>i" ) );
+    _italics = new ToggleButton() {
+      has_frame = false,
+      tooltip_markup = Utils.tooltip_with_accel( _( "Italic" ), "<Control>i" )
+    };
+    add_markup( _italics, true, "<i>I</i>" );
     _italics.toggled.connect( handle_italics );
 
-    _underline = new ToggleButton();
-    add_markup( _underline, "<u>U</u>" );
-    _underline.relief = ReliefStyle.NONE;
-    _underline.set_tooltip_text( _( "Underline" ) );
+    _underline = new ToggleButton() {
+      has_frame = false,
+      tooltip_text = _( "Underline" )
+    };
+    add_markup( _underline, true, "<u>U</u>" );
     _underline.toggled.connect( handle_underline );
 
-    _strike = new ToggleButton();
-    add_markup( _strike, "<s>S</s>" );
-    _strike.relief = ReliefStyle.NONE;
-    _strike.set_tooltip_text( _( "Strikethrough" ) );
+    _strike = new ToggleButton() {
+      has_frame = false,
+      tooltip_text = _( "Strikethrough" )
+    };
+    add_markup( _strike, true, "<s>S</s>" );
     _strike.toggled.connect( handle_strikethru );
 
-    _code = new ToggleButton();
-    add_markup( _code, "{ }" );
-    _code.relief = ReliefStyle.NONE;
-    _code.set_tooltip_text( _( "Code Block" ) );
+    _code = new ToggleButton() {
+      has_frame = false,
+      tooltip_text = _( "Code Block" )
+    };
+    add_markup( _code, true, "{ }" );
     _code.toggled.connect( handle_code );
 
-    _super = new ToggleButton();
-    add_markup( _super, "A<sup>x</sup>" );
-    _super.relief = ReliefStyle.NONE;
-    _super.set_tooltip_text( _( "Superscript" ) );
+    _super = new ToggleButton() {
+      has_frame = false,
+      tooltip_text = _( "Superscript" )
+    };
+    add_markup( _super, true, "A<sup>x</sup>" );
     _super.toggled.connect( handle_superscript );
 
-    _sub = new ToggleButton();
-    add_markup( _sub, "A<sub>x</sub>" );
-    _sub.relief = ReliefStyle.NONE;
-    _sub.set_tooltip_text( _( "Subscript" ) );
+    _sub = new ToggleButton() {
+      has_frame = false,
+      tooltip_text = _( "Subscript" )
+    };
+    add_markup( _sub, true, "A<sub>x</sub>" );
     _sub.toggled.connect( handle_subscript );
 
-    _header = new MenuButton();
-    add_markup( _header, "H<i>x</i>" );
-    _header.relief = ReliefStyle.NONE;
-    _header.set_tooltip_text( _( "Header" ) );
-    _header.popup = new Gtk.Menu();
-    unowned SList<RadioMenuItem>? group = null;
+    var header_menu = new GLib.Menu();
     for( int i=0; i<7; i++ ) {
-      var mi    = new Gtk.RadioMenuItem.with_label( group, (i == 0) ? _( "None" ) : "<H%d>".printf( i ) );
-      var level = i;
-      mi.activate.connect(() => {
-        handle_header( level );
-      });
-      _header.popup.add( mi );
-      if( group == null ) {
-        group = mi.get_group();
-      }
+      header_menu.append( ((i == 0) ? _( "None" ) : "<H%d>".printf( i )), "format.handle_header('%d')".printf( i ) );
     }
-    _header.popup.show_all();
 
-    _hilite = new ColorPicker( get_hilite_color(), ColorPickerType.HCOLOR );
-    _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
-    _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
+    _header = new MenuButton() {
+      has_frame    = false,
+      tooltip_text = _( "Header" ),
+      menu_model   = header_menu
+    };
+    add_markup( _header, false, "H<i>x</i>" );
+
+    _hilite = new ColorPicker( get_hilite_color(), ColorPickerType.HCOLOR ) {
+      toggle_tooltip = _( "Apply Highlight Color" ),
+      select_tooltip = _( "Change Highlight Color" )
+    };
     _hilite.color_changed.connect( handle_hilite );
 
-    _color = new ColorPicker( get_font_color(), ColorPickerType.FCOLOR );
-    _color.set_toggle_tooltip( _( "Apply Font Color" ) );
-    _color.set_select_tooltip( _( "Change Font Color" ) );
+    _color = new ColorPicker( get_font_color(), ColorPickerType.FCOLOR ) {
+      toggle_tooltip = _( "Apply Font Color" ),
+      select_tooltip = _( "Change Font Color" )
+    };
     _color.color_changed.connect( handle_color );
 
-    _link = new ToggleButton();
-    _link.image = new Image.from_icon_name( "insert-link-symbolic", IconSize.SMALL_TOOLBAR );
-    _link.relief = ReliefStyle.NONE;
-    _link.set_tooltip_text( _( "Link" ) );
+    _link = new ToggleButton() {
+      icon_name    = "insert-link-symbolic",
+      has_frame    = false,
+      tooltip_text = _( "Link" )
+    };
     _link.toggled.connect( handle_link );
 
-    _clear = new Button.from_icon_name( "edit-clear-symbolic", IconSize.SMALL_TOOLBAR );
-    _clear.relief = ReliefStyle.NONE;
-    _clear.set_tooltip_text( _( "Clear all formatting" ) );
+    _clear = new Button.from_icon_name( "edit-clear-symbolic" ) {
+      has_frame    = false,
+      tooltip_text = _( "Clear all formatting" )
+    };
     _clear.clicked.connect( handle_clear );
 
     var spacer = "    ";
 
-    box.pack_start( _copy,               false, false, 0 );
-    box.pack_start( _cut,                false, false, 0 );
+    box.append( _copy );
+    box.append( _cut );
     if( !table.markdown ) {
-      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-      box.pack_start( _bold,               false, false, 0 );
-      box.pack_start( _italics,            false, false, 0 );
-      box.pack_start( _underline,          false, false, 0 );
-      box.pack_start( _strike,             false, false, 0 );
-      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-      box.pack_start( _code,               false, false, 0 );
-      box.pack_start( _header,             false, false, 0 );
-      box.pack_start( _link,               false, false, 0 );
-      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-      box.pack_start( _super,              false, false, 0 );
-      box.pack_start( _sub,                false, false, 0 );
-      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-      box.pack_start( new Label( spacer ), false, false, 0 );
-      box.pack_start( _hilite,             false, false, 0 );
-      box.pack_start( new Label( spacer ), false, false, 0 );
-      box.pack_start( _color,              false, false, 0 );
-      box.pack_start( new Separator( Orientation.VERTICAL ), false, false, 0 );
-      box.pack_start( _clear,              false, false, 0 );
+      box.append( new Separator( Orientation.VERTICAL ) );
+      box.append( _bold );
+      box.append( _italics );
+      box.append( _underline );
+      box.append( _strike );
+      box.append( new Separator( Orientation.VERTICAL ) );
+      box.append( _code );
+      box.append( _header );
+      box.append( _link );
+      box.append( new Separator( Orientation.VERTICAL ) );
+      box.append( _super );
+      box.append( _sub );
+      box.append( new Separator( Orientation.VERTICAL ) );
+      box.append( new Label( spacer ) );
+      box.append( _hilite );
+      box.append( new Label( spacer ) );
+      box.append( _color );
+      box.append( new Separator( Orientation.VERTICAL ) );
+      box.append( _clear );
     }
 
-    add( box );
-
-    show_all();
+    child = box;
 
     initialize();
 
   }
 
-  private void add_markup( Button btn, string markup ) {
-    var lbl = new Label( "<span size=\"large\">" + markup + "</span>" );
-    lbl.use_markup = true;
-    btn.image = lbl;
+  private void add_markup( Widget w, bool is_button, string markup ) {
+    var lbl = new Label( "<span size=\"large\">" + markup + "</span>" ) {
+      use_markup = true
+    };
+    if( is_button ) {
+      var btn = (Button)w;
+      btn.child = lbl;
+    } else {
+      var mb = (MenuButton)w;
+      mb.child = lbl;
+    }
   }
 
   private RGBA get_hilite_color() {
     if( _table.hilite_color == null ) {
       return( _table.get_theme().hilite );
     } else {
-      RGBA color = {1.0, 1.0, 1.0, 1.0};
+      RGBA color = {(float)1.0, (float)1.0, (float)1.0, (float)1.0};
       color.parse( _table.hilite_color );
       return( color );
     }
@@ -201,7 +213,7 @@ public class FormatBar : Gtk.Popover {
     if( _table.font_color == null ) {
       return( _table.get_theme().foreground );
     } else {
-      RGBA color = {1.0, 1.0, 1.0, 1.0};
+      RGBA color = {(float)1.0, (float)1.0, (float)1.0, (float)1.0};
       color.parse( _table.font_color );
       return( color );
     }
@@ -405,9 +417,11 @@ public class FormatBar : Gtk.Popover {
 
   /* Sets the active status of the header menubutton */
   private void activate_header( int index ) {
+    /* TODO
     var buttons = _header.popup.get_children();
     var button  = (CheckMenuItem)buttons.nth_data( index );
     button.set_active( true );
+    */
   }
 
   /* Sets the active status of the correct header radio menu item */

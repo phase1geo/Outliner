@@ -21,9 +21,10 @@
 
 using Gtk;
 
-public class NodeMenu : Gtk.PopoverMenu {
+public class NodeMenu {
 
   private OutlineTable _ot;
+  private PopoverMenu  _popover;
 
   private const GLib.ActionEntry action_entries[] = {
     { "action_clone_copy",               action_clone_copy },
@@ -57,6 +58,7 @@ public class NodeMenu : Gtk.PopoverMenu {
     { "action_move_to_label",            action_move_to_label, "s" },
   };
 
+  /* Constructor */
   public NodeMenu( Gtk.Application app, OutlineTable ot ) {
 
     _ot = ot;
@@ -69,8 +71,8 @@ public class NodeMenu : Gtk.PopoverMenu {
     clone2_menu.append( _( "Unclone" ), "node.action_unclone" );
 
     var clone_menu = new GLib.Menu();
-    clone_menu.add_section( null, clone1_menu );
-    clone_menu.add_section( null, clone2_menu );
+    clone_menu.append_section( null, clone1_menu );
+    clone_menu.append_section( null, clone2_menu );
 
     var edit_menu = new GLib.Menu();
     edit_menu.append( _( "Copy" ),              "node.action_copy" );
@@ -142,6 +144,7 @@ public class NodeMenu : Gtk.PopoverMenu {
     target_menu.append_submenu( _( "Select Row" ), select_menu );
     target_menu.append_submenu( _( "Labels" ),     label_menu );
 
+    /* Add all of the submenus to ourself */
     var menu = new GLib.Menu();
     menu.append_section( null, edit_menu );
     menu.append_section( null, node_menu );
@@ -159,12 +162,13 @@ public class NodeMenu : Gtk.PopoverMenu {
 
     }
 
-    base.from_model( menu );
+    /* Create the popover */
+    _popover = new PopoverMenu.from_model( menu );
 
     /* Add the menu actions */
     var actions = new SimpleActionGroup();
     actions.add_action_entries( action_entries, this );
-    insert_action_group( "node", actions );
+    _ot.insert_action_group( "node", actions );
 
     /* Add keyboard shortcuts */
     app.set_accels_for_action( "node.action_copy",                     { "<Control>c" } );
@@ -192,57 +196,57 @@ public class NodeMenu : Gtk.PopoverMenu {
     
     for( int i=0; i<9; i++ ) {
       app.set_accels_for_action( "node.action_select_label('%d')".printf( i ), { "%d".printf( i + 1 ) } );
-      app.set_accels_for_action( "node.action_move_to_label('%d')".printf( i ), { "<control>%d".print( i + 1 ) } );
+      app.set_accels_for_action( "node.action_move_to_label('%d')".printf( i ), { "<control>%d".printf( i + 1 ) } );
     }
 
   }
 
   /* Called when the menu is popped up */
-  public void show_menu( double x, double y ) {
+  public void show( double x, double y ) {
 
     var pasteable  = OutlinerClipboard.node_pasteable();
     var first_node = _ot.root.get_first_node();
 
     /* Set the menu sensitivity */
-    action_set_enabled( "node.action_paste",                    pasteable );
-    action_set_enabled( "node.action_paste_replace",            pasteable );
-    action_set_enabled( "node.action_unclone",                  _ot.selected.is_clone() );
-    action_set_enabled( "node.action_clone_paste",              _ot.cloneable() );
-    action_set_enabled( "node.action_indent",                   _ot.indentable() );
-    action_set_enabled( "node.action_unindent",                 _ot.unindentable() );
-    action_set_enabled( "node.action_select_node_above",        (_ot.selected.get_previous_node() != null) );
-    action_set_enabled( "node.action_select_node_below",        (_ot.selected.get_next_node() != null) );
-    action_set_enabled( "node.action_select_prev_sibling_node", (_ot.selected.get_previous_sibling() != null) );
-    action_set_enabled( "node.action_select_next_sibling_node", (_ot.selected.get_next_sibling() != null) );
-    action_set_enabled( "node.action_select_parent_node",       !_ot.selected.parent.is_root() );
-    action_set_enabled( "node.action_select_last_child_node",   !_ot.selected.is_leaf() );
-    action_set_enabled( "node.action_select_first_node",        ((first_node != _ot.selected) && !first_node.is_root()) );
-    action_set_enabled( "node.action_select_last_node",         ((_ot.root.get_last_node() != _ot.selected) && !first_node.is_root()) );
-    action_set_enabled( "node.action_join_row",                 _ot.is_node_joinable() );
-    action_set_enabled( "node.action_toggle_expand",            (_ot.selected.children.length > 0) );
+    _ot.action_set_enabled( "node.action_paste",                    pasteable );
+    _ot.action_set_enabled( "node.action_paste_replace",            pasteable );
+    _ot.action_set_enabled( "node.action_unclone",                  _ot.selected.is_clone() );
+    _ot.action_set_enabled( "node.action_clone_paste",              _ot.cloneable() );
+    _ot.action_set_enabled( "node.action_indent",                   _ot.indentable() );
+    _ot.action_set_enabled( "node.action_unindent",                 _ot.unindentable() );
+    _ot.action_set_enabled( "node.action_select_node_above",        (_ot.selected.get_previous_node() != null) );
+    _ot.action_set_enabled( "node.action_select_node_below",        (_ot.selected.get_next_node() != null) );
+    _ot.action_set_enabled( "node.action_select_prev_sibling_node", (_ot.selected.get_previous_sibling() != null) );
+    _ot.action_set_enabled( "node.action_select_next_sibling_node", (_ot.selected.get_next_sibling() != null) );
+    _ot.action_set_enabled( "node.action_select_parent_node",       !_ot.selected.parent.is_root() );
+    _ot.action_set_enabled( "node.action_select_last_child_node",   !_ot.selected.is_leaf() );
+    _ot.action_set_enabled( "node.action_select_first_node",        ((first_node != _ot.selected) && !first_node.is_root()) );
+    _ot.action_set_enabled( "node.action_select_last_node",         ((_ot.root.get_last_node() != _ot.selected) && !first_node.is_root()) );
+    _ot.action_set_enabled( "node.action_join_row",                 _ot.is_node_joinable() );
+    _ot.action_set_enabled( "node.action_toggle_expand",            (_ot.selected.children.length > 0) );
 
     if( _ot.labels.get_label_for_node( _ot.selected ) == -1 ) {
-      action_set_enabled( "node.action_toggle_label", _ot.labels.label_available() );
+      _ot.action_set_enabled( "node.action_toggle_label", _ot.labels.label_available() );
     } else {
-      action_set_enabled( "node.action_toggle_label", true );
+      _ot.action_set_enabled( "node.action_toggle_label", true );
     }
 
     for( int i=0; i<9; i++ ) {
       var node = _ot.labels.get_node( i );
-      action_set_enabled( "node.action_move_to_label('%d')".printf( i ), (node != null) );
-      action_set_enabled( "node.action_select_label('%d')".printf( i ),  (node != null) );
+      _ot.action_set_enabled( "node.action_move_to_label('%d')".printf( i ), (node != null) );
+      _ot.action_set_enabled( "node.action_select_label('%d')".printf( i ),  (node != null) );
     }
 
     if( _ot.selected.hide_note ) {
-      action_set_enabled( "node.action_toggle_note", (_ot.selected.note.text.text != "") );
+      _ot.action_set_enabled( "node.action_toggle_note", (_ot.selected.note.text.text != "") );
     } else {
-      action_set_enabled( "node.action_toggle_note", true );
+      _ot.action_set_enabled( "node.action_toggle_note", true );
     }
 
-    /* Display the menu */
+    /* Display the popover at the given location */
     Gdk.Rectangle rect = {(int)x, (int)y, 1, 1};
-    pointing_to = rect;
-    popup();
+    _popover.pointing_to = rect;
+    _popover.popup();
 
   }
 

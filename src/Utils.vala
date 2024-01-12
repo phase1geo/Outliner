@@ -174,13 +174,56 @@ public class Utils {
   public static void set_chooser_folder( FileChooser chooser ) {
     var dir = Outliner.settings.get_string( "last-directory" );
     if( dir != "" ) {
-      chooser.set_current_folder( dir );
+      var file = File.new_for_path( dir );
+      try {
+        chooser.set_current_folder( file );
+      } catch( Error e ) {}
     }
   }
 
   public static void store_chooser_folder( string file, bool is_dir ) {
     var dir = is_dir ? file : GLib.Path.get_dirname( file );
     Outliner.settings.set_string( "last-directory", dir );
+  }
+
+  /* Returns the child widget at the given index of the parent widget (or null if one does not exist) */
+  public static Widget? get_child_at_index( Widget parent, int index ) {
+    var child = parent.get_first_child();
+    while( (child != null) && (index-- > 0) ) {
+      child = child.get_next_sibling();
+    }
+    return( child );
+  }
+
+  /* Reads the string from the input stream */
+  public static string read_stream( InputStream stream ) {
+    var str = "";
+    var dis = new DataInputStream( stream );
+    try {
+      do {
+        var line = dis.read_line();
+        if( line != null ) {
+          str += line + "\n";
+        }
+      } while( dis.get_available() > 0 );
+    } catch( IOError e ) {
+      return( "" );
+    }
+    return( str );
+  }
+
+  /* Draws a rounded rectangle on the given context */
+  public static void draw_rounded_rectangle( Cairo.Context ctx, double x, double y, double w, double h, double radius ) {
+
+    var deg = Math.PI / 180.0;
+
+    ctx.new_sub_path();
+    ctx.arc( (x + w - radius), (y + radius),     radius, (-90 * deg), (0 * deg) );
+    ctx.arc( (x + w - radius), (y + h - radius), radius, (0 * deg),   (90 * deg) );
+    ctx.arc( (x + radius),     (y + h - radius), radius, (90 * deg),  (180 * deg) );
+    ctx.arc( (x + radius),     (y + radius),     radius, (180 * deg), (270 * deg) );
+    ctx.close_path();
+
   }
 
 }

@@ -94,11 +94,6 @@ public class SearchBar : Box {
 
     _search_entry.search_changed.connect( search );
     _search_entry.activate.connect( search_next );
-    _search_entry.icon_release.connect((pos, e) => {
-      if( pos == EntryIconPosition.SECONDARY ) {
-        _search_entry.grab_focus();
-      }
-    });
 
     append( _search_entry );
 
@@ -306,7 +301,7 @@ public class SearchBar : Box {
   /* Adds a spacer between the search and replace portions of the search bar */
   private void add_spacer() {
     var lbl = new Label( " " );
-    pack_start( lbl, false, false, 2 );
+    append( lbl );
   }
 
   /* Returns true if the selected text is a matched pattern */
@@ -334,30 +329,23 @@ public class SearchBar : Box {
     _replace_entry = new Gtk.SearchEntry() {
       halign            = Align.FILL,
       hexpand           = true,
-      placeholder_text  = _( "Replace with…"),
-      primary_icon_name = null
+      placeholder_text  = _( "Replace with…")
     };
     _replace_entry.add_controller( focus_controller );
 
     _replace_entry.search_changed.connect( replace_text_changed );
-    _replace_entry.enter.connect( replace_focus_in );
 
-    _replace_entry.icon_release.connect((pos, e) => {
-      if( (pos == EntryIconPosition.SECONDARY) && _replace_entry.can_focus ) {
-        _replace_entry.grab_focus();
-      }
-    });
+    focus_controller.enter.connect( replace_focus_in );
 
     append( _replace_entry );
 
   }
 
   /* Called when the search box loses focus */
-  private bool replace_focus_in() {
+  private void replace_focus_in() {
     if( !is_match_selected() ) {
       select_matched_text( _next );
     }
-    return( false );
   }
 
   /* Called whenever the replacement text is changed */

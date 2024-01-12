@@ -22,7 +22,6 @@
 using Gtk;
 using Gdk;
 using Gee;
-using Granite.Drawing;
 
 public enum NodeMode {
   NONE = 0,      // Indicates that this node is nothing special
@@ -332,7 +331,7 @@ public class Node {
     table_parse_urls_changed();
 
     /* Detect any size changes by the drawing area */
-    ot.win.configure_event.connect( window_size_changed );
+    ot.win.notify["default_width"].connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
@@ -386,7 +385,7 @@ public class Node {
     table_parse_urls_changed();
 
     /* Detect any size changes by the drawing area */
-    ot.win.configure_event.connect( window_size_changed );
+    ot.win.notify["default_width"].connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
@@ -398,7 +397,7 @@ public class Node {
 
   /* Destructor */
   ~Node() {
-    _ot.win.configure_event.disconnect( window_size_changed );
+    _ot.win.notify["default_width"].disconnect( window_size_changed );
     _ot.zoom_changed.disconnect( table_zoom_changed );
     _ot.theme_changed.disconnect( table_theme_changed );
     _ot.show_tasks_changed.disconnect( update_height_from_resize );
@@ -417,9 +416,8 @@ public class Node {
   }
 
   /* If the window size changes, adjust our width */
-  private bool window_size_changed( EventConfigure e ) {
+  private void window_size_changed() {
     update_width();
-    return( false );
   }
 
   /* Updates the size of the name and note information */
@@ -535,14 +533,10 @@ public class Node {
   /* Called whenever the canvas width changes */
   private void update_width() {
 
-    /* Get the width of the table */
-    int w, h;
-    _ot.win.get_size( out w, out h );
-
     var rmargin = (padx * 5) + 20;
 
     /* Update our width information */
-    _w = w;
+    _w = _ot.win.default_width;
     _name.max_width = _w - (_name.posx + rmargin);
     _note.max_width = _w - (_note.posx + rmargin);
 
@@ -875,9 +869,7 @@ public class Node {
   /* Returns the area where we will draw the task icon */
   private void task_bbox( out double x, out double y, out double w, out double h ) {
     if( _ot.tasks_on_right ) {
-      int win_width, win_height;
-      _ot.win.get_size( out win_width, out win_height );
-      x = win_width - ((padx * 4) + 20);
+      x = _ot.win.default_width - ((padx * 4) + 20);
     } else {
       x = this.x + (padx * 5) + 20 + (depth * indent);
     }
@@ -1551,7 +1543,7 @@ public class Node {
     Utils.set_context_color_with_alpha( ctx, color, alpha );
 
     ctx.set_line_width( 1 );
-    Utilities.cairo_rounded_rectangle( ctx, tx, ty, tw, tw, 2 );
+    Utils.draw_rounded_rectangle( ctx, tx, ty, tw, th, 2.0 );
     ctx.stroke();
 
     switch( task ) {
@@ -1600,8 +1592,7 @@ public class Node {
     if( tmode == NodeMode.EDITABLE ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
-      Utilities.cairo_rounded_rectangle( ctx, (name.posx - (padx / 2)), name.posy, name.max_width, name.height, 4 );
-      // ctx.rectangle( (name.posx - (padx / 2)), name.posy, name.max_width, name.height );
+      Utils.draw_rounded_rectangle( ctx, (name.posx - (padx / 2)), name.posy, name.max_width, name.height, 4 );
       ctx.stroke();
     }
 
@@ -1646,16 +1637,14 @@ public class Node {
     /* Draw the background color */
     if( opts.show_note_bg ) {
       Utils.set_context_color_with_alpha( ctx, bg_color, alpha );
-      // ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
-      Utilities.cairo_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
+      Utils.draw_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
       ctx.fill();
     }
 
     if( (tmode == NodeMode.NOTEEDIT) || opts.show_note_ol ) {
       Utils.set_context_color_with_alpha( ctx, theme.root_background, alpha );
       ctx.set_line_width( 1 );
-      // ctx.rectangle( (note.posx - (padx / 2)), note.posy, note.max_width, note.height );
-      Utilities.cairo_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
+      Utils.draw_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
       ctx.stroke();
     }
 

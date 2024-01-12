@@ -29,18 +29,17 @@ public enum TabAddReason {
   LOAD
 }
 
-public class MainWindow : Hdy.ApplicationWindow {
+public class MainWindow : Gtk.ApplicationWindow {
 
   private GLib.Settings               _settings;
-  private Revealer                    _header_revealer;
-  private Hdy.HeaderBar               _header;
-  private DynamicNotebook             _nb;
+  private HeaderBar                   _header;
+  private Notebook                    _nb;
   private Button                      _search_btn;
-  private Popover?                    _export      = null;
+  private PopoverMenu                 _export;
   private Button?                     _undo_btn    = null;
   private Button?                     _redo_btn    = null;
   private ZoomWidget                  _zoom;
-  private Granite.Widgets.ModeButton  _list_types;
+  private ModeGroup                   _list_types;
   private FontButton                  _fonts_title;
   private FontButton                  _fonts_name;
   private FontButton                  _fonts_note;
@@ -59,10 +58,11 @@ public class MainWindow : Hdy.ApplicationWindow {
   private Label                       _stats_tdone;
   private bool                        _debug       = false;
   private Box                         _themes;
-  private HashMap<string,RadioButton> _theme_buttons;
+  private HashMap<string,CheckButton> _theme_buttons;
   private Exports                     _exports;
   private Exporter                    _exporter;
   private UnicodeInsert               _unicoder;
+  private Label                       _info_label;
 
   private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
 
@@ -116,10 +116,8 @@ public class MainWindow : Hdy.ApplicationWindow {
     _settings = settings;
 
     /* Initialize variables */
-    _theme_buttons = new HashMap<string,RadioButton>();
+    _theme_buttons = new HashMap<string,CheckButton>();
 
-    var window_x = settings.get_int( "window-x" );
-    var window_y = settings.get_int( "window-y" );
     var window_w = settings.get_int( "window-w" );
     var window_h = settings.get_int( "window-h" );
 
@@ -145,28 +143,17 @@ public class MainWindow : Hdy.ApplicationWindow {
 #endif
 
     /* Create the header bar */
-    _header = new Hdy.HeaderBar();
-    _header.set_show_close_button( true );
+    _header = new HeaderBar() {
+      show_title_buttons = true,
+      title_widget = new Label( _( "Outliner" ) )
+    };
     _header.get_style_context().add_class( "outliner-toolbar" );
     _header.get_style_context().add_class( "titlebar" );
 
-    /* Add header bar revealer */
-    _header_revealer = new Revealer();
-    _header_revealer.add( _header );
-    _header_revealer.reveal_child = !focus_mode;
+    set_titlebar( _header );
 
     /* Set the main window data */
-    title = _( "Outliner" );
-    if( (window_x == -1) && (window_y == -1) ) {
-      set_position( Gtk.WindowPosition.CENTER );
-    } else {
-      move( window_x, window_y );
-    }
     set_default_size( window_w, window_h );
-    destroy.connect( Gtk.main_quit );
-
-    /* Allows the titlebar to be drawn without a large black border */
-    _header_revealer.get_style_context().remove_class( "titlebar" );
 
     /* Set the stage for menu actions */
     var actions = new SimpleActionGroup ();
@@ -176,40 +163,48 @@ public class MainWindow : Hdy.ApplicationWindow {
     /* Add keyboard shortcuts */
     add_keyboard_shortcuts( app );
 
-    _nb = new DynamicNotebook();
-    _nb.add_button_visible = false;
-    _nb.tab_bar_behavior   = focus_mode ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
-    _nb.tab_switched.connect( tab_switched );
-    _nb.tab_reordered.connect( tab_reordered );
-    _nb.tab_removed.connect( tab_removed );
-    _nb.close_tab_requested.connect( close_tab_requested );
-    _nb.get_style_context().add_class( Gtk.STYLE_CLASS_INLINE_TOOLBAR );
+    _nb = new Notebook() {
+      halign  = Align.FILL,
+      valign  = Align.FILL,
+      hexpand = true,
+      vexpand = true
+    };
+    // _nb.add_button_visible = false;
+    // _nb.tab_bar_behavior   = focus_mode ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
+    _nb.switch_page.connect( tab_switched );
+    _nb.page_reordered.connect( tab_reordered );
+    _nb.page_removed.connect( tab_removed );
 
     /* Create title toolbar */
-    var new_btn = new Button.from_icon_name( get_icon_name( "document-new" ), get_icon_size() );
-    new_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "New File" ), "<Control>n" ) );
+    var new_btn = new Button.from_icon_name( get_icon_name( "document-new" ) ) {
+      tooltip_markup = Utils.tooltip_with_accel( _( "New File" ), "<Control>n" )
+    };
     new_btn.clicked.connect( do_new_file );
     _header.pack_start( new_btn );
 
-    var open_btn = new Button.from_icon_name( get_icon_name( "document-open" ), get_icon_size() );
-    open_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Open File" ), "<Control>o" ) );
+    var open_btn = new Button.from_icon_name( get_icon_name( "document-open" ) ) {
+      tooltip_markup = Utils.tooltip_with_accel( _( "Open File" ), "<Control>o" )
+    };
     open_btn.clicked.connect( do_open_file );
     _header.pack_start( open_btn );
 
-    var save_btn = new Button.from_icon_name( get_icon_name( "document-save-as" ), get_icon_size() );
-    save_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Save File As" ), "<Control><Shift>s" ) );
+    var save_btn = new Button.from_icon_name( get_icon_name( "document-save-as" ) ) {
+      tooltip_markup = Utils.tooltip_with_accel( _( "Save File As" ), "<Control><Shift>s" )
+    };
     save_btn.clicked.connect( do_save_as_file );
     _header.pack_start( save_btn );
 
-    _undo_btn = new Button.from_icon_name( get_icon_name( "edit-undo" ), get_icon_size() );
-    _undo_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Undo" ), "<Control>z" ) );
-    _undo_btn.set_sensitive( false );
+    _undo_btn = new Button.from_icon_name( get_icon_name( "edit-undo" ) ) {
+      tooltip_markup = Utils.tooltip_with_accel( _( "Undo" ), "<Control>z" ),
+      sensitive = false
+    };
     _undo_btn.clicked.connect( do_undo );
     _header.pack_start( _undo_btn );
 
-    _redo_btn = new Button.from_icon_name( get_icon_name( "edit-redo" ), get_icon_size() );
-    _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Redo" ), "<Control><Shift>z" ) );
-    _redo_btn.set_sensitive( false );
+    _redo_btn = new Button.from_icon_name( get_icon_name( "edit-redo" ) ) {
+      tooltip_markup = Utils.tooltip_with_accel( _( "Redo" ), "<Control><Shift>z" ),
+      sensitive = false
+    };
     _redo_btn.clicked.connect( do_redo );
     _header.pack_start( _redo_btn );
 
@@ -219,18 +214,9 @@ public class MainWindow : Hdy.ApplicationWindow {
     add_stats_button();
     add_search_button();
 
-    var top_box = new Box( Orientation.VERTICAL, 0 );
-    top_box.pack_start( _header_revealer, false, true, 0 );
-    top_box.pack_start( _nb, true, true, 0 );
+    child = _nb;
+    show();
 
-    /* Display the UI */
-    add( top_box );
-    show_all();
-
-  }
-
-  static construct {
-    Hdy.init();
   }
 
   /* Returns the name of the icon to use for a headerbar icon */
@@ -238,18 +224,14 @@ public class MainWindow : Hdy.ApplicationWindow {
     return( "%s%s".printf( icon_name, (on_elementary ? "" : "-symbolic") ) );
   }
 
-  /* Returns the size of the icon to use for a headerbar icon */
-  private IconSize get_icon_size() {
-    return( on_elementary ? IconSize.LARGE_TOOLBAR : IconSize.SMALL_TOOLBAR );
-  }
-
-  /* Returns the OutlineTable from the given tab */
-  private OutlineTable? get_table( Tab tab ) {
-    var box  = tab.page as Gtk.Box;
-    var bin1 = box.get_children().nth_data( 1 ) as Gtk.ScrolledWindow;
-    var bin2 = bin1.get_child() as Gtk.Bin;  // Viewport
-    var bin3 = bin2.get_child() as Gtk.Bin;  // Overlay
-    return( bin3.get_child() as OutlineTable );
+  /* Returns the OutlineTable associated with the given notebook page */
+  public OutlineTable get_table( int page ) {
+    var pg = _nb.get_nth_page( page );
+    var sw = (ScrolledWindow)Utils.get_child_at_index( pg, 1 );
+    var vp = (Viewport)sw.child;
+    var ol = (Overlay)vp.child;
+    var ot = (OutlineTable)ol.child;
+    return( ot );
   }
 
   /* Returns the current drawing area */
@@ -257,99 +239,87 @@ public class MainWindow : Hdy.ApplicationWindow {
     if( _debug && (caller != null) ) {
       stdout.printf( "get_current_table called from %s\n", caller );
     }
-    if( _nb.current == null ) { return( null ); }
-    return( get_table( _nb.current ) );
+    if( _nb.get_n_pages() == 0 ) { return( null ); }
+    return( get_table( _nb.page ) );
   }
 
   /* Shows or hides the search bar for the current tab */
   private void toggle_search_bar() {
-    if( _nb.current != null ) {
-      var box = _nb.current.page as Gtk.Box;
-      var revealer = box.get_children().nth_data( 0 ) as Gtk.Revealer;
-      if( revealer != null ) {
-        var bar    = revealer.get_child() as SearchBar;
-        var reveal = !revealer.reveal_child;
-        revealer.reveal_child = reveal;
-        bar.change_display( reveal );
-      }
+    var revealer = Utils.get_child_at_index( _nb.get_nth_page( _nb.page ), 0 ) as Revealer;
+    if( revealer != null ) {
+      var bar    = (SearchBar)revealer.child;
+      var reveal = !revealer.reveal_child;
+      revealer.reveal_child = reveal;
+      bar.change_display( reveal );
     }
   }
 
   /* Shows or hides the information bar, setting the message to the given value */
   private void show_info_bar( string? msg ) {
-    if( _nb.current != null ) {
-      var box  = _nb.current.page as Gtk.Box;
-      var info = box.get_children().nth_data( 2 ) as Gtk.InfoBar;
-      if( info != null ) {
-        if( msg != null ) {
-          var lbl = info.get_content_area().get_children().nth_data( 0 ) as Gtk.Label;
-          lbl.label = msg;
-          info.set_revealed( true );
-        } else {
-          info.set_revealed( false );
-        }
+    var info = Utils.get_child_at_index( _nb.get_nth_page( _nb.page ), 2 ) as InfoBar;
+    if( info != null ) {
+      if( msg != null ) {
+        _info_label.label = msg;
+        info.set_revealed( true );
+      } else {
+        info.set_revealed( false );
       }
     }
   }
 
   /* Updates the title */
   private void update_title( OutlineTable? ot ) {
-    string suffix = " \u2014 Outliner";
+    var suffix = " \u2014 Outliner";
+    var title  = (Label)_header.title_widget;
     if( (ot == null) || !ot.document.is_saved() ) {
-      _header.set_title( _( "Unnamed Document" ) + suffix );
+      title.label = _( "Unnamed Document" ) + suffix;
     } else {
-      _header.set_title( GLib.Path.get_basename( ot.document.filename ) + suffix );
+      title.label = GLib.Path.get_basename( ot.document.filename ) + suffix;
     }
   }
 
   /* This needs to be called whenever the tab is changed */
-  private void tab_changed( Tab tab ) {
-    var ot = get_table( tab );
+  private void tab_changed( OutlineTable ot ) {
     do_buffer_changed( ot.undo_buffer );
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
     ot.grab_focus();
-    save_tab_state( tab );
+    save_tab_state( ot );
   }
 
   /* Called whenever the current tab is switched in the notebook */
-  private void tab_switched( Tab? old_tab, Tab new_tab ) {
-    tab_changed( new_tab );
+  private void tab_switched( Widget page, uint page_num ) {
+    tab_changed( get_table( (int)page_num ) );
   }
 
   /* Called whenever the current tab is moved to a new position */
-  private void tab_reordered( Tab? tab, int new_pos ) {
-    save_tab_state( tab );
+  private void tab_reordered( Widget page, uint page_num ) {
+    save_tab_state( get_table( (int)page_num ) );
   }
 
   /* Called whenever the current tab is moved to a new position */
-  private void tab_removed( Tab tab ) {
-    save_tab_state( tab );
+  private void tab_removed( Widget page, uint page_num ) {
+    save_tab_state( get_table( (int)page_num ) );
   }
 
   /* Closes the current tab */
   public void close_current_tab() {
-    if( _nb.n_tabs == 1 ) return;
-    _nb.current.close();
-  }
-
-  /* Called whenever the user clicks on the close button and the tab is unnamed */
-  private bool close_tab_requested( Tab tab ) {
-    var ot  = get_table( tab );
-    var ret = (_nb.n_tabs > 1) && (ot.document.is_saved() || show_save_warning( ot ));
-    return( ret );
+    if( _nb.get_n_pages() == 1 ) return;
+    var ot = get_table( _nb.page );
+    if( ot.document.is_saved() ) {
+      _nb.detach_tab( _nb.get_nth_page( _nb.page ) );
+    } else {
+      show_save_warning( ot );
+    }
   }
 
    /* Adds a new tab to the notebook */
   public OutlineTable add_tab( string? fname, TabAddReason reason ) {
 
-    var box = new Box( Orientation.VERTICAL, 0 );
-    box.border_width = 0;
-
     /* Create and pack the canvas */
     var ot = new OutlineTable( this, _settings );
-    ot.map_event.connect( on_table_mapped );
+    ot.map.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
     ot.theme_changed.connect( theme_changed );
@@ -361,34 +331,40 @@ public class MainWindow : Hdy.ApplicationWindow {
     }
 
     /* Create the overlay that will hold the canvas so that we can put an entry box for emoji support */
-    var overlay = new Overlay();
-    overlay.add( ot );
+    var overlay = new Overlay() {
+      child = ot
+    };
 
     /* Create the scrolled window for the treeview */
-    var scroll = new ScrolledWindow( null, null );
-    scroll.vscrollbar_policy = PolicyType.AUTOMATIC;
-    scroll.hscrollbar_policy = PolicyType.EXTERNAL;
-    scroll.add( overlay );
+    var scroll = new ScrolledWindow() {
+      halign = Align.FILL,
+      valign = Align.FILL,
+      hexpand = true,
+      vexpand = true,
+      vscrollbar_policy = PolicyType.AUTOMATIC,
+      hscrollbar_policy = PolicyType.EXTERNAL,
+      child = overlay
+    };
 
     /* Create the search bar */
     var search = new SearchBar( ot );
-    var search_reveal = new Revealer();
-    search_reveal.add( search );
+    var search_reveal = new Revealer() {
+      halign = Align.FILL,
+      child = search
+    };
 
     /* Create the info bar */
     var info_bar = create_info_bar();
 
-    box.pack_start( search_reveal, false, true );
-    box.pack_start( scroll,        true,  true );
-    box.pack_start( info_bar,      false, true );
+    var box = new Box( Orientation.VERTICAL, 0 );
+    box.append( search_reveal );
+    box.append( scroll );
+    box.append( info_bar );
 
-    /* Create the tab in the notebook */
-    var tab = new Tab( ot.document.label, null, box );
-    tab.pinnable = false;
-    tab.tooltip  = fname;
+    var tab_label = new Label( ot.document.label );
 
     /* Add the page to the notebook */
-    _nb.insert_tab( tab, _nb.n_tabs );
+    var tab_index = _nb.append_page( box, tab_label );
 
     /* Update the titlebar */
     update_title( ot );
@@ -397,12 +373,12 @@ public class MainWindow : Hdy.ApplicationWindow {
     switch( reason ) {
       case TabAddReason.NEW    :
         ot.initialize_for_new();
-        _nb.current = tab;
+        _nb.page = tab_index;
         break;
       case TabAddReason.IMPORT :
       case TabAddReason.OPEN :
         ot.initialize_for_open();
-        _nb.current = tab;
+        _nb.page = tab_index;
         break;
     }
 
@@ -419,11 +395,11 @@ public class MainWindow : Hdy.ApplicationWindow {
   */
   private OutlineTable add_tab_conditionally( string fname, TabAddReason reason ) {
 
-    foreach( Tab tab in _nb.tabs ) {
-      var ot = get_table( tab );
+    for( int i=0; i<_nb.get_n_pages(); i++ ) {
+      var ot = get_table( i );
       if( ot.document.filename == fname ) {
         ot.initialize_for_open();
-        _nb.current = tab;
+        _nb.page = i;
         return( ot );
       }
     }
@@ -436,10 +412,12 @@ public class MainWindow : Hdy.ApplicationWindow {
   /* Creates the info bar UI */
   private InfoBar create_info_bar() {
 
-    var lbl = new Label( "" );
+    _info_label = new Label( "" );
 
-    var info_bar = new InfoBar();
-    info_bar.get_content_area().add( lbl );
+    var info_bar = new InfoBar() {
+      halign = Align.FILL
+    };
+    info_bar.add_child( _info_label );
     info_bar.set_revealed( false );
     info_bar.message_type = MessageType.INFO;
 
@@ -448,7 +426,7 @@ public class MainWindow : Hdy.ApplicationWindow {
   }
 
   /* Save the current tab state */
-  private void save_tab_state( Tab current_tab ) {
+  private void save_tab_state( OutlineTable current_table ) {
 
     var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
 
@@ -458,23 +436,21 @@ public class MainWindow : Hdy.ApplicationWindow {
 
     var       fname        = GLib.Path.build_filename( dir, "tab_state.xml" );
     var       selected_tab = -1;
-    var       i            = 0;
     Xml.Doc*  doc          = new Xml.Doc( "1.0" );
     Xml.Node* root         = new Xml.Node( null, "tabs" );
 
     doc->set_root_element( root );
 
-    _nb.tabs.foreach((tab) => {
-      var       table = get_table( tab );
+    for( int i=0; i<_nb.get_n_pages(); i++ ) {
+      var table = get_table( i );
       Xml.Node* node  = new Xml.Node( null, "tab" );
       node->new_prop( "path",  table.document.filename );
       node->new_prop( "saved", table.document.is_saved().to_string() );
       root->add_child( node );
-      if( tab == current_tab ) {
+      if( table == current_table ) {
         selected_tab = i;
       }
-      i++;
-    });
+    }
 
     if( selected_tab > -1 ) {
       root->new_prop( "selected", selected_tab.to_string() );
@@ -512,13 +488,13 @@ public class MainWindow : Hdy.ApplicationWindow {
 
     var s = root->get_prop( "selected" );
     if( s != null ) {
-      _nb.current = _nb.get_tab_by_index( int.parse( s ) );
-      tab_changed( _nb.current );
+      _nb.page = int.parse( s );
+      // tab_changed( _nb.get_nth_page( _nb.current );
     }
 
     delete doc;
 
-    return( _nb.n_tabs > 0 );
+    return( _nb.get_n_pages() > 0 );
 
   }
 
@@ -548,94 +524,82 @@ public class MainWindow : Hdy.ApplicationWindow {
   private void add_search_button() {
 
     /* Create the menu button */
-    _search_btn = new Button.from_icon_name( get_icon_name( "edit-find" ), get_icon_size() );
-    _search_btn.set_tooltip_markup( Utils.tooltip_with_accel( _( "Search" ), "<Control>f" ) );
+    _search_btn = new Button.from_icon_name( get_icon_name( "edit-find" ) ) {
+      tooltip_markup = Utils.tooltip_with_accel( _( "Search" ), "<Control>f" )
+    };
     _search_btn.clicked.connect( toggle_search_bar );
     _header.pack_end( _search_btn );
+
+  }
+
+  /* Adds a statistic row to the given grid, returning the created value label */
+  private Label add_stats_row( Grid grid, int row, string text ) {
+
+    var lbl = new Label( text ) {
+      margin_start = 30,
+      xalign = 0
+    };
+    var val = new Label( "0" ) {
+      xalign = 0
+    };
+
+    grid.attach( lbl, 0, row );
+    grid.attach( val, 1, row );
+
+    return( val );
 
   }
 
   /* Adds the statistics functionality */
   private void add_stats_button() {
 
-    var stats_btn = new MenuButton();
-    stats_btn.set_image( new Image.from_icon_name( "org.gnome.PowerStats", get_icon_size() ) );
-    stats_btn.set_tooltip_markup( _( "Statistics" ) );
-    stats_btn.clicked.connect( stats_clicked );
-
-    var grid = new Grid();
-    grid.border_width       = 10;
-    grid.row_spacing        = 10;
-    // grid.column_homogeneous = true;
-    grid.column_spacing     = 10;
+    var grid = new Grid() {
+      margin_start   = 10,
+      margin_end     = 10,
+      margin_top     = 10,
+      margin_bottom  = 10,
+      row_spacing    = 10,
+      column_spacing = 10
+    };
 
     var lmargin = "    ";
 
-    var group_text = new Label( _( "<b>Text Statistics</b>" ) );
-    group_text.xalign     = 0;
-    group_text.use_markup = true;
+    var group_text = new Label( _( "<b>Text Statistics</b>" ) ) {
+      xalign     = 0,
+      use_markup = true
+    };
 
-    var lbl_chars = new Label( lmargin + _( "Characters:") );
-    lbl_chars.xalign = 0;
-    _stats_chars  = new Label( "0" );
-    _stats_chars.xalign = 0;
+    grid.attach( group_text, 0, 0, 2 );
 
-    var lbl_words = new Label( lmargin + _( "Words:" ) );
-    lbl_words.xalign = 0;
-    _stats_words  = new Label( "0" );
-    _stats_words.xalign = 0;
+    _stats_chars = add_stats_row( grid, 1, _( "Characters:" ) );
+    _stats_words = add_stats_row( grid, 2, _( "Words:" ) );
+    _stats_rows  = add_stats_row( grid, 3, _( "Rows:" ) );
 
-    var lbl_rows = new Label( lmargin + _( "Rows:") );
-    lbl_rows.xalign = 0;
-    _stats_rows  = new Label( "0" );
-    _stats_rows.xalign = 0;
-
-    var group_tasks = new Label( _( "<b>Checkbox Statistics</b>" ) );
-    group_tasks.xalign     = 0;
-    group_tasks.use_markup = true;
-
-    var lbl_ttotal = new Label( lmargin + _( "Total:" ) );
-    lbl_ttotal.xalign = 0;
-    _stats_ttotal  = new Label( "0" );
-    _stats_ttotal.xalign = 0;
-
-    var lbl_topen = new Label( lmargin + _( "Incomplete:" ) );
-    lbl_topen.xalign = 0;
-    _stats_topen  = new Label( "0" );
-    _stats_topen.xalign = 0;
-
-    var lbl_tip   = new Label( lmargin + _( "In Progress:" ) );
-    lbl_tip.xalign = 0;
-    _stats_tip    = new Label( "0" );
-    _stats_tip.xalign = 0;
-
-    var lbl_tdone = new Label( lmargin + _( "Completed:" ) );
-    lbl_tdone.xalign = 0;
-    _stats_tdone  = new Label( "0" );
-    _stats_tdone.xalign = 0;
-
-    grid.attach( group_text,    0, 0, 2 );
-    grid.attach( lbl_chars,     0, 1 );
-    grid.attach( _stats_chars,  1, 1 );
-    grid.attach( lbl_words,     0, 2 );
-    grid.attach( _stats_words,  1, 2 );
-    grid.attach( lbl_rows,      0, 3 );
-    grid.attach( _stats_rows,   1, 3 );
     grid.attach( new Separator( Orientation.HORIZONTAL ), 0, 4, 2 );
-    grid.attach( group_tasks,   0, 5, 2 );
-    grid.attach( lbl_ttotal,    0, 6 );
-    grid.attach( _stats_ttotal, 1, 6 );
-    grid.attach( lbl_topen,     0, 7 );
-    grid.attach( _stats_topen,  1, 7 );
-    grid.attach( lbl_tip,       0, 8 );
-    grid.attach( _stats_tip,    1, 8 );
-    grid.attach( lbl_tdone,     0, 9 );
-    grid.attach( _stats_tdone,  1, 9 );
-    grid.show_all();
 
-    /* Create the popover and associate it with the menu button */
-    stats_btn.popover = new Popover( null );
-    stats_btn.popover.add( grid );
+    var group_tasks = new Label( _( "<b>Checkbox Statistics</b>" ) ) {
+      xalign     = 0,
+      use_markup = true
+    };
+
+    grid.attach( group_tasks, 0, 5, 2 );
+
+    _stats_ttotal = add_stats_row( grid, 6, _( "Total:" ) );
+    _stats_topen  = add_stats_row( grid, 7, _( "Incomplete:" ) );
+    _stats_tip    = add_stats_row( grid, 8, _( "In Progress:" ) );
+    _stats_tdone  = add_stats_row( grid, 9, _( "Completed:" ) );
+
+    var popover = new Popover() {
+      child = grid
+    };
+
+    var stats_btn = new MenuButton() {
+      icon_name = "org.gnome.PowerStats",
+      tooltip_markup = _( "Statistics" ),
+      popover        = popover
+
+    };
+    popover.map.connect( stats_clicked );
 
     /* Add the button to the header bar */
     _header.pack_end( stats_btn );
@@ -668,81 +632,68 @@ public class MainWindow : Hdy.ApplicationWindow {
   /* Adds the export functionality */
   private void add_export_button() {
 
+    /* Create export menu */
+    _exporter = new Exporter( this );
+
+    var export_menu_item = new GLib.MenuItem( null, null );
+    export_menu_item.set_attribute( "custom", "s", "exporter" );
+
+    var export_menu = new GLib.Menu();
+    export_menu.append_item( export_menu_item );
+
+    var print_menu = new GLib.Menu();
+    print_menu.append( _( "Print…" ), "win.action_print" );
+
+    var menu = new GLib.Menu();
+    menu.append_section( null, export_menu );
+    menu.append_section( null, print_menu );
+
+    _export = new PopoverMenu.from_model( menu ) {
+      cascade_popdown = false
+    };
+    _export.add_child( _exporter, "exporter" );
+
     /* Create the menu button */
-    var menu_btn = new MenuButton();
-    menu_btn.image = new Image.from_icon_name( (on_elementary ? "document-export" : "document-send-symbolic"), get_icon_size() );
-    menu_btn.tooltip_text = _( "Export" );
+    var menu_btn = new MenuButton() {
+      icon_name    = (on_elementary ? "document-export" : "document-send-symbolic"),
+      tooltip_text = _( "Export" ),
+      popover      = _export
+    };
+
+    _exporter.export_done.connect(() => {
+      menu_btn.popover.popdown();
+    });
 
     _header.pack_end( menu_btn );
 
-    /* Create export menu */
-    _exporter = new Exporter( this );
-    _exporter.export_done.connect(() => {
-      Utils.hide_popover( menu_btn.popover );
-    });
-
-    /* Create export menu */
-    var box = new Box( Orientation.VERTICAL, 5 );
-
-    var print = new ModelButton();
-    print.get_child().destroy();
-    print.add( new Granite.AccelLabel( _( "Print…" ), "<Control>p" ) );
-    print.action_name = "win.action_print";
-    print.set_sensitive( false );
-
-    box.margin = 5;
-    box.pack_start( _exporter, false, true );
-    box.pack_start( new Separator( Orientation.HORIZONTAL ), false, true );
-    box.pack_start( print,  false, true );
-    box.show_all();
-
-    /* Create the popover and associate it with clicking on the menu button */
-    _export = new Popover( null );
-    _export.add( box );
-
-    menu_btn.popover = _export;
-
   }
 
-  /* Adds the property functionality */
-  private void add_properties_button() {
+  private Box create_theme_selector() {
 
-    /* Add the button */
-    var prop_btn = new MenuButton();
-    prop_btn.set_image( new Image.from_icon_name( get_icon_name( "open-menu" ), get_icon_size() ) );
-    prop_btn.set_tooltip_text( _( "Properties" ) );
-    prop_btn.clicked.connect( properties_clicked );
-    _header.pack_end( prop_btn );
-
-    var box = new Box( Orientation.VERTICAL, 0 );
-
-    _zoom = new ZoomWidget( 100, 225, 25 );
-    _zoom.margin = 10;
-    _zoom.zoom_changed.connect( zoom_changed );
-
-    box.pack_start( _zoom, false, false, 0 );
-
-    /* Add theme selector */
-    var theme_box = new Box( Orientation.HORIZONTAL, 0 );
-    var theme_lbl = new Label( _( "Theme:" ) );
-    _themes = new Box( Orientation.HORIZONTAL, 0 );
-    theme_box.pack_start( theme_lbl, false, false, 10 );
-    theme_box.pack_end(   _themes, false, false, 10 );
-    box.pack_start( theme_box, false, false, 10 );
+    var theme_lbl = new Label( _( "Theme:" ) ) {
+      halign = Align.START,
+      hexpand = true
+    };
+    
+    _themes = new Box( Orientation.HORIZONTAL, 10 ) {
+      halign = Align.END
+    };
 
     var names = new Array<string>();
     themes.names( ref names );
 
-    RadioButton? rb = null;
+    CheckButton? rb = null;
 
     for( int i=0; i<names.length; i++ ) {
       var theme  = themes.get_theme( names.index( i ) );
-      var button = new RadioButton.from_widget( rb );
-      button.halign       = Align.CENTER;
-      button.tooltip_text = theme.label;
+      var button = new CheckButton() {
+        halign       = Align.CENTER,
+        tooltip_text = theme.label,
+        group        = rb
+      };
       button.get_style_context().add_class( theme.name );
       button.get_style_context().add_class( "color-button" );
-      button.clicked.connect(() => {
+      button.toggled.connect(() => {
         var table = get_current_table();
         table.set_theme( theme );
         theme_changed( table );
@@ -753,155 +704,227 @@ public class MainWindow : Hdy.ApplicationWindow {
       }
     }
 
+    var theme_box = new Box( Orientation.HORIZONTAL, 10 );
+    theme_box.append( theme_lbl );
+    theme_box.append( _themes );
+
     update_themes();
 
+    return( theme_box );
+
+  }
+
+  /* Adds the property functionality */
+  private void add_properties_button() {
+
+    /* Add zoom widget */
+    _zoom = new ZoomWidget( 100, 225, 25 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 10,
+      margin_bottom = 10
+    };
+    _zoom.zoom_changed.connect( zoom_changed );
+
+    var zoom_mi = new GLib.MenuItem( null, null );
+    zoom_mi.set_attribute( "custom", "s", "zoom" );
+
+    /* Add theme selector */
+    var theme_box = create_theme_selector();
+
+    var theme_mi = new GLib.MenuItem( null, null );
+    theme_mi.set_attribute( "custom", "s", "theme" );
+
     /* Add list type selector */
-    var ltbox = new Box( Orientation.HORIZONTAL, 0 );
-    var ltlbl = new Label( _( "Enumeration Style:" ) );
-    _list_types = new Granite.Widgets.ModeButton();
-    _list_types.has_tooltip = true;
-    _list_types.button_release_event.connect( link_type_changed );
-    _list_types.query_tooltip.connect( link_type_show_tooltip );
+    var ltbox = new Box( Orientation.HORIZONTAL, 10 );
+    var ltlbl = new Label( _( "Enumeration Style:" ) ) {
+      halign  = Align.START,
+      hexpand = true
+    };
+    _list_types = new ModeGroup() {
+      halign = Align.END
+    };
+    _list_types.changed.connect( link_type_changed );
 
     for( int i=0; i<NodeListType.LENGTH; i++ ) {
-      _list_types.append_text( ((NodeListType)i).label() );
+      var list_type = (NodeListType)i;
+      _list_types.add_mode_text( list_type.label(), list_type.tooltip() );
     }
 
-    ltbox.pack_start( ltlbl,       false, false, 10 );
-    ltbox.pack_end(   _list_types, false, false, 10 );
-    box.pack_start( ltbox, false, false, 10 );
+    ltbox.append( ltlbl );
+    ltbox.append( _list_types );
+
+    var list_type_mi = new GLib.MenuItem( null, null );
+    list_type_mi.set_attribute( "custom", "s", "list_type" );
 
     /* Add condensed mode switch */
-    var cbox = new Box( Orientation.HORIZONTAL, 0 );
-    var clbl = new Label( _( "Condensed Mode:" ) );
-    _condensed = new Switch();
-    _condensed.state_set.connect( (state) => {
+    var cbox = new Box( Orientation.HORIZONTAL, 10 );
+    var clbl = new Label( _( "Condensed Mode:" ) ) {
+      halign  = Align.START,
+      hexpand = true
+    };
+    _condensed = new Switch() {
+      halign = Align.END
+    };
+    _condensed.notify["active"].connect(() => {
       var table = get_current_table();
-      table.condensed = state;
-      return( false );
+      table.condensed = _condensed.active;
     });
-    cbox.pack_start( clbl,       false, true,  10 );
-    cbox.pack_end(   _condensed, false, false, 10 );
-    box.pack_start( cbox, false, false, 10 );
+    cbox.append( clbl );
+    cbox.append( _condensed );
+
+    var condensed_mi = new GLib.MenuItem( null, null );
+    condensed_mi.set_attribute( "custom", "s", "condensed" );
 
     /* Add show tasks switch */
-    var tbox = new Box( Orientation.HORIZONTAL, 0 );
-    var tlbl = new Label( _( "Show Checkboxes" ) );
-    _show_tasks = new Switch();
-    _show_tasks.state_set.connect( (state) => {
+    var tbox = new Box( Orientation.HORIZONTAL, 10 );
+    var tlbl = new Label( _( "Show Checkboxes" ) ) {
+      halign = Align.START,
+      hexpand = true
+    };
+    _show_tasks = new Switch() {
+      halign = Align.END
+    };
+    _show_tasks.notify["active"].connect(() => {
       var table = get_current_table();
-      table.show_tasks = state;
-      return( false );
+      table.show_tasks = _show_tasks.active;
     });
-    tbox.pack_start( tlbl,        false, true,  10 );
-    tbox.pack_end(   _show_tasks, false, false, 10 );
-    box.pack_start( tbox, false, false, 10 );
+    tbox.append( tlbl );
+    tbox.append( _show_tasks );
+
+    var tasks_mi = new GLib.MenuItem( null, null );
+    tasks_mi.set_attribute( "custom", "s", "tasks" );
 
     /* Add show depth switch */
-    var dbox = new Box( Orientation.HORIZONTAL, 0 );
-    var dlbl = new Label( _( "Show Depth Lines" ) );
-    _show_depth = new Switch();
-    _show_depth.state_set.connect( (state) => {
+    var dbox = new Box( Orientation.HORIZONTAL, 10 );
+    var dlbl = new Label( _( "Show Depth Lines" ) ) {
+      halign = Align.START,
+      hexpand = true
+    };
+    _show_depth = new Switch() {
+      halign = Align.END
+    };
+    _show_depth.notify["active"].connect(() => {
       var table = get_current_table();
-      table.show_depth = state;
-      return( false );
+      table.show_depth = _show_depth.active;
     });
-    dbox.pack_start( dlbl,        false, true,  10 );
-    dbox.pack_end(   _show_depth, false, false, 10 );
-    box.pack_start( dbox, false, false, 10 );
+    dbox.append( dlbl );
+    dbox.append( _show_depth );
+
+    var depth_mi = new GLib.MenuItem( null, null );
+    depth_mi.set_attribute( "custom", "s", "depth" );
 
     /* Add blank rows switch */
-    var brbox = new Box( Orientation.HORIZONTAL, 0 );
-    var brlbl = new Label( _( "Enable Blank Rows" ) );
-    _blank_rows = new Switch();
-    _blank_rows.state_set.connect( (state) => {
+    var brbox = new Box( Orientation.HORIZONTAL, 10 );
+    var brlbl = new Label( _( "Enable Blank Rows" ) ) {
+      halign = Align.START,
+      hexpand = true
+    };
+    _blank_rows = new Switch() {
+      halign = Align.END
+    };
+    _blank_rows.notify["active"].connect(() => {
       var table = get_current_table();
-      table.blank_rows = state;
-      return( false );
+      table.blank_rows = _blank_rows.active;
     });
-    brbox.pack_start( brlbl,       false, true, 10 );
-    brbox.pack_end(   _blank_rows, false, false, 10 );
-    box.pack_start( brbox, false, false, 10 );
+    brbox.append( brlbl );
+    brbox.append( _blank_rows );
+
+    var blank_mi = new GLib.MenuItem( null, null );
+    blank_mi.set_attribute( "custom", "s", "blank" );
 
     /* Add header sizing switch */
-    var asbox = new Box( Orientation.HORIZONTAL, 0 );
-    var aslbl = new Label( _( "Enable Header Auto-Sizing" ) );
-    _auto_sizing = new Switch();
-    _auto_sizing.state_set.connect( (state) => {
+    var asbox = new Box( Orientation.HORIZONTAL, 10 );
+    var aslbl = new Label( _( "Enable Header Auto-Sizing" ) ) {
+      halign = Align.START,
+      hexpand = true
+    };
+    _auto_sizing = new Switch() {
+      halign = Align.END
+    };
+    _auto_sizing.notify["active"].connect(() => {
 			var table = get_current_table();
-			table.auto_sizing = state;
-			return( false );
+			table.auto_sizing = _auto_sizing.active;
     });
-		asbox.pack_start( aslbl,        false, true, 10 );
-		asbox.pack_end(   _auto_sizing, false, false, 10 );
-		box.pack_start( asbox, false, false, 10 );
+		asbox.append( aslbl );
+		asbox.append( _auto_sizing );
+
+    var size_mi = new GLib.MenuItem( null, null );
+    size_mi.set_attribute( "custom", "s", "size" );
 
     /* Add the Markdown switch */
-    var mbox = new Box( Orientation.HORIZONTAL, 0 );
-    var mlbl = new Label( _( "Enable Markdown Highlighting" ) );
-    _markdown = new Switch();
-    _markdown.state_set.connect( (state) => {
+    var mbox = new Box( Orientation.HORIZONTAL, 10 );
+    var mlbl = new Label( _( "Enable Markdown Highlighting" ) ) {
+      halign = Align.START,
+      hexpand = true
+    };
+    _markdown = new Switch() {
+      halign = Align.END
+    };
+    _markdown.notify["active"].connect(() => {
       var table = get_current_table();
-      table.markdown = state;
-      return( false );
+      table.markdown = _markdown.active;
     });
-    mbox.pack_start( mlbl,      false, true, 10 );
-    mbox.pack_end(   _markdown, false, false, 10 );
-    box.pack_start( mbox, false, false, 10 );
+    mbox.append( mlbl );
+    mbox.append( _markdown );
 
-    /* Add a separator for the ModelButtons */
-    box.pack_start( new Separator( Orientation.HORIZONTAL ) );
+    var markdown_mi = new GLib.MenuItem( null, null );
+    markdown_mi.set_attribute( "custom", "s", "markdown" );
 
-    var btn_box = new Box( Orientation.VERTICAL, 0 );
+    var top_menu = new GLib.Menu();
+    top_menu.append_item( zoom_mi );
+    top_menu.append_item( theme_mi );
+    top_menu.append_item( list_type_mi );
+    top_menu.append_item( condensed_mi );
+    top_menu.append_item( tasks_mi );
+    top_menu.append_item( depth_mi );
+    top_menu.append_item( blank_mi );
+    top_menu.append_item( size_mi );
+    top_menu.append_item( markdown_mi );
 
-    /* Add button to access preferences */
-    var prefs = new ModelButton();
-    prefs.get_child().destroy();
-    prefs.add( new Granite.AccelLabel( _( "Preferences" ), "<Control>period" ) );
-    prefs.action_name = "win.action_preferences";
-    btn_box.pack_start( prefs, false, false, 5 );
+    var misc_menu = new GLib.Menu();
+    misc_menu.append( _( "Preferences" ),                 "win.action_preferences" );
+    misc_menu.append( _( "Shortcuts Cheatsheet" ),        "win.action_shortcuts" );
+    misc_menu.append( _( "Enter Distraction-Free Mode" ), "win.action_focus_mode" );
 
-    /* Add button to display shortcuts */
-    var shortcuts = new ModelButton();
-    shortcuts.get_child().destroy();
-    shortcuts.add( new Granite.AccelLabel( _( "Shortcuts Cheatsheet" ), "<Control>question" ) );
-    shortcuts.action_name = "win.action_shortcuts";
-    btn_box.pack_start( shortcuts, false, false, 5 );
-
-    /* Focus mode */
-    var focus_mode = new ModelButton();
-    focus_mode.get_child().destroy();
-    focus_mode.add( new Granite.AccelLabel( _( "Enter Distraction-Free Mode" ), "F2" ) );
-    focus_mode.action_name = "win.action_focus_mode";
-    btn_box.pack_start( focus_mode, false, false, 5 );
-
-    box.pack_start( btn_box, false, false, 0 );
-
-    box.show_all();
+    var menu = new GLib.Menu();
+    menu.append_section( null, misc_menu );
 
     /* Create the popover and associate it with the menu button */
-    var prop_popover = new Popover( null );
-    prop_popover.add( box );
-    prop_btn.popover = prop_popover;
+    var prop_popover = new PopoverMenu.from_model( menu );
+    prop_popover.add_child( _zoom,     "zoom" );
+    prop_popover.add_child( theme_box, "theme" );
+    prop_popover.add_child( ltbox,     "list_type" );
+    prop_popover.add_child( cbox,      "condensed" );
+    prop_popover.add_child( tbox,      "tasks" );
+    prop_popover.add_child( dbox,      "depth" );
+    prop_popover.add_child( brbox,     "blank" );
+    prop_popover.add_child( asbox,     "size" );
+    prop_popover.add_child( mbox,      "markdown" );
+
+    /* Add the button */
+    var prop_btn = new MenuButton() {
+      icon_name    = get_icon_name( "open-menu" ),
+      tooltip_text = _( "Properties" ),
+      popover      = prop_popover
+    };
+    prop_popover.map.connect( properties_clicked );
+
+    _header.pack_end( prop_btn );
 
   }
 
   /* Called whenever the themes need to be updated */
   private void update_themes() {
 
-#if GRANITE_6_OR_NEWER
     var settings = Granite.Settings.get_default();
     var dark     = settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
     var hide     = true;
-#else
-    var dark     = false;
-    var hide     = false;
-#endif
 
     /* Remove all of the themes */
-    _themes.get_children().foreach((entry) => {
-      _themes.remove( entry );
-    });
+    while( _themes.get_first_child() != null ) {
+      _themes.remove( _themes.get_first_child() );
+    }
 
     var names = new Array<string>();
     themes.names( ref names );
@@ -910,11 +933,9 @@ public class MainWindow : Hdy.ApplicationWindow {
       var theme = themes.get_theme( names.index( i ) );
       if( !hide || (theme.prefer_dark == dark) ) {
         var button = _theme_buttons.get( theme.name );
-        _themes.pack_start( button, false, false, 10 );
+        _themes.append( button );
       }
     }
-
-    _themes.show_all();
 
   }
 
@@ -934,27 +955,15 @@ public class MainWindow : Hdy.ApplicationWindow {
   }
 
   /* Causes the link type to change */
-  private bool link_type_changed( Gdk.EventButton e ) {
-    if( _list_types.selected < NodeListType.LENGTH ) {
-      get_current_table( "link_type_changed" ).list_type = (NodeListType)_list_types.selected;
+  private void link_type_changed() {
+    var selected = _list_types.selected;
+    if( selected < NodeListType.LENGTH ) {
+      get_current_table( "link_type_changed" ).list_type = (NodeListType)selected;
     }
-    return( false );
-  }
-
-  /* Displays the tooltip for the link type widget */
-  private bool link_type_show_tooltip( int x, int y, bool keyboard, Tooltip tooltip ) {
-    if( !keyboard ) {
-      int button_width = (int)(_list_types.get_allocated_width() / NodeListType.LENGTH);
-      if( (x / button_width) < NodeListType.LENGTH ) {
-        tooltip.set_text( ((NodeListType)(x / button_width)).tooltip() );
-        return( true );
-      }
-    }
-    return( false );
   }
 
   /* Displays the save warning dialog window */
-  public bool show_save_warning( OutlineTable ot ) {
+  public void show_save_warning( OutlineTable ot ) {
 
     var dialog = new Granite.MessageDialog.with_image_from_icon_name(
       _( "Save current unnamed document?" ),
@@ -970,25 +979,28 @@ public class MainWindow : Hdy.ApplicationWindow {
     dialog.add_action_widget( cancel, ResponseType.CANCEL );
 
     var save = new Button.with_label( _( "Save" ) );
-    save.get_style_context().add_class( STYLE_CLASS_SUGGESTED_ACTION );
+    save.get_style_context().add_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
     dialog.add_action_widget( save, ResponseType.ACCEPT );
 
     dialog.set_transient_for( this );
     dialog.set_default_response( ResponseType.ACCEPT );
     dialog.set_title( "" );
 
-    dialog.show_all();
+    dialog.response.connect((id) => {
+      switch( id ) {
+        case ResponseType.ACCEPT :
+          save_file( ot, true );
+          break;
+        case ResponseType.CLOSE  :
+          if( ot.document.remove() ) {
+            _nb.detach_tab( _nb.get_nth_page( _nb.page ) );
+          }
+          break;
+      }
+      dialog.destroy();
+    });
 
-    var res = dialog.run();
-
-    dialog.destroy();
-
-    switch( res ) {
-      case ResponseType.ACCEPT :  return( save_file( ot ) );
-      case ResponseType.CLOSE  :  return( ot.document.remove() );
-    }
-
-    return( false );
+    dialog.show();
 
   }
 
@@ -1025,11 +1037,15 @@ public class MainWindow : Hdy.ApplicationWindow {
       }
     }
 
-    if( dialog.run() == ResponseType.ACCEPT ) {
-      open_file( dialog.get_filename() );
-    }
+    dialog.response.connect((id) => {
+      if( id == ResponseType.ACCEPT ) {
+        open_file( dialog.get_file().get_path() );
+        get_current_table( "do_open_file" ).grab_focus();
+      }
+      dialog.destroy();
+    });
 
-    get_current_table( "do_open_file" ).grab_focus();
+    dialog.show();
 
   }
 
@@ -1046,13 +1062,13 @@ public class MainWindow : Hdy.ApplicationWindow {
     } else {
       for( int i=0; i<exports.length(); i++ ) {
         if( exports.index( i ).importable ) {
-          string new_fname;
+          string new_fname = "";
           if( exports.index( i ).filename_matches( fname, out new_fname ) ) {
             new_fname += ".outliner";
             var table = add_tab_conditionally( new_fname, TabAddReason.IMPORT );
             update_title( table );
             if( exports.index( i ).import( fname, table ) ) {
-              save_tab_state( _nb.current );
+              save_tab_state( get_table( _nb.page ) );
               return( true );
             }
             close_current_tab();
@@ -1086,9 +1102,8 @@ public class MainWindow : Hdy.ApplicationWindow {
   }
 
   /* Called when the outline table is initially mapped */
-  private bool on_table_mapped( Gdk.EventAny e ) {
+  private void on_table_mapped() {
     get_current_table().queue_draw();
-    return( false );
   }
 
   /* Called whenever the theme is changed */
@@ -1111,30 +1126,41 @@ public class MainWindow : Hdy.ApplicationWindow {
   }
 
   /* Allow the user to select a filename to save the document as */
-  public bool save_file( OutlineTable ot ) {
+  public void save_file( OutlineTable ot, bool close_tab = false ) {
+
     FileChooserDialog dialog = new FileChooserDialog( _( "Save File" ), this, FileChooserAction.SAVE,
       _( "Cancel" ), ResponseType.CANCEL, _( "Save" ), ResponseType.ACCEPT );
     FileFilter        filter = new FileFilter();
-    bool              retval = false;
+
     filter.set_filter_name( _( "Outliner" ) );
     filter.add_pattern( "*.outliner" );
     dialog.add_filter( filter );
-    if( dialog.run() == ResponseType.ACCEPT ) {
-      string fname = dialog.get_filename();
-      if( fname.substring( -9, -1 ) != ".outliner" ) {
-        fname += ".outliner";
+
+    dialog.response.connect((id) => {
+      if( id == ResponseType.ACCEPT ) {
+        var fname = dialog.get_file().get_path();
+        if( fname.substring( -9, -1 ) != ".outliner" ) {
+          fname += ".outliner";
+        }
+        ot.document.filename = fname;
+        ot.document.save();
+        var page = _nb.get_nth_page( _nb.page );
+        var tab_label = (Label)_nb.get_tab_label( page );
+        tab_label.label = ot.document.label;
+        tab_label.tooltip_text = fname;
+        update_title( ot );
+        save_tab_state( get_table( _nb.page ) );
+        if( close_tab ) {
+          _nb.detach_tab( _nb.get_nth_page( _nb.page ) );
+        } else {
+          ot.grab_focus();
+        }
       }
-      ot.document.filename = fname;
-      ot.document.save();
-      _nb.current.label = ot.document.label;
-      _nb.current.tooltip = fname;
-      update_title( ot );
-      save_tab_state( _nb.current );
-      retval = true;
-    }
-    dialog.close();
-    ot.grab_focus();
-    return( retval );
+      dialog.destroy();
+    });
+
+    dialog.show();
+
   }
 
   /* Called when the save as button is clicked */
@@ -1239,7 +1265,6 @@ public class MainWindow : Hdy.ApplicationWindow {
   /* Displays the preferences window */
   private void action_preferences() {
     var prefs = new Preferences( this, _settings );
-    prefs.show_all();
   }
 
   /* Displays the shortcuts cheatsheet */
@@ -1271,20 +1296,20 @@ public class MainWindow : Hdy.ApplicationWindow {
   /* Hides the header bar */
   public void action_focus_mode() {
 
-    var enable = _header_revealer.reveal_child;
+    var enable = (get_titlebar() == null);
 
     /* Hide the header bar */
-    _header_revealer.reveal_child = !enable;
-    _nb.tab_bar_behavior   = enable ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
+    set_titlebar( enable ? _header : null );
+    _nb.show_tabs = enable;
     _settings.set_boolean( "focus-mode", enable );
 
   }
 
   /* Returns the height of a single line label */
   public int get_label_height() {
-    int min_height, nat_height;
-    _stats_chars.get_preferred_height( out min_height, out nat_height );
-    return( nat_height );
+    Requisition min_size, nat_size;
+    _stats_chars.get_preferred_size( out min_size, out nat_size );
+    return( nat_size.height );
   }
 
   /* Generate a notification */

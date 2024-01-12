@@ -30,7 +30,10 @@ public class Preferences : Gtk.Dialog {
   public Preferences( MainWindow win, GLib.Settings settings ) {
 
     Object(
-      border_width: 5,
+      margin_start: 5,
+      margin_end: 5,
+      margin_top: 5,
+      margin_bottom: 5,
       deletable: false,
       resizable: false,
       title: _("Preferences"),
@@ -40,22 +43,25 @@ public class Preferences : Gtk.Dialog {
     _win      = win;
     _settings = settings;
 
-    var stack = new Stack();
-    stack.margin        = 6;
-    stack.margin_bottom = 18;
-    stack.margin_top    = 24;
+    var stack = new Stack() {
+      margin_start  = 6,
+      margin_end    = 6,
+      margin_top    = 24,
+      margin_bottom = 18
+    };
     stack.add_titled( create_behavior(), "behavior", _( "Behavior" ) );
     stack.add_titled( create_appearance(), "appearance", _( "Appearance" ) );
 
-    var switcher = new StackSwitcher();
-    switcher.set_stack( stack );
-    switcher.halign = Align.CENTER;
+    var switcher = new StackSwitcher() {
+      halign = Align.CENTER,
+      stack  = stack
+    };
 
     var box = new Box( Orientation.VERTICAL, 0 );
-    box.pack_start( switcher, false, true, 0 );
-    box.pack_start( stack,    true,  true, 0 );
+    box.append( switcher );
+    box.append( stack );
 
-    get_content_area().add( box );
+    get_content_area().append( box );
 
     /* Create close button at bottom of window */
     var close_button = new Button.with_label( _( "Close" ) );
@@ -111,11 +117,9 @@ public class Preferences : Gtk.Dialog {
     grid.column_spacing = 12;
     grid.row_spacing    = 6;
 
-#if GRANITE_6_OR_LATER
     grid.attach( make_label( _( "Hide themes not matching visual style" ) ), 0, row );
     grid.attach( make_switch( "hide-themes-not-matching-visual-style" ), 1, row );
     row++;
-#endif
 
     grid.attach( make_label( _( "Default theme" ) ), 0, row );
     grid.attach( make_themes(), 1, row, 2 );
@@ -156,17 +160,19 @@ public class Preferences : Gtk.Dialog {
 
   /* Creates label */
   private Label make_label( string label ) {
-    var w = new Label( label );
-    w.halign = Align.END;
-    margin_start = 12;
+    var w = new Label( label ) {
+      halign = Align.END,
+      margin_start = 12
+    };
     return( w );
   }
 
   /* Creates switch */
   private Switch make_switch( string setting ) {
-    var w = new Switch();
-    w.halign = Align.START;
-    w.valign = Align.CENTER;
+    var w = new Switch() {
+      halign = Align.START,
+      valign = Align.CENTER
+    };
     _settings.bind( setting, w, "active", SettingsBindFlags.DEFAULT );
     return( w );
   }
@@ -180,16 +186,16 @@ public class Preferences : Gtk.Dialog {
 
   /* Creates an information image */
   private Image make_info( string detail ) {
-    var w = new Image.from_icon_name( "dialog-information-symbolic", IconSize.MENU );
-    w.halign       = Align.START;
-    w.tooltip_text = detail;
+    var w = new Image.from_icon_name( "dialog-information-symbolic" ) {
+      halign       = Align.START,
+      tooltip_text = detail
+    };
     return( w );
   }
 
   /* Creates a font button */
   private FontButton make_font( FontTarget target, string family_setting, string size_setting ) {
     var btn = new FontButton();
-    btn.show_style = false;
     btn.set_filter_func( (family, face) => {
       var fd     = face.describe();
       var weight = fd.get_weight();
@@ -207,30 +213,32 @@ public class Preferences : Gtk.Dialog {
   }
 
   /* Creates the theme menu button */
-  private MenuButton make_themes() {
-
-    var mb  = new MenuButton();
-    var mnu = new Gtk.Menu();
-
-    mb.label = _win.themes.get_theme( _settings.get_string( "default-theme" ) ).label;
-    mb.popup = mnu;
+  private DropDown make_themes() {
 
     /* Get the available theme names */
     var names = new Array<string>();
     _win.themes.names( ref names );
 
+    var theme   = _settings.get_string( "default-theme" );
+    var current = 0;
+    var themes  = new string[names.length];
+
     for( int i=0; i<names.length; i++ ) {
       var name = names.index( i );
-      var lbl  = _win.themes.get_theme( name ).label;
-      var item = new Gtk.MenuItem.with_label( lbl );
-      item.activate.connect(() => {
-        _settings.set_string( "default-theme", name );
-        mb.label = lbl;
-      });
-      mnu.add( item );
+      themes[i] = _win.themes.get_theme( name ).label;
+      if( name == theme ) {
+        current = i;
+      }
     }
 
-    mnu.show_all();
+    var mb = new DropDown.from_strings( themes ) {
+      selected = current
+    };
+
+    mb.activate.connect(() => {
+      var name = names.index( mb.selected );
+      _settings.set_string( "default-theme", name );
+    });
 
     return( mb );
 

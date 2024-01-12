@@ -79,8 +79,8 @@ public class Themes : Object {
       css += "." + _themes.index( i ).name + " radio { background: " + _themes.index( i ).background.to_string() + "; color: " + _themes.index( i ).foreground.to_string() + "; } ";
     }
     try {
-      provider.load_from_data( css );
-      Gtk.StyleContext.add_provider_for_screen( Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION );
+      provider.load_from_data( css.data );
+      StyleContext.add_provider_for_display( Gdk.Display.get_default(), provider, STYLE_PROVIDER_PRIORITY_APPLICATION );
     } catch( GLib.Error e ) {
       stdout.printf( "Unable to load theme CSS: %s\n", e.message );
     }

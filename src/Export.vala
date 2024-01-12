@@ -63,36 +63,39 @@ public class Export {
   /* Adds settings to the export dialog page */
   public virtual void add_settings( Grid grid ) {}
 
+  /* Creates a help widget */
   private Label make_help( string help ) {
 
-    var lbl = new Label( help );
-    lbl.margin_left     = 10;
-    lbl.margin_bottom   = 10;
-    lbl.xalign          = (float)0;
-    lbl.justify         = Justification.LEFT;
-    lbl.max_width_chars = 40;
-    lbl.wrap_mode       = Pango.WrapMode.WORD;
-    lbl.set_line_wrap( true );
+    var lbl = new Label( help ) {
+      margin_start     = 10,
+      margin_bottom    = 10,
+      xalign           = (float)0,
+      justify          = Justification.LEFT,
+      max_width_chars  = 40,
+      wrap_mode        = Pango.WrapMode.WORD,
+      single_line_mode = false
+    };
 
     return( lbl );
 
   }
 
+  /* Add boolean export setting */
   protected void add_setting_bool( string name, Grid grid, string label, string? help, bool dflt ) {
 
     var row = _settings.size * 2;
 
-    var lbl = new Label( Utils.make_title( label ) );
-    lbl.halign     = Align.START;
-    lbl.use_markup = true;
+    var lbl = new Label( Utils.make_title( label ) ) {
+      halign     = Align.START,
+      use_markup = true
+    };
 
-    var sw  = new Switch();
-    sw.halign = Align.END;
-    sw.expand = true;
-    sw.button_press_event.connect((e) => {
-      sw.active = !sw.active;
+    var sw = new Switch() {
+      halign = Align.END,
+      hexpand = true
+    };
+    sw.notify["active"].connect(() => {
       settings_changed();
-      return( true );
     });
 
     grid.attach( lbl, 0, row );
@@ -107,19 +110,22 @@ public class Export {
 
   }
 
+  /* Adds a scale setting to the given grid */
   protected void add_setting_scale( string name, Grid grid, string label, string? help, int min, int max, int step, int dflt ) {
 
     var row = _settings.size * 2;
 
-    var lbl = new Label( Utils.make_title( label ) );
-    lbl.halign     = Align.START;
-    lbl.use_markup = true;
+    var lbl = new Label( Utils.make_title( label ) ) {
+      halign     = Align.START,
+      use_markup = true
+    };
 
-    var scale = new Scale.with_range( Orientation.HORIZONTAL, min, max, step );
-    scale.halign       = Align.END;
-    scale.expand       = true;
-    scale.draw_value   = true;
-    scale.round_digits = max.to_string().char_count();
+    var scale = new Scale.with_range( Orientation.HORIZONTAL, min, max, step ) {
+      halign       = Align.END,
+      hexpand      = true,
+      draw_value   = true,
+      round_digits = max.to_string().char_count()
+    };
     scale.value_changed.connect(() => {
       settings_changed();
     });
