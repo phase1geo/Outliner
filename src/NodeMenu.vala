@@ -164,6 +164,7 @@ public class NodeMenu {
 
     /* Create the popover */
     _popover = new PopoverMenu.from_model( menu );
+    _popover.set_parent( _ot );
 
     /* Add the menu actions */
     var actions = new SimpleActionGroup();

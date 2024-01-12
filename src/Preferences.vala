@@ -30,14 +30,11 @@ public class Preferences : Gtk.Dialog {
   public Preferences( MainWindow win, GLib.Settings settings ) {
 
     Object(
-      margin_start: 5,
-      margin_end: 5,
-      margin_top: 5,
-      margin_bottom: 5,
       deletable: false,
       resizable: false,
       title: _("Preferences"),
-      transient_for: win
+      transient_for: win,
+      modal: true
     );
 
     _win      = win;
@@ -57,7 +54,12 @@ public class Preferences : Gtk.Dialog {
       stack  = stack
     };
 
-    var box = new Box( Orientation.VERTICAL, 0 );
+    var box = new Box( Orientation.VERTICAL, 0 ) {
+      halign = Align.FILL,
+      valign = Align.FILL,
+      hexpand = true,
+      vexpand = true
+    };
     box.append( switcher );
     box.append( stack );
 

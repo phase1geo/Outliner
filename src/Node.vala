@@ -331,7 +331,7 @@ public class Node {
     table_parse_urls_changed();
 
     /* Detect any size changes by the drawing area */
-    ot.win.notify["default_width"].connect( window_size_changed );
+    ot.width_changed.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
@@ -385,7 +385,7 @@ public class Node {
     table_parse_urls_changed();
 
     /* Detect any size changes by the drawing area */
-    ot.win.notify["default_width"].connect( window_size_changed );
+    ot.width_changed.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
     ot.show_tasks_changed.connect( update_height_from_resize );
@@ -397,7 +397,7 @@ public class Node {
 
   /* Destructor */
   ~Node() {
-    _ot.win.notify["default_width"].disconnect( window_size_changed );
+    _ot.width_changed.disconnect( window_size_changed );
     _ot.zoom_changed.disconnect( table_zoom_changed );
     _ot.theme_changed.disconnect( table_theme_changed );
     _ot.show_tasks_changed.disconnect( update_height_from_resize );
@@ -536,7 +536,7 @@ public class Node {
     var rmargin = (padx * 5) + 20;
 
     /* Update our width information */
-    _w = _ot.win.default_width;
+    _w = _ot.width;
     _name.max_width = _w - (_name.posx + rmargin);
     _note.max_width = _w - (_note.posx + rmargin);
 
@@ -869,7 +869,7 @@ public class Node {
   /* Returns the area where we will draw the task icon */
   private void task_bbox( out double x, out double y, out double w, out double h ) {
     if( _ot.tasks_on_right ) {
-      x = _ot.win.default_width - ((padx * 4) + 20);
+      x = _ot.width - ((padx * 4) + 20);
     } else {
       x = this.x + (padx * 5) + 20 + (depth * indent);
     }

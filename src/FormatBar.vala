@@ -181,6 +181,8 @@ public class FormatBar : Gtk.Popover {
     }
 
     child = box;
+    position = PositionType.TOP;
+    set_parent( table );
 
     initialize();
 

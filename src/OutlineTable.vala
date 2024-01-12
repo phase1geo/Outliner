@@ -46,6 +46,7 @@ public class OutlineTable : DrawingArea {
 
   private MainWindow      _win;
   private Document        _doc;
+  private int             _width;
   private Node?           _selected = null;
   private Node?           _active   = null;
   private bool            _active_to_select;
@@ -105,6 +106,11 @@ public class OutlineTable : DrawingArea {
   public CanvasText     title {
     get {
       return( _title );
+    }
+  }
+  public int width {
+    get {
+      return( _width );
     }
   }
   public Node? selected {
@@ -333,6 +339,7 @@ public class OutlineTable : DrawingArea {
   public signal void auto_size_changed();
   public signal void focus_mode( string? msg );
   public signal void nodes_filtered( string? msg );
+  public signal void width_changed();
 
   /* Default constructor */
   public OutlineTable( MainWindow win, GLib.Settings settings ) {
@@ -437,12 +444,9 @@ public class OutlineTable : DrawingArea {
 
     this.set_draw_func( on_draw );
 
-    this.notify["default_width"].connect(() => {
-      see_internal();
-    });
-
     /* Make sure the drawing area can receive keyboard focus */
     this.can_focus = true;
+    this.focusable = true;
 
     /* Make sure that we us the IMMulticontext input method when editing text only */
     _im_context = new IMMulticontext();
@@ -451,7 +455,16 @@ public class OutlineTable : DrawingArea {
     _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
+    _key_controller.set_im_context( _im_context );
 
+  }
+
+  /* Attempts to get the size of the outline table */
+  public override void size_allocate( int width, int height, int baseline ) {
+    _width = width;
+    window_size_changed();
+    see_internal();
+    width_changed();
   }
 
   /* Called whenever the selection mode changed of the current node */
@@ -798,7 +811,9 @@ public class OutlineTable : DrawingArea {
 
   /* Handle primary button press event */
   private void on_primary_press( int n_press, double x, double y ) {
+
     grab_focus();
+
     _press_x    = x;
     _press_y    = y;
     _pressed    = set_current_at_position( n_press, x, y );
@@ -1145,7 +1160,7 @@ public class OutlineTable : DrawingArea {
         else if( has_key( kvs, Key.F10 ) )                  { if( shift ) show_contextual_menu(); }
         else if( has_key( kvs, Key.Menu ) )                 { show_contextual_menu(); }
         else {
-          _im_context.filter_keypress( _key_controller.get_current_event() );
+          // _im_context.filter_keypress( _key_controller.get_current_event() );
         }
       }
     } else {
@@ -2866,10 +2881,12 @@ public class OutlineTable : DrawingArea {
   */
   private void window_size_changed() {
 
+    if( _title == null ) return;
+
     var rmargin = 20;
 
     /* Update our width information */
-    _title.max_width = win.default_width - (_title.posx + rmargin);
+    _title.max_width = _width - (_title.posx + rmargin);
 
   }
 
@@ -2880,9 +2897,6 @@ public class OutlineTable : DrawingArea {
     _press_type = 0;
 
     Idle.add(() => {
-
-      /* Handle any window size changes */
-      win.notify["default_width"].connect( window_size_changed );
 
       /* Create the main idea node */
       var node = new Node( this );

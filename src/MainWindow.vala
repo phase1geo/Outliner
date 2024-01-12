@@ -285,7 +285,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     canvas_changed( ot );
     ot.update_theme();
     ot.grab_focus();
-    save_tab_state( ot );
+    save_tab_state();
   }
 
   /* Called whenever the current tab is switched in the notebook */
@@ -295,16 +295,21 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   /* Called whenever the current tab is moved to a new position */
   private void tab_reordered( Widget page, uint page_num ) {
-    save_tab_state( get_table( (int)page_num ) );
+    save_tab_state();
   }
 
   /* Called whenever the current tab is moved to a new position */
   private void tab_removed( Widget page, uint page_num ) {
-    save_tab_state( get_table( (int)page_num ) );
+    save_tab_state();
   }
 
   /* Closes the current tab */
   public void close_current_tab() {
+    close_tab( _nb.page );
+  }
+
+  /* Closes the tab at the given location */
+  public void close_tab( int page ) {
     if( _nb.get_n_pages() == 1 ) return;
     var ot = get_table( _nb.page );
     if( ot.document.is_saved() ) {
@@ -361,10 +366,57 @@ public class MainWindow : Gtk.ApplicationWindow {
     box.append( scroll );
     box.append( info_bar );
 
-    var tab_label = new Label( ot.document.label );
+    var tab_label = new Label( ot.document.label ) {
+      margin_start  = 10,
+      margin_end    = 5,
+      margin_top    = 5,
+      margin_bottom = 5,
+      tooltip_text  = ot.document.filename
+    };
+
+    var tab_close = new Button.from_icon_name( "window-close-symbolic" ) {
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
+
+    var tab_revealer = new Revealer() {
+      reveal_child = true,
+      transition_type = RevealerTransitionType.CROSSFADE,
+      child = tab_close
+    };
+
+    var tab_focus = new EventControllerMotion();
+    var tab_box = new Box( Orientation.HORIZONTAL, 5 );
+    tab_box.add_controller( tab_focus );
+    tab_box.append( tab_label );
+    tab_box.append( tab_revealer );
+
+    /* We need to unreveal the close button */
+    var other_page = _nb.get_nth_page( _nb.page );
+    if( other_page != null ) {
+      var label    = _nb.get_tab_label( other_page );
+      var revealer = (Revealer)Utils.get_child_at_index( label, 1 );
+      revealer.reveal_child = false;
+    }
 
     /* Add the page to the notebook */
-    var tab_index = _nb.append_page( box, tab_label );
+    var tab_index = _nb.append_page( box, tab_box );
+
+    tab_focus.enter.connect((x, y) => {
+      if( _nb.get_n_pages() > 1 ) {
+        tab_revealer.reveal_child = true;
+      }
+    });
+    tab_focus.leave.connect(() => {
+      if( _nb.page != tab_index ) {
+        tab_revealer.reveal_child = false;
+      }
+    });
+
+    tab_close.clicked.connect(() => {
+      close_tab( tab_index );
+    });
 
     /* Update the titlebar */
     update_title( ot );
@@ -426,7 +478,7 @@ public class MainWindow : Gtk.ApplicationWindow {
   }
 
   /* Save the current tab state */
-  private void save_tab_state( OutlineTable current_table ) {
+  private void save_tab_state() {
 
     var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
 
@@ -434,10 +486,9 @@ public class MainWindow : Gtk.ApplicationWindow {
       return;
     }
 
-    var       fname        = GLib.Path.build_filename( dir, "tab_state.xml" );
-    var       selected_tab = -1;
-    Xml.Doc*  doc          = new Xml.Doc( "1.0" );
-    Xml.Node* root         = new Xml.Node( null, "tabs" );
+    var       fname = GLib.Path.build_filename( dir, "tab_state.xml" );
+    Xml.Doc*  doc   = new Xml.Doc( "1.0" );
+    Xml.Node* root  = new Xml.Node( null, "tabs" );
 
     doc->set_root_element( root );
 
@@ -447,14 +498,9 @@ public class MainWindow : Gtk.ApplicationWindow {
       node->new_prop( "path",  table.document.filename );
       node->new_prop( "saved", table.document.is_saved().to_string() );
       root->add_child( node );
-      if( table == current_table ) {
-        selected_tab = i;
-      }
     }
 
-    if( selected_tab > -1 ) {
-      root->new_prop( "selected", selected_tab.to_string() );
-    }
+    root->new_prop( "selected", _nb.page.to_string() );
 
     /* Save the file */
     doc->save_format_file( fname, 1 );
@@ -1113,7 +1159,7 @@ public class MainWindow : Gtk.ApplicationWindow {
             var table = add_tab_conditionally( new_fname, TabAddReason.IMPORT );
             update_title( table );
             if( exports.index( i ).import( fname, table ) ) {
-              save_tab_state( get_table( _nb.page ) );
+              save_tab_state();
               return( true );
             }
             close_current_tab();
@@ -1194,7 +1240,7 @@ public class MainWindow : Gtk.ApplicationWindow {
         tab_label.label = ot.document.label;
         tab_label.tooltip_text = fname;
         update_title( ot );
-        save_tab_state( get_table( _nb.page ) );
+        save_tab_state();
         if( close_tab ) {
           _nb.detach_tab( _nb.get_nth_page( _nb.page ) );
         } else {
@@ -1309,7 +1355,10 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   /* Displays the preferences window */
   private void action_preferences() {
+
     var prefs = new Preferences( this, _settings );
+    prefs.show();
+
   }
 
   /* Displays the shortcuts cheatsheet */
@@ -1341,11 +1390,18 @@ public class MainWindow : Gtk.ApplicationWindow {
   /* Hides the header bar */
   public void action_focus_mode() {
 
-    var enable = (get_titlebar() == null);
+    var enable = _header.visible;
 
     /* Hide the header bar */
-    set_titlebar( enable ? _header : null );
-    _nb.show_tabs = enable;
+    if( enable ) {
+      get_titlebar().hide();
+      fullscreen();
+    } else {
+      get_titlebar().show();
+      unfullscreen();
+    }
+
+    _nb.show_tabs = !enable;
     _settings.set_boolean( "focus-mode", enable );
 
   }
