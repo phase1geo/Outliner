@@ -633,7 +633,10 @@ public class MainWindow : Gtk.ApplicationWindow {
   private void add_export_button() {
 
     /* Create export menu */
-    _exporter = new Exporter( this );
+    _exporter = new Exporter( this ) {
+      margin_start = 10,
+      margin_end   = 10
+    };
 
     var export_menu_item = new GLib.MenuItem( null, null );
     export_menu_item.set_attribute( "custom", "s", "exporter" );
@@ -651,6 +654,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     _export = new PopoverMenu.from_model( menu ) {
       cascade_popdown = false
     };
+
     _export.add_child( _exporter, "exporter" );
 
     /* Create the menu button */
@@ -704,7 +708,12 @@ public class MainWindow : Gtk.ApplicationWindow {
       }
     }
 
-    var theme_box = new Box( Orientation.HORIZONTAL, 10 );
+    var theme_box = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     theme_box.append( theme_lbl );
     theme_box.append( _themes );
 
@@ -736,7 +745,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     theme_mi.set_attribute( "custom", "s", "theme" );
 
     /* Add list type selector */
-    var ltbox = new Box( Orientation.HORIZONTAL, 10 );
+    var ltbox = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     var ltlbl = new Label( _( "Enumeration Style:" ) ) {
       halign  = Align.START,
       hexpand = true
@@ -758,7 +772,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     list_type_mi.set_attribute( "custom", "s", "list_type" );
 
     /* Add condensed mode switch */
-    var cbox = new Box( Orientation.HORIZONTAL, 10 );
+    var cbox = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     var clbl = new Label( _( "Condensed Mode:" ) ) {
       halign  = Align.START,
       hexpand = true
@@ -777,7 +796,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     condensed_mi.set_attribute( "custom", "s", "condensed" );
 
     /* Add show tasks switch */
-    var tbox = new Box( Orientation.HORIZONTAL, 10 );
+    var tbox = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     var tlbl = new Label( _( "Show Checkboxes" ) ) {
       halign = Align.START,
       hexpand = true
@@ -796,7 +820,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     tasks_mi.set_attribute( "custom", "s", "tasks" );
 
     /* Add show depth switch */
-    var dbox = new Box( Orientation.HORIZONTAL, 10 );
+    var dbox = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     var dlbl = new Label( _( "Show Depth Lines" ) ) {
       halign = Align.START,
       hexpand = true
@@ -815,7 +844,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     depth_mi.set_attribute( "custom", "s", "depth" );
 
     /* Add blank rows switch */
-    var brbox = new Box( Orientation.HORIZONTAL, 10 );
+    var brbox = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     var brlbl = new Label( _( "Enable Blank Rows" ) ) {
       halign = Align.START,
       hexpand = true
@@ -834,7 +868,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     blank_mi.set_attribute( "custom", "s", "blank" );
 
     /* Add header sizing switch */
-    var asbox = new Box( Orientation.HORIZONTAL, 10 );
+    var asbox = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     var aslbl = new Label( _( "Enable Header Auto-Sizing" ) ) {
       halign = Align.START,
       hexpand = true
@@ -853,7 +892,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     size_mi.set_attribute( "custom", "s", "size" );
 
     /* Add the Markdown switch */
-    var mbox = new Box( Orientation.HORIZONTAL, 10 );
+    var mbox = new Box( Orientation.HORIZONTAL, 10 ) {
+      margin_start  = 10,
+      margin_end    = 10,
+      margin_top    = 5,
+      margin_bottom = 5
+    };
     var mlbl = new Label( _( "Enable Markdown Highlighting" ) ) {
       halign = Align.START,
       hexpand = true
@@ -888,6 +932,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     misc_menu.append( _( "Enter Distraction-Free Mode" ), "win.action_focus_mode" );
 
     var menu = new GLib.Menu();
+    menu.append_section( null, top_menu );
     menu.append_section( null, misc_menu );
 
     /* Create the popover and associate it with the menu button */
