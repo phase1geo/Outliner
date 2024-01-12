@@ -53,6 +53,14 @@ public class SearchBar : Box {
   /* Default constructor */
   public SearchBar( OutlineTable ot ) {
 
+    Object(
+      spacing: 5,
+      margin_start: 5,
+      margin_end: 5,
+      margin_top: 5,
+      margin_bottom: 5
+    );
+
     _ot = ot;
 
     _next = new SearchMatch();
@@ -89,6 +97,8 @@ public class SearchBar : Box {
   private void add_search_entry() {
 
     _search_entry = new Gtk.SearchEntry() {
+      halign = Align.FILL,
+      hexpand = true,
       placeholder_text = _( "Find text…")
     };
 
