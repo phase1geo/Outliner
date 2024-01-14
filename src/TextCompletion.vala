@@ -140,7 +140,7 @@ public class TextCompletion {
     /* Populate the list */
     var row = _list.get_row_at_index( 0 );
     while( row != null ) {
-      _list.remove( row.child );
+      _list.remove( row );
       row = _list.get_row_at_index( 0 );
     }
     foreach( TextCompletionItem item in list ) {

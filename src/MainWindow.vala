@@ -375,6 +375,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     };
 
     var tab_close = new Button.from_icon_name( "window-close-symbolic" ) {
+      has_frame     = false,
       margin_end    = 10,
       margin_top    = 5,
       margin_bottom = 5
@@ -557,7 +558,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
     // app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
     app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
-    app.set_accels_for_action( "win.action_preferences", { "<Control>period" } );
+    app.set_accels_for_action( "win.action_preferences", { "<Control>comma" } );
     app.set_accels_for_action( "win.action_shortcuts",   { "<Control>question" } );
     app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
     app.set_accels_for_action( "win.action_zoom_in",     { "<Control>plus", "<Control>equal" } );

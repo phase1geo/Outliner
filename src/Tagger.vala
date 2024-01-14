@@ -191,7 +191,7 @@ public class Tagger {
 
     var row = listbox.get_row_at_index( 0 );
     while( row != null ) {
-      listbox.remove( row.child );
+      listbox.remove( row );
       row = listbox.get_row_at_index( 0 );
     }
 

@@ -2268,6 +2268,7 @@ public class OutlineTable : DrawingArea {
   /* Called whenever the period key is entered with the control key */
   private void handle_control_period() {
     if( is_node_editable() ) {
+      stdout.printf( "HERE!!!!\n" );
       insert_emoji( selected.name );
     } else if( is_note_editable() ) {
       insert_emoji( selected.note );
@@ -2798,6 +2799,8 @@ public class OutlineTable : DrawingArea {
     var emoji = new EmojiChooser() {
       pointing_to = rect
     };
+    emoji.set_parent( this );
+    emoji.popup();
     emoji.emoji_picked.connect((txt) => {
       text.insert( txt, undo_text );
       grab_focus();
