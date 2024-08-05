@@ -1,6 +1,6 @@
 app-id: com.github.phase1geo.outliner
 runtime: io.elementary.Platform
-runtime-version: '7.2'
+runtime-version: '8'
 sdk: io.elementary.Sdk
 command: com.github.phase1geo.outliner
 finish-args:
