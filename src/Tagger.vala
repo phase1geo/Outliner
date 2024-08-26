@@ -129,6 +129,7 @@ public class Tagger {
       pointing_to = rect,
       position    = PositionType.BOTTOM
     };
+    popover.set_parent( _ot );
 
     var listbox = new ListBox() {
       selection_mode = SelectionMode.BROWSE,

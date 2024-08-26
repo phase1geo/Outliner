@@ -870,7 +870,11 @@ public class OutlineTable : DrawingArea {
         selected.parent.remove_child( selected );
       }
 
-      if( selected != null ) {
+      /* If we are dragging out a selection in the title, handle it */
+      if( (_title != null) && _title.is_within( ex, ey ) ) {
+        change_selection( title, ex, ey );
+
+      } else if( selected != null ) {
 
         /* If we are dragging out a text selection, handle it here */
         if( (selected.mode == NodeMode.EDITABLE) || (selected.mode == NodeMode.NOTEEDIT) ) {
@@ -1006,7 +1010,7 @@ public class OutlineTable : DrawingArea {
           _active_to_select = false;
           queue_draw();
           changed();
-        } else if( selected.mode == NodeMode.MOVETO ) {
+        } else if( (selected != null) && (selected.mode == NodeMode.MOVETO) ) {
           _move_parent.add_child( selected, _move_index );
           set_node_mode( selected, NodeMode.SELECTED );
           queue_draw();
