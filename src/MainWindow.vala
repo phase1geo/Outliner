@@ -1237,7 +1237,8 @@ public class MainWindow : Gtk.ApplicationWindow {
         ot.document.filename = fname;
         ot.document.save();
         var page = _nb.get_nth_page( _nb.page );
-        var tab_label = (Label)_nb.get_tab_label( page );
+        var tab_box = (Box)_nb.get_tab_label( page );
+        var tab_label = (Label)Utils.get_child_at_index( tab_box, 0 );
         tab_label.label = ot.document.label;
         tab_label.tooltip_text = fname;
         update_title( ot );
