@@ -123,57 +123,60 @@ public class Tagger {
     name.get_char_pos( name.text.text.char_count(), out left, out top, out bottom, out line );
     Gdk.Rectangle rect = {(int)left, (int)bottom, 1, 1};
 
-    var popover = new Popover( _ot );
-    popover.pointing_to = rect;
-    popover.position    = PositionType.BOTTOM;
-
-    var box = new Box( Orientation.VERTICAL, 0 );
-
     var lbl = new Label( _( "Add Tag" ) );
 
-    var listbox = new ListBox();
-    listbox.selection_mode = SelectionMode.BROWSE;
-    listbox.halign         = Align.START;
-    listbox.valign         = Align.START;
-    listbox.row_activated.connect( (row) => {
+    var popover = new Popover() {
+      pointing_to = rect,
+      position    = PositionType.BOTTOM
+    };
+    popover.set_parent( _ot );
+
+    var listbox = new ListBox() {
+      selection_mode = SelectionMode.BROWSE,
+      halign         = Align.START,
+      valign         = Align.START
+    };
+    listbox.row_activated.connect((row) => {
       var label = (Label)row.get_child();
-      var value = label.get_text();
-      _ot.add_tag( value );
-      Utils.hide_popover( popover );
+      _ot.add_tag( label.get_text() );
+      popover.popdown();
     });
 
-    var scroll = new ScrolledWindow( null, null );
-    scroll.vscrollbar_policy  = PolicyType.AUTOMATIC;
-    scroll.hscrollbar_policy  = PolicyType.EXTERNAL;
-    scroll.min_content_height = 200;
-    scroll.add( listbox );
+    var scroll = new ScrolledWindow() {
+      vscrollbar_policy  = PolicyType.AUTOMATIC,
+      hscrollbar_policy  = PolicyType.EXTERNAL,
+      min_content_height = 200,
+      child = listbox
+    };
 
-    _entry = new SearchEntry();
-    _entry.max_width_chars  = 30;
+    _entry = new SearchEntry() {
+      max_width_chars = 30
+    };
     _entry.activate.connect( () => {
-      var value = _entry.text;
-      _ot.add_tag( value );
-      Utils.hide_popover( popover );
+      _ot.add_tag( _entry.text );
+      popover.popdown();
     });
     _entry.insert_text.connect( filter_tag_text );
     _entry.search_changed.connect( () => {
       populate_listbox( listbox, get_matches( _entry.text ) );
     });
 
-    box.pack_start( lbl,    false, true, 5 );
-    box.pack_start( _entry, false, true, 5 );
-    box.pack_start( scroll, true,  true, 5 );
-    box.show_all();
+    var box = new Box( Orientation.VERTICAL, 5 );
+    box.append( lbl );
+    box.append( _entry );
+    box.append( scroll );
 
-    popover.add( box );
+    popover.child = box;
 
-    Utils.show_popover( popover );
+    /* Display the popover */
+    popover.popup();
 
     /* Preload the tags */
     populate_listbox( listbox, get_matches( "" ) );
 
   }
 
+  /* Filters the tag text */
   private void filter_tag_text( string str, int slen, ref int pos ) {
     var filtered = str.replace( " ", "" ).replace( "\t", "" ).replace( "@", "" );
     if( str != filtered ) {
@@ -184,19 +187,26 @@ public class Tagger {
     }
   }
 
+  /* Populates the listbox with the list of text completions */
   private void populate_listbox( ListBox listbox, GLib.List<TextCompletionItem> tags ) {
-    listbox.foreach( (w) => {
-      listbox.remove( w );
-    });
-    foreach( TextCompletionItem item in tags ) {
-      var lbl = new Label( item.label );
-      lbl.xalign       = 0;
-      lbl.margin       = 5;
-      lbl.margin_start = 10;
-      lbl.margin_end   = 10;
-      listbox.add( lbl );
+
+    var row = listbox.get_row_at_index( 0 );
+    while( row != null ) {
+      listbox.remove( row );
+      row = listbox.get_row_at_index( 0 );
     }
-    listbox.show_all();
+
+    foreach( TextCompletionItem item in tags ) {
+      var lbl = new Label( item.label ) {
+        xalign        = 0,
+        margin_top    = 5,
+        margin_bottom = 5,
+        margin_start  = 10,
+        margin_end    = 10
+      };
+      listbox.append( lbl );
+    }
+
   }
 
 }

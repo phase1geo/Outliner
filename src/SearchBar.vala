@@ -53,6 +53,14 @@ public class SearchBar : Box {
   /* Default constructor */
   public SearchBar( OutlineTable ot ) {
 
+    Object(
+      spacing: 5,
+      margin_start: 5,
+      margin_end: 5,
+      margin_top: 5,
+      margin_bottom: 5
+    );
+
     _ot = ot;
 
     _next = new SearchMatch();
@@ -66,8 +74,6 @@ public class SearchBar : Box {
     add_replace_entry();
     add_replace_current();
     add_replace_all();
-
-    show_all();
 
     _ot.selected_changed.connect( update_next_previous );
     _ot.cursor_changed.connect( update_next_previous );
@@ -90,17 +96,16 @@ public class SearchBar : Box {
   /* Creates the search entry field and adds it to this box */
   private void add_search_entry() {
 
-    _search_entry = new Gtk.SearchEntry();
-    _search_entry.placeholder_text = _( "Find text…");
+    _search_entry = new Gtk.SearchEntry() {
+      halign = Align.FILL,
+      hexpand = true,
+      placeholder_text = _( "Find text…")
+    };
+
     _search_entry.search_changed.connect( search );
     _search_entry.activate.connect( search_next );
-    _search_entry.icon_release.connect((pos, e) => {
-      if( pos == EntryIconPosition.SECONDARY ) {
-        _search_entry.grab_focus();
-      }
-    });
 
-    pack_start( _search_entry, true, true, 2 );
+    append( _search_entry );
 
   }
 
@@ -151,10 +156,10 @@ public class SearchBar : Box {
   /* Creates the search next field and adds it to this box */
   private void add_search_next() {
 
-    _search_next = new Gtk.Button.from_icon_name( "go-down-symbolic", IconSize.SMALL_TOOLBAR );
+    _search_next = new Gtk.Button.from_icon_name( "go-down-symbolic" );
     _search_next.clicked.connect( search_next );
 
-    pack_start( _search_next, false, false, 2 );
+    append( _search_next );
 
   }
 
@@ -288,10 +293,10 @@ public class SearchBar : Box {
   /* Creates the search previous field and adds it to this box */
   private void add_search_previous() {
 
-    _search_prev = new Gtk.Button.from_icon_name( "go-up-symbolic", IconSize.SMALL_TOOLBAR );
+    _search_prev = new Gtk.Button.from_icon_name( "go-up-symbolic" );
     _search_prev.clicked.connect( search_previous );
 
-    pack_start( _search_prev, false, false, 2 );
+    append( _search_prev );
 
   }
 
@@ -306,7 +311,7 @@ public class SearchBar : Box {
   /* Adds a spacer between the search and replace portions of the search bar */
   private void add_spacer() {
     var lbl = new Label( " " );
-    pack_start( lbl, false, false, 2 );
+    append( lbl );
   }
 
   /* Returns true if the selected text is a matched pattern */
@@ -330,27 +335,27 @@ public class SearchBar : Box {
   /* Adds the replace text entry field and adds it to this box */
   private void add_replace_entry() {
 
-    _replace_entry = new Gtk.SearchEntry();
-    _replace_entry.placeholder_text  = _( "Replace with…");
-    _replace_entry.primary_icon_name = null;
-    _replace_entry.search_changed.connect( replace_text_changed );
-    _replace_entry.focus_in_event.connect( replace_focus_in );
-    _replace_entry.icon_release.connect((pos, e) => {
-      if( (pos == EntryIconPosition.SECONDARY) && _replace_entry.can_focus ) {
-        _replace_entry.grab_focus();
-      }
-    });
+    var focus_controller = new EventControllerFocus();
+    _replace_entry = new Gtk.SearchEntry() {
+      halign            = Align.FILL,
+      hexpand           = true,
+      placeholder_text  = _( "Replace with…")
+    };
+    _replace_entry.add_controller( focus_controller );
 
-    pack_start( _replace_entry, true, true, 2 );
+    _replace_entry.search_changed.connect( replace_text_changed );
+
+    focus_controller.enter.connect( replace_focus_in );
+
+    append( _replace_entry );
 
   }
 
   /* Called when the search box loses focus */
-  private bool replace_focus_in( EventFocus e ) {
+  private void replace_focus_in() {
     if( !is_match_selected() ) {
       select_matched_text( _next );
     }
-    return( false );
   }
 
   /* Called whenever the replacement text is changed */
@@ -364,7 +369,7 @@ public class SearchBar : Box {
     _replace_current = new Gtk.Button.with_label( _( "Replace" ) );
     _replace_current.clicked.connect( replace_current );
 
-    pack_start( _replace_current, false, false, 2 );
+    append( _replace_current );
 
   }
 
@@ -385,7 +390,7 @@ public class SearchBar : Box {
     _replace_all = new Gtk.Button.with_label( _( "Replace All" ) );
     _replace_all.clicked.connect( replace_all );
 
-    pack_start( _replace_all, false, false, 2 );
+    append( _replace_all );
 
   }
 

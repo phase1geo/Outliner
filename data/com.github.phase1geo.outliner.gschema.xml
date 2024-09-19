@@ -176,5 +176,10 @@
       <summary>Printer page setup used in the last print invocation</summary>
       <description>Printer page setup used in the last print invocation</description>
     </key>
+    <key name="hide-themes-not-matching-visual-style" type="b">
+      <default>true</default>
+      <summary>Hides themes from being displayed in preferences that do not match system visual style.</summary>
+      <description>Hides themes from being displayed in preferences that do not match system visual style.</description>
+    </key>
   </schema>
 </schemalist>

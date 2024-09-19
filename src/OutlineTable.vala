@@ -38,13 +38,15 @@ public enum FontTarget {
 
 public class OutlineTable : DrawingArea {
 
-  private const CursorType click_cursor   = CursorType.HAND2;
-  private const CursorType text_cursor    = CursorType.XTERM;
-  private const double     dim_selected   = 0.3;
-  private const double     dim_unselected = 0.1;
+  private const double dim_selected   = 0.3;
+  private const double dim_unselected = 0.1;
+
+  private Cursor          click_cursor = new Cursor.from_name( "hand2", null );
+  private Cursor          text_cursor  = new Cursor.from_name( "text", null );
 
   private MainWindow      _win;
   private Document        _doc;
+  private int             _width;
   private Node?           _selected = null;
   private Node?           _active   = null;
   private bool            _active_to_select;
@@ -53,7 +55,7 @@ public class OutlineTable : DrawingArea {
   private double          _motion_x;
   private double          _motion_y;
   private bool            _pressed    = false;
-  private EventType       _press_type = EventType.NOTHING;
+  private int             _press_type = 0;
   private bool            _motion     = false;
   private Theme           _theme;
   private IMMulticontext  _im_context;
@@ -93,6 +95,9 @@ public class OutlineTable : DrawingArea {
   private Node?           _focus_node = null;
   private bool            _in_focus_exit = false;
   private CanvasText?     _title         = null;
+  private bool            _control_set = false;
+  private bool            _shift_set   = false;
+  private EventControllerKey _key_controller;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -101,6 +106,11 @@ public class OutlineTable : DrawingArea {
   public CanvasText     title {
     get {
       return( _title );
+    }
+  }
+  public int width {
+    get {
+      return( _width );
     }
   }
   public Node? selected {
@@ -329,6 +339,7 @@ public class OutlineTable : DrawingArea {
   public signal void auto_size_changed();
   public signal void focus_mode( string? msg );
   public signal void nodes_filtered( string? msg );
+  public signal void width_changed();
 
   /* Default constructor */
   public OutlineTable( MainWindow win, GLib.Settings settings ) {
@@ -342,7 +353,7 @@ public class OutlineTable : DrawingArea {
     root = new Node.root( this );
 
     /* Create contextual menu(s) */
-    _node_menu = new NodeMenu( this );
+    _node_menu = new NodeMenu( win.application, this );
 
     /* Create the node draw options */
     _draw_options = new NodeDrawOptions();
@@ -409,38 +420,51 @@ public class OutlineTable : DrawingArea {
     undo_text   = new UndoTextBuffer( this );
 
     /* Add event listeners */
-    this.draw.connect( on_draw );
-    this.button_press_event.connect( on_press );
-    this.motion_notify_event.connect( on_motion );
-    this.button_release_event.connect( on_release );
-    this.key_press_event.connect( on_keypress );
-    this.key_release_event.connect( on_keyrelease );
-    this.size_allocate.connect( (a) => {
-      see_internal();
-    });
+    _key_controller = new EventControllerKey();
+    var pri_click_controller = new GestureClick() {
+      button = Gdk.BUTTON_PRIMARY
+    };
+    var sec_click_controller = new GestureClick() {
+      button = Gdk.BUTTON_SECONDARY
+    };
+    var motion_controller = new EventControllerMotion();
 
-    /* Make sure the above events are listened for */
-    this.add_events(
-      EventMask.BUTTON_PRESS_MASK |
-      EventMask.BUTTON_RELEASE_MASK |
-      EventMask.BUTTON1_MOTION_MASK |
-      EventMask.POINTER_MOTION_MASK |
-      EventMask.KEY_PRESS_MASK |
-      EventMask.SMOOTH_SCROLL_MASK |
-      EventMask.STRUCTURE_MASK
-    );
+    this.add_controller( _key_controller );
+    this.add_controller( pri_click_controller );
+    this.add_controller( sec_click_controller );
+    this.add_controller( motion_controller );
+
+    _key_controller.key_pressed.connect( on_keypress );
+    _key_controller.key_released.connect( on_keyrelease );
+
+    pri_click_controller.pressed.connect( on_primary_press );
+    pri_click_controller.released.connect( on_release );
+    sec_click_controller.pressed.connect( on_secondary_press );
+    motion_controller.motion.connect( on_motion );
+
+    this.set_draw_func( on_draw );
 
     /* Make sure the drawing area can receive keyboard focus */
     this.can_focus = true;
+    this.focusable = true;
 
     /* Make sure that we us the IMMulticontext input method when editing text only */
     _im_context = new IMMulticontext();
-    _im_context.set_client_window( this.get_window() );
+    _im_context.set_client_widget( this );
     _im_context.set_use_preedit( false );
     _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
+    _key_controller.set_im_context( _im_context );
 
+  }
+
+  /* Attempts to get the size of the outline table */
+  public override void size_allocate( int width, int height, int baseline ) {
+    _width = width;
+    window_size_changed();
+    see_internal();
+    width_changed();
   }
 
   /* Called whenever the selection mode changed of the current node */
@@ -451,20 +475,6 @@ public class OutlineTable : DrawingArea {
   /* Called whenever the cursor changes position in the current node */
   private void selected_cursor_changed( bool name ) {
     cursor_changed();
-  }
-
-  /* Sets the cursor of the drawing area */
-  private void set_cursor( CursorType? type = null ) {
-
-    var     win    = get_window();
-    Cursor? cursor = win.get_cursor();
-
-    if( type == null ) {
-      win.set_cursor( null );
-    } else if( (cursor == null) || (cursor.cursor_type != type) ) {
-      win.set_cursor( new Cursor.for_display( get_display(), type ) );
-    }
-
   }
 
   /* Called whenever we want to change the current selected node's mode */
@@ -661,12 +671,10 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Called when the given coordinates are clicked within a CanvasText item. */
-  private bool clicked_in_text( Node clicked, CanvasText text, EventButton e, NodeMode select_mode ) {
+  private bool clicked_in_text( int n_press, double x, double y, Node clicked, CanvasText text, NodeMode select_mode ) {
 
-    var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
-    var control = (bool)(e.state & ModifierType.CONTROL_MASK);
-    var tag     = FormatTag.URL;
-    var extra   = "";
+    var tag   = FormatTag.URL;
+    var extra = "";
 
     /* Set the selected node to the clicked node */
     selected = clicked;
@@ -675,7 +683,7 @@ public class OutlineTable : DrawingArea {
      If the mouse click was within a URL and the control key was pressed, open
      the URL in an external application.
     */
-    if( control && text.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
+    if( _control_set && text.is_within_clickable( x, y, out tag, out extra ) ) {
       _active = clicked;
       switch( tag ) {
         case FormatTag.URL :  Utils.open_url( extra );       break;
@@ -689,11 +697,11 @@ public class OutlineTable : DrawingArea {
     set_node_mode( selected, select_mode );
 
     /* Set the cursor or selection */
-    switch( e.type ) {
-      case EventType.BUTTON_PRESS        :  text.set_cursor_at_char( e.x, e.y, shift );  break;
-      case EventType.DOUBLE_BUTTON_PRESS :  text.set_cursor_at_word( e.x, e.y, shift );  break;
-      case EventType.TRIPLE_BUTTON_PRESS :  text.set_cursor_all( false );                break;
-      default                            :  break;
+    switch( n_press ) {
+      case 1  :  text.set_cursor_at_char( x, y, _shift_set );  break;
+      case 2  :  text.set_cursor_at_word( x, y, _shift_set );  break;
+      case 3  :  text.set_cursor_all( false );                 break;
+      default :  break;
     }
 
     return( true );
@@ -701,7 +709,7 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Selects the node at the given coordinates */
-  private bool set_current_at_position( double x, double y, EventButton e ) {
+  private bool set_current_at_position( int n_press, double x, double y ) {
 
     var clicked = node_at_coordinates( x, y );;
 
@@ -719,21 +727,20 @@ public class OutlineTable : DrawingArea {
         _active = clicked;
         return( false );
       } else if( clicked.is_within_name( x, y ) ) {
-        return( clicked_in_text( clicked, clicked.name, e, NodeMode.EDITABLE ) );
+        return( clicked_in_text( n_press, x, y, clicked, clicked.name, NodeMode.EDITABLE ) );
       } else if( clicked.is_within_note( x, y ) ) {
-        return( clicked_in_text( clicked, clicked.note, e, NodeMode.NOTEEDIT ) );
+        return( clicked_in_text( n_press, x, y, clicked, clicked.note, NodeMode.NOTEEDIT ) );
       } else {
         _active           = clicked;
         _active_to_select = true;
       }
     } else if( _title.is_within( x, y ) ) {
-      var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
       set_title_editable( true );
-      switch( e.type ) {
-        case EventType.BUTTON_PRESS        :  _title.set_cursor_at_char( e.x, e.y, shift );  break;
-        case EventType.DOUBLE_BUTTON_PRESS :  _title.set_cursor_at_word( e.x, e.y, shift );  break;
-        case EventType.TRIPLE_BUTTON_PRESS :  _title.set_cursor_all( false );                break;
-        default                            :  break;
+      switch( n_press ) {
+        case 1  :  _title.set_cursor_at_char( x, y, _shift_set );  break;
+        case 2  :  _title.set_cursor_at_word( x, y, _shift_set );  break;
+        case 3  :  _title.set_cursor_all( false );                 break;
+        default :  break;
       }
     } else {
       selected = null;
@@ -795,50 +802,53 @@ public class OutlineTable : DrawingArea {
   /* Changes the text selection for the specified canvas text element */
   private void change_selection( CanvasText ct, double x, double y ) {
     switch( _press_type ) {
-      case EventType.BUTTON_PRESS        :  ct.set_cursor_at_char( x, y, true );  break;
-      case EventType.DOUBLE_BUTTON_PRESS :  ct.set_cursor_at_word( x, y, true );  break;
-      default                            :  break;
+      case 1  :  ct.set_cursor_at_char( x, y, true );  break;
+      case 2  :  ct.set_cursor_at_word( x, y, true );  break;
+      default :  break;
     }
     queue_draw();
   }
 
-  /* Handle button press event */
-  private bool on_press( EventButton e ) {
+  /* Handle primary button press event */
+  private void on_primary_press( int n_press, double x, double y ) {
 
-    switch( e.button ) {
-      case Gdk.BUTTON_PRIMARY :
-        grab_focus();
-        _press_x    = e.x;
-        _press_y    = e.y;
-        _pressed    = set_current_at_position( _press_x, _press_y, e );
-        _press_type = e.type;
-        _motion     = false;
-        queue_draw();
-        break;
-      case Gdk.BUTTON_SECONDARY :
-        show_contextual_menu( e );
-        break;
-    }
+    grab_focus();
+
+    _press_x    = x;
+    _press_y    = y;
+    _pressed    = set_current_at_position( n_press, x, y );
+    _press_type = n_press;
+    _motion     = false;
+    queue_draw();
 
     /* Update the format bar display */
     update_format_bar( "on_press" );
 
-    return( false );
+  }
+
+  /* Handle a secondary button press event */
+  private void on_secondary_press( int n_press, double x, double y ) {
+
+    /* Display the contextual menu */
+    show_contextual_menu();
+
+    /* Update the format bar display */
+    update_format_bar( "on_press" );
 
   }
 
   /* Handle mouse motion */
-  private bool on_motion( EventMotion e ) {
+  private void on_motion( double ex, double ey ) {
 
     _motion   = true;
-    _motion_x = e.x;
-    _motion_y = e.y;
+    _motion_x = ex;
+    _motion_y = ey;
 
     /* Handles the focus on exit button */
     var prev_in_focus_exit = _in_focus_exit;
     _in_focus_exit = false;
 
-    if( is_within_focus_exit( e.x, e.y ) ) {
+    if( is_within_focus_exit( ex, ey ) ) {
       _in_focus_exit = true;
       set_tooltip_markup( Utils.tooltip_with_accel( _( "Exit Focus Mode" ), "F2" ) );
       queue_draw();
@@ -860,21 +870,25 @@ public class OutlineTable : DrawingArea {
         selected.parent.remove_child( selected );
       }
 
-      if( selected != null ) {
+      /* If we are dragging out a selection in the title, handle it */
+      if( (_title != null) && _title.is_within( ex, ey ) ) {
+        change_selection( title, ex, ey );
+
+      } else if( selected != null ) {
 
         /* If we are dragging out a text selection, handle it here */
         if( (selected.mode == NodeMode.EDITABLE) || (selected.mode == NodeMode.NOTEEDIT) ) {
-          change_selection( ((selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note), e.x, e.y );
+          change_selection( ((selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note), ex, ey );
 
         /* Otherwise, we are moving the current node */
         } else {
-          selected.y = e.y;
-          var current = node_at_coordinates( e.x, e.y );
+          selected.y = ey;
+          var current = node_at_coordinates( ex, ey );
           if( current != null ) {
-            if( current.is_within_attachto( e.x, e.y ) ) {
+            if( current.is_within_attachto( ex, ey ) ) {
               set_node_mode( current, NodeMode.ATTACHTO );
               selected.depth = current.depth + 1;
-            } else if( current.is_within_attachabove( e.x, e.y ) ) {
+            } else if( current.is_within_attachabove( ex, ey ) ) {
               set_node_mode( current, NodeMode.ATTACHABOVE );
               var prev_node = current.get_previous_node();
               selected.depth = (prev_node != null) ? prev_node.depth : 0;
@@ -900,26 +914,25 @@ public class OutlineTable : DrawingArea {
       var extra = "";
 
       /* Get the current node */
-      var current = node_at_coordinates( e.x, e.y );
-      var control = (bool)(e.state & ModifierType.CONTROL_MASK);
+      var current = node_at_coordinates( ex, ey );
 
       /* Check the location of the cursor and update the UI appropriately */
       if( current != null ) {
         var orig_over = current.over_note_icon;
         current.over_note_icon = false;
         set_tooltip_markup( null );
-        if( current.is_within_note_icon( e.x, e.y ) ) {
+        if( current.is_within_note_icon( ex, ey ) ) {
           current.over_note_icon = true;
           set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
           set_cursor( null );
-        } else if( current.is_within_expander( e.x, e.y ) ) {
+        } else if( current.is_within_expander( ex, ey ) ) {
           if( current.children.length > 0 ) {
             set_tooltip_markup( _( "%u subrows" ).printf( current.children.length ) );
           }
-        } else if( current.is_within_task( e.x, e.y ) ) {
+        } else if( current.is_within_task( ex, ey ) ) {
           set_cursor( click_cursor );
-        } else if( current.is_within_name( e.x, e.y ) ) {
-          if( control && !is_node_editable() && current.name.is_within_clickable( e.x, e.y, out tag, out extra ) ) {
+        } else if( current.is_within_name( ex, ey ) ) {
+          if( _control_set && !is_node_editable() && current.name.is_within_clickable( ex, ey, out tag, out extra ) ) {
             set_cursor( click_cursor );
             if( tag == FormatTag.URL ) {
               set_tooltip_markup( extra );
@@ -927,8 +940,8 @@ public class OutlineTable : DrawingArea {
           } else {
             set_cursor( text_cursor );
           }
-        } else if( current.is_within_note( e.x, e.y ) ) {
-          if( control && !is_note_editable() && current.note.is_within_clickable( e.x, e.y, out tag, out extra ) && (tag == FormatTag.URL) ) {
+        } else if( current.is_within_note( ex, ey ) ) {
+          if( _control_set && !is_note_editable() && current.note.is_within_clickable( ex, ey, out tag, out extra ) && (tag == FormatTag.URL) ) {
             set_cursor( click_cursor );
             set_tooltip_markup( extra );
           } else {
@@ -940,7 +953,7 @@ public class OutlineTable : DrawingArea {
         if( orig_over != current.over_note_icon ) {
           queue_draw();
         }
-      } else if( (_title != null) && _title.is_within( e.x, e.y ) ) {
+      } else if( (_title != null) && _title.is_within( ex, ey ) ) {
         set_cursor( text_cursor );
       } else {
         set_cursor( null );
@@ -961,12 +974,10 @@ public class OutlineTable : DrawingArea {
 
     }
 
-    return( false );
-
   }
 
   /* Handles the release of the mouse button */
-  private bool on_release( EventButton e ) {
+  private void on_release( int n_press, double x, double y ) {
 
     if( _pressed ) {
 
@@ -999,7 +1010,7 @@ public class OutlineTable : DrawingArea {
           _active_to_select = false;
           queue_draw();
           changed();
-        } else if( selected.mode == NodeMode.MOVETO ) {
+        } else if( (selected != null) && (selected.mode == NodeMode.MOVETO) ) {
           _move_parent.add_child( selected, _move_index );
           set_node_mode( selected, NodeMode.SELECTED );
           queue_draw();
@@ -1015,16 +1026,15 @@ public class OutlineTable : DrawingArea {
       /* If the user clicked in an expander, toggle the expander */
       if( !_motion ) {
         if( _active != null ) {
-          if( _active.is_within_expander( e.x, e.y ) ) {
+          if( _active.is_within_expander( x, y ) ) {
             toggle_expand( _active );
-          } else if( _active.is_within_note_icon( e.x, e.y ) ) {
-            var control = (bool)(e.state & ModifierType.CONTROL_MASK);
-            if( control ) {
+          } else if( _active.is_within_note_icon( x, y ) ) {
+            if( _control_set ) {
               toggle_notes( _active );
             } else {
               toggle_note( _active, true );
             }
-          } else if( _active.is_within_task( e.x, e.y ) ) {
+          } else if( _active.is_within_task( x, y ) ) {
             _active.task = (_active.task == NodeTaskMode.OPEN) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
             queue_draw();
             changed();
@@ -1039,11 +1049,9 @@ public class OutlineTable : DrawingArea {
 
     _pressed = false;
 
-    return( false );
-
   }
 
-    /*
+  /*
    Returns true if the following key was found to be pressed (regardless of
    keyboard layout).
   */
@@ -1055,17 +1063,16 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Handles keypress events */
-  private bool on_keypress( EventKey e ) {
+  private bool on_keypress( uint keyval, uint keycode, ModifierType state ) {
 
     /* Figure out which modifiers were used */
-    var control = (bool)(e.state & ModifierType.CONTROL_MASK);
-    var shift   = (bool)(e.state & ModifierType.SHIFT_MASK);
-    var nomod   = !(control || shift);
-    var keymap     = Keymap.get_for_display( Display.get_default() );
+    var control    = (bool)(state & ModifierType.CONTROL_MASK);
+    var shift      = (bool)(state & ModifierType.SHIFT_MASK);
+    var nomod      = !(control || shift);
     KeymapKey[] ks = {};
     uint[] kvs     = {};
 
-    keymap.get_entries_for_keycode( e.hardware_keycode, out ks, out kvs );
+    Display.get_default().map_keycode( keycode, out ks, out kvs );
 
     /* If there is a current node or connection selected, operate on it */
     if( (selected != null) || is_title_editable() ) {
@@ -1110,50 +1117,54 @@ public class OutlineTable : DrawingArea {
         else if( !shift && has_key( kvs, Key.u ) )         { handle_control_u(); }
         else if( !shift && has_key( kvs, Key.w ) )         { handle_control_w(); }
       } else if( nomod || shift ) {
-        if( !insert_user_text( e.str ) ) {
-          if( has_key( kvs, Key.BackSpace ) )                 { handle_backspace(); }
-          else if( has_key( kvs, Key.Delete ) )               { handle_delete(); }
-          else if( has_key( kvs, Key.Escape ) )               { handle_escape(); }
-          else if( has_key( kvs, Key.Return ) )               { handle_return( shift ); }
-          else if( has_key( kvs, Key.Tab ) )                  { handle_tab( shift ); }
-          else if( has_key( kvs, Key.Right ) )                { handle_right( shift ); }
-          else if( has_key( kvs, Key.Left ) )                 { handle_left( shift ); }
-          else if( has_key( kvs, Key.Home ) )                 { handle_home( shift ); }
-          else if( has_key( kvs, Key.End ) )                  { handle_end( shift ); }
-          else if( has_key( kvs, Key.Up ) )                   { handle_up( shift ); }
-          else if( has_key( kvs, Key.Down ) )                 { handle_down( shift ); }
-          else if( has_key( kvs, Key.Page_Up ) )              { handle_pageup(); }
-          else if( has_key( kvs, Key.Page_Down ) )            { handle_pagedn(); }
-          else if( has_key( kvs, Key.Control_L ) )            { handle_control( true ); }
-          else if( !shift && has_key( kvs, Key.a ) )          { change_selected( node_parent( selected ) ); }
-          else if(  shift && has_key( kvs, Key.B ) )          { change_selected( node_bottom() ); }
-          else if( !shift && has_key( kvs, Key.c ) )          { change_selected( node_last_child( selected ) ); }
-          else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
-          else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
-          else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
-          else if( !shift && has_key( kvs, Key.h ) )          { unindent(); }
-          else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
-          else if( !shift && has_key( kvs, Key.j ) )          { change_selected( node_next( selected ) ); }
-          else if( !shift && has_key( kvs, Key.k ) )          { change_selected( node_previous( selected ) ); }
-          else if( !shift && has_key( kvs, Key.l ) )          { indent(); }
-          else if( !shift && has_key( kvs, Key.n ) )          { change_selected( node_next_sibling( selected ) ); }
-          else if( !shift && has_key( kvs, Key.p ) )          { change_selected( node_previous_sibling( selected ) ); }
-          else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
-          else if(  shift && has_key( kvs, Key.T ) )          { change_selected( node_top() ); }
-          else if(  shift && has_key( kvs, Key.numbersign ) ) { toggle_label(); }
-          else if(  shift && has_key( kvs, Key.asterisk ) )   { clear_all_labels(); }
-          else if( !shift && has_key( kvs, Key.@1 ) )         { goto_label( 0 ); }
-          else if( !shift && has_key( kvs, Key.@2 ) )         { goto_label( 1 ); }
-          else if( !shift && has_key( kvs, Key.@3 ) )         { goto_label( 2 ); }
-          else if( !shift && has_key( kvs, Key.@4 ) )         { goto_label( 3 ); }
-          else if( !shift && has_key( kvs, Key.@5 ) )         { goto_label( 4 ); }
-          else if( !shift && has_key( kvs, Key.@6 ) )         { goto_label( 5 ); }
-          else if( !shift && has_key( kvs, Key.@7 ) )         { goto_label( 6 ); }
-          else if( !shift && has_key( kvs, Key.@8 ) )         { goto_label( 7 ); }
-          else if( !shift && has_key( kvs, Key.@9 ) )         { goto_label( 8 ); }
-          else if(  shift && has_key( kvs, Key.at ) )         { tagger.show_add_ui(); }
-          else if( has_key( kvs, Key.F10 ) )                  { if( shift ) show_contextual_menu( e ); }
-          else if( has_key( kvs, Key.Menu ) )                 { show_contextual_menu( e ); }
+        if( has_key( kvs, Key.BackSpace ) )                 { handle_backspace(); }
+        else if( has_key( kvs, Key.Delete ) )               { handle_delete(); }
+        else if( has_key( kvs, Key.Escape ) )               { handle_escape(); }
+        else if( has_key( kvs, Key.Return ) )               { handle_return( shift ); }
+        else if( has_key( kvs, Key.Tab ) )                  { handle_tab( shift ); }
+        else if( has_key( kvs, Key.Right ) )                { handle_right( shift ); }
+        else if( has_key( kvs, Key.Left ) )                 { handle_left( shift ); }
+        else if( has_key( kvs, Key.Home ) )                 { handle_home( shift ); }
+        else if( has_key( kvs, Key.End ) )                  { handle_end( shift ); }
+        else if( has_key( kvs, Key.Up ) )                   { handle_up( shift ); }
+        else if( has_key( kvs, Key.Down ) )                 { handle_down( shift ); }
+        else if( has_key( kvs, Key.Page_Up ) )              { handle_pageup(); }
+        else if( has_key( kvs, Key.Page_Down ) )            { handle_pagedn(); }
+        else if( has_key( kvs, Key.Control_L ) )            { handle_control( true ); }
+        else if( has_key( kvs, Key.Control_R ) )            { handle_control( true ); }
+        else if( has_key( kvs, Key.Shift_L ) )              { _shift_set = true; }
+        else if( has_key( kvs, Key.Shift_R ) )              { _shift_set = true; }
+        else if( !shift && has_key( kvs, Key.a ) )          { change_selected( node_parent( selected ) ); }
+        else if(  shift && has_key( kvs, Key.B ) )          { change_selected( node_bottom() ); }
+        else if( !shift && has_key( kvs, Key.c ) )          { change_selected( node_last_child( selected ) ); }
+        else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
+        else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
+        else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
+        else if( !shift && has_key( kvs, Key.h ) )          { unindent(); }
+        else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
+        else if( !shift && has_key( kvs, Key.j ) )          { change_selected( node_next( selected ) ); }
+        else if( !shift && has_key( kvs, Key.k ) )          { change_selected( node_previous( selected ) ); }
+        else if( !shift && has_key( kvs, Key.l ) )          { indent(); }
+        else if( !shift && has_key( kvs, Key.n ) )          { change_selected( node_next_sibling( selected ) ); }
+        else if( !shift && has_key( kvs, Key.p ) )          { change_selected( node_previous_sibling( selected ) ); }
+        else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
+        else if(  shift && has_key( kvs, Key.T ) )          { change_selected( node_top() ); }
+        else if(  shift && has_key( kvs, Key.numbersign ) ) { toggle_label(); }
+        else if(  shift && has_key( kvs, Key.asterisk ) )   { clear_all_labels(); }
+        else if( !shift && has_key( kvs, Key.@1 ) )         { goto_label( 0 ); }
+        else if( !shift && has_key( kvs, Key.@2 ) )         { goto_label( 1 ); }
+        else if( !shift && has_key( kvs, Key.@3 ) )         { goto_label( 2 ); }
+        else if( !shift && has_key( kvs, Key.@4 ) )         { goto_label( 3 ); }
+        else if( !shift && has_key( kvs, Key.@5 ) )         { goto_label( 4 ); }
+        else if( !shift && has_key( kvs, Key.@6 ) )         { goto_label( 5 ); }
+        else if( !shift && has_key( kvs, Key.@7 ) )         { goto_label( 6 ); }
+        else if( !shift && has_key( kvs, Key.@8 ) )         { goto_label( 7 ); }
+        else if( !shift && has_key( kvs, Key.@9 ) )         { goto_label( 8 ); }
+        else if(  shift && has_key( kvs, Key.at ) )         { tagger.show_add_ui(); }
+        else if( has_key( kvs, Key.F10 ) )                  { if( shift ) show_contextual_menu(); }
+        else if( has_key( kvs, Key.Menu ) )                 { show_contextual_menu(); }
+        else {
+          // _im_context.filter_keypress( _key_controller.get_current_event() );
         }
       }
     } else {
@@ -1173,6 +1184,9 @@ public class OutlineTable : DrawingArea {
         else if( has_key( kvs, Key.Up ) )           { handle_up( shift ); }
         else if( has_key( kvs, Key.Down ) )         { handle_down( shift ); }
         else if( has_key( kvs, Key.Control_L ) )    { handle_control( true ); }
+        else if( has_key( kvs, Key.Control_R ) )    { handle_control( true ); }
+        else if( has_key( kvs, Key.Shift_L ) )      { _shift_set = true; }
+        else if( has_key( kvs, Key.Shift_R ) )      { _shift_set = true; }
         else if( has_key( kvs, Key.Escape ) )       { handle_escape(); }
       }
     }
@@ -1185,13 +1199,20 @@ public class OutlineTable : DrawingArea {
   }
 
   /* Called whenever a key is released */
-  private bool on_keyrelease( EventKey e ) {
-    if( e.keyval == Key.Control_L ) {
-      handle_control( false );
+  private void on_keyrelease( uint keyval, uint keycode, ModifierType state ) {
+    switch( keyval ) {
+      case Key.Control_L :
+      case Key.Control_R :
+        handle_control( false );
+        break;
+      case Key.Shift_L :
+      case Key.Shift_R :
+        _shift_set = false;
+        break;
     }
-    return( true );
   }
 
+  /* Handles holding down the Control key only */
   private void handle_control( bool pressed ) {
     var tag   = FormatTag.URL;
     var extra = "";
@@ -1211,21 +1232,14 @@ public class OutlineTable : DrawingArea {
         }
       }
     }
+    _control_set = pressed;
   }
 
   /* Displays the contextual menu based on what is currently selected */
-  private void show_contextual_menu( Event event ) {
-
-#if GTK322
+  private void show_contextual_menu() {
     if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {
-      _node_menu.popup_at_pointer( event );
+      _node_menu.show( _motion_x, _motion_y );
     }
-#else
-    if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {
-      _node_menu.popup( null, null, null, event.button, event.time );
-    }
-#endif
-
   }
 
   /* Expands or collapses the current node's children */
@@ -2782,20 +2796,19 @@ public class OutlineTable : DrawingArea {
 
   /* Handles the emoji insertion process for the given text item */
   private void insert_emoji( CanvasText text ) {
-    var overlay = (Overlay)get_parent();
-    var entry = new Entry();
     int x, ytop, ybot;
     text.get_cursor_pos( out x, out ytop, out ybot );
-    entry.margin_start = x;
-    entry.margin_top   = ytop + ((ybot - ytop) / 2);
-    entry.changed.connect(() => {
-      text.insert( entry.text, undo_text );
-      entry.unparent();
+    Gdk.Rectangle rect = {x, (ytop + ((ybot - ytop) / 2)), 1, 1};
+    var emoji = new EmojiChooser() {
+      pointing_to = rect
+    };
+    emoji.set_parent( this );
+    emoji.popup();
+    emoji.emoji_picked.connect((txt) => {
+      text.insert( txt, undo_text );
       grab_focus();
       queue_draw();
     });
-    overlay.add_overlay( entry );
-    entry.insert_emoji();
   }
 
   /* Returns the currently applied heme */
@@ -2819,13 +2832,11 @@ public class OutlineTable : DrawingArea {
 
   /* Updates the CSS for the current outline table */
   private void update_css() {
-
-    StyleContext.add_provider_for_screen(
-      Screen.get_default(),
+    StyleContext.add_provider_for_display(
+      win.get_display(),
       _theme.get_css_provider(),
       STYLE_PROVIDER_PRIORITY_APPLICATION
     );
-
   }
 
   /* Updates the current them in the UI */
@@ -2874,18 +2885,14 @@ public class OutlineTable : DrawingArea {
    Called whenever the window size is changed.  Adjusts the title text
    field to match the window width.
   */
-  private bool window_size_changed( EventConfigure e ) {
+  private void window_size_changed() {
 
-    /* Get the width of the table */
-    int w, h;
-    win.get_size( out w, out h );
+    if( _title == null ) return;
 
     var rmargin = 20;
 
     /* Update our width information */
-    _title.max_width = w - (_title.posx + rmargin);
-
-    return( false );
+    _title.max_width = _width - (_title.posx + rmargin);
 
   }
 
@@ -2893,12 +2900,9 @@ public class OutlineTable : DrawingArea {
   public void initialize_for_new() {
 
     /* Initialize variables */
-    _press_type = EventType.NOTHING;
+    _press_type = 0;
 
     Idle.add(() => {
-
-      /* Handle any window size changes */
-      win.configure_event.connect( window_size_changed );
 
       /* Create the main idea node */
       var node = new Node( this );
@@ -2929,7 +2933,7 @@ public class OutlineTable : DrawingArea {
     selected = null;
 
     /* Initialize variables */
-    _press_type = EventType.NOTHING;
+    _press_type = 0;
 
   }
 
@@ -2965,7 +2969,7 @@ public class OutlineTable : DrawingArea {
       _format_bar.position    = PositionType.TOP;
     }
 
-    Utils.show_popover( _format_bar );
+    _format_bar.popup();
 
   }
 
@@ -3463,14 +3467,10 @@ public class OutlineTable : DrawingArea {
   /*******************/
 
   /* Draw the available nodes */
-  public bool on_draw( Context ctx ) {
-
+  public void on_draw( DrawingArea da, Context ctx, int width, int height ) {
     draw_background( ctx );
     draw_exit_focus_mode( ctx );
     draw_all( ctx );
-
-    return( false );
-
   }
 
   /* Draw the background from the stylesheet */

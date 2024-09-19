@@ -59,7 +59,7 @@ public class Theme : Object {
   /* Returns the RGBA color for the given color value */
   protected RGBA get_color( string value ) {
 
-    RGBA c = {1.0, 1.0, 1.0, 1.0};
+    RGBA c = {(float)1.0, (float)1.0, (float)1.0, (float)1.0};
     c.parse( value );
 
     return( c );
@@ -74,8 +74,8 @@ public class Theme : Object {
     try {
       var css_data = "@define-color tab_base_color " + background.to_string() + ";" +
                      ".canvas { background: " + background.to_string() + "; } " +
-                     ".color_chooser { padding-right: 0px; padding-left: 0px; margin-right: 0px; margin-left: 0px }";
-      provider.load_from_data( css_data );
+                     ".color_chooser { padding-right: 0px; padding-left: 0px; margin-right: 0px; margin-left: 0px; }";
+      provider.load_from_data( css_data.data );
     } catch( GLib.Error e ) {
       stdout.printf( "Unable to load theme: %s\n", e.message );
     }

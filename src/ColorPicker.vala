@@ -36,11 +36,14 @@ public enum ColorPickerType {
 
   public void set_image( ToggleButton btn ) {
     switch( this ) {
-      case HCOLOR :  btn.image = new Image.from_icon_name( "format-text-highlight", IconSize.SMALL_TOOLBAR );  break;
+      case HCOLOR :
+        btn.icon_name = "format-text-highlight";
+        break;
       case FCOLOR :  {
-        var lbl = new Label( "<span size=\"large\">A</span>" );
-        lbl.use_markup = true;
-        btn.image      = lbl;
+        var lbl = new Label( "<span size=\"large\">A</span>" ) {
+          use_markup = true
+        };
+        btn.child = lbl;
         break;
       }
       default     :  assert_not_reached();
@@ -57,47 +60,64 @@ public class ColorPicker : Box {
   private MenuButton         _select;
   private bool               _ignore_active;
 
+  public string toggle_tooltip {
+    get {
+      return( _toggle.get_tooltip_text() );
+    }
+    set {
+      _toggle.set_tooltip_text( value );
+    }
+  }
+
+  public string select_tooltip {
+    get {
+      return( _select.get_tooltip_text() );
+    }
+    set {
+      _select.set_tooltip_text( value );
+    }
+  }
+
   public signal void color_changed( RGBA? color );
 
   public ColorPicker( RGBA init_color, ColorPickerType type ) {
 
     _type = type;
 
-    _toggle = new ToggleButton();
-    _toggle.relief = ReliefStyle.NONE;
+    _toggle = new ToggleButton() {
+      has_frame = false
+    };
     _toggle.toggled.connect( handle_toggle );
     _toggle.get_style_context().add_class( type.get_css_class() );
+
     type.set_image( _toggle );
 
-    _chooser = new ColorChooserWidget();
-    _chooser.rgba = init_color;
+    _chooser = new ColorChooserWidget() {
+      rgba = init_color
+    };
 
-    var overlay = new Overlay();
-    overlay.button_press_event.connect( handle_chooser );
-    overlay.add( _chooser );
-    overlay.show_all();
+    var click_controller = new GestureClick();
+    var overlay = new Overlay() {
+      child = _chooser
+    };
+    overlay.add_controller( click_controller );
 
-    _select = new MenuButton();
-    _select.relief = ReliefStyle.NONE;
+    click_controller.pressed.connect( handle_chooser );
+
+    _select = new MenuButton() {
+      has_frame = false
+    };
     _select.get_style_context().add_class( "color_chooser" );
 
-    _select.popover = new Popover( null );
-    _select.popover.add( overlay );
+    _select.popover = new Popover() {
+      child = overlay
+    };
 
-    pack_start( _toggle, false, false );
-    pack_start( _select, false, false );
-    show_all();
+    append( _toggle );
+    append( _select );
 
     update_css( init_color );
 
-  }
-
-  public void set_toggle_tooltip( string tooltip ) {
-    _toggle.set_tooltip_text( tooltip );
-  }
-
-  public void set_select_tooltip( string tooltip ) {
-    _select.set_tooltip_text( tooltip );
   }
 
   public void set_active( bool active ) {
@@ -111,9 +131,9 @@ public class ColorPicker : Box {
     try {
       var color    = Utils.color_from_rgba( rgba );
       var css_data = ".%s { background: %s; }".printf( _type.get_css_class(), color );
-      provider.load_from_data( css_data );
-      StyleContext.add_provider_for_screen(
-        Screen.get_default(),
+      provider.load_from_data( css_data.data );
+      StyleContext.add_provider_for_display(
+        Display.get_default(),
         provider,
         STYLE_PROVIDER_PRIORITY_APPLICATION
       );
@@ -132,12 +152,11 @@ public class ColorPicker : Box {
     }
   }
 
-  private bool handle_chooser( EventButton e ) {
+  private void handle_chooser( int n_press, double x, double y ) {
     update_css( _chooser.rgba );
     set_active( true );
     color_changed( _chooser.rgba );
-    Utils.hide_popover( _select.popover );
-    return( true );
+    _select.popover.popup();
   }
 
 }
