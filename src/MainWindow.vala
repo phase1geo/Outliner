@@ -164,13 +164,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     add_keyboard_shortcuts( app );
 
     _nb = new Notebook() {
+      scrollable = true,
       halign  = Align.FILL,
       valign  = Align.FILL,
       hexpand = true,
       vexpand = true
     };
-    // _nb.add_button_visible = false;
-    // _nb.tab_bar_behavior   = focus_mode ? DynamicNotebook.TabBarBehavior.NEVER : DynamicNotebook.TabBarBehavior.SINGLE;
     _nb.switch_page.connect( tab_switched );
     _nb.page_reordered.connect( tab_reordered );
     _nb.page_removed.connect( tab_removed );
