@@ -7,17 +7,10 @@
         <file alias="shortcuts.ui" compressed="true">com.github.phase1geo.outliner.shortcuts.ui</file>
     </gresource>
     <gresource prefix="/com/github/phase1geo/outliner/images">
-        <file alias="com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/com.github.phase1geo.outliner.svg</file>
-        <file alias="16-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/16/com.github.phase1geo.outliner.svg</file>
         <file alias="accessories-text-editor-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/accessories-text-editor-symbolic.svg</file>
         <file alias="code-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/code-symbolic.svg</file>
         <file alias="superscript-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/superscript-symbolic.svg</file>
         <file alias="subscript-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/subscript-symbolic.svg</file>
         <file alias="header-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/header-symbolic.svg</file>
-        <file alias="24-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/24/com.github.phase1geo.outliner.svg</file>
-        <file alias="32-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/32/com.github.phase1geo.outliner.svg</file>
-        <file alias="48-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/48/com.github.phase1geo.outliner.svg</file>
-        <file alias="64-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/64/com.github.phase1geo.outliner.svg</file>
-        <file alias="128-com.github.phase1geo.outliner.svg" compressed="true" preprocess="xml-stripblanks">images/icons/128/com.github.phase1geo.outliner.svg</file>
     </gresource>
 </gresources>

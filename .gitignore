@@ -9,3 +9,4 @@ src/themes/*.c
 src/themes/*.swp
 src/undo_actions/*.c
 src/undo_actions/*.swp
+src/.DS_Store
