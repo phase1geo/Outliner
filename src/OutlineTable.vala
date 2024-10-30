@@ -734,7 +734,7 @@ public class OutlineTable : DrawingArea {
         _active           = clicked;
         _active_to_select = true;
       }
-    } else if( _title.is_within( x, y ) ) {
+    } else if( (_title != null) && _title.is_within( x, y ) ) {
       set_title_editable( true );
       switch( n_press ) {
         case 1  :  _title.set_cursor_at_char( x, y, _shift_set );  break;
