@@ -1062,6 +1062,58 @@ public class OutlineTable : DrawingArea {
     return( false );
   }
 
+  private bool handle_filtered_keypress( string str ) {
+    if( (selected != null) || is_title_editable() ) {
+      switch( str ) {
+        case "a" :  change_selected( node_parent( selected ) );  break;
+        case "B" :  change_selected( node_bottom() );  break;
+        case "c" :  change_selected( node_last_child( selected ) );  break;
+        case "e" :  edit_selected( true );  break;
+        case "E" :  edit_selected( false );  break;
+        case "f" :  focus_on_selected();  break;
+        case "h" :  unindent();  break;
+        case "H" :  place_at_top( selected );  break;
+        case "j" :  change_selected( node_next( selected ) );  break;
+        case "k" :  change_selected( node_previous( selected ) );  break;
+        case "l" :  indent();  break;
+        case "n" :  change_selected( node_next_sibling( selected ) );  break;
+        case "p" :  change_selected( node_previous_sibling( selected ) );  break;
+        case "t" :  rotate_task();  break;
+        case "T" :  change_selected( node_top() );  break;
+        case "#" :  toggle_label();  break;
+        case "*" :  clear_all_labels();  break;
+        case "1" :  goto_label( 0 );  break;
+        case "2" :  goto_label( 1 );  break;
+        case "3" :  goto_label( 2 );  break;
+        case "4" :  goto_label( 3 );  break;
+        case "5" :  goto_label( 4 );  break;
+        case "6" :  goto_label( 5 );  break;
+        case "7" :  goto_label( 6 );  break;
+        case "8" :  goto_label( 7 );  break;
+        case "9" :  goto_label( 8 );  break;
+        case "@" :  tagger.show_add_ui();  break;
+        default  :  return( false );
+      }
+    } else {
+      switch( str ) {
+        case "*" :  clear_all_labels();  break;
+        case "1" :  goto_label( 0 );  break;
+        case "2" :  goto_label( 1 );  break;
+        case "3" :  goto_label( 2 );  break;
+        case "4" :  goto_label( 3 );  break;
+        case "5" :  goto_label( 4 );  break;
+        case "6" :  goto_label( 5 );  break;
+        case "7" :  goto_label( 6 );  break;
+        case "8" :  goto_label( 7 );  break;
+        case "9" :  goto_label( 8 );  break;
+        case "j" :  handle_down( false );  break;
+        case "k" :  handle_up( false );  break;
+        default  :  return( false );
+      }
+    }
+    return( true );
+  }
+
   /* Handles keypress events */
   private bool on_keypress( uint keyval, uint keycode, ModifierType state ) {
 
@@ -1305,6 +1357,7 @@ public class OutlineTable : DrawingArea {
   public string? serialize_text_for_copy( CanvasText ct ) {
     var ft = ct.get_selected_formatted_text( this );
     if( ft != null ) {
+      stdout.printf( "FT is not null\n" );
       string    str;
       Xml.Doc*  doc  = new Xml.Doc( "1.0" );
       Xml.Node* root = new Xml.Node( null, "oltext" );
@@ -2597,7 +2650,7 @@ public class OutlineTable : DrawingArea {
       _title.insert( str, undo_text );
       queue_draw();
     } else {
-      return( false );
+      return( handle_filtered_keypress( str ) );
     }
     return( true );
   }

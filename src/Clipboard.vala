@@ -51,14 +51,10 @@ public class OutlinerClipboard {
 
     if( nodes.length > 0 ) {
 
-      var ftxt = ot.serialize_text_for_copy( nodes.index( 0 ).name );
-      var txt  = nodes.index( 0 ).name.text.text;
-
       var clipboard = Display.get_default().get_clipboard();
-      clipboard.set_text( txt );
-
-      var bytes = new Bytes( ftxt.data );
-      var provider = new ContentProvider.for_bytes( NODES_TARGET_NAME, bytes );
+      var ntxt      = ot.serialize_node_for_copy( nodes.index( 0 ) );
+      var bytes     = new Bytes( ntxt.data );
+      var provider  = new ContentProvider.for_bytes( NODES_TARGET_NAME, bytes );
       clipboard.set_content( provider );
 
     }
