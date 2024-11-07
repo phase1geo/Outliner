@@ -455,7 +455,6 @@ public class OutlineTable : DrawingArea {
     _im_context.commit.connect( handle_im_commit );
     _im_context.retrieve_surrounding.connect( handle_im_retrieve_surrounding );
     _im_context.delete_surrounding.connect( handle_im_delete_surrounding );
-    _key_controller.set_im_context( _im_context );
 
   }
 
@@ -1062,58 +1061,6 @@ public class OutlineTable : DrawingArea {
     return( false );
   }
 
-  private bool handle_filtered_keypress( string str ) {
-    if( (selected != null) || is_title_editable() ) {
-      switch( str ) {
-        case "a" :  change_selected( node_parent( selected ) );  break;
-        case "B" :  change_selected( node_bottom() );  break;
-        case "c" :  change_selected( node_last_child( selected ) );  break;
-        case "e" :  edit_selected( true );  break;
-        case "E" :  edit_selected( false );  break;
-        case "f" :  focus_on_selected();  break;
-        case "h" :  unindent();  break;
-        case "H" :  place_at_top( selected );  break;
-        case "j" :  change_selected( node_next( selected ) );  break;
-        case "k" :  change_selected( node_previous( selected ) );  break;
-        case "l" :  indent();  break;
-        case "n" :  change_selected( node_next_sibling( selected ) );  break;
-        case "p" :  change_selected( node_previous_sibling( selected ) );  break;
-        case "t" :  rotate_task();  break;
-        case "T" :  change_selected( node_top() );  break;
-        case "#" :  toggle_label();  break;
-        case "*" :  clear_all_labels();  break;
-        case "1" :  goto_label( 0 );  break;
-        case "2" :  goto_label( 1 );  break;
-        case "3" :  goto_label( 2 );  break;
-        case "4" :  goto_label( 3 );  break;
-        case "5" :  goto_label( 4 );  break;
-        case "6" :  goto_label( 5 );  break;
-        case "7" :  goto_label( 6 );  break;
-        case "8" :  goto_label( 7 );  break;
-        case "9" :  goto_label( 8 );  break;
-        case "@" :  tagger.show_add_ui();  break;
-        default  :  return( false );
-      }
-    } else {
-      switch( str ) {
-        case "*" :  clear_all_labels();  break;
-        case "1" :  goto_label( 0 );  break;
-        case "2" :  goto_label( 1 );  break;
-        case "3" :  goto_label( 2 );  break;
-        case "4" :  goto_label( 3 );  break;
-        case "5" :  goto_label( 4 );  break;
-        case "6" :  goto_label( 5 );  break;
-        case "7" :  goto_label( 6 );  break;
-        case "8" :  goto_label( 7 );  break;
-        case "9" :  goto_label( 8 );  break;
-        case "j" :  handle_down( false );  break;
-        case "k" :  handle_up( false );  break;
-        default  :  return( false );
-      }
-    }
-    return( true );
-  }
-
   /* Handles keypress events */
   private bool on_keypress( uint keyval, uint keycode, ModifierType state ) {
 
@@ -1186,37 +1133,38 @@ public class OutlineTable : DrawingArea {
         else if( has_key( kvs, Key.Control_R ) )            { handle_control( true ); }
         else if( has_key( kvs, Key.Shift_L ) )              { _shift_set = true; }
         else if( has_key( kvs, Key.Shift_R ) )              { _shift_set = true; }
-        else if( !shift && has_key( kvs, Key.a ) )          { change_selected( node_parent( selected ) ); }
-        else if(  shift && has_key( kvs, Key.B ) )          { change_selected( node_bottom() ); }
-        else if( !shift && has_key( kvs, Key.c ) )          { change_selected( node_last_child( selected ) ); }
-        else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
-        else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
-        else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
-        else if( !shift && has_key( kvs, Key.h ) )          { unindent(); }
-        else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
-        else if( !shift && has_key( kvs, Key.j ) )          { change_selected( node_next( selected ) ); }
-        else if( !shift && has_key( kvs, Key.k ) )          { change_selected( node_previous( selected ) ); }
-        else if( !shift && has_key( kvs, Key.l ) )          { indent(); }
-        else if( !shift && has_key( kvs, Key.n ) )          { change_selected( node_next_sibling( selected ) ); }
-        else if( !shift && has_key( kvs, Key.p ) )          { change_selected( node_previous_sibling( selected ) ); }
-        else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
-        else if(  shift && has_key( kvs, Key.T ) )          { change_selected( node_top() ); }
-        else if(  shift && has_key( kvs, Key.numbersign ) ) { toggle_label(); }
-        else if(  shift && has_key( kvs, Key.asterisk ) )   { clear_all_labels(); }
-        else if( !shift && has_key( kvs, Key.@1 ) )         { goto_label( 0 ); }
-        else if( !shift && has_key( kvs, Key.@2 ) )         { goto_label( 1 ); }
-        else if( !shift && has_key( kvs, Key.@3 ) )         { goto_label( 2 ); }
-        else if( !shift && has_key( kvs, Key.@4 ) )         { goto_label( 3 ); }
-        else if( !shift && has_key( kvs, Key.@5 ) )         { goto_label( 4 ); }
-        else if( !shift && has_key( kvs, Key.@6 ) )         { goto_label( 5 ); }
-        else if( !shift && has_key( kvs, Key.@7 ) )         { goto_label( 6 ); }
-        else if( !shift && has_key( kvs, Key.@8 ) )         { goto_label( 7 ); }
-        else if( !shift && has_key( kvs, Key.@9 ) )         { goto_label( 8 ); }
-        else if(  shift && has_key( kvs, Key.at ) )         { tagger.show_add_ui(); }
-        else if( has_key( kvs, Key.F10 ) )                  { if( shift ) show_contextual_menu(); }
-        else if( has_key( kvs, Key.Menu ) )                 { show_contextual_menu(); }
-        else {
-          // _im_context.filter_keypress( _key_controller.get_current_event() );
+        else if( !is_node_editable() && !is_note_editable() && !is_title_editable() ) {
+          if( !shift && has_key( kvs, Key.a ) )          { change_selected( node_parent( selected ) ); }
+          else if(  shift && has_key( kvs, Key.B ) )          { change_selected( node_bottom() ); }
+          else if( !shift && has_key( kvs, Key.c ) )          { change_selected( node_last_child( selected ) ); }
+          else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
+          else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
+          else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
+          else if( !shift && has_key( kvs, Key.h ) )          { unindent(); }
+          else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
+          else if( !shift && has_key( kvs, Key.j ) )          { change_selected( node_next( selected ) ); }
+          else if( !shift && has_key( kvs, Key.k ) )          { change_selected( node_previous( selected ) ); }
+          else if( !shift && has_key( kvs, Key.l ) )          { indent(); }
+          else if( !shift && has_key( kvs, Key.n ) )          { change_selected( node_next_sibling( selected ) ); }
+          else if( !shift && has_key( kvs, Key.p ) )          { change_selected( node_previous_sibling( selected ) ); }
+          else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
+          else if(  shift && has_key( kvs, Key.T ) )          { change_selected( node_top() ); }
+          else if(  shift && has_key( kvs, Key.numbersign ) ) { toggle_label(); }
+          else if(  shift && has_key( kvs, Key.asterisk ) )   { clear_all_labels(); }
+          else if( !shift && has_key( kvs, Key.@1 ) )         { goto_label( 0 ); }
+          else if( !shift && has_key( kvs, Key.@2 ) )         { goto_label( 1 ); }
+          else if( !shift && has_key( kvs, Key.@3 ) )         { goto_label( 2 ); }
+          else if( !shift && has_key( kvs, Key.@4 ) )         { goto_label( 3 ); }
+          else if( !shift && has_key( kvs, Key.@5 ) )         { goto_label( 4 ); }
+          else if( !shift && has_key( kvs, Key.@6 ) )         { goto_label( 5 ); }
+          else if( !shift && has_key( kvs, Key.@7 ) )         { goto_label( 6 ); }
+          else if( !shift && has_key( kvs, Key.@8 ) )         { goto_label( 7 ); }
+          else if( !shift && has_key( kvs, Key.@9 ) )         { goto_label( 8 ); }
+          else if(  shift && has_key( kvs, Key.at ) )         { tagger.show_add_ui(); }
+          else if( has_key( kvs, Key.F10 ) )                  { if( shift ) show_contextual_menu(); }
+          else if( has_key( kvs, Key.Menu ) )                 { show_contextual_menu(); }
+        } else {
+          _im_context.filter_keypress( _key_controller.get_current_event() );
         }
       }
     } else {
@@ -1357,7 +1305,6 @@ public class OutlineTable : DrawingArea {
   public string? serialize_text_for_copy( CanvasText ct ) {
     var ft = ct.get_selected_formatted_text( this );
     if( ft != null ) {
-      stdout.printf( "FT is not null\n" );
       string    str;
       Xml.Doc*  doc  = new Xml.Doc( "1.0" );
       Xml.Node* root = new Xml.Node( null, "oltext" );
@@ -2650,7 +2597,7 @@ public class OutlineTable : DrawingArea {
       _title.insert( str, undo_text );
       queue_draw();
     } else {
-      return( handle_filtered_keypress( str ) );
+      return( false );
     }
     return( true );
   }
