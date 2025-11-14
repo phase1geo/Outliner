@@ -47,6 +47,8 @@ add_project_arguments([
     language: 'vala',
 )
 
+add_project_arguments(['-w'], language: 'c')
+
 dependencies = [
     dependency('gobject-2.0'),
     dependency('glib-2.0'),
@@ -66,7 +68,7 @@ e = executable('com.github.phase1geo.outliner',
     gresource,
     dependencies: dependencies,
     vala_args: [
-        meson.source_root() + '/vapi/libmarkdown.vapi'
+        meson.project_source_root() + '/vapi/libmarkdown.vapi'
     ],
     install : true
 )
