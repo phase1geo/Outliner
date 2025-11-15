@@ -23,11 +23,10 @@ using Gtk;
 
 public class Preferences : Gtk.Dialog {
 
-  private MainWindow    _win;
-  private GLib.Settings _settings;
+  private MainWindow _win;
 
   /* Constructor */
-  public Preferences( MainWindow win, GLib.Settings settings ) {
+  public Preferences( MainWindow win ) {
 
     Object(
       deletable: false,
@@ -37,8 +36,7 @@ public class Preferences : Gtk.Dialog {
       modal: true
     );
 
-    _win      = win;
-    _settings = settings;
+    _win = win;
 
     var stack = new Stack() {
       margin_start  = 6,
@@ -175,14 +173,14 @@ public class Preferences : Gtk.Dialog {
       halign = Align.START,
       valign = Align.CENTER
     };
-    _settings.bind( setting, w, "active", SettingsBindFlags.DEFAULT );
+    Outliner.settings.bind( setting, w, "active", SettingsBindFlags.DEFAULT );
     return( w );
   }
 
   /* Creates spinner */
   private SpinButton make_spinner( string setting, int min_value, int max_value, int step ) {
     var w = new SpinButton.with_range( min_value, max_value, step );
-    _settings.bind( setting, w, "value", SettingsBindFlags.DEFAULT );
+    Outliner.settings.bind( setting, w, "value", SettingsBindFlags.DEFAULT );
     return( w );
   }
 
@@ -204,12 +202,12 @@ public class Preferences : Gtk.Dialog {
       var style  = fd.get_style();
       return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
     });
-    btn.set_font( _settings.get_string( family_setting ) + " " + _settings.get_int( size_setting ).to_string() );
+    btn.set_font( Outliner.settings.get_string( family_setting ) + " " + Outliner.settings.get_int( size_setting ).to_string() );
     btn.font_set.connect(() => {
       var table = _win.get_current_table();
       table.change_font( target, btn.get_font_family().get_name(), (btn.get_font_size() / Pango.SCALE) );
-      _settings.set_string( family_setting, btn.get_font_family().get_name() );
-      _settings.set_int( size_setting, (btn.get_font_size() / Pango.SCALE) );
+      Outliner.settings.set_string( family_setting, btn.get_font_family().get_name() );
+      Outliner.settings.set_int( size_setting, (btn.get_font_size() / Pango.SCALE) );
     });
     return( btn );
   }
@@ -221,7 +219,7 @@ public class Preferences : Gtk.Dialog {
     var names = new Array<string>();
     _win.themes.names( ref names );
 
-    var theme   = _settings.get_string( "default-theme" );
+    var theme   = Outliner.settings.get_string( "default-theme" );
     var current = 0;
     var themes  = new string[names.length];
 
@@ -239,7 +237,7 @@ public class Preferences : Gtk.Dialog {
 
     mb.activate.connect(() => {
       var name = names.index( mb.selected );
-      _settings.set_string( "default-theme", name );
+      Outliner.settings.set_string( "default-theme", name );
     });
 
     return( mb );

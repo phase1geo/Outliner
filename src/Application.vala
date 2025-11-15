@@ -62,7 +62,7 @@ public class Outliner : Gtk.Application {
     StyleContext.add_provider_for_display( Gdk.Display.get_default(), provider, STYLE_PROVIDER_PRIORITY_APPLICATION );
 
     /* Create the main window */
-    appwin = new MainWindow( this, settings );
+    appwin = new MainWindow( this );
 
     /* Load the tab information */
     loaded = appwin.load_tab_state();

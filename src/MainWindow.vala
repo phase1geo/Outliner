@@ -29,9 +29,20 @@ public enum TabAddReason {
   LOAD
 }
 
+public class ShortcutTooltip {
+  private Widget _widget;
+  private string _label;
+  public ShortcutTooltip( Widget w, string l ) {
+    _widget = w;
+    _label  = l;
+  }
+  public void set_tooltip( Shortcut? shortcut ) {
+    _widget.tooltip_markup = (shortcut == null) ? _label : Utils.tooltip_with_accel( _label, shortcut.get_accelerator() );
+  }
+}
+
 public class MainWindow : Gtk.ApplicationWindow {
 
-  private GLib.Settings               _settings;
   private HeaderBar                   _header;
   private Notebook                    _nb;
   private Button                      _search_btn;
@@ -63,14 +74,12 @@ public class MainWindow : Gtk.ApplicationWindow {
   private Exporter                    _exporter;
   private UnicodeInsert               _unicoder;
   private Label                       _info_label;
+  private SimpleActionGroup           _actions;
+  private Shortcuts                   _shortcuts;
+  private Gee.HashMap<KeyCommand, ShortcutTooltip> _shortcut_widgets;
 
   private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
 
-  public GLib.Settings settings {
-    get {
-      return( _settings );
-    }
-  }
   public Exports exports {
     get {
       return( _exports );
@@ -81,45 +90,29 @@ public class MainWindow : Gtk.ApplicationWindow {
       return( _unicoder );
     }
   }
+  public Shortcuts shortcuts {
+    get {
+      return( _shortcuts );
+    }
+  }
 
   public static Themes themes = new Themes();
   public static bool   enable_tag_completion = true;
-
-  private const GLib.ActionEntry[] action_entries = {
-    { "action_new",           action_new },
-    { "action_open",          action_open },
-    { "action_save",          action_save },
-    { "action_save_as",       action_save_as },
-    { "action_undo",          action_undo },
-    { "action_redo",          action_redo },
-    { "action_search",        action_search },
-    { "action_quit",          action_quit },
-    // { "action_export",        action_export },
-    { "action_print",         action_print },
-    { "action_preferences",   action_preferences },
-    { "action_shortcuts",     action_shortcuts },
-    { "action_focus_mode",    action_focus_mode },
-    { "action_zoom_in",       action_zoom_in },
-    { "action_zoom_out",      action_zoom_out },
-    { "action_zoom_actual",   action_zoom_actual }
-  };
 
   private delegate void ChangedFunc();
 
   public signal void canvas_changed( OutlineTable? ot );
 
   /* Create the main window UI */
-  public MainWindow( Gtk.Application app, GLib.Settings settings ) {
+  public MainWindow( Gtk.Application app ) {
 
     Object( application: app );
-
-    _settings = settings;
 
     /* Initialize variables */
     _theme_buttons = new HashMap<string,CheckButton>();
 
-    var window_w = settings.get_int( "window-w" );
-    var window_h = settings.get_int( "window-h" );
+    var window_w = Outliner.settings.get_int( "window-w" );
+    var window_h = Outliner.settings.get_int( "window-h" );
 
     /* Create the exports and load it */
     _exports = new Exports();
@@ -127,20 +120,18 @@ public class MainWindow : Gtk.ApplicationWindow {
     /* Unicoder */
     _unicoder = new UnicodeInsert();
 
-    var focus_mode = settings.get_boolean( "focus-mode" );
+    var focus_mode = Outliner.settings.get_boolean( "focus-mode" );
 
-    enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
+    enable_tag_completion = Outliner.settings.get_boolean( "enable-tag-auto-completion" );
 
     /* Add the theme CSS */
     themes.add_css();
 
     /* Listen for changes to the system dark mode */
-#if GRANITE_6_OR_NEWER
     var granite_settings = Granite.Settings.get_default();
     granite_settings.notify["prefers-color-scheme"].connect( () => {
       update_themes();
     });
-#endif
 
     /* Create the header bar */
     _header = new HeaderBar() {
@@ -155,10 +146,15 @@ public class MainWindow : Gtk.ApplicationWindow {
     /* Set the main window data */
     set_default_size( window_w, window_h );
 
+    // Load the user shortcuts
+    _shortcuts = new Shortcuts();
+    _shortcuts.shortcut_changed.connect( shortcut_changed );
+
+    _shortcut_widgets = new Gee.HashMap<KeyCommand, ShortcutTooltip>();
+
     /* Set the stage for menu actions */
-    var actions = new SimpleActionGroup ();
-    actions.add_action_entries( action_entries, this );
-    insert_action_group( "win", actions );
+    _actions = new SimpleActionGroup();
+    insert_action_group( "win", _actions );
 
     /* Add keyboard shortcuts */
     add_keyboard_shortcuts( app );
@@ -322,7 +318,7 @@ public class MainWindow : Gtk.ApplicationWindow {
   public OutlineTable add_tab( string? fname, TabAddReason reason ) {
 
     /* Create and pack the canvas */
-    var ot = new OutlineTable( this, _settings );
+    var ot = new OutlineTable( this );
     ot.map.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
@@ -1280,38 +1276,23 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
   }
 
-  /* Called when the user uses the Control-S keyboard shortcut */
-  private void action_save_as() {
-    do_save_as_file();
-  }
-
-  /* Called when the user uses the Control-z keyboard shortcut */
-  private void action_undo() {
-    do_undo();
-  }
-
-  /* Called when the user uses the Control-Z keyboard shortcut */
-  private void action_redo() {
-    do_redo();
-  }
-
   /* Called when the user uses the Control-f keyboard shortcut */
-  private void action_search() {
+  public void do_search() {
     _search_btn.clicked();
   }
 
   /* Called when the user uses the Control-Plus/Equal shortcut */
-  private void action_zoom_in() {
+  public void do_zoom_in() {
     _zoom.zoom_in();
   }
 
   /* Called when the user uses the Control-Minus shortcut */
-  private void action_zoom_out() {
+  public void do_zoom_out() {
     _zoom.zoom_out();
   }
 
   /* Called when the user uses the Control-0 shortcut */
-  private void action_zoom_actual() {
+  public void do_zoom_actual() {
     _zoom.zoom_actual();
   }
 
@@ -1334,12 +1315,6 @@ public class MainWindow : Gtk.ApplicationWindow {
     return( fname + extensions[0] );
   }
 
-  /* Exports the model to the printer */
-  private void action_print() {
-    var print = new ExportPrint();
-    print.print( get_current_table( "action_print" ), this );
-  }
-
   /* Called whenever the properties button is clicked */
   private void properties_clicked() {
     var table      = get_current_table( "properties_clicked" );
@@ -1354,42 +1329,8 @@ public class MainWindow : Gtk.ApplicationWindow {
     _list_types.selected = table.list_type;
   }
 
-  /* Displays the preferences window */
-  private void action_preferences() {
-
-    var prefs = new Preferences( this, _settings );
-    prefs.show();
-
-  }
-
-  /* Displays the shortcuts cheatsheet */
-  private void action_shortcuts() {
-
-    var builder = new Builder.from_resource( "/com/github/phase1geo/outliner/shortcuts/shortcuts.ui" );
-    var win     = builder.get_object( "shortcuts" ) as ShortcutsWindow;
-    var table   = get_current_table( "action_shortcuts" );
-
-    win.transient_for = this;
-    win.view_name     = null;
-
-    /* Display the most relevant information based on the current state */
-    if( table.selected != null ) {
-      if( (table.selected.mode == NodeMode.EDITABLE) ||
-          (table.selected.mode == NodeMode.NOTEEDIT) ) {
-        win.section_name = "text-editing";
-      } else {
-        win.section_name = "node";
-      }
-    } else {
-      win.section_name = "general";
-    }
-
-    win.show();
-
-  }
-
   /* Hides the header bar */
-  public void action_focus_mode() {
+  public void toggle_focus_mode() {
 
     var enable = _header.visible;
 
@@ -1403,7 +1344,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
 
     _nb.show_tabs = !enable;
-    _settings.set_boolean( "focus-mode", enable );
+    Outliner.settings.set_boolean( "focus-mode", enable );
 
   }
 
@@ -1427,6 +1368,91 @@ public class MainWindow : Gtk.ApplicationWindow {
       app.send_notification( "com.github.phase1geo.outliner", notification );
     }
 
+  }
+
+  //-------------------------------------------------------------
+  // SHORTCUT HANDLING
+  //-------------------------------------------------------------
+
+  //-------------------------------------------------------------
+  // Adds and action for the given command.
+  private void set_action_for_command( KeyCommand command ) {
+
+    // Create action to execute
+    var action = new SimpleAction( command.to_string(), null );
+    action.activate.connect((v) => {
+      var func = command.get_func();
+      func( get_current_table( "set_action_for_command" ) );
+    });
+    _actions.add_action( action );
+
+    var shortcut = shortcuts.get_shortcut( command );
+    if( shortcut != null ) {
+      application.set_accels_for_action( "win.%s".printf( command.to_string() ), { shortcut.get_accelerator() } );
+    }
+
+  }
+
+  //-------------------------------------------------------------
+  // Appends a command with the given command to the specified menu.
+  private void append_menu_item( GLib.Menu menu, KeyCommand command, string label ) {
+    menu.append( label, "win.%s".printf( command.to_string() ) );
+    set_action_for_command( command );
+  }
+
+  //-------------------------------------------------------------
+  // Registers a widget when only a tooltip label update
+  // is needed.
+  public void register_widget_for_tooltip( Gtk.Widget w, KeyCommand command, string label ) {
+    var tooltip = new ShortcutTooltip( w, label );
+    _shortcut_widgets.set( command, tooltip );
+    var shortcut = shortcuts.get_shortcut( command );
+    if( shortcut != null ) {
+      tooltip.set_tooltip( shortcut );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Updates registers for shortcuts
+  public void register_widget_for_shortcut( Gtk.Widget w, KeyCommand command, string label ) {
+    register_widget_for_tooltip( w, command, label );
+    set_action_for_command( command );
+  }
+
+  //-------------------------------------------------------------
+  // Handles any changes to shortcuts.  If a shortcut is used by
+  // the main window, update the shortcut and associated tooltips.
+  private void shortcut_changed( KeyCommand command, Shortcut? shortcut ) {
+    var action = _actions.lookup_action( command.to_string() );
+    if( action != null ) {
+      var detail_name = "win.%s".printf( command.to_string() );
+      if( shortcut == null ) {
+        application.set_accels_for_action( detail_name, {} );
+      } else {
+        application.set_accels_for_action( detail_name, { shortcut.get_accelerator() } );
+      }
+    }
+    if( _shortcut_widgets.has_key( command ) ) {
+      _shortcut_widgets.get( command ).set_tooltip( shortcut );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Returns the shortcut accelerator associated with the given
+  // key command.
+  private string get_accelerator( KeyCommand command ) {
+    var shortcut = shortcuts.get_shortcut( command );
+    if( shortcut != null ) {
+      return( shortcut.get_accelerator() );
+    }
+    return( "" );
+  }
+
+  //-------------------------------------------------------------
+  // Execute command.
+  public void execute_command( KeyCommand command ) {
+    var func = command.get_func();
+    func( get_current_table( "execute_command" ) );
   }
 
 }

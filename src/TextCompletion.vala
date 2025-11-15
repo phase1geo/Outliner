@@ -109,7 +109,7 @@ public class TextCompletion {
     }
 
     /* Get the maximum number of items that we will display */
-    var max_items = _ot.win.settings.get_int( "max-auto-completion-items" );
+    var max_items = Outliner.settings.get_int( "max-auto-completion-items" );
 
     /* Remember the text positions that will be replaced */
     _ct        = ct;

@@ -86,7 +86,7 @@ public class Exporter : Box {
     append( _stack_reveal );
 
     /* Initialize the UI */
-    select_export( win.settings.get_string( "last-export" ) );
+    select_export( Outliner.settings.get_string( "last-export" ) );
 
     /* Add the menu actions */
     var actions = new SimpleActionGroup();
@@ -112,7 +112,7 @@ public class Exporter : Box {
       _mb.label = export.label;
       _stack.visible_child_name = export.name;
       _stack_reveal.reveal_child = export.settings_available();
-      _win.settings.set_string( "last-export", export.name );
+      Outliner.settings.set_string( "last-export", export.name );
     }
   }
 

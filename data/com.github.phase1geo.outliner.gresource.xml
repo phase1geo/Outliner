@@ -12,5 +12,6 @@
         <file alias="superscript-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/superscript-symbolic.svg</file>
         <file alias="subscript-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/subscript-symbolic.svg</file>
         <file alias="header-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/header-symbolic.svg</file>
+        <file alias="outliner-logo" compressed="true" preprocess="xml-stripblanks">images/icons/scalable/com.github.phase1geo.outliner.svg</file>
     </gresource>
 </gresources>
