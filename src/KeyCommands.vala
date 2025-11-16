@@ -670,11 +670,9 @@ public enum KeyCommand {
       case FILE_SAVE                 :  return( file_save );
       case FILE_SAVE_AS              :  return( file_save_as );
       case FILE_PRINT                :  return( file_print );
-      /*
       case TAB_GOTO_NEXT             :  return( tab_goto_next );
       case TAB_GOTO_PREV             :  return( tab_goto_prev );
       case TAB_CLOSE_CURRENT         :  return( tab_close_current );
-      */
       case UNDO_ACTION               :  return( undo_action );
       case REDO_ACTION               :  return( redo_action );
       case ZOOM_IN                   :  return( zoom_in );
@@ -1051,19 +1049,17 @@ public enum KeyCommand {
     print.print( ot, ot.win );
   }
 
-  /*
   public static void tab_goto_next( OutlineTable ot ) {
-    map.win.next_tab();
+    ot.win.next_tab();
   }
 
   public static void tab_goto_prev( OutlineTable ot ) {
-    map.win.previous_tab();
+    ot.win.previous_tab();
   }
 
   public static void tab_close_current( OutlineTable ot ) {
-    map.win.close_current_tab();
+    ot.win.close_current_tab();
   }
-  */
 
   public static void undo_action( OutlineTable ot ) {
     if( ot.is_node_editable() || ot.is_note_editable() ) {
