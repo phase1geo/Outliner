@@ -1,6 +1,7 @@
 sources += files(
   'About.vala',
   'Application.vala',
+  'BaseMenu.vala',
   'CanvasText.vala',
   'Clipboard.vala',
   'ColorPicker.vala',

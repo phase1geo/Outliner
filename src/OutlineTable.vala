@@ -96,6 +96,7 @@ public class OutlineTable : DrawingArea {
   private CanvasText?     _title         = null;
   private bool            _control_set = false;
   private bool            _shift_set   = false;
+  private bool            _alt_set     = false;
   private EventControllerKey _key_controller;
 
   public MainWindow     win         { get { return( _win ); } }
@@ -317,6 +318,12 @@ public class OutlineTable : DrawingArea {
       return( _tagger );
     }
   }
+  public TextCompletion completion {
+    get {
+      return( _completion );
+    }
+  }
+
   public int top_margin      { get; private set; default = 45; }
   public bool tasks_on_right { get; private set; default = true; }
 
@@ -695,6 +702,21 @@ public class OutlineTable : DrawingArea {
   // Returns the node at the given coordinates
   private Node? node_at_coordinates( double x, double y ) {
     return( root.get_containing_node( x, y ) );
+  }
+
+  //-------------------------------------------------------------
+  // Returns the current CanvasText being edited.  If we are not
+  // editing, returns null.
+  public CanvasText? get_current_text() {
+    if( is_node_editable() ) {
+      return( selected.name );
+    } else if( is_note_editable() ) {
+      return( selected.note );
+    } else if( is_title_editable() ) {
+      return( title );
+    } else {
+      return( null );
+    }
   }
 
   //-------------------------------------------------------------
@@ -1100,6 +1122,45 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
+  // Handle a key event
+  private bool on_keypress( uint keyval, uint keycode, ModifierType state ) {
+
+    // If we have the mouse pressed, ignore keypresses
+    if( _pressed ) return( false );
+
+    // Handle Control, Shift or Alt keyvals
+    switch( keyval ) {
+      case Gdk.Key.Control_L :
+      case Gdk.Key.Control_R :
+        _control_set = true;
+        handle_control( true );
+        break;
+      case Gdk.Key.Shift_L :
+      case Gdk.Key.Shift_R :
+        _shift_set = true;
+        break;
+      case Gdk.Key.Alt_L :
+      case Gdk.Key.Alt_R :
+        _alt_set = true;
+        break;
+    }
+
+    // Attempt to execute a keyboard shortcut
+    if( _win.shortcuts.execute( this, keyval, keycode, state ) ) {
+      return( true );
+
+    // If anyone is being edited, just insert the key value
+    } else if( is_node_editable() || is_note_editable() ) {
+      _im_context.filter_keypress( _key_controller.get_current_event() );
+      return( false );
+    }
+
+    return( true );
+
+  }
+
+  /*
+  //-------------------------------------------------------------
   // Handles keypress events.
   private bool on_keypress( uint keyval, uint keycode, ModifierType state ) {
 
@@ -1236,6 +1297,7 @@ public class OutlineTable : DrawingArea {
     return( true );
 
   }
+  */
 
   //-------------------------------------------------------------
   // Called whenever a key is released
@@ -1248,6 +1310,10 @@ public class OutlineTable : DrawingArea {
       case Key.Shift_L :
       case Key.Shift_R :
         _shift_set = false;
+        break;
+      case Gdk.Key.Alt_L :
+      case Gdk.Key.Alt_R :
+        _alt_set = false;
         break;
     }
   }
@@ -2878,21 +2944,6 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Edit the selected node.
-  public void edit_selected( bool title ) {
-    if( selected == null ) return;
-    if( title ) {
-      set_node_mode( selected, NodeMode.EDITABLE );
-      selected.name.move_cursor_to_end();
-    } else {
-      set_node_mode( selected, NodeMode.NOTEEDIT );
-      selected.note.move_cursor_to_end();
-      selected.hide_note = false;
-    }
-    queue_draw();
-  }
-
-  //-------------------------------------------------------------
   // Change the selected node to the given node
   public void change_selected( Node? node ) {
     if( (node == null) || node.is_root() ) return;
@@ -2936,7 +2987,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Handles the emoji insertion process for the given text item
-  private void insert_emoji( CanvasText text ) {
+  public void insert_emoji( CanvasText text ) {
     int x, ytop, ybot;
     text.get_cursor_pos( out x, out ytop, out ybot );
     Gdk.Rectangle rect = {x, (ytop + ((ybot - ytop) / 2)), 1, 1};

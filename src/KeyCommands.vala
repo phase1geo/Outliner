@@ -55,6 +55,8 @@ public enum KeyCommand {
       SEARCH,
       SHOW_ABOUT,
       TOGGLE_FOCUS_MODE,
+      EDIT_NOTE,
+      EDIT_SELECTED,
       QUIT,
     MISCELLANEOUS_END,
     CONTROL_PRESSED,
@@ -243,6 +245,8 @@ public enum KeyCommand {
       case SEARCH                    :  return( "search" );
       case SHOW_ABOUT                :  return( "show-about" );
       case TOGGLE_FOCUS_MODE         :  return( "toggle-focus-mode" );
+      case EDIT_NOTE                 :  return( "edit-note" );
+      case EDIT_SELECTED             :  return( "edit-selected" );
       case QUIT                      :  return( "quit" );
       case CONTROL_PRESSED           :  return( "control" );
       case ESCAPE                    :  return( "escape" );
@@ -390,6 +394,8 @@ public enum KeyCommand {
       case "search"                    :  return( SEARCH );
       case "show-about"                :  return( SHOW_ABOUT );
       case "toggle-focus-mode"         :  return( TOGGLE_FOCUS_MODE );
+      case "edit-note"                 :  return( EDIT_NOTE );
+      case "edit-selected"             :  return( EDIT_SELECTED );
       case "quit"                      :  return( QUIT );
       case "control"                   :  return( CONTROL_PRESSED );
       case "escape"                    :  return( ESCAPE );
@@ -537,6 +543,8 @@ public enum KeyCommand {
       case SEARCH                    :  return( _( "Display search panel" ) );
       case SHOW_ABOUT                :  return( _( "Show About window" ) );
       case TOGGLE_FOCUS_MODE         :  return( _( "Toggle focus mode" ) );
+      case EDIT_NOTE                 :  return( _( "Edit the selected node note" ) );
+      case EDIT_SELECTED             :  return( _( "Edit the currently selected node" ) );
       case QUIT                      :  return( _( "Quit the application" ) );
       /*
       case NODE_START                :  return( _( "Node" ) );
@@ -684,6 +692,8 @@ public enum KeyCommand {
       case SEARCH                    :  return( search );
       case SHOW_ABOUT                :  return( show_about );
       case TOGGLE_FOCUS_MODE         :  return( toggle_focus_mode );
+      case EDIT_NOTE                 :  return( edit_note );
+      case EDIT_SELECTED             :  return( edit_selected );
       case QUIT                      :  return( quit_application );
       case CONTROL_PRESSED           :  return( control_pressed );
       case ESCAPE                    :  return( escape );
@@ -806,12 +816,10 @@ public enum KeyCommand {
   public bool for_node() {
     return(
       // ((NODE_START < this) && (this < NODE_END)) ||
-      /*
       (this == EDIT_NOTE) ||
       (this == EDIT_COPY) ||
       (this == EDIT_CUT)  ||
       (this == EDIT_PASTE) ||
-      */
       (this == ESCAPE)
     );
   }
@@ -1137,39 +1145,26 @@ public enum KeyCommand {
     ot.win.toggle_focus_mode();
   }
 
-  /*
   public static void edit_note( OutlineTable ot ) {
-    map.show_properties( "current", PropertyGrab.NOTE ); 
+    if( ot.selected != null ) {
+      ot.set_node_mode( ot.selected, NodeMode.NOTEEDIT );
+      ot.selected.note.move_cursor_to_end();
+      ot.selected.hide_note = false;
+      ot.queue_draw();
+    }
   }
 
   public static void edit_selected( OutlineTable ot ) {
-    var current_node = map.get_current_node();
-    if( current_node != null ) {
-      map.model.set_node_mode( current_node, NodeMode.EDITABLE );
-      map.queue_draw();
-      return;
-    }
-    var current_conn = map.get_current_connection();
-    if( current_conn != null ) {
-      current_conn.edit_title_begin( map );
-      map.model.set_connection_mode( current_conn, ConnMode.EDITABLE );
-      map.queue_draw();
-      return;
-    }
-    var current_call = map.get_current_callout();
-    if( current_call != null ) {
-      map.model.set_callout_mode( current_call, CalloutMode.EDITABLE );
-      map.queue_draw();
-      return;
+    if( ot.selected != null ) {
+      ot.set_node_mode( ot.selected, NodeMode.EDITABLE );
+      ot.selected.name.move_cursor_to_end();
+      ot.queue_draw();
     }
   }
 
+  /*
   public static void show_selected( OutlineTable ot ) {
-    map.canvas.see();
-  }
-
-  public static void remove_sticker_selected( OutlineTable ot ) {
-    map.model.remove_sticker();
+    ot.see();
   }
   */
 
@@ -1562,260 +1557,221 @@ public enum KeyCommand {
   // Helper function that should be called whenever text changes
   // while editing.
   private static void text_changed( OutlineTable ot ) {
-    /*
-    map.current_changed( map );
-    map.queue_draw();
-    */
+    ot.changed();
+    ot.queue_draw();
   }
 
   //-------------------------------------------------------------
   // Helper function that will insert a given string into the
   // current text context.
   private static void insert_text( OutlineTable ot, string str ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
-      text.insert( str, map.undo_text );
-      text_changed( map );
+      text.insert( str, ot.undo_text );
+      text_changed( ot );
     }
-    */
   }
 
   //-------------------------------------------------------------
   // Helper function that moves the cursor in a given direction.
   private static void edit_cursor( OutlineTable ot, string dir ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
       switch( dir ) {
-        case "char-next" :  text.move_cursor( 1 );                break;
-        case "char-prev" :  text.move_cursor( -1 );               break;
-        case "up"        :  text.move_cursor_vertically( -1 );    break;
-        case "down"      :  text.move_cursor_vertically( 1 );     break;
-        case "word-next" :  text.move_cursor_by_word( 1 );        break;
-        case "word-prev" :  text.move_cursor_by_word( -1 );       break;
-        case "start"     :  text.move_cursor_to_start();          break;
-        case "end"       :  text.move_cursor_to_end();            break;
-        case "linestart" :  text.move_cursor_to_start_of_line();  break;
-        case "lineend"   :  text.move_cursor_to_end_of_line();    break;
+        case "char-next" :  text.move_cursor( 1 );              break;
+        case "char-prev" :  text.move_cursor( -1 );             break;
+        case "up"        :  text.move_cursor_vertically( -1 );  break;
+        case "down"      :  text.move_cursor_vertically( 1 );   break;
+        case "word-next" :  text.move_cursor_by_word( 1 );      break;
+        case "word-prev" :  text.move_cursor_by_word( -1 );     break;
+        case "start"     :  text.move_cursor_to_start();        break;
+        case "end"       :  text.move_cursor_to_end();          break;
+        case "linestart" :  text.move_cursor_to_linestart();    break;
+        case "lineend"   :  text.move_cursor_to_lineend();      break;
         default          :  return;
       }
-      map.queue_draw();
+      ot.queue_draw();
     }
-    */
   }
 
   //-------------------------------------------------------------
   // Helper function that changes the selection in a given direction.
   private static void edit_selection( OutlineTable ot, string dir ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
       switch( dir ) {
-        case "char-next"  :  text.selection_by_char( 1 );              break;
-        case "char-prev"  :  text.selection_by_char( -1 );             break;
-        case "up"         :  text.selection_vertically( -1 );          break;
-        case "down"       :  text.selection_vertically( 1 );           break;
-        case "word-next"  :  text.selection_by_word( 1 );              break;
-        case "word-prev"  :  text.selection_by_word( -1 );             break;
-        case "start-up"   :  text.selection_to_start( false );         break;
-        case "start-home" :  text.selection_to_start( true );          break;
-        case "end-down"   :  text.selection_to_end( false );           break;
-        case "end-end"    :  text.selection_to_end( true );            break;
-        case "linestart"  :  text.selection_to_start_of_line( true );  break;
-        case "lineend"    :  text.selection_to_end_of_line( true );    break;
-        case "all"        :  text.set_cursor_all( false );             break;
-        case "none"       :  text.clear_selection();                   break;
+        case "char-next"  :  text.selection_by_char( 1 );          break;
+        case "char-prev"  :  text.selection_by_char( -1 );         break;
+        case "up"         :  text.selection_vertically( -1 );      break;
+        case "down"       :  text.selection_vertically( 1 );       break;
+        case "word-next"  :  text.selection_by_word( 1 );          break;
+        case "word-prev"  :  text.selection_by_word( -1 );         break;
+        case "start-up"   :  text.selection_to_start( false );     break;
+        case "start-home" :  text.selection_to_start( true );      break;
+        case "end-down"   :  text.selection_to_end( false );       break;
+        case "end-end"    :  text.selection_to_end( true );        break;
+        case "linestart"  :  text.selection_to_linestart( true );  break;
+        case "lineend"    :  text.selection_to_lineend( true );    break;
+        case "all"        :  text.set_cursor_all( false );         break;
+        case "none"       :  text.clear_selection();               break;
         default           :  return;
       }
-      map.queue_draw();
+      ot.queue_draw();
     }
-    */
   }
 
   public static void edit_escape( OutlineTable ot ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
-      if( map.canvas.completion.shown ) {
-        map.canvas.completion.hide();
+      if( ot.completion.shown ) {
+        ot.completion.hide();
       } else {
-        var current_node = map.get_current_node();
-        var current_conn = map.get_current_connection();
-        var current_call = map.get_current_callout();
-        map.canvas.im_context.reset();
-        if( current_node != null ) {
-          map.model.set_node_mode( current_node, NodeMode.CURRENT );
-          text_changed( map );
-          map.auto_save();
-        } else if( current_conn != null ) {
-          current_conn.edit_title_end();
-          map.model.set_connection_mode( current_conn, ConnMode.SELECTED );
-          text_changed( map );
-          map.auto_save();
-        } else if( current_conn != null ) {
-          map.model.set_callout_mode( current_call, CalloutMode.SELECTED );
-          text_changed( map );
-          map.auto_save();
-        } else {
-          map.hide_properties();
-        }
+        ot.set_node_mode( ot.selected, NodeMode.SELECTED );
       }
     }
-    */
   }
 
   public static void edit_insert_newline( OutlineTable ot ) {
-    // insert_text( map, "\n" );
+    insert_text( ot, "\n" );
   }
 
   public static void edit_insert_tab( OutlineTable ot ) {
-    // insert_text( map, "\t" );
+    insert_text( ot, "\t" );
   }
 
   public static void edit_insert_emoji( OutlineTable ot ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
-      map.canvas.insert_emoji( text );
+      ot.insert_emoji( text );
     }
-    */
   }
 
   public static void edit_backspace( OutlineTable ot ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
-      text.backspace( map.undo_text );
-      text_changed( map );
+      text.backspace( ot.undo_text );
+      text_changed( ot );
     }
-    */
   }
 
   public static void edit_delete( OutlineTable ot ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
-      text.delete( map.undo_text );
-      text_changed( map );
+      text.delete( ot.undo_text );
+      text_changed( ot );
     }
-    */
   }
 
   public static void edit_remove_word_previous( OutlineTable ot ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
-      text.backspace_word( map.undo_text );
-      text_changed( map );
+      text.backspace_word( ot.undo_text );
+      text_changed( ot );
     }
-    */
   }
 
   public static void edit_remove_word_next( OutlineTable ot ) {
-    /*
-    var text = map.get_current_text();
+    var text = ot.get_current_text();
     if( text != null ) {
-      text.delete_word( map.undo_text );
-      text_changed( map );
+      text.delete_word( ot.undo_text );
+      text_changed( ot );
     }
-    */
   }
 
   public static void edit_cursor_char_next( OutlineTable ot ) {
-    // edit_cursor( map, "char-next" );
+    edit_cursor( ot, "char-next" );
   }
 
   public static void edit_cursor_char_previous( OutlineTable ot ) {
-    // edit_cursor( map, "char-prev" );
+    edit_cursor( ot, "char-prev" );
   }
 
   public static void edit_cursor_up( OutlineTable ot ) {
-    // edit_cursor( map, "up" );
+    edit_cursor( ot, "up" );
   }
 
   public static void edit_cursor_down( OutlineTable ot ) {
-    // edit_cursor( map, "down" );
+    edit_cursor( ot, "down" );
   }
 
   public static void edit_cursor_word_next( OutlineTable ot ) {
-    // edit_cursor( map, "word-next" );
+    edit_cursor( ot, "word-next" );
   }
 
   public static void edit_cursor_word_previous( OutlineTable ot ) {
-    // edit_cursor( map, "word-prev" );
+    edit_cursor( ot, "word-prev" );
   }
 
   public static void edit_cursor_to_start( OutlineTable ot ) {
-    // edit_cursor( map, "start" );
+    edit_cursor( ot, "start" );
   }
 
   public static void edit_cursor_to_end( OutlineTable ot ) {
-    // edit_cursor( map, "end" );
+    edit_cursor( ot, "end" );
   }
 
   public static void edit_cursor_to_linestart( OutlineTable ot ) {
-    // edit_cursor( map, "linestart" );
+    edit_cursor( ot, "linestart" );
   }
 
   public static void edit_cursor_to_lineend( OutlineTable ot ) {
-    // edit_cursor( map, "lineend" );
+    edit_cursor( ot, "lineend" );
   }
 
   public static void edit_select_char_next( OutlineTable ot ) {
-    // edit_selection( map, "char-next" );
+    edit_selection( ot, "char-next" );
   }
 
   public static void edit_select_char_previous( OutlineTable ot ) {
-    // edit_selection( map, "char-prev" );
+    edit_selection( ot, "char-prev" );
   }
 
   public static void edit_select_up( OutlineTable ot ) {
-    // edit_selection( map, "up" );
+    edit_selection( ot, "up" );
   }
 
   public static void edit_select_down( OutlineTable ot ) {
-    // edit_selection( map, "down" );
+    edit_selection( ot, "down" );
   }
 
   public static void edit_select_word_next( OutlineTable ot ) {
-    // edit_selection( map, "word-next" );
+    edit_selection( ot, "word-next" );
   }
 
   public static void edit_select_word_previous( OutlineTable ot ) {
-    // edit_selection( map, "word-prev" );
+    edit_selection( ot, "word-prev" );
   }
 
   public static void edit_select_start_up( OutlineTable ot ) {
-    // edit_selection( map, "start-up" );
+    edit_selection( ot, "start-up" );
   }
 
   public static void edit_select_start_home( OutlineTable ot ) {
-    // edit_selection( map, "start-home" );
+    edit_selection( ot, "start-home" );
   }
 
   public static void edit_select_end_down( OutlineTable ot ) {
-    // edit_selection( map, "end-down" );
+    edit_selection( ot, "end-down" );
   }
 
   public static void edit_select_end_end( OutlineTable ot ) {
-    // edit_selection( map, "end-end" );
+    edit_selection( ot, "end-end" );
   }
 
   public static void edit_select_linestart( OutlineTable ot ) {
-    // edit_selection( map, "linestart" );
+    edit_selection( ot, "linestart" );
   }
 
   public static void edit_select_lineend( OutlineTable ot ) {
-    // edit_selection( map, "lineend" );
+    edit_selection( ot, "lineend" );
   }
 
   public static void edit_select_all( OutlineTable ot ) {
-    // edit_selection( map, "all" );
+    edit_selection( ot, "all" );
   }
 
   public static void edit_deselect_all( OutlineTable ot ) {
-    // edit_selection( map, "none" );
+    edit_selection( ot, "none" );
   }
 
   public static void edit_open_url( OutlineTable ot ) {
@@ -1843,87 +1799,84 @@ public enum KeyCommand {
   }
 
   public static void edit_copy( OutlineTable ot ) {
-    // map.model.do_copy();
+    ot.do_copy();
   }
 
   public static void edit_cut( OutlineTable ot ) {
-    // map.model.do_cut();
+    ot.do_cut();
   }
 
   public static void edit_paste( OutlineTable ot ) {
-    // map.do_paste( false );
+    ot.do_paste( false );
   }
 
   private static void edit_return_helper( OutlineTable ot, bool shift ) {
-    /*
-    if( map.canvas.completion.shown ) {
-      map.canvas.completion.select();
-      map.queue_draw();
-    }
-    var current_node = map.get_current_node();
-    if( current_node != null ) {
-      map.model.set_node_mode( current_node, NodeMode.CURRENT );
-      if( map.settings.get_boolean( "new-node-from-edit" ) ) {
-        if( !current_node.is_root() ) {
-          map.model.add_sibling_node( shift );
-        } else {
-          map.model.add_root_node();
-        }
+    if( ot.is_note_editable() ) {
+      ot.selected.note.insert( "\n", ot.undo_text );
+      ot.see( ot.selected );
+      ot.queue_draw();
+    } else if( ot.is_node_editable() && (shift || ot.completion.shown) ) {
+      if( shift ) {
+        ot.selected.name.insert( "\n", ot.undo_text );
+        ot.see( ot.selected );
       } else {
-        text_changed( map );
-        map.auto_save();
+        ot.completion.select();
       }
-      return;
+      ot.queue_draw();
+    } else if( ot.is_title_editable() ) {
+      ot.set_title_editable( false );
+      ot.selected = ot.root.get_last_node();
+      ot.set_node_mode( ot.selected, NodeMode.EDITABLE );
+      ot.queue_draw();
+    } else if( ot.selected != null ) {
+      if( (ot.selected.children.length > 0) && ot.selected.expanded ) {
+        ot.add_child_node( 0 );
+      } else {
+        ot.add_sibling_node( !shift );
+      }
     }
-    var current_conn = map.get_current_connection();
-    if( current_conn != null ) {
-      current_conn.edit_title_end();
-      map.model.set_connection_mode( current_conn, ConnMode.SELECTED );
-      text_changed( map );
-      map.auto_save();
-      return;
-    }
-    var current_call = map.get_current_callout();
-    if( current_call != null ) {
-      map.model.set_callout_mode( current_call, CalloutMode.SELECTED );
-      text_changed( map );
-      return;
-    }
-    */
   }
 
   public static void edit_return( OutlineTable ot ) {
-    // edit_return_helper( map, false );
+    edit_return_helper( ot, false );
   }
 
   public static void edit_shift_return( OutlineTable ot ) {
-    // edit_return_helper( map, true );
+    edit_return_helper( ot, true );
   }
 
   private static void edit_tab_helper( OutlineTable ot, bool shift ) {
-    /*
-    if( ot.is_node_editable() ) {
-      var current = map.get_current_node();
-      map.model.set_node_mode( current, NodeMode.CURRENT );
-      if( map.settings.get_boolean( "new-node-from-edit" ) ) {
-        if( shift ) {
-          map.model.add_parent_node();
-        } else {
-          map.model.add_child_node();
-        }
+    if( ot.completion.shown ) {
+      ot.completion.select();
+      ot.queue_draw();
+    } else if( ot.is_note_editable() && shift ) {
+      ot.selected.note.insert( "\t", ot.undo_text );
+      ot.see( ot.selected );
+      ot.queue_draw();
+    } else if( ot.is_title_editable() ) {
+      if( shift ) {
+        ot.title.insert( "\t", ot.undo_text );
       } else {
-        text_changed( map );
+        ot.set_title_editable( false );
+        ot.selected = ot.root.get_last_node();
+        ot.set_node_mode( ot.selected, NodeMode.EDITABLE );
+      }
+      ot.queue_draw();
+    } else if( ot.selected != null ) {
+      if( shift ) {
+        ot.unindent();
+      } else {
+        ot.indent();
       }
     }
-    */
   }
 
   public static void edit_tab( OutlineTable ot ) {
-    // edit_tab_helper( map, false );
+    edit_tab_helper( ot, false );
   }
 
   public static void edit_shift_tab( OutlineTable ot ) {
-    // edit_tab_helper( map, true );
+    edit_tab_helper( ot, true );
   }
 
 }

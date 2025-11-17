@@ -110,6 +110,7 @@ public class Outliner : Gtk.Application {
       return( end_cl( cl, 1 ) );
     }
 
+    // If help information is requested, output it and then exit
     if( show_help ) {
       stdout.printf( context.get_help( true, null ) );
       return( end_cl( cl, 0 ) );
@@ -121,7 +122,6 @@ public class Outliner : Gtk.Application {
       return( end_cl( cl, 0 ) );
     }
 
-    // This is called if files aren't specified on the command-line
     if( new_file ) {
       appwin.do_new_file();
     } else {

@@ -29,7 +29,7 @@ public enum TableState {
   //-------------------------------------------------------------
   // Returns the state from the given outline table
   public static TableState get_state( OutlineTable ot ) {
-    if( ot.is_node_editable() || ot.is_note_editable() ) {
+    if( ot.is_node_editable() || ot.is_note_editable() || ot.is_title_editable() ) {
       return( EDITING );
     } else if( ot.selected != null ) {
       return( NODE );
@@ -480,51 +480,41 @@ public class Shortcuts {
   // shortcuts.xml file and therefore cannot be changed by the user)
   public void add_builtin_shortcuts() {
 
-    /*
     add_shortcut( Key.Escape,    false, false, false, KeyCommand.ESCAPE );
     add_shortcut( Key.Escape,    false, false, false, KeyCommand.EDIT_ESCAPE );
     add_shortcut( Key.BackSpace, false, false, false, KeyCommand.EDIT_BACKSPACE );
-    add_shortcut( Key.BackSpace, false, false, false, KeyCommand.NODE_REMOVE );
-    add_shortcut( Key.BackSpace, false, true,  false, KeyCommand.NODE_REMOVE_ONLY );
-    add_shortcut( Key.BackSpace, false, false, false, KeyCommand.CONNECTION_REMOVE );
-    add_shortcut( Key.BackSpace, false, false, false, KeyCommand.CALLOUT_REMOVE );
-    add_shortcut( Key.BackSpace, false, false, false, KeyCommand.STICKER_REMOVE );
-    add_shortcut( Key.BackSpace, false, false, false, KeyCommand.GROUP_REMOVE );
+    // add_shortcut( Key.BackSpace, false, false, false, KeyCommand.NODE_REMOVE );
+    // add_shortcut( Key.BackSpace, false, true,  false, KeyCommand.NODE_REMOVE_ONLY );
     add_shortcut( Key.Delete,    false, false, false, KeyCommand.EDIT_DELETE );
-    add_shortcut( Key.Delete,    false, false, false, KeyCommand.NODE_REMOVE );
-    add_shortcut( Key.Delete,    false, true,  false, KeyCommand.NODE_REMOVE_ONLY );
-    add_shortcut( Key.Delete,    false, false, false, KeyCommand.CONNECTION_REMOVE );
-    add_shortcut( Key.Delete,    false, false, false, KeyCommand.CALLOUT_REMOVE );
-    add_shortcut( Key.Delete,    false, false, false, KeyCommand.STICKER_REMOVE );
-    add_shortcut( Key.Delete,    false, false, false, KeyCommand.GROUP_REMOVE );
+    // add_shortcut( Key.Delete,    false, false, false, KeyCommand.NODE_REMOVE );
+    // add_shortcut( Key.Delete,    false, true,  false, KeyCommand.NODE_REMOVE_ONLY );
 
     add_shortcut( Key.Return,    false, false, false, KeyCommand.EDIT_RETURN );
-    add_shortcut( Key.Return,    false, false, false, KeyCommand.NODE_ADD_SIBLING_AFTER );
+    // add_shortcut( Key.Return,    false, false, false, KeyCommand.NODE_ADD_SIBLING_AFTER );
     add_shortcut( Key.Return,    false, true,  false, KeyCommand.EDIT_SHIFT_RETURN );
-    add_shortcut( Key.Return,    false, true,  false, KeyCommand.NODE_ADD_SIBLING_BEFORE );
+    // add_shortcut( Key.Return,    false, true,  false, KeyCommand.NODE_ADD_SIBLING_BEFORE );
     add_shortcut( Key.Tab,       false, false, false, KeyCommand.EDIT_TAB );
-    add_shortcut( Key.Tab,       false, false, false, KeyCommand.NODE_ADD_CHILD );
+    // add_shortcut( Key.Tab,       false, false, false, KeyCommand.NODE_ADD_CHILD );
     add_shortcut( Key.Tab,       false, true,  false, KeyCommand.EDIT_SHIFT_TAB );
-    add_shortcut( Key.Tab,       false, true,  false, KeyCommand.NODE_ADD_PARENT );
+    // add_shortcut( Key.Tab,       false, true,  false, KeyCommand.NODE_ADD_PARENT );
     add_shortcut( Key.Right,     false, false, false, KeyCommand.EDIT_CURSOR_CHAR_NEXT );
-    add_shortcut( Key.Right,     false, false, false, KeyCommand.NODE_SELECT_RIGHT );
+    // add_shortcut( Key.Right,     false, false, false, KeyCommand.NODE_SELECT_RIGHT );
     add_shortcut( Key.Right,     false, true,  false, KeyCommand.EDIT_SELECT_CHAR_NEXT );
     add_shortcut( Key.Left,      false, false, false, KeyCommand.EDIT_CURSOR_CHAR_PREV );
-    add_shortcut( Key.Left,      false, false, false, KeyCommand.NODE_SELECT_LEFT );
+    // add_shortcut( Key.Left,      false, false, false, KeyCommand.NODE_SELECT_LEFT );
     add_shortcut( Key.Left,      false, true,  false, KeyCommand.EDIT_SELECT_CHAR_PREV );
     add_shortcut( Key.Up,        false, false, false, KeyCommand.EDIT_CURSOR_UP );
-    add_shortcut( Key.Up,        false, false, false, KeyCommand.NODE_SELECT_UP );
-    add_shortcut( Key.Up,        false, false, true,  KeyCommand.NODE_SWAP_UP );
+    // add_shortcut( Key.Up,        false, false, false, KeyCommand.NODE_SELECT_UP );
+    // add_shortcut( Key.Up,        false, false, true,  KeyCommand.NODE_SWAP_UP );
     add_shortcut( Key.Up,        false, true,  false, KeyCommand.EDIT_SELECT_UP );
     add_shortcut( Key.Down,      false, false, false, KeyCommand.EDIT_CURSOR_DOWN );
-    add_shortcut( Key.Down,      false, false, false, KeyCommand.NODE_SELECT_DOWN );
-    add_shortcut( Key.Down,      false, false, true,  KeyCommand.NODE_SWAP_DOWN );
+    // add_shortcut( Key.Down,      false, false, false, KeyCommand.NODE_SELECT_DOWN );
+    // add_shortcut( Key.Down,      false, false, true,  KeyCommand.NODE_SWAP_DOWN );
     add_shortcut( Key.Down,      false, true,  false, KeyCommand.EDIT_SELECT_DOWN );
-    add_shortcut( Key.Page_Up,   false, false, false, KeyCommand.NODE_SELECT_SIBLING_PREV );
-    add_shortcut( Key.Page_Down, false, false, false, KeyCommand.NODE_SELECT_SIBLING_NEXT );
+    // add_shortcut( Key.Page_Up,   false, false, false, KeyCommand.NODE_SELECT_SIBLING_PREV );
+    // add_shortcut( Key.Page_Down, false, false, false, KeyCommand.NODE_SELECT_SIBLING_NEXT );
     add_shortcut( Key.Control_L, false, false, false, KeyCommand.CONTROL_PRESSED );
     add_shortcut( Key.Control_R, false, false, false, KeyCommand.CONTROL_PRESSED );
-    */
 
   }
 
@@ -546,17 +536,16 @@ public class Shortcuts {
     add_default( Key.p,            true, false, false, KeyCommand.FILE_PRINT );
     add_default( Key.comma,        true, false, false, KeyCommand.SHOW_PREFERENCES );
     add_default( Key.question,     true, false, false, KeyCommand.SHOW_SHORTCUTS );
-    // add_default( Key.Tab,          true, false, false, KeyCommand.TAB_GOTO_NEXT );
-    // add_default( Key.Tab,          true, true,  false, KeyCommand.TAB_GOTO_PREV );
+    add_default( Key.Tab,          true, false, false, KeyCommand.TAB_GOTO_NEXT );
+    add_default( Key.Tab,          true, true,  false, KeyCommand.TAB_GOTO_PREV );
     add_default( Key.f,            true, true,  false, KeyCommand.TOGGLE_FOCUS_MODE );
     add_default( Key.f,            true, false, false, KeyCommand.SEARCH );
-    // add_default( Key.w,            true, false, false, KeyCommand.TAB_CLOSE_CURRENT );
+    add_default( Key.w,            true, false, false, KeyCommand.TAB_CLOSE_CURRENT );
 
-    /*
     add_default( Key.c,            true, false, false, KeyCommand.EDIT_COPY );
     add_default( Key.x,            true, false, false, KeyCommand.EDIT_CUT );
     add_default( Key.v,            true, false, false, KeyCommand.EDIT_PASTE );
-    add_default( Key.v,            true, true,  false, KeyCommand.NODE_PASTE_REPLACE );
+    // add_default( Key.v,            true, true,  false, KeyCommand.NODE_PASTE_REPLACE );
     add_default( Key.Return,       true, false, false, KeyCommand.EDIT_INSERT_NEWLINE );
     add_default( Key.BackSpace,    true, false, false, KeyCommand.EDIT_REMOVE_WORD_PREV );
     add_default( Key.Delete,       true, false, false, KeyCommand.EDIT_REMOVE_WORD_NEXT );
@@ -576,15 +565,16 @@ public class Shortcuts {
     add_default( Key.a,            true, false, false, KeyCommand.EDIT_SELECT_ALL );
     add_default( Key.a,            true, true,  false, KeyCommand.EDIT_SELECT_NONE );
     add_default( Key.period,       true, false, false, KeyCommand.EDIT_INSERT_EMOJI );
-    add_default( Key.e,            true, true,  false, KeyCommand.NODE_QUICK_ENTRY_INSERT );
+    // add_default( Key.e,            true, true,  false, KeyCommand.NODE_QUICK_ENTRY_INSERT );
     add_default( Key.k,            true, false, false, KeyCommand.EDIT_ADD_URL );
     add_default( Key.k,            true, true,  false, KeyCommand.EDIT_REMOVE_URL );
-    add_default( Key.r,            true, true,  false, KeyCommand.NODE_QUICK_ENTRY_REPLACE );
-    add_default( Key.y,            true, false, false, KeyCommand.NODE_PASTE_NODE_LINK );
+    // add_default( Key.r,            true, true,  false, KeyCommand.NODE_QUICK_ENTRY_REPLACE );
+    // add_default( Key.y,            true, false, false, KeyCommand.NODE_PASTE_NODE_LINK );
 
     add_default( Key.F10,          false, true,  false, KeyCommand.SHOW_CONTEXTUAL_MENU );
     add_default( Key.Menu,         false, false, false, KeyCommand.SHOW_CONTEXTUAL_MENU );
 
+    /*
     add_default( Key.minus,        false, false, false, KeyCommand.NODE_ALIGN_TOP );
     add_default( Key.equal,        false, false, false, KeyCommand.NODE_ALIGN_VCENTER );
     add_default( Key.bracketleft,  false, false, false, KeyCommand.NODE_ALIGN_LEFT );
@@ -602,18 +592,12 @@ public class Shortcuts {
     add_default( Key.numbersign,   false, true,  false, KeyCommand.NODE_TOGGLE_SEQUENCE );
     add_default( Key.x,            false, false, false, KeyCommand.NODE_ADD_CONNECTION );
     add_default( Key.y,            false, false, false, KeyCommand.NODE_TOGGLE_LINKS );
+    */
     add_default( Key.e,            false, true,  false, KeyCommand.EDIT_NOTE );
-    add_default( Key.i,            false, false, false, KeyCommand.SHOW_CURRENT_INFO );
     add_default( Key.e,            false, false, false, KeyCommand.EDIT_SELECTED );
-    add_default( Key.s,            false, false, false, KeyCommand.SHOW_SELECTED );
+    // add_default( Key.s,            false, false, false, KeyCommand.SHOW_SELECTED );
 
-    add_default( Key.o,            false, true,  false, KeyCommand.CALLOUT_SELECT_NODE );
-
-    add_default( Key.f,            false, false, false, KeyCommand.CONNECTION_SELECT_FROM );
-    add_default( Key.n,            false, false, false, KeyCommand.CONNECTION_SELECT_NEXT );
-    add_default( Key.p,            false, false, false, KeyCommand.CONNECTION_SELECT_PREV );
-    add_default( Key.t,            false, false, false, KeyCommand.CONNECTION_SELECT_TO );
-
+    /*
     add_default( Key.c,            false, true,  false, KeyCommand.NODE_CENTER );
     add_default( Key.d,            false, true,  false, KeyCommand.NODE_SELECT_TREE );
     add_default( Key.i,            false, true,  false, KeyCommand.NODE_CHANGE_IMAGE );

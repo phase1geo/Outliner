@@ -1220,6 +1220,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
+  //-------------------------------------------------------------
   // Opens the file and display it in the table
   public bool open_file( string fname ) {
     if( !FileUtils.test( fname, FileTest.IS_REGULAR ) ) {

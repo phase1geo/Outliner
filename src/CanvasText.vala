@@ -27,11 +27,11 @@ using Pango;
 
 public class CanvasText : Object {
 
-  /* Member variables */
+  // Member variables
   private FormattedText  _text;
   private bool           _edit         = false;
-  private int            _cursor       = 0;   /* Location of the cursor when editing */
-  private int            _column       = 0;   /* Character column to use when moving vertically */
+  private int            _cursor       = 0;   // Location of the cursor when editing
+  private int            _column       = 0;   // Character column to use when moving vertically
   private Pango.Layout   _pango_layout = null;
   private Pango.Layout   _line_layout  = null;
   private int            _selstart     = 0;
@@ -43,12 +43,12 @@ public class CanvasText : Object {
   private bool           _debug        = false;
   private int            _font_size    = 12;
 
-  /* Signals */
+  // Signals
   public signal void resized();
   public signal void select_mode( bool mode );
   public signal void cursor_changed();
 
-  /* Properties */
+  // Properties
   public FormattedText text {
     get {
       return( _text );
@@ -112,7 +112,8 @@ public class CanvasText : Object {
     }
   }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public CanvasText( OutlineTable table, double max_width ) {
     _text         = new FormattedText( table );
     _text.changed.connect( text_changed );
@@ -125,7 +126,8 @@ public class CanvasText : Object {
     update_size( false );
   }
 
-  /* Constructor initializing string */
+  //-------------------------------------------------------------
+  // Constructor initializing string
   public CanvasText.with_text( OutlineTable table, double max_width, string txt ) {
     _text         = new FormattedText.with_text( table, txt );
     _text.changed.connect( text_changed );
@@ -138,7 +140,8 @@ public class CanvasText : Object {
     update_size( false );
   }
 
-  /* Constructor which is cloned from the given FormattedText */
+  //-------------------------------------------------------------
+  // Constructor which is cloned from the given FormattedText
   public CanvasText.clone_from( OutlineTable table, double max_width, CanvasText ct ) {
     _text         = ct.text;
     _text.changed.connect( text_changed );
@@ -152,7 +155,8 @@ public class CanvasText : Object {
     update_size( false );
   }
 
-  /* Allocates and initializes the font description for the layouts */
+  //-------------------------------------------------------------
+  // Allocates and initializes the font description for the layouts
   private void initialize_font_description() {
     var fd = new Pango.FontDescription();
     fd.set_size( _font_size * Pango.SCALE );
@@ -160,7 +164,8 @@ public class CanvasText : Object {
     _pango_layout.set_font_description( fd );
   }
 
-  /* Copies an existing CanvasText to this CanvasText */
+  //-------------------------------------------------------------
+  // Copies an existing CanvasText to this CanvasText
   public void copy( CanvasText ct ) {
     posx       = ct.posx;
     posy       = ct.posy;
@@ -173,14 +178,16 @@ public class CanvasText : Object {
     update_size( true );
   }
 
-  /* Clones an existing CanvasText */
+  //-------------------------------------------------------------
+  // Clones an existing CanvasText
   public void clone( FormattedText text ) {
     _text = text;
     _text.changed.connect( text_changed );
     update_size( true );
   }
 
-  /* Unclones the text */
+  //-------------------------------------------------------------
+  // Unclones the text
   public void unclone( OutlineTable ot ) {
     var orig_text = _text;
     _text = new FormattedText( ot );
@@ -189,12 +196,14 @@ public class CanvasText : Object {
     update_size( true );
   }
 
-  /* Returns the font description set for this text */
+  //-------------------------------------------------------------
+  // Returns the font description set for this text
   public FontDescription get_font_fd() {
     return( _line_layout.get_font_description() );
   }
 
-  /* Sets the font size to the given size */
+  //-------------------------------------------------------------
+  // Sets the font size to the given size
   public void set_font( string? family = null, int? size = null, double zoom_factor = 1.0 ) {
     var fd = _line_layout.get_font_description();
     if( family != null ) {
@@ -210,17 +219,21 @@ public class CanvasText : Object {
     update_size( true );
   }
 
-  /* Sets the alignment to the given type */
+  //-------------------------------------------------------------
+  // Sets the alignment to the given type
   public void set_alignment( Pango.Alignment alignment ) {
     _pango_layout.set_alignment( alignment );
   }
 
-  /* Returns true if the text is currently wrapped */
+  //-------------------------------------------------------------
+  // Returns true if the text is currently wrapped
   public bool is_wrapped() {
     return( _pango_layout.is_wrapped() );
   }
 
-  /* Returns true if the given cursor coordinates lies within this node */
+  //-------------------------------------------------------------
+  // Returns true if the given cursor coordinates lies within this
+  // node
   public bool is_within( double x, double y ) {
     var x_pos = posx;
     if( _pango_layout.get_alignment() == Pango.Alignment.CENTER ) {
@@ -230,10 +243,9 @@ public class CanvasText : Object {
     return( Utils.is_within_bounds( x, y, x_pos, posy, _width, _height ) );
   }
 
-  /*
-   Returns true if the given coordinates within a URL and returns the matching
-   URL.
-  */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates within a URL and returns
+  // the matching URL.
   public bool is_within_clickable( double x, double y, out FormatTag tag, out string extra ) {
     int adjusted_x = (int)(x - posx) * Pango.SCALE;
     int adjusted_y = (int)(y - posy) * Pango.SCALE;
@@ -255,12 +267,14 @@ public class CanvasText : Object {
     return( false );
   }
 
-  /* Returns true if text is currently selected */
+  //-------------------------------------------------------------
+  // Returns true if text is currently selected
   public bool is_selected() {
     return( _selstart != _selend );
   }
 
-  /* Saves the current instace into the given XML tree */
+  //-------------------------------------------------------------
+  // Saves the current instace into the given XML tree
   public virtual Xml.Node* save( string title ) {
 
     Xml.Node* n = new Xml.Node( null, title );
@@ -275,7 +289,8 @@ public class CanvasText : Object {
 
   }
 
-  /* Loads the file contents into this instance */
+  //-------------------------------------------------------------
+  // Loads the file contents into this instance
   public virtual void load( Xml.Node* n ) {
 
     string? x = n->get_prop( "posx" );
@@ -294,7 +309,7 @@ public class CanvasText : Object {
       _pango_layout.set_width( (int)_max_width * Pango.SCALE );
     }
 
-    /* Load the text and formatting */
+    // Load the text and formatting
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "text" ) )  {
         _text.load( it );
@@ -304,12 +319,15 @@ public class CanvasText : Object {
 
   }
 
-  /* Returns the height of a single line of text */
+  //-------------------------------------------------------------
+  // Returns the height of a single line of text
   public double get_line_height() {
     return( Utils.get_line_height( _pango_layout ) );
   }
 
-  /* Returns the number of pixels to include on the current page of this text item */
+  //-------------------------------------------------------------
+  // Returns the number of pixels to include on the current page
+  // of this text item
   public double get_page_include_size( int page_size ) {
     Pango.Rectangle ink_rect, log_rect;
     var line_count = _pango_layout.get_line_count();
@@ -324,14 +342,14 @@ public class CanvasText : Object {
     return( _height );
   }
 
-  /* Called whenever the text changes */
+  //-------------------------------------------------------------
+  // Called whenever the text changes
   private void text_changed() {
     update_size( true );
   }
 
-  /*
-   Updates the width and height based on the current text.
-  */
+  //-------------------------------------------------------------
+  // Updates the width and height based on the current text.
   public void update_size( bool call_resized = true ) {
     if( _pango_layout != null ) {
       int text_width, text_height;
@@ -346,21 +364,24 @@ public class CanvasText : Object {
     }
   }
 
-  /* Resizes the node width by the given amount */
+  //-------------------------------------------------------------
+  // Resizes the node width by the given amount
   public virtual void resize( double diff ) {
     _max_width += diff;
     _pango_layout.set_width( (int)_max_width * Pango.SCALE );
     update_size( true );
   }
 
-  /* Updates the column value */
+  //-------------------------------------------------------------
+  // Updates the column value
   private void update_column() {
     int line;
     var cpos = text.text.index_of_nth_char( _cursor );
     _pango_layout.index_to_line_x( cpos, false, out line, out _column );
   }
 
-  /* Only sets the cursor location to the given value */
+  //-------------------------------------------------------------
+  // Only sets the cursor location to the given value
   public void set_cursor_only( int cursor ) {
     var orig_cursor = _cursor;
     _cursor = cursor;
@@ -370,7 +391,8 @@ public class CanvasText : Object {
     }
   }
 
-  /* Sets the cursor from the given mouse coordinates */
+  //-------------------------------------------------------------
+  // Sets the cursor from the given mouse coordinates
   public void set_cursor_at_char( double x, double y, bool motion ) {
     int cursor, trailing;
     int adjusted_x = (int)(x - posx) * Pango.SCALE;
@@ -395,7 +417,8 @@ public class CanvasText : Object {
     set_cursor_only( _selend );
   }
 
-  /* Selects the word at the current x/y position in the text */
+  //-------------------------------------------------------------
+  // Selects the word at the current x/y position in the text
   public void set_cursor_at_word( double x, double y, bool motion ) {
     int cursor, trailing;
     int adjusted_x = (int)(x - posx) * Pango.SCALE;
@@ -427,7 +450,8 @@ public class CanvasText : Object {
     }
   }
 
-  /* Called after the cursor has been moved, clears the selection */
+  //-------------------------------------------------------------
+  // Called after the cursor has been moved, clears the selection
   public void clear_selection( string? msg = null ) {
     if( _debug && (msg != null) ) {
       stdout.printf( "In clear_selection, msg: %s\n", msg );
@@ -435,10 +459,9 @@ public class CanvasText : Object {
     change_selection( _cursor, _cursor, "clear_selection" );
   }
 
-  /*
-   Called after the cursor has been moved, adjusts the selection
-   to include the cursor.
-  */
+  //-------------------------------------------------------------
+  // Called after the cursor has been moved, adjusts the selection
+  // to include the cursor.
   private void adjust_selection( int last_cursor ) {
     if( last_cursor == _selstart ) {
       if( _cursor <= _selend ) {
@@ -455,12 +478,15 @@ public class CanvasText : Object {
     }
   }
 
-  /* Deselects all of the text */
+  //-------------------------------------------------------------
+  // Deselects all of the text
   public void set_cursor_none() {
     clear_selection( "set_cursor_none" );
   }
 
-  /* Selects all of the text and places the cursor at the end of the name string */
+  //-------------------------------------------------------------
+  // Selects all of the text and places the cursor at the end of
+  // the name string
   public void set_cursor_all( bool motion ) {
     if( !motion ) {
       change_selection( 0, text.text.char_count(), "set_cursor_all" );
@@ -469,7 +495,8 @@ public class CanvasText : Object {
     }
   }
 
-  /* Adjusts the cursor by the given amount of characters */
+  //-------------------------------------------------------------
+  // Adjusts the cursor by the given amount of characters
   private void cursor_by_char( int dir ) {
     var last = text.text.char_count();
     var cpos = _cursor + dir;
@@ -481,20 +508,23 @@ public class CanvasText : Object {
     set_cursor_only( cpos );
   }
 
-  /* Move the cursor in the given direction */
+  //-------------------------------------------------------------
+  // Move the cursor in the given direction
   public void move_cursor( int dir ) {
     cursor_by_char( dir );
     clear_selection( "move_cursor" );
   }
 
-  /* Adjusts the selection by the given cursor */
+  //-------------------------------------------------------------
+  // Adjusts the selection by the given cursor
   public void selection_by_char( int dir ) {
     var last_cursor = _cursor;
     cursor_by_char( dir );
     adjust_selection( last_cursor );
   }
 
-  /* Moves the cursor up/down the text by a line */
+  //-------------------------------------------------------------
+  // Moves the cursor up/down the text by a line
   private void cursor_by_line( int dir ) {
     int line, x;
     var cpos = text.text.index_of_nth_char( _cursor );
@@ -512,23 +542,24 @@ public class CanvasText : Object {
     }
   }
 
-  /*
-   Moves the cursor in the given vertical direction, clearing the
-   selection.
-  */
+  //-------------------------------------------------------------
+  // Moves the cursor in the given vertical direction, clearing the
+  // selection.
   public void move_cursor_vertically( int dir ) {
     cursor_by_line( dir );
     clear_selection( "move_cursor_vertically" );
   }
 
-  /* Adjusts the selection in the vertical direction */
+  //-------------------------------------------------------------
+  // Adjusts the selection in the vertical direction
   public void selection_vertically( int dir ) {
     var last_cursor = _cursor;
     cursor_by_line( dir );
     adjust_selection( last_cursor );
   }
 
-  /* Finds the start or end character of a line */
+  //-------------------------------------------------------------
+  // Finds the start or end character of a line
   private int find_line_extent( bool start ) {
     int line, column;
     _pango_layout.index_to_line_x( text.text.index_of_nth_char( _cursor ), false, out line, out column );
@@ -537,13 +568,15 @@ public class CanvasText : Object {
             (text.text.char_count( line_layout.start_index + line_layout.length ) - 1) );
   }
 
-  /* Moves the cursor to the beginning of the current line */
+  //-------------------------------------------------------------
+  // Moves the cursor to the beginning of the current line
   public void move_cursor_to_linestart() {
     set_cursor_only( find_line_extent( true ) );
     clear_selection( "move_cursor_to_linestart" );
   }
 
-  /* Moves the cursor to the end of the name */
+  //-------------------------------------------------------------
+  // Moves the cursor to the end of the name
   public void move_cursor_to_lineend() {
     set_cursor_only( find_line_extent( false ) );
     clear_selection( "move_cursor_to_lineend" );
