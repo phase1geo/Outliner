@@ -545,8 +545,9 @@ public class Shortcuts {
     add_default( Key.c,            true, false, false, KeyCommand.EDIT_COPY );
     add_default( Key.x,            true, false, false, KeyCommand.EDIT_CUT );
     add_default( Key.v,            true, false, false, KeyCommand.EDIT_PASTE );
-    // add_default( Key.v,            true, true,  false, KeyCommand.NODE_PASTE_REPLACE );
+    add_default( Key.v,            true, true,  false, KeyCommand.NODE_PASTE_REPLACE );
     add_default( Key.Return,       true, false, false, KeyCommand.EDIT_INSERT_NEWLINE );
+    add_default( Key.Return,       true, true,  false, KeyCommand.EDIT_SPLIT_LINE );
     add_default( Key.BackSpace,    true, false, false, KeyCommand.EDIT_REMOVE_WORD_PREV );
     add_default( Key.Delete,       true, false, false, KeyCommand.EDIT_REMOVE_WORD_NEXT );
     add_default( Key.Tab,          true, false, false, KeyCommand.EDIT_INSERT_TAB );
@@ -603,8 +604,6 @@ public class Shortcuts {
     add_default( Key.i,            false, true,  false, KeyCommand.NODE_CHANGE_IMAGE );
     add_default( Key.o,            false, true,  false, KeyCommand.NODE_SELECT_CALLOUT );
     add_default( Key.s,            false, true,  false, KeyCommand.NODE_SORT_ALPHABETICALLY );
-    add_default( Key.x,            false, true,  false, KeyCommand.NODE_SELECT_CONNECTION );
-    add_default( Key.y,            false, true,  false, KeyCommand.NODE_SELECT_LINKED );
     add_default( Key.c,            false, false, false, KeyCommand.NODE_SELECT_CHILD );
     add_default( Key.h,            false, false, false, KeyCommand.NODE_SELECT_LEFT );
     add_default( Key.j,            false, false, false, KeyCommand.NODE_SELECT_DOWN );

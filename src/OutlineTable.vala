@@ -1176,10 +1176,6 @@ public class OutlineTable : DrawingArea {
     // If there is a current node or connection selected, operate on it
     if( (selected != null) || is_title_editable() ) {
       if( control ) {
-        if( !shift && has_key( kvs, Key.c ) )              { do_copy(); }
-        else if( !shift && has_key( kvs, Key.x ) )         { do_cut(); }
-        else if( !shift && has_key( kvs, Key.v ) )         { do_paste( false ); }
-        else if(  shift && has_key( kvs, Key.V ) )         { do_paste( true ); }
         else if( has_key( kvs, Key.Return ) )              { handle_control_return( shift ); }
         else if( has_key( kvs, Key.Tab ) )                 { handle_control_tab(); }
         else if( has_key( kvs, Key.Right ) )               { handle_control_right( shift ); }
@@ -1803,7 +1799,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Splits the text at the current cursor position
-  private void split_text() {
+  public void split_text() {
     if( is_node_editable() ) {
       var sel    = selected;
       var curpos = selected.name.cursor;
