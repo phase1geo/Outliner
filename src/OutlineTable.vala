@@ -1177,8 +1177,6 @@ public class OutlineTable : DrawingArea {
     // If there is a current node or connection selected, operate on it
     if( (selected != null) || is_title_editable() ) {
       if( control ) {
-        else if( has_key( kvs, Key.Up ) )                  { handle_control_up( shift ); }
-        else if( has_key( kvs, Key.Down ) )                { handle_control_down( shift ); }
         else if( has_key( kvs, Key.Home ) )                { handle_control_home( shift ); }
         else if( has_key( kvs, Key.End ) )                 { handle_control_end( shift ); }
         else if( has_key( kvs, Key.BackSpace ) )           { handle_control_backspace(); }
@@ -1923,30 +1921,6 @@ public class OutlineTable : DrawingArea {
       return( true );
     }
     return( false );
-  }
-
-  //-------------------------------------------------------------
-  // Handles a Control-Up arrow keypress
-  private void handle_control_up( bool shift ) {
-    if( selected != null ) {
-      if( shift ) {
-        // TBD
-      } else {
-        move_node_up( selected );
-      }
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles Control-Down arrow keypress
-  private void handle_control_down( bool shift ) {
-    if( selected != null ) {
-      if( shift ) {
-        // TBD
-      } else {
-        move_node_down( selected );
-      }
-    }
   }
 
   //-------------------------------------------------------------

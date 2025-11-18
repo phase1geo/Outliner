@@ -569,6 +569,8 @@ public class Shortcuts {
 
     add_default( Key.Tab,          false, false, false, KeyCommand.NODE_INDENT );
     add_default( Key.Tab,          false, true,  false, KeyCommand.NODE_UNINDENT );
+    add_default( Key.Down,         true,  false, false, KeyCommand.NODE_MOVE_DOWN );
+    add_default( Key.Up,           true,  false, false, KeyCommand.NODE_MOVE_UP );
 
     add_default( Key.t,            false, true,  false, KeyCommand.NODE_SELECT_TOP );
     add_default( Key.b,            false, true,  false, KeyCommand.NODE_SELECT_BOTTOM );
