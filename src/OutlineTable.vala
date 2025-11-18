@@ -1181,7 +1181,6 @@ public class OutlineTable : DrawingArea {
         else if( has_key( kvs, Key.End ) )                 { handle_control_end( shift ); }
         else if( has_key( kvs, Key.BackSpace ) )           { handle_control_backspace(); }
         else if( has_key( kvs, Key.Delete ) )              { handle_control_delete(); }
-        else if( !shift && has_key( kvs, Key.period ) )    { handle_control_period(); }
         else if( !shift && has_key( kvs, Key.slash ) )     { handle_control_slash(); }
         else if( !shift && has_key( kvs, Key.@1 ) )        { handle_control_number( 0 ); }
         else if( !shift && has_key( kvs, Key.@2 ) )        { handle_control_number( 1 ); }
@@ -1972,7 +1971,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Handles a Control-number keypress which moves the currently
   // selected row within the labeled row (if one exists)
-  public void handle_control_number( int label ) {
+  public void move_node_to_label( int label ) {
     if( is_node_selected() ) {
       var parent = _labels.get_node( label );
       if( (parent != null) && (parent != selected) && (parent != selected.parent) && !parent.is_descendant_of( selected ) ) {
@@ -1985,18 +1984,6 @@ public class OutlineTable : DrawingArea {
         changed();
         see( selected );
       }
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Called whenever the period key is entered with the control key
-  private void handle_control_period() {
-    if( is_node_editable() ) {
-      insert_emoji( selected.name );
-    } else if( is_note_editable() ) {
-      insert_emoji( selected.note );
-    } else if( is_title_editable() ) {
-      insert_emoji( _title );
     }
   }
 

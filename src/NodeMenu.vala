@@ -27,27 +27,14 @@ public class NodeMenu : BaseMenu {
     { "action_clone_copy",               action_clone_copy },
     { "action_clone_paste",              action_clone_paste },
     { "action_unclone",                  action_unclone },
-    { "action_paste_replace",            action_paste_replace },
     { "action_delete_node",              action_delete_node },
     { "action_toggle_note",              action_toggle_note },
     { "action_add_tag",                  action_add_tag },
-    { "action_indent",                   action_indent },
-    { "action_unindent",                 action_unindent },
     { "action_toggle_expand",            action_toggle_expand },
     { "action_focus",                    action_focus },
     { "action_add_row_above",            action_add_row_above },
     { "action_add_row_below",            action_add_row_below },
     { "action_join_row",                 action_join_row },
-    { "action_select_node_above",        action_select_node_above },
-    { "action_select_node_below",        action_select_node_below },
-    { "action_select_prev_sibling_node", action_select_prev_sibling_node },
-    { "action_select_next_sibling_node", action_select_next_sibling_node },
-    { "action_select_parent_node",       action_select_parent_node },
-    { "action_select_last_child_node",   action_select_last_child_node },
-    { "action_select_first_node",        action_select_first_node },
-    { "action_select_last_node",         action_select_last_node },
-    { "action_select_label",             action_select_label, "s" },
-    { "action_move_to_label",            action_move_to_label, "s" },
   };
 
   /* Constructor */
@@ -71,7 +58,7 @@ public class NodeMenu : BaseMenu {
     append_menu_item( edit_menu, KeyCommand.EDIT_CUT,   _( "Cut" ) );
     append_menu_item( edit_menu, KeyCommand.EDIT_PASTE, _( "Paste" ) );
 
-    edit_menu.append( _( "Paste and Replace" ), "node.action_paste_replace" );
+    append_menu_item( edit_menu, KeyCommand.NODE_PASTE_REPLACE, _( "Paste and Replace" ) );
     edit_menu.append_submenu( _( "Clone" ),     clone_menu );
     edit_menu.append( _( "Delete" ),            "node.action_delete_node" );
 
@@ -82,8 +69,8 @@ public class NodeMenu : BaseMenu {
     node_menu.append( _( "Add Tag" ),                "node.action_add_tag" );
 
     var tree_menu = new GLib.Menu();
-    tree_menu.append( _( "Indent" ),                     "node.action_indent" );
-    tree_menu.append( _( "Unindent" ),                   "node.action_unindent" );
+    append_menu_item( tree_menu, KeyCommand.NODE_INDENT,   _( "Indent" ) );
+    append_menu_item( tree_menu, KeyCommand.NODE_UNINDENT, _( "Unindent" ) );
     tree_menu.append( _( "Toggle Children Visibility" ), "node.action_toggle_expand" );
     tree_menu.append( _( "Focus" ),                      "node.action_focus" );
 
@@ -93,20 +80,20 @@ public class NodeMenu : BaseMenu {
     add_menu.append( _( "Join To Row Above" ), "node.action_join_row" );
 
     var select1_menu = new GLib.Menu();
-    select1_menu.append( _( "Select Row Above" ), "node.action_select_node_above" );
-    select1_menu.append( _( "Select Row Below" ), "node.action_select_node_below" );
+    append_menu_item( select1_menu, KeyCommand.NODE_SELECT_UP,   _( "Select Row Above" ) );
+    append_menu_item( select1_menu, KeyCommand.NODE_SELECT_DOWN, _( "Select Row Below" ) );
 
     var select2_menu = new GLib.Menu();
-    select2_menu.append( _( "Select Previous Sibling Row" ), "node.action_select_prev_sibling_node" );
-    select2_menu.append( _( "Select Next Sibling Row" ),     "node.action_select_next_sibling_node" );
+    append_menu_item( select2_menu, KeyCommand.NODE_SELECT_PREV_SIBLING, _( "Select Previous Sibling Row" ) );
+    append_menu_item( select2_menu, KeyCommand.NODE_SELECT_NEXT_SIBLING, _( "Select Next Sibling Row" ) );
 
     var select3_menu = new GLib.Menu();
-    select3_menu.append( _( "Select Parent Row" ), "node.action_select_parent_node" );
-    select3_menu.append( _( "Select Last Child" ), "node.action_select_last_child_node" );
+    append_menu_item( select3_menu, KeyCommand.NODE_SELECT_PARENT,     _( "Select Parent Row" ) );
+    append_menu_item( select3_menu, KeyCommand.NODE_SELECT_LAST_CHILD, _( "Select Last Child Row" ) );
 
     var select4_menu = new GLib.Menu();
-    select4_menu.append( _( "Select First Row" ), "node.action_select_first_node" );
-    select4_menu.append( _( "Select Last Row" ),  "node.action_select_last_node" );
+    append_menu_item( select4_menu, KeyCommand.NODE_SELECT_TOP,    _( "Select First Row" ) );
+    append_menu_item( select4_menu, KeyCommand.NODE_SELECT_BOTTOM, _( "Select Last Row" ) );
 
     // These will be populated a bit later
     var select_label_menu = new GLib.Menu();
@@ -123,11 +110,11 @@ public class NodeMenu : BaseMenu {
     select_menu.append_section( null, select5_menu );
 
     var label1_menu = new GLib.Menu();
-    label1_menu.append( _( "Add Label" ), "node.action_toggle_label" );
+    append_menu_item( label1_menu, KeyCommand.NODE_LABEL_TOGGLE, _( "Add Label" ) );
     label1_menu.append_submenu( _( "Move To Label" ), move_label_menu );
 
     var label2_menu = new GLib.Menu();
-    label2_menu.append( _( "Clear All Labels" ), "node.action_clear_all_labels" );
+    append_menu_item( label2_menu, KeyCommand.NODE_LABEL_CLEAR_ALL, _( "Clear All Labels" ) );
 
     var label_menu = new GLib.Menu();
     label_menu.append_section( null, label1_menu );
@@ -138,7 +125,6 @@ public class NodeMenu : BaseMenu {
     target_menu.append_submenu( _( "Labels" ),     label_menu );
 
     /* Add all of the submenus to ourself */
-    var menu = new GLib.Menu();
     menu.append_section( null, edit_menu );
     menu.append_section( null, node_menu );
     menu.append_section( null, tree_menu );
@@ -149,9 +135,11 @@ public class NodeMenu : BaseMenu {
     for( int i=0; i<9; i++ ) {
 
       var name = _( "Label-%d" ).printf( i + 1 );
+      var goto = (KeyCommand)(KeyCommand.NODE_LABEL_GOTO_1 + i);
+      var move = (KeyCommand)(KeyCommand.NODE_MOVE_TO_LABEL_1 + i);
 
-      select_label_menu.append( name, "node.action_select_label('%d')".printf( i ) );
-      move_label_menu.append( name, "node.action_move_to_label('%d')".printf( i ) );
+      append_menu_item( select_label_menu, goto, name );
+      append_menu_item( move_label_menu,   move, name );
 
     }
 
@@ -159,30 +147,6 @@ public class NodeMenu : BaseMenu {
     var actions = new SimpleActionGroup();
     actions.add_action_entries( action_entries, this );
     ot.insert_action_group( "node", actions );
-
-    /* Add keyboard shortcuts */
-    app.set_accels_for_action( "node.action_paste_replace",            { "<Control><Shift>v" } );
-    app.set_accels_for_action( "node.action_delete_node",              { "Delete" } );
-    app.set_accels_for_action( "node.action_indent",                   { "Tab" } );
-    app.set_accels_for_action( "node.action_unindent",                 { "<Shift>Tab" } );
-    app.set_accels_for_action( "node.action_focus",                    { "f" } );
-    app.set_accels_for_action( "node.action_add_row_above",            { "<Shift>Return" } );
-    app.set_accels_for_action( "node.action_add_row_below",            { "Return" } );
-    app.set_accels_for_action( "node.action_join_row",                 { "<Control>BackSpace" } );
-    app.set_accels_for_action( "node.action_select_node_above",        { "Up" } );
-    app.set_accels_for_action( "node.action_select_node_below",        { "Down" } );
-    app.set_accels_for_action( "node.action_select_prev_sibling_node", { "<Shift>Up" } );
-    app.set_accels_for_action( "node.action_select_next_sibling_node", { "<Shift>Down" } );
-    app.set_accels_for_action( "node.action_select_parent_node",       { "a" } );
-    app.set_accels_for_action( "node.action_select_last_child_node",   { "c" } );
-    app.set_accels_for_action( "node.action_select_first_node",        { "<Shift>t" } );
-    app.set_accels_for_action( "node.action_select_last_node",         { "<Shift>b" } );
-    app.set_accels_for_action( "node.action_toggle_label",             { "numbersign" } );
-    
-    for( int i=0; i<9; i++ ) {
-      app.set_accels_for_action( "node.action_select_label('%d')".printf( i ), { "%d".printf( i + 1 ) } );
-      app.set_accels_for_action( "node.action_move_to_label('%d')".printf( i ), { "<control>%d".printf( i + 1 ) } );
-    }
 
   }
 
@@ -194,32 +158,34 @@ public class NodeMenu : BaseMenu {
 
     /* Set the menu sensitivity */
     set_enabled( KeyCommand.EDIT_PASTE,                  pasteable );
-    ot.action_set_enabled( "node.action_paste_replace",            pasteable );
+    set_enabled( KeyCommand.NODE_PASTE_REPLACE,          pasteable );
     ot.action_set_enabled( "node.action_unclone",                  ot.selected.is_clone() );
     ot.action_set_enabled( "node.action_clone_paste",              ot.cloneable() );
-    ot.action_set_enabled( "node.action_indent",                   ot.indentable() );
-    ot.action_set_enabled( "node.action_unindent",                 ot.unindentable() );
-    ot.action_set_enabled( "node.action_select_node_above",        (ot.selected.get_previous_node() != null) );
-    ot.action_set_enabled( "node.action_select_node_below",        (ot.selected.get_next_node() != null) );
-    ot.action_set_enabled( "node.action_select_prev_sibling_node", (ot.selected.get_previous_sibling() != null) );
-    ot.action_set_enabled( "node.action_select_next_sibling_node", (ot.selected.get_next_sibling() != null) );
-    ot.action_set_enabled( "node.action_select_parent_node",       !ot.selected.parent.is_root() );
-    ot.action_set_enabled( "node.action_select_last_child_node",   !ot.selected.is_leaf() );
-    ot.action_set_enabled( "node.action_select_first_node",        ((first_node != ot.selected) && !first_node.is_root()) );
-    ot.action_set_enabled( "node.action_select_last_node",         ((ot.root.get_last_node() != ot.selected) && !first_node.is_root()) );
+    set_enabled( KeyCommand.NODE_INDENT,                 ot.indentable() );
+    set_enabled( KeyCommand.NODE_UNINDENT,               ot.unindentable() );
+    set_enabled( KeyCommand.NODE_SELECT_UP,              (ot.selected.get_previous_node() != null) );
+    set_enabled( KeyCommand.NODE_SELECT_DOWN,            (ot.selected.get_next_node() != null) );
+    set_enabled( KeyCommand.NODE_SELECT_PREV_SIBLING,    (ot.selected.get_previous_sibling() != null ) );
+    set_enabled( KeyCommand.NODE_SELECT_NEXT_SIBLING,    (ot.selected.get_next_sibling() != null ) );
+    set_enabled( KeyCommand.NODE_SELECT_PARENT,          !ot.selected.parent.is_root() );
+    set_enabled( KeyCommand.NODE_SELECT_LAST_CHILD,      !ot.selected.is_leaf() );
+    set_enabled( KeyCommand.NODE_SELECT_TOP,             ((first_node != ot.selected) && !first_node.is_root()) );
+    set_enabled( KeyCommand.NODE_SELECT_BOTTOM,          ((ot.root.get_last_node() != ot.selected) && !first_node.is_root()) );
     ot.action_set_enabled( "node.action_join_row",                 ot.is_node_joinable() );
     ot.action_set_enabled( "node.action_toggle_expand",            (ot.selected.children.length > 0) );
 
     if( ot.labels.get_label_for_node( ot.selected ) == -1 ) {
-      ot.action_set_enabled( "node.action_toggle_label", ot.labels.label_available() );
+      set_enabled( KeyCommand.NODE_LABEL_TOGGLE, ot.labels.label_available() );
     } else {
-      ot.action_set_enabled( "node.action_toggle_label", true );
+      set_enabled( KeyCommand.NODE_LABEL_TOGGLE, true );
     }
 
     for( int i=0; i<9; i++ ) {
       var node = ot.labels.get_node( i );
-      ot.action_set_enabled( "node.action_move_to_label('%d')".printf( i ), (node != null) );
-      ot.action_set_enabled( "node.action_select_label('%d')".printf( i ),  (node != null) );
+      var goto = (KeyCommand)(KeyCommand.NODE_LABEL_GOTO_1 + i);
+      var move = (KeyCommand)(KeyCommand.NODE_MOVE_TO_LABEL_1 + i);
+      set_enabled( move, (node != null) );
+      set_enabled( goto, (node != null) );
     }
 
     if( ot.selected.hide_note ) {
@@ -279,16 +245,6 @@ public class NodeMenu : BaseMenu {
     ot.join_row();
   }
 
-  /* Indents the currently selected row by one level */
-  private void action_indent() {
-    ot.indent();
-  }
-
-  /* Unindents the currently selected row by one level */
-  private void action_unindent() {
-    ot.unindent();
-  }
-
   /* Toggles the expand/collapse property of the node */
   private void action_toggle_expand() {
     ot.toggle_expand( ot.selected );
@@ -297,68 +253,6 @@ public class NodeMenu : BaseMenu {
   /* Enters focus mode */
   private void action_focus() {
     ot.focus_on_selected();
-  }
-
-  /* Selects the node just above the selected node */
-  private void action_select_node_above() {
-    ot.change_selected( ot.selected.get_previous_node() );
-  }
-
-  /* Selects the node just below the selected node */
-  private void action_select_node_below() {
-    ot.change_selected( ot.selected.get_next_node() );
-  }
-
-  /* Selects the previous sibling node relative to the selected node */
-  private void action_select_prev_sibling_node() {
-    ot.change_selected( ot.selected.get_previous_sibling() );
-  }
-
-  /* Selects the next sibling node relative to the selected node */
-  private void action_select_next_sibling_node() {
-    ot.change_selected( ot.selected.get_next_sibling() );
-  }
-
-  /* Selects the parent node of the selected node */
-  private void action_select_parent_node() {
-    ot.change_selected( ot.selected.parent );
-  }
-
-  /* Selects the last child node of the selected node */
-  private void action_select_last_child_node() {
-    ot.change_selected( ot.selected.get_last_child() );
-  }
-
-  /* Selects the top-most node of the document */
-  private void action_select_first_node() {
-    ot.change_selected( ot.root.get_first_node() );
-  }
-
-  /* Selects the bottom-most node of the document */
-  private void action_select_last_node() {
-    ot.change_selected( ot.root.get_last_node() );
-  }
-
-  /* Adds a label to the currently selected node */
-  private void action_toggle_label() {
-    ot.toggle_label();
-  }
-
-  /* Selects the given label index */
-  private void action_select_label( SimpleAction action, Variant? variant ) {
-    var index = int.parse( variant.get_string() );
-    ot.goto_label( index );
-  }
-  
-  /* Moves the current row to the given label */
-  private void action_move_to_label( SimpleAction action, Variant? variant ) {
-    var index = int.parse( variant.get_string() );
-    ot.handle_control_number( index );
-  }
-
-  /* Clears all of the set labels */
-  private void action_clear_all_labels() {
-    ot.clear_all_labels();
   }
 
 }

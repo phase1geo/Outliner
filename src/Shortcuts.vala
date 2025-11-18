@@ -571,6 +571,15 @@ public class Shortcuts {
     add_default( Key.Tab,          false, true,  false, KeyCommand.NODE_UNINDENT );
     add_default( Key.Down,         true,  false, false, KeyCommand.NODE_MOVE_DOWN );
     add_default( Key.Up,           true,  false, false, KeyCommand.NODE_MOVE_UP );
+    add_default( Key.@1,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_1 );
+    add_default( Key.@2,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_2 );
+    add_default( Key.@3,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_3 );
+    add_default( Key.@4,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_4 );
+    add_default( Key.@5,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_5 );
+    add_default( Key.@6,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_6 );
+    add_default( Key.@7,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_7 );
+    add_default( Key.@8,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_8 );
+    add_default( Key.@9,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_9 );
 
     add_default( Key.t,            false, true,  false, KeyCommand.NODE_SELECT_TOP );
     add_default( Key.b,            false, true,  false, KeyCommand.NODE_SELECT_BOTTOM );

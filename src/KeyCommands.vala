@@ -93,6 +93,15 @@ public enum KeyCommand {
       NODE_UNINDENT,
       NODE_MOVE_UP,
       NODE_MOVE_DOWN,
+      NODE_MOVE_TO_LABEL_1,
+      NODE_MOVE_TO_LABEL_2,
+      NODE_MOVE_TO_LABEL_3,
+      NODE_MOVE_TO_LABEL_4,
+      NODE_MOVE_TO_LABEL_5,
+      NODE_MOVE_TO_LABEL_6,
+      NODE_MOVE_TO_LABEL_7,
+      NODE_MOVE_TO_LABEL_8,
+      NODE_MOVE_TO_LABEL_9,
     NODE_MOVE_END,
     NODE_LABEL_START,
       NODE_LABEL_TOGGLE,  // 70
@@ -229,6 +238,15 @@ public enum KeyCommand {
       case NODE_UNINDENT             :  return( "node-unindent" );
       case NODE_MOVE_UP              :  return( "node-move-up" );
       case NODE_MOVE_DOWN            :  return( "node-move-down" );
+      case NODE_MOVE_TO_LABEL_1      :  return( "node-move-to-label-1" );
+      case NODE_MOVE_TO_LABEL_2      :  return( "node-move-to-label-2" );
+      case NODE_MOVE_TO_LABEL_3      :  return( "node-move-to-label-3" );
+      case NODE_MOVE_TO_LABEL_4      :  return( "node-move-to-label-4" );
+      case NODE_MOVE_TO_LABEL_5      :  return( "node-move-to-label-5" );
+      case NODE_MOVE_TO_LABEL_6      :  return( "node-move-to-label-6" );
+      case NODE_MOVE_TO_LABEL_7      :  return( "node-move-to-label-7" );
+      case NODE_MOVE_TO_LABEL_8      :  return( "node-move-to-label-8" );
+      case NODE_MOVE_TO_LABEL_9      :  return( "node-move-to-label-9" );
       case NODE_LABEL_TOGGLE         :  return( "node-label-toggle" );
       case NODE_LABEL_CLEAR_ALL      :  return( "node-label-clear-all" );
       case NODE_LABEL_GOTO_1         :  return( "node-label-goto-1" );
@@ -357,6 +375,15 @@ public enum KeyCommand {
       case "node-unindent"             :  return( NODE_UNINDENT );
       case "node-move-down"            :  return( NODE_MOVE_DOWN );
       case "node-move-up"              :  return( NODE_MOVE_UP );
+      case "node-move-to-label-1"      :  return( NODE_MOVE_TO_LABEL_1 );
+      case "node-move-to-label-2"      :  return( NODE_MOVE_TO_LABEL_2 );
+      case "node-move-to-label-3"      :  return( NODE_MOVE_TO_LABEL_3 );
+      case "node-move-to-label-4"      :  return( NODE_MOVE_TO_LABEL_4 );
+      case "node-move-to-label-5"      :  return( NODE_MOVE_TO_LABEL_5 );
+      case "node-move-to-label-6"      :  return( NODE_MOVE_TO_LABEL_6 );
+      case "node-move-to-label-7"      :  return( NODE_MOVE_TO_LABEL_7 );
+      case "node-move-to-label-8"      :  return( NODE_MOVE_TO_LABEL_8 );
+      case "node-move-to-label-9"      :  return( NODE_MOVE_TO_LABEL_9 );
       case "node-label-toggle"         :  return( NODE_LABEL_TOGGLE );
       case "node-label-clear-all"      :  return( NODE_LABEL_CLEAR_ALL );
       case "node-label-goto-1"         :  return( NODE_LABEL_GOTO_1 );
@@ -494,6 +521,15 @@ public enum KeyCommand {
       case NODE_UNINDENT             :  return( _( "Unindent currently selected row" ) );
       case NODE_MOVE_DOWN            :  return( _( "Move current row down" ) );
       case NODE_MOVE_UP              :  return( _( "Move current row up" ) );
+      case NODE_MOVE_TO_LABEL_1      :  return( _( "Move current row to label 1" ) );
+      case NODE_MOVE_TO_LABEL_2      :  return( _( "Move current row to label 2" ) );
+      case NODE_MOVE_TO_LABEL_3      :  return( _( "Move current row to label 3" ) );
+      case NODE_MOVE_TO_LABEL_4      :  return( _( "Move current row to label 4" ) );
+      case NODE_MOVE_TO_LABEL_5      :  return( _( "Move current row to label 5" ) );
+      case NODE_MOVE_TO_LABEL_6      :  return( _( "Move current row to label 6" ) );
+      case NODE_MOVE_TO_LABEL_7      :  return( _( "Move current row to label 7" ) );
+      case NODE_MOVE_TO_LABEL_8      :  return( _( "Move current row to label 8" ) );
+      case NODE_MOVE_TO_LABEL_9      :  return( _( "Move current row to label 9" ) );
       case NODE_LABEL_START          :  return( _( "Label Commands" ) );
       case NODE_LABEL_TOGGLE         :  return( _( "Toggle label for current row" ) );
       case NODE_LABEL_CLEAR_ALL      :  return( _( "Clear all set labels" ) );
@@ -618,6 +654,15 @@ public enum KeyCommand {
       case NODE_UNINDENT             :  return( node_unindent );
       case NODE_MOVE_DOWN            :  return( node_move_down );
       case NODE_MOVE_UP              :  return( node_move_up );
+      case NODE_MOVE_TO_LABEL_1      :  return( node_move_to_label_1 );
+      case NODE_MOVE_TO_LABEL_2      :  return( node_move_to_label_2 );
+      case NODE_MOVE_TO_LABEL_3      :  return( node_move_to_label_3 );
+      case NODE_MOVE_TO_LABEL_4      :  return( node_move_to_label_4 );
+      case NODE_MOVE_TO_LABEL_5      :  return( node_move_to_label_5 );
+      case NODE_MOVE_TO_LABEL_6      :  return( node_move_to_label_6 );
+      case NODE_MOVE_TO_LABEL_7      :  return( node_move_to_label_7 );
+      case NODE_MOVE_TO_LABEL_8      :  return( node_move_to_label_8 );
+      case NODE_MOVE_TO_LABEL_9      :  return( node_move_to_label_9 );
       case NODE_LABEL_TOGGLE         :  return( node_label_toggle );
       case NODE_LABEL_CLEAR_ALL      :  return( node_label_clear_all );
       case NODE_LABEL_GOTO_1         :  return( node_label_goto_1 );
@@ -1111,6 +1156,42 @@ public enum KeyCommand {
     ot.move_node_up( ot.selected );
   }
 
+  public static void node_move_to_label_1( OutlineTable ot ) {
+    ot.move_node_to_label( 0 );
+  }
+
+  public static void node_move_to_label_2( OutlineTable ot ) {
+    ot.move_node_to_label( 1 );
+  }
+
+  public static void node_move_to_label_3( OutlineTable ot ) {
+    ot.move_node_to_label( 2 );
+  }
+
+  public static void node_move_to_label_4( OutlineTable ot ) {
+    ot.move_node_to_label( 3 );
+  }
+
+  public static void node_move_to_label_5( OutlineTable ot ) {
+    ot.move_node_to_label( 4 );
+  }
+
+  public static void node_move_to_label_6( OutlineTable ot ) {
+    ot.move_node_to_label( 5 );
+  }
+
+  public static void node_move_to_label_7( OutlineTable ot ) {
+    ot.move_node_to_label( 6 );
+  }
+
+  public static void node_move_to_label_8( OutlineTable ot ) {
+    ot.move_node_to_label( 7 );
+  }
+
+  public static void node_move_to_label_9( OutlineTable ot ) {
+    ot.move_node_to_label( 8 );
+  }
+
   public static void node_label_toggle( OutlineTable ot ) {
     ot.toggle_label();
   }
@@ -1119,49 +1200,41 @@ public enum KeyCommand {
     ot.clear_all_labels();
   }
 
-  public static void node_label_goto_0( OutlineTable ot ) {
+  public static void node_label_goto_1( OutlineTable ot ) {
     ot.goto_label( 0 );
   }
 
-  public static void node_label_goto_1( OutlineTable ot ) {
+  public static void node_label_goto_2( OutlineTable ot ) {
     ot.goto_label( 1 );
   }
 
-  public static void node_label_goto_2( OutlineTable ot ) {
+  public static void node_label_goto_3( OutlineTable ot ) {
     ot.goto_label( 2 );
   }
 
-  public static void node_label_goto_3( OutlineTable ot ) {
+  public static void node_label_goto_4( OutlineTable ot ) {
     ot.goto_label( 3 );
   }
 
-  public static void node_label_goto_4( OutlineTable ot ) {
+  public static void node_label_goto_5( OutlineTable ot ) {
     ot.goto_label( 4 );
   }
 
-  public static void node_label_goto_5( OutlineTable ot ) {
+  public static void node_label_goto_6( OutlineTable ot ) {
     ot.goto_label( 5 );
   }
 
-  public static void node_label_goto_6( OutlineTable ot ) {
+  public static void node_label_goto_7( OutlineTable ot ) {
     ot.goto_label( 6 );
   }
 
-  public static void node_label_goto_7( OutlineTable ot ) {
+  public static void node_label_goto_8( OutlineTable ot ) {
     ot.goto_label( 7 );
   }
 
-  public static void node_label_goto_8( OutlineTable ot ) {
+  public static void node_label_goto_9( OutlineTable ot ) {
     ot.goto_label( 8 );
   }
-
-  public static void node_label_goto_9( OutlineTable ot ) {
-    ot.goto_label( 9 );
-  }
-
-
-
-
 
   /*
   public static void node_change_task( OutlineTable ot ) {
