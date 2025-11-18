@@ -1147,10 +1147,11 @@ public class OutlineTable : DrawingArea {
 
     // Attempt to execute a keyboard shortcut
     if( _win.shortcuts.execute( this, keyval, keycode, state ) ) {
+      update_format_bar( "on_keypress" );
       return( true );
 
     // If anyone is being edited, just insert the key value
-    } else if( is_node_editable() || is_note_editable() ) {
+    } else if( is_node_editable() || is_note_editable() || is_title_editable() ) {
       _im_context.filter_keypress( _key_controller.get_current_event() );
       return( false );
     }
@@ -1176,10 +1177,6 @@ public class OutlineTable : DrawingArea {
     // If there is a current node or connection selected, operate on it
     if( (selected != null) || is_title_editable() ) {
       if( control ) {
-        else if( has_key( kvs, Key.Return ) )              { handle_control_return( shift ); }
-        else if( has_key( kvs, Key.Tab ) )                 { handle_control_tab(); }
-        else if( has_key( kvs, Key.Right ) )               { handle_control_right( shift ); }
-        else if( has_key( kvs, Key.Left ) )                { handle_control_left( shift ); }
         else if( has_key( kvs, Key.Up ) )                  { handle_control_up( shift ); }
         else if( has_key( kvs, Key.Down ) )                { handle_control_down( shift ); }
         else if( has_key( kvs, Key.Home ) )                { handle_control_home( shift ); }
@@ -1216,35 +1213,20 @@ public class OutlineTable : DrawingArea {
         else if( has_key( kvs, Key.Delete ) )               { handle_delete(); }
         else if( has_key( kvs, Key.Escape ) )               { handle_escape(); }
         else if( has_key( kvs, Key.Return ) )               { handle_return( shift ); }
-        else if( has_key( kvs, Key.Tab ) )                  { handle_tab( shift ); }
-        else if( has_key( kvs, Key.Right ) )                { handle_right( shift ); }
-        else if( has_key( kvs, Key.Left ) )                 { handle_left( shift ); }
         else if( has_key( kvs, Key.Home ) )                 { handle_home( shift ); }
         else if( has_key( kvs, Key.End ) )                  { handle_end( shift ); }
-        else if( has_key( kvs, Key.Up ) )                   { handle_up( shift ); }
-        else if( has_key( kvs, Key.Down ) )                 { handle_down( shift ); }
         else if( has_key( kvs, Key.Page_Up ) )              { handle_pageup(); }
         else if( has_key( kvs, Key.Page_Down ) )            { handle_pagedn(); }
-        else if( has_key( kvs, Key.Control_L ) )            { handle_control( true ); }
-        else if( has_key( kvs, Key.Control_R ) )            { handle_control( true ); }
-        else if( has_key( kvs, Key.Shift_L ) )              { _shift_set = true; }
-        else if( has_key( kvs, Key.Shift_R ) )              { _shift_set = true; }
         else if( !is_node_editable() && !is_note_editable() && !is_title_editable() ) {
-          if( !shift && has_key( kvs, Key.a ) )          { change_selected( node_parent( selected ) ); }
-          else if(  shift && has_key( kvs, Key.B ) )          { change_selected( node_bottom() ); }
-          else if( !shift && has_key( kvs, Key.c ) )          { change_selected( node_last_child( selected ) ); }
           else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
           else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
           else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
           else if( !shift && has_key( kvs, Key.h ) )          { unindent(); }
           else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
-          else if( !shift && has_key( kvs, Key.j ) )          { change_selected( node_next( selected ) ); }
-          else if( !shift && has_key( kvs, Key.k ) )          { change_selected( node_previous( selected ) ); }
           else if( !shift && has_key( kvs, Key.l ) )          { indent(); }
           else if( !shift && has_key( kvs, Key.n ) )          { change_selected( node_next_sibling( selected ) ); }
           else if( !shift && has_key( kvs, Key.p ) )          { change_selected( node_previous_sibling( selected ) ); }
           else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
-          else if(  shift && has_key( kvs, Key.T ) )          { change_selected( node_top() ); }
           else if(  shift && has_key( kvs, Key.numbersign ) ) { toggle_label(); }
           else if(  shift && has_key( kvs, Key.asterisk ) )   { clear_all_labels(); }
           else if( !shift && has_key( kvs, Key.@1 ) )         { goto_label( 0 ); }
@@ -1275,20 +1257,9 @@ public class OutlineTable : DrawingArea {
         else if( !shift && has_key( kvs, Key.@7 ) ) { goto_label( 6 ); }
         else if( !shift && has_key( kvs, Key.@8 ) ) { goto_label( 7 ); }
         else if( !shift && has_key( kvs, Key.@9 ) ) { goto_label( 8 ); }
-        else if( !shift && has_key( kvs, Key.j ) )  { handle_down( shift ); }
-        else if( !shift && has_key( kvs, Key.k ) )  { handle_up( shift ); }
-        else if( has_key( kvs, Key.Up ) )           { handle_up( shift ); }
-        else if( has_key( kvs, Key.Down ) )         { handle_down( shift ); }
-        else if( has_key( kvs, Key.Control_L ) )    { handle_control( true ); }
-        else if( has_key( kvs, Key.Control_R ) )    { handle_control( true ); }
-        else if( has_key( kvs, Key.Shift_L ) )      { _shift_set = true; }
-        else if( has_key( kvs, Key.Shift_R ) )      { _shift_set = true; }
         else if( has_key( kvs, Key.Escape ) )       { handle_escape(); }
       }
     }
-
-    // Update the format bar state, if necessary
-    update_format_bar( "on_keypress" );
 
     return( true );
 
@@ -1842,287 +1813,45 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Handles a Control-Return keypress
-  private void handle_control_return( bool shift ) {
-    if( is_node_editable() && !shift ) {
-      split_text();
-    } else if( is_note_editable() ) {
-      selected.note.insert( "\n", undo_text );
-      queue_draw();
-    } else if( is_title_editable() ) {
-      _title.insert( "\n", undo_text );
-      queue_draw();
-    }
-  }
+  // NODE EXPAND/COLLAPSE
+  //-------------------------------------------------------------
 
   //-------------------------------------------------------------
-  // Handles a tab key hit when a node is selected
-  private void handle_tab( bool shift ) {
-    if( is_node_editable() && _completion.shown && !shift ) {
-      _completion.select();
-      queue_draw();
-    } else if( is_note_editable() && shift ) {
-      selected.note.insert( "\t", undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.insert( "\t", undo_text );
+  // Expandes the current node by one level or if "all" is set to
+  // true, all descendant nodes will be expanded.
+  public void node_expand( bool all ) {
+    if( (selected != null) && !selected.is_leaf() ) {
+      var nodes = new Array<Node>();
+      if( all ) {
+        selected.expand_all( nodes );
       } else {
-        set_title_editable( false );
-        selected = root.get_last_node();
-        set_node_mode( selected, NodeMode.EDITABLE );
-      }
-      queue_draw();
-    } else if( selected != null ) {
-      if( shift ) {
-        unindent();
-      } else {
-        indent();
-      }
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a Control-Tab keypress
-  private void handle_control_tab() {
-    if( is_node_editable() ) {
-      selected.name.insert( "\t", undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.insert( "\t", undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_title_editable() ) {
-      _title.insert( "\t", undo_text );
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a right arrow keypress
-  private void handle_right( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_by_char( 1 );
-      } else {
-        selected.name.move_cursor( 1 );
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_by_char( 1 );
-      } else {
-        selected.note.move_cursor( 1 );
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_by_char( 1 );
-      } else {
-        _title.move_cursor( 1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( selected != null ) {
-      if( !selected.is_leaf() ) {
-        var nodes = new Array<Node>();
-        if( shift ) {
-          selected.expand_all( nodes );
-        } else {
-          if( !selected.expanded ) {
-            selected.collapse_all( nodes );
-          }
-          selected.expand_next( nodes );
-        }
-        selected.adjust_nodes( selected.last_y, false, "expand next" );
-        undo_buffer.add_item( new UndoNodeExpander( selected, nodes ) );
-        queue_draw();
-        changed();
-      }
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a Control-Right arrow keypress
-  private void handle_control_right( bool shift ) {
-    if( is_node_selected() ) {
-      indent();
-    } else if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_by_word( 1 );
-      } else {
-        selected.name.move_cursor_by_word( 1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_by_word( 1 );
-      } else {
-        selected.note.move_cursor_by_word( 1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_by_word( 1 );
-      } else {
-        _title.move_cursor_by_word( 1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a left arrow keypress
-  private void handle_left( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_by_char( -1 );
-      } else {
-        selected.name.move_cursor( -1 );
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_by_char( -1 );
-      } else {
-        selected.note.move_cursor( -1 );
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_by_char( -1 );
-      } else {
-        _title.move_cursor( -1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( selected != null ) {
-      if( !selected.is_leaf() && selected.expanded ) {
-        var nodes = new Array<Node>();
-        if( shift ) {
+        if( !selected.expanded ) {
           selected.collapse_all( nodes );
-        } else {
-          selected.collapse_next( nodes );
         }
-        selected.adjust_nodes( selected.last_y, false, "left key" );
-        undo_buffer.add_item( new UndoNodeExpander( selected, nodes ) );
-        queue_draw();
-        changed();
+        selected.expand_next( nodes );
       }
+      selected.adjust_nodes( selected.last_y, false, "node expand" );
+      undo_buffer.add_item( new UndoNodeExpander( selected, nodes ) );
+      queue_draw();
+      changed();
     }
   }
 
   //-------------------------------------------------------------
-  // Handles a Control-left arrow keypress
-  private void handle_control_left( bool shift ) {
-    if( is_node_selected() ) {
-      unindent();
-    } else if( is_node_editable() ) {
+  // Expandes the current node by one level or if "all" is set to
+  // true, all descendant nodes will be expanded.
+  public void node_collapse( bool shift ) {
+    if( (selected != null) && !selected.is_leaf() && selected.expanded ) {
+      var nodes = new Array<Node>();
       if( shift ) {
-        selected.name.selection_by_word( -1 );
+        selected.collapse_all( nodes );
       } else {
-        selected.name.move_cursor_by_word( -1 );
+        selected.collapse_next( nodes );
       }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
+      selected.adjust_nodes( selected.last_y, false, "node collapse" );
+      undo_buffer.add_item( new UndoNodeExpander( selected, nodes ) );
       queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_by_word( -1 );
-      } else {
-        selected.note.move_cursor_by_word( -1 );
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_by_word( -1 );
-      } else {
-        _title.move_cursor_by_word( -1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles an up arrow keypress
-  private void handle_up( bool shift ) {
-    if( is_node_editable() ) {
-      if( _completion.shown ) {
-        _completion.up();
-      } else {
-        if( shift ) {
-          selected.name.selection_vertically( -1 );
-        } else {
-          selected.name.move_cursor_vertically( -1 );
-        }
-        undo_text.mergeable = false;
-        see( selected );
-        _im_context.reset();
-        queue_draw();
-      }
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_vertically( -1 );
-      } else {
-        selected.note.move_cursor_vertically( -1 );
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_vertically( -1 );
-      } else {
-        _title.move_cursor_vertically( -1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( selected != null ) {
-      var node = shift ? node_top() : node_previous( selected );
-      if( node != null ) {
-        selected = node;
-        queue_draw();
-      }
-    } else {
-      int y1, y2;
-      get_window_ys( out y1, out y2 );
-      var node = node_at_coordinates( 0, y2 );
-      if( node != null ) {
-        selected = node;
-      } else {
-        selected = root.get_last_node();
-      }
-      queue_draw();
+      changed();
     }
   }
 
@@ -2228,36 +1957,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Handles a Control-Up arrow keypress
   private void handle_control_up( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_to_start( false );
-      } else {
-        selected.name.move_cursor_to_start();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_to_start( false );
-      } else {
-        selected.note.move_cursor_to_start();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_to_start( false );
-      } else {
-        _title.move_cursor_to_start();
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( selected != null ) {
+    if( selected != null ) {
       if( shift ) {
         // TBD
       } else {
@@ -2267,91 +1967,9 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Handles down arrow keypress
-  private void handle_down( bool shift ) {
-    if( is_node_editable() ) {
-      if( _completion.shown ) {
-        _completion.down();
-      } else {
-        if( shift ) {
-          selected.name.selection_vertically( 1 );
-        } else {
-          selected.name.move_cursor_vertically( 1 );
-        }
-        undo_text.mergeable = false;
-        see( selected );
-        _im_context.reset();
-        queue_draw();
-      }
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_vertically( 1 );
-      } else {
-        selected.note.move_cursor_vertically( 1 );
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_vertically( 1 );
-      } else {
-        _title.move_cursor_vertically( 1 );
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( selected != null ) {
-      var node = node_next( selected );
-      if( node != null ) {
-        selected = node;
-        queue_draw();
-      }
-    } else {
-      int y1, y2;
-      get_window_ys( out y1, out y2 );
-      var node = node_at_coordinates( 0, y1 );
-      if( node != null ) {
-        selected = node;
-        queue_draw();
-      }
-    }
-  }
-
-  //-------------------------------------------------------------
   // Handles Control-Down arrow keypress
   private void handle_control_down( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_to_end( false );
-      } else {
-        selected.name.move_cursor_to_end();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_to_end( false );
-      } else {
-        selected.note.move_cursor_to_end();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_to_end( false );
-      } else {
-        _title.move_cursor_to_end();
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    } else if( selected != null ) {
+    if( selected != null ) {
       if( shift ) {
         // TBD
       } else {
@@ -2860,8 +2478,12 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
+  // NODE LOCATION METHODS
+  //-------------------------------------------------------------
+
+  //-------------------------------------------------------------
   // Returns the first visible parent node of the given node.
-  private Node? node_parent( Node node ) {
+  public Node? node_parent( Node node ) {
     do {
       node = node.parent;
     } while( !node.is_root() && node.hidden );
@@ -2870,7 +2492,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Returns the top-most visible node.
-  private Node? node_top() {
+  public Node? node_top() {
     var node = root.get_first_node();
     while( (node != null) && node.hidden ) {
       node = node.get_next_node();
@@ -2880,7 +2502,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Returns the bottom-most visible node.
-  private Node? node_bottom() {
+  public Node? node_bottom() {
     var node = root.get_last_node();
     while( (node != null) && node.hidden ) {
       node = node.get_previous_node();
@@ -2889,8 +2511,24 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
+  // Returns the node at the top of the viewable page.
+  public Node? node_page_top() {
+    int y1, y2;
+    get_window_ys( out y1, out y2 );
+    return( node_at_coordinates( 0, y2 ) );
+  }
+
+  //-------------------------------------------------------------
+  // Returns the node at the bottom of the viewable page.
+  public Node? node_page_bottom() {
+    int y1, y2;
+    get_window_ys( out y1, out y2 );
+    return( node_at_coordinates( 0, y1 ) );
+  }
+
+  //-------------------------------------------------------------
   // Returns the last visible child of the given node.
-  private Node? node_last_child( Node node ) {
+  public Node? node_last_child( Node node ) {
     var n = node.get_last_child();
     while( (n != null) && n.hidden ) {
       n = node_previous_sibling( n );
@@ -2900,7 +2538,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Returns the next visible node.
-  private Node? node_next( Node node ) {
+  public Node? node_next( Node node ) {
     var n = node.get_next_node();
     while( (n != null) && n.hidden ) {
       n = n.get_next_node();
@@ -2910,7 +2548,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Returns the previous visible node.
-  private Node? node_previous( Node node ) {
+  public Node? node_previous( Node node ) {
     var n = node.get_previous_node();
     while( (n != null) && n.hidden ) {
       n = n.get_previous_node();
@@ -2920,7 +2558,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Returns the next visible sibling node.
-  private Node? node_next_sibling( Node node ) {
+  public Node? node_next_sibling( Node node ) {
     var n = node.get_next_sibling();
     while( (n != null) && n.hidden ) {
       n = n.get_next_sibling();
@@ -2931,13 +2569,17 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Returns the node that is the sibling above the current one.
   // If the current node is the top-most node, return null.
-  private Node? node_previous_sibling( Node? node ) {
+  public Node? node_previous_sibling( Node? node ) {
     var n = node.get_previous_sibling();
     while( (n != null) && n.hidden ) {
       n = n.get_previous_sibling();
     }
     return( n );
   }
+
+  //-------------------------------------------------------------
+  // MISCELLANEOUS
+  //-------------------------------------------------------------
 
   //-------------------------------------------------------------
   // Change the selected node to the given node

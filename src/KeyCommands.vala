@@ -70,61 +70,43 @@ public enum KeyCommand {
       NODE_ADD_SIBLING_BEFORE,
       NODE_ADD_CHILD,
       NODE_ADD_PARENT,
-      NODE_QUICK_ENTRY_INSERT,
-      NODE_QUICK_ENTRY_REPLACE,
       NODE_REMOVE,
       NODE_REMOVE_ONLY,
     NODE_EXIST_END,
     */
     NODE_CLIPBOARD_START,
-      // NODE_PASTE_NODE_LINK,
       NODE_PASTE_REPLACE,
     NODE_CLIPBOARD_END,
-    /*
     NODE_VIEW_START,
-      NODE_CENTER,
+      // NODE_CENTER,
+      NODE_EXPAND_ONE,
+      NODE_EXPAND_ALL,
+      NODE_COLLAPSE_ONE,
+      NODE_COLLAPSE_ALL,
     NODE_VIEW_END,
+    /*
     NODE_CHANGE_START,
       NODE_CHANGE_TASK,
-      NODE_CHANGE_IMAGE,
-      NODE_REMOVE_IMAGE,
-      NODE_CHANGE_LINK_COLOR,
-      NODE_RANDOMIZE_LINK_COLOR,  // 80
-      NODE_REPARENT_LINK_COLOR,
-      NODE_TOGGLE_FOLDS_SHALLOW,
-      NODE_TOGGLE_FOLDS_DEEP,
-      NODE_TOGGLE_LINKS,
-      NODE_ADD_GROUP,
-      NODE_ADD_CONNECTION,
-      NODE_TOGGLE_CALLOUT,
-      NODE_TOGGLE_SEQUENCE,
     NODE_CHANGE_END,
-    NODE_SELECT_START,  // 90
-      NODE_SELECT_ROOT,
-      NODE_SELECT_PARENT,
-      NODE_SELECT_SIBLING_NEXT,
-      NODE_SELECT_SIBLING_PREV,
-      NODE_SELECT_CHILD,
-      NODE_SELECT_CHILDREN,
-      NODE_SELECT_TREE,
+    */
+    NODE_SELECT_START,
+      NODE_SELECT_TOP,
+      NODE_SELECT_BOTTOM,
+      NODE_SELECT_PAGE_TOP,
+      NODE_SELECT_PAGE_BOTTOM,
       NODE_SELECT_DOWN,
       NODE_SELECT_UP,
-      NODE_SELECT_RIGHT,  // 100
-      NODE_SELECT_LEFT,
-      NODE_SELECT_LINKED,
-      NODE_SELECT_CALLOUT,
-      NODE_SELECT_CONNECTION,
+      NODE_SELECT_PARENT,
+      NODE_SELECT_LAST_CHILD,
+      NODE_SELECT_NEXT_SIBLING,
+      NODE_SELECT_PREV_SIBLING,
     NODE_SELECT_END,
     NODE_MOVE_START,
-      NODE_SWAP_RIGHT,
-      NODE_SWAP_LEFT,
-      NODE_SWAP_UP,
-      NODE_SWAP_DOWN,  // 110
-      NODE_SORT_ALPHABETICALLY,
-      NODE_SORT_RANDOMLY,
-      NODE_DETACH,
+      NODE_INDENT,
+      NODE_UNINDENT,
+      NODE_MOVE_UP,
+      NODE_MOVE_DOWN,
     NODE_MOVE_END,
-    */
   NODE_END,
   EDIT_START,
     EDIT_TEXT_START,
@@ -223,40 +205,30 @@ public enum KeyCommand {
       case NODE_ADD_SIBLING_BEFORE   :  return( "node-shift-return" );
       case NODE_ADD_CHILD            :  return( "node-tab" );
       case NODE_ADD_PARENT           :  return( "node-shift-tab" );
-      case NODE_QUICK_ENTRY_INSERT   :  return( "node-quick-entry-insert" );
-      case NODE_QUICK_ENTRY_REPLACE  :  return( "node-quick-entry-replace" );
       case NODE_REMOVE               :  return( "node-remove" );
       case NODE_REMOVE_ONLY          :  return( "node-remove-only" );
       case NODE_PASTE_NODE_LINK      :  return( "node-paste-node-link" );
+      */
       case NODE_PASTE_REPLACE        :  return( "node-paste-replace" );
-      case NODE_CENTER               :  return( "node-center" );
-      case NODE_CHANGE_TASK          :  return( "node-change-task" );
-      case NODE_CHANGE_IMAGE         :  return( "node-change-image" );
-      case NODE_REMOVE_IMAGE         :  return( "node-remove-image" );
-      case NODE_CHANGE_LINK_COLOR    :  return( "node-change-link-color" );
-      case NODE_RANDOMIZE_LINK_COLOR :  return( "node-randomize-link-color" );
-      case NODE_REPARENT_LINK_COLOR  :  return( "node-reparent-link-color" );
-      case NODE_TOGGLE_FOLDS_SHALLOW :  return( "node-toggle-folds-shallow" );
-      case NODE_TOGGLE_FOLDS_DEEP    :  return( "node-toggle-folds-deep" );
-      case NODE_TOGGLE_LINKS         :  return( "node-toggle-links" );
-      case NODE_ADD_GROUP            :  return( "node-add-group" );
-      case NODE_ADD_CONNECTION       :  return( "node-add-connection" );
-      case NODE_TOGGLE_CALLOUT       :  return( "node-toggle-callout" );
-      case NODE_TOGGLE_SEQUENCE      :  return( "node-toggle-sequence" );
-      case NODE_SELECT_ROOT          :  return( "node-select-root" );
-      case NODE_SELECT_PARENT        :  return( "node-select-parent" );
-      case NODE_SELECT_SIBLING_NEXT  :  return( "node-select-sibling-next" );
-      case NODE_SELECT_SIBLING_PREV  :  return( "node-select-sibling-prev" );
-      case NODE_SELECT_CHILD         :  return( "node-select-child" );
-      case NODE_SELECT_CHILDREN      :  return( "node-select-children" );
-      case NODE_SELECT_TREE          :  return( "node-select-tree" );
+      // case NODE_CENTER               :  return( "node-center" );
+      case NODE_EXPAND_ONE           :  return( "node-expand-one" );
+      case NODE_EXPAND_ALL           :  return( "node-expand-all" );
+      case NODE_COLLAPSE_ONE         :  return( "node-collapse-one" );
+      case NODE_COLLAPSE_ALL         :  return( "node-collapse-all" );
+      // case NODE_CHANGE_TASK          :  return( "node-change-task" );
+      case NODE_SELECT_TOP           :  return( "node-select-top" );
+      case NODE_SELECT_BOTTOM        :  return( "node-select-bottom" );
+      case NODE_SELECT_PAGE_TOP      :  return( "node-select-page-top" );
+      case NODE_SELECT_PAGE_BOTTOM   :  return( "node-select-page-bottom" );
       case NODE_SELECT_DOWN          :  return( "node-select-down" );
       case NODE_SELECT_UP            :  return( "node-select-up" );
-      case NODE_SELECT_RIGHT         :  return( "node-select-right" );
-      case NODE_SELECT_LEFT          :  return( "node-select-left" );
-      case NODE_SELECT_LINKED        :  return( "node-select-linked" );
-      case NODE_SELECT_CALLOUT       :  return( "node-select-callout" );
-      case NODE_SELECT_CONNECTION    :  return( "node-select-connection" );
+      case NODE_SELECT_PARENT        :  return( "node-select-parent" );
+      case NODE_SELECT_LAST_CHILD    :  return( "node-select-last-child" );
+      case NODE_SELECT_NEXT_SIBLING  :  return( "node-select-next-sibling" );
+      case NODE_SELECT_PREV_SIBLING  :  return( "node-select-prev-sibling" );
+      case NODE_INDENT               :  return( "node-indent" );
+      case NODE_UNINDENT             :  return( "node_unindent" );
+      /*
       case NODE_SWAP_RIGHT           :  return( "node-swap-right" );
       case NODE_SWAP_LEFT            :  return( "node-swap-left" );
       case NODE_SWAP_UP              :  return( "node-swap-up" );
@@ -264,23 +236,6 @@ public enum KeyCommand {
       case NODE_SORT_ALPHABETICALLY  :  return( "node-sort-alphabetically" );
       case NODE_SORT_RANDOMLY        :  return( "node-sort-randomly" );
       case NODE_DETACH               :  return( "node-detach" );
-      case CALLOUT_START             :  return( "callout" );
-      case CALLOUT_SELECT_NODE       :  return( "callout-select-node" );
-      case CALLOUT_REMOVE            :  return( "callout-remove" );
-      case CONNECTION_START          :  return( "connection" );
-      case CONNECTION_REMOVE         :  return( "connection-remove" );
-      case CONNECTION_SELECT_FROM    :  return( "connection-select-from" );
-      case CONNECTION_SELECT_TO      :  return( "connection-select-to" );
-      case CONNECTION_SELECT_NEXT    :  return( "connection-select-next" );
-      case CONNECTION_SELECT_PREV    :  return( "connection-select-prev" );
-      case STICKER_START             :  return( "sticker" );
-      case STICKER_REMOVE            :  return( "sticker-remove" );
-      case GROUP_START               :  return( "group" );
-      case GROUP_CHANGE_COLOR        :  return( "group-change-color" );
-      case GROUP_MERGE               :  return( "group-merge" );
-      case GROUP_REMOVE              :  return( "group-remove" );
-      case GROUP_SELECT_MAIN         :  return( "group-select-main" );
-      case GROUP_SELECT_ALL          :  return( "group-select-all" );
       */
       case EDIT_START                :  return( "editing" );
       case EDIT_INSERT_NEWLINE       :  return( "edit-insert-newline" );
@@ -366,60 +321,36 @@ public enum KeyCommand {
       case "node-shift-return"         :  return( NODE_ADD_SIBLING_BEFORE );
       case "node-tab"                  :  return( NODE_ADD_CHILD );
       case "node-shift-tab"            :  return( NODE_ADD_PARENT );
-      case "node-quick-entry-insert"   :  return( NODE_QUICK_ENTRY_INSERT );
-      case "node-quick-entry-replace"  :  return( NODE_QUICK_ENTRY_REPLACE );
       case "node-remove"               :  return( NODE_REMOVE );
       case "node-remove-only"          :  return( NODE_REMOVE_ONLY );
       case "node-paste-node-link"      :  return( NODE_PASTE_NODE_LINK );
       case "node-paste-replace"        :  return( NODE_PASTE_REPLACE );
       case "node-center"               :  return( NODE_CENTER );
-      case "node-change-task"          :  return( NODE_CHANGE_TASK );
-      case "node-change-image"         :  return( NODE_CHANGE_IMAGE );
-      case "node-remove-image"         :  return( NODE_REMOVE_IMAGE );
-      case "node-change-link-color"    :  return( NODE_CHANGE_LINK_COLOR );
-      case "node-randomize-link-color" :  return( NODE_RANDOMIZE_LINK_COLOR );
-      case "node-reparent-link-color"  :  return( NODE_REPARENT_LINK_COLOR );
-      case "node-toggle-folds-shallow" :  return( NODE_TOGGLE_FOLDS_SHALLOW );
-      case "node-toggle-folds-deep"    :  return( NODE_TOGGLE_FOLDS_DEEP );
-      case "node-toggle-links"         :  return( NODE_TOGGLE_LINKS );
-      case "node-add-group"            :  return( NODE_ADD_GROUP );
-      case "node-add-connection"       :  return( NODE_ADD_CONNECTION );
-      case "node-toggle-callout"       :  return( NODE_TOGGLE_CALLOUT );
-      case "node-toggle-sequence"      :  return( NODE_TOGGLE_SEQUENCE );
-      case "node-select-root"          :  return( NODE_SELECT_ROOT );
-      case "node-select-parent"        :  return( NODE_SELECT_PARENT );
-      case "node-select-sibling-next"  :  return( NODE_SELECT_SIBLING_NEXT );
-      case "node-select-sibling-prev"  :  return( NODE_SELECT_SIBLING_PREV );
-      case "node-select-child"         :  return( NODE_SELECT_CHILD );
-      case "node-select-children"      :  return( NODE_SELECT_CHILDREN );
-      case "node-select-tree"          :  return( NODE_SELECT_TREE );
+      */
+      case "node-expand-one"           :  return( NODE_EXPAND_ONE );
+      case "node-expand-all"           :  return( NODE_EXPAND_ALL );
+      case "node-collapse-one"         :  return( NODE_COLLAPSE_ONE );
+      case "node-collapse-all"         :  return( NODE_COLLAPSE_ALL );
+      // case "node-change-task"          :  return( NODE_CHANGE_TASK );
+      case "node-select-top"           :  return( NODE_SELECT_TOP );
+      case "node-select-bottom"        :  return( NODE_SELECT_BOTTOM );
+      case "node-select-page-top"      :  return( NODE_SELECT_PAGE_TOP );
+      case "node-select-page-bottom"   :  return( NODE_SELECT_PAGE_BOTTOM );
       case "node-select-down"          :  return( NODE_SELECT_DOWN );
       case "node-select-up"            :  return( NODE_SELECT_UP );
-      case "node-select-right"         :  return( NODE_SELECT_RIGHT );
-      case "node-select-left"          :  return( NODE_SELECT_LEFT );
-      case "node-select-linked"        :  return( NODE_SELECT_LINKED );
-      case "node-select-callout"       :  return( NODE_SELECT_CALLOUT );
-      case "node-select-connection"    :  return( NODE_SELECT_CONNECTION );
+      case "node-select-parent"        :  return( NODE_SELECT_PARENT );
+      case "node-select-last-child"    :  return( NODE_SELECT_LAST_CHILD );
+      case "node-select-next-sibling"  :  return( NODE_SELECT_NEXT_SIBLING );
+      case "node-select-prev-sibling"  :  return( NODE_SELECT_PREV_SIBLING );
+      case "node-indent"               :  return( NODE_INDENT );
+      case "node-unindent"             :  return( NODE_UNINDENT );
+      /*
       case "node-swap-right"           :  return( NODE_SWAP_RIGHT );
       case "node-swap-left"            :  return( NODE_SWAP_LEFT );
       case "node-swap-up"              :  return( NODE_SWAP_UP );
       case "node-swap-down"            :  return( NODE_SWAP_DOWN );
       case "node-sort-alphabetically"  :  return( NODE_SORT_ALPHABETICALLY );
       case "node-sort-randomly"        :  return( NODE_SORT_RANDOMLY );
-      case "node-detach"               :  return( NODE_DETACH );
-      case "callout-select-node"       :  return( CALLOUT_SELECT_NODE );
-      case "callout-remove"            :  return( CALLOUT_REMOVE );
-      case "connection-remove"         :  return( CONNECTION_REMOVE );
-      case "connection-select-from"    :  return( CONNECTION_SELECT_FROM );
-      case "connection-select-to"      :  return( CONNECTION_SELECT_TO );
-      case "connection-select-next"    :  return( CONNECTION_SELECT_NEXT );
-      case "connection-select-prev"    :  return( CONNECTION_SELECT_PREV );
-      case "sticker-remove"            :  return( STICKER_REMOVE );
-      case "group-change-color"        :  return( GROUP_CHANGE_COLOR );
-      case "group-merge"               :  return( GROUP_MERGE );
-      case "group-remove"              :  return( GROUP_REMOVE );
-      case "group-select-main"         :  return( GROUP_SELECT_MAIN );
-      case "group-select-all"          :  return( GROUP_SELECT_ALL );
       */
       case "edit-insert-newline"       :  return( EDIT_INSERT_NEWLINE );
       case "edit-split-line"           :  return( EDIT_SPLIT_LINE );
@@ -510,51 +441,40 @@ public enum KeyCommand {
       case NODE_ADD_SIBLING_BEFORE   :  return( _( "Add sibling node before current node" ) );
       case NODE_ADD_CHILD            :  return( _( "Add child node to current node" ) );
       case NODE_ADD_PARENT           :  return( _( "Add parent node to current node" ) );
-      case NODE_QUICK_ENTRY_INSERT   :  return( _( "Use quick entry to insert nodes" ) );
-      case NODE_QUICK_ENTRY_REPLACE  :  return( _( "Use quick entry to replace current node" ) );
       case NODE_REMOVE_ONLY          :  return( _( "Remove selected node only (leave subtree)" ) );
       case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
       case NODE_PASTE_NODE_LINK      :  return( _( "Paste node link from clipboard into current node" ) );
       case NODE_PASTE_REPLACE        :  return( _( "Replace current node with clipboard content") );
       case NODE_VIEW_START           :  return( _( "View Commands" ) );
       case NODE_CENTER               :  return( _( "Center current node in map canvas" ) );
+      */
+      case NODE_EXPAND_ONE           :  return( _( "Expand current row by one level" ) );
+      case NODE_EXPAND_ALL           :  return( _( "Expand current row completely" ) );
+      case NODE_COLLAPSE_ONE         :  return( _( "Collapse current row by one level" ) );
+      case NODE_COLLAPSE_ALL         :  return( _( "Collapse current row completely" ) );
+      /*
       case NODE_CHANGE_START         :  return( _( "Change Commands" ) );
       case NODE_CHANGE_TASK          :  return( _( "Change task status of current node" ) );
-      case NODE_CHANGE_IMAGE         :  return( _( "Add/Edit image of current node" ) );
-      case NODE_REMOVE_IMAGE         :  return( _( "Remove image from current node" ) );
-      case NODE_CHANGE_LINK_COLOR    :  return( _( "Change link color of current node" ) );
-      case NODE_RANDOMIZE_LINK_COLOR :  return( _( "Randomize the current node link color" ) );
-      case NODE_REPARENT_LINK_COLOR  :  return( _( "Set current node link color to match parent node" ) );
-      case NODE_TOGGLE_FOLDS_SHALLOW :  return( _( "Toggle folding of current node" ) );
-      case NODE_TOGGLE_FOLDS_DEEP    :  return( _( "Toggle folding of current node subtree" ) );
-      case NODE_TOGGLE_LINKS         :  return( _( "Toggle the node link state" ) );
-      case NODE_ADD_GROUP            :  return( _( "Add group for current node and its subtree" ) );
-      case NODE_ADD_CONNECTION       :  return( _( "Start creation of connection from current node" ) );
-      case NODE_TOGGLE_CALLOUT       :  return( _( "Add/Remove callout for current node" ) );
-      case NODE_TOGGLE_SEQUENCE      :  return( _( "Toggle sequence state of children of current node" ) );
+      */
       case NODE_SELECT_START         :  return( _( "Selection Commands" ) );
-      case NODE_SELECT_ROOT          :  return( _( "Select root node of current node" ) );
-      case NODE_SELECT_PARENT        :  return( _( "Select parent node of current node" ) );
-      case NODE_SELECT_CHILDREN      :  return( _( "Select all child nodes of current node" ) );
-      case NODE_SELECT_CHILD         :  return( _( "Select single child node of current node" ) );
-      case NODE_SELECT_TREE          :  return( _( "Select all nodes in subtree of current node" ) );
-      case NODE_SELECT_SIBLING_NEXT  :  return( _( "Select next sibling node of current node" ) );
-      case NODE_SELECT_SIBLING_PREV  :  return( _( "Select previous sibling node of current node" ) );
-      case NODE_SELECT_LEFT          :  return( _( "Select node to the left of current node" ) );
-      case NODE_SELECT_RIGHT         :  return( _( "Select node to the right of current node" ) );
-      case NODE_SELECT_UP            :  return( _( "Select node above current node" ) );
-      case NODE_SELECT_DOWN          :  return( _( "Select node below current node" ) );
-      case NODE_SELECT_LINKED        :  return( _( "Select linked node of current node" ) );
-      case NODE_SELECT_CONNECTION    :  return( _( "Select connection of current node" ) );
-      case NODE_SELECT_CALLOUT       :  return( _( "Select callout of current node" ) );
+      case NODE_SELECT_TOP           :  return( _( "Select top-most row" ) );
+      case NODE_SELECT_BOTTOM        :  return( _( "Select bottom-most row" ) );
+      case NODE_SELECT_PAGE_TOP      :  return( _( "Select row at the top of the current view" ) );
+      case NODE_SELECT_PAGE_BOTTOM   :  return( _( "Select row at the bottom of the current view" ) );
+      case NODE_SELECT_DOWN          :  return( _( "Select row below the current row" ) );
+      case NODE_SELECT_UP            :  return( _( "Select row above the current row" ) );
+      case NODE_SELECT_PARENT        :  return( _( "Select parent of current row" ) );
+      case NODE_SELECT_LAST_CHILD    :  return( _( "Select last child row of current row" ) );
+      case NODE_SELECT_NEXT_SIBLING  :  return( _( "Select next sibling row of current row" ) );
+      case NODE_SELECT_PREV_SIBLING  :  return( _( "Select previous sibling row of current row" ) );
+      case NODE_INDENT               :  return( _( "Indent currently selected row" ) );
+      case NODE_UNINDENT             :  return( _( "Unindent currently selected row" ) );
+      /*
       case NODE_MOVE_START           :  return( _( "Move Commands" ) );
-      case NODE_SWAP_RIGHT           :  return( _( "Swap current node with right node" ) );
-      case NODE_SWAP_LEFT            :  return( _( "Swap current node with left node" ) );
       case NODE_SWAP_UP              :  return( _( "Swap current node with above node" ) );
       case NODE_SWAP_DOWN            :  return( _( "Swap current node with below node" ) );
       case NODE_SORT_ALPHABETICALLY  :  return( _( "Sort child nodes of current node alphabetically" ) );
       case NODE_SORT_RANDOMLY        :  return( _( "Sort child nodes of current node randomly" ) );
-      case NODE_DETACH               :  return( _( "Detaches current node and its subtree" ) );
       */
       case EDIT_START                :  return( _( "Text Editing" ) );
       case EDIT_TEXT_START           :  return( _( "Insertion/Deletion Commands" ) );
@@ -638,49 +558,34 @@ public enum KeyCommand {
       case NODE_ADD_SIBLING_BEFORE   :  return( node_shift_return );
       case NODE_ADD_CHILD            :  return( node_tab );
       case NODE_ADD_PARENT           :  return( node_shift_tab );
-      case NODE_QUICK_ENTRY_INSERT   :  return( node_quick_entry_insert );
-      case NODE_QUICK_ENTRY_REPLACE  :  return( node_quick_entry_replace );
       case NODE_REMOVE               :  return( node_remove );
       case NODE_REMOVE_ONLY          :  return( node_remove_only_selected );
       case NODE_PASTE_NODE_LINK      :  return( node_paste_node_link );
       */
       case NODE_PASTE_REPLACE        :  return( node_paste_replace );
-      /*
-      case NODE_CENTER               :  return( node_center );
-      case NODE_CHANGE_TASK          :  return( node_change_task );
-      case NODE_CHANGE_IMAGE         :  return( node_change_image );
-      case NODE_REMOVE_IMAGE         :  return( node_remove_image );
-      case NODE_CHANGE_LINK_COLOR    :  return( node_change_link_color );
-      case NODE_RANDOMIZE_LINK_COLOR :  return( node_randomize_link_color );
-      case NODE_REPARENT_LINK_COLOR  :  return( node_reparent_link_color );
-      case NODE_TOGGLE_FOLDS_SHALLOW :  return( node_toggle_folds_shallow );
-      case NODE_TOGGLE_FOLDS_DEEP    :  return( node_toggle_folds_deep );
-      case NODE_TOGGLE_LINKS         :  return( node_toggle_links );
-      case NODE_ADD_GROUP            :  return( node_add_group );
-      case NODE_ADD_CONNECTION       :  return( node_add_connection );
-      case NODE_TOGGLE_CALLOUT       :  return( node_toggle_callout );
-      case NODE_TOGGLE_SEQUENCE      :  return( node_toggle_sequence );
-      case NODE_SELECT_ROOT          :  return( node_select_root );
-      case NODE_SELECT_PARENT        :  return( node_select_parent );
-      case NODE_SELECT_SIBLING_NEXT  :  return( node_select_sibling_next );
-      case NODE_SELECT_SIBLING_PREV  :  return( node_select_sibling_previous );
-      case NODE_SELECT_CHILD         :  return( node_select_child );
-      case NODE_SELECT_CHILDREN      :  return( node_select_children );
-      case NODE_SELECT_TREE          :  return( node_select_tree );
+      // case NODE_CENTER               :  return( node_center );
+      case NODE_EXPAND_ONE           :  return( node_expand_one );
+      case NODE_EXPAND_ALL           :  return( node_expand_all );
+      case NODE_COLLAPSE_ONE         :  return( node_collapse_one ); 
+      case NODE_COLLAPSE_ALL         :  return( node_collapse_all ); 
+      // case NODE_CHANGE_TASK          :  return( node_change_task );
+      case NODE_SELECT_TOP           :  return( node_select_top );
+      case NODE_SELECT_BOTTOM        :  return( node_select_bottom );
+      case NODE_SELECT_PAGE_TOP      :  return( node_select_page_top );
+      case NODE_SELECT_PAGE_BOTTOM   :  return( node_select_page_bottom );
       case NODE_SELECT_DOWN          :  return( node_select_down );
       case NODE_SELECT_UP            :  return( node_select_up );
-      case NODE_SELECT_RIGHT         :  return( node_select_right );
-      case NODE_SELECT_LEFT          :  return( node_select_left );
-      case NODE_SELECT_LINKED        :  return( node_select_linked );
-      case NODE_SELECT_CALLOUT       :  return( node_select_callout );
-      case NODE_SELECT_CONNECTION    :  return( node_select_connection );
-      case NODE_SWAP_RIGHT           :  return( node_swap_right );
-      case NODE_SWAP_LEFT            :  return( node_swap_left );
+      case NODE_SELECT_PARENT        :  return( node_select_parent );
+      case NODE_SELECT_LAST_CHILD    :  return( node_select_last_child );
+      case NODE_SELECT_NEXT_SIBLING  :  return( node_select_next_sibling );
+      case NODE_SELECT_PREV_SIBLING  :  return( node_select_prev_sibling );
+      case NODE_INDENT               :  return( node_indent );
+      case NODE_UNINDENT             :  return( node_unindent );
+      /*
       case NODE_SWAP_UP              :  return( node_swap_up );
       case NODE_SWAP_DOWN            :  return( node_swap_down );
       case NODE_SORT_ALPHABETICALLY  :  return( node_sort_alphabetically );
       case NODE_SORT_RANDOMLY        :  return( node_sort_randomly );
-      case NODE_DETACH               :  return( node_detach );
       */
       case EDIT_INSERT_NEWLINE       :  return( edit_insert_newline );
       case EDIT_SPLIT_LINE           :  return( edit_split_line );
@@ -748,7 +653,6 @@ public enum KeyCommand {
   // in the map.
   public bool for_none() {
     switch( this ) {
-      // case NODE_QUICK_ENTRY_INSERT :
       // case NODE_ADD_SIBLING_AFTER  :
       // case NODE_ADD_SIBLING_BEFORE :
       case EDIT_PASTE              :
@@ -812,12 +716,10 @@ public enum KeyCommand {
       (this != EDIT_CURSOR_DOWN) &&
       (this != EDIT_SELECT_CHAR_NEXT) &&
       (this != EDIT_SELECT_CHAR_PREV) &&
-      // (this != NODE_SELECT_RIGHT) &&
-      // (this != NODE_SELECT_LEFT) &&
       // (this != NODE_SELECT_UP) &&
       // (this != NODE_SELECT_DOWN) &&
-      // (this != NODE_SELECT_SIBLING_PREV) &&
-      // (this != NODE_SELECT_SIBLING_NEXT) &&
+      // (this != NODE_SELECT_PREV_SIBLING) &&
+      // (this != NODE_SELECT_NEXT_SIBLING) &&
       // (this != NODE_SWAP_UP) &&
       // (this != NODE_SWAP_DOWN) &&
       ((this < EDIT_MISC_START) || (EDIT_MISC_END < this))
@@ -883,14 +785,12 @@ public enum KeyCommand {
       case UNDO_START           :
       case ZOOM_START           :
       case MISCELLANEOUS_START  :
-      /*
-      case NODE_EXIST_START     :
+      // case NODE_EXIST_START     :
       case NODE_CLIPBOARD_START :
       case NODE_VIEW_START      :
-      case NODE_CHANGE_START    :
+      // case NODE_CHANGE_START    :
       case NODE_SELECT_START    :
       case NODE_MOVE_START      :
-      */
       case EDIT_TEXT_START      :
       case EDIT_CLIPBOARD_START :
       case EDIT_URL_START       :
@@ -913,14 +813,12 @@ public enum KeyCommand {
       case UNDO_END           :
       case ZOOM_END           :
       case MISCELLANEOUS_END  :
-      /*
-      case NODE_EXIST_END     :
+      // case NODE_EXIST_END     :
       case NODE_CLIPBOARD_END :
       case NODE_VIEW_END      :
-      case NODE_CHANGE_END    :
+      // case NODE_CHANGE_END    :
       case NODE_SELECT_END    :
       case NODE_MOVE_END      :
-      */
       case EDIT_TEXT_END      :
       case EDIT_CLIPBOARD_END :
       case EDIT_URL_END       :
@@ -1107,156 +1005,57 @@ public enum KeyCommand {
 
   //-------------------------------------------------------------
   // NODE FUNCTIONS
-
-  /*
-  public static void node_align_top( OutlineTable ot ) {
-    if( map.model.nodes_alignable() ) {
-      NodeAlign.align_top( map, map.selected.nodes() );
-    }
-  }
-
-  public static void node_align_vcenter( OutlineTable ot ) {
-    if( map.model.nodes_alignable() ) {
-      NodeAlign.align_vcenter( map, map.selected.nodes() );
-    }
-  }
-
-  public static void node_align_bottom( OutlineTable ot ) {
-    if( map.model.nodes_alignable() ) {
-      NodeAlign.align_bottom( map, map.selected.nodes() );
-    }
-  }
-
-  public static void node_align_left( OutlineTable ot ) {
-    if( map.model.nodes_alignable() ) {
-      NodeAlign.align_left( map, map.selected.nodes() );
-    }
-  }
-
-  public static void node_align_hcenter( OutlineTable ot ) {
-    if( map.model.nodes_alignable() ) {
-      NodeAlign.align_hcenter( map, map.selected.nodes() );
-    }
-  }
-
-  public static void node_align_right( OutlineTable ot ) {
-    if( map.model.nodes_alignable() ) {
-      NodeAlign.align_right( map, map.selected.nodes() );
-    }
-  }
-
   //-------------------------------------------------------------
-  // Returns the node relative to the current node for the given
-  // direction.
-  private static Node? get_node_by_direction( OutlineTable ot, Node current, string dir ) {
-    switch( dir ) {
-      case "root"          :  return( current.get_root() );
-      case "parent"        :  return( current.parent ?? current );
-      case "child"         :  return( current.last_selected_child ?? current.children().index( 0 ) );
-      case "sibling-next"  :  return( map.model.sibling_node( current, "next",  true ) );
-      case "sibling-prev"  :  return( map.model.sibling_node( current, "prev",  true ) );
-      case "sibling-first" :  return( map.model.sibling_node( current, "first", true ) );
-      case "sibling-last"  :  return( map.model.sibling_node( current, "last",  true ) );
-      case "left"          :  return( map.model.get_node_left( current ) );
-      case "right"         :  return( map.model.get_node_right( current ) );
-      case "up"            :  return( map.model.get_node_up( current ) );
-      case "down"          :  return( map.model.get_node_down( current ) );
-      default              :  return( null );
-    }
+
+  public static void node_select_top( OutlineTable ot ) {
+    ot.change_selected( ot.node_top() );
   }
 
-  //-------------------------------------------------------------
-  // Changes the selected node based on the given direction.  If we
-  // are connecting a connection, move the attach node based on the
-  // given direction instead.
-  private static void node_select( OutlineTable ot, string dir ) {
-    if( map.is_connection_connecting() && (map.model.attach_node != null) ) {
-      map.model.update_connection_by_node( get_node_by_direction( map, map.model.attach_node, dir ) );
-    } else if( map.is_node_selected() ) {
-      if( map.select_node( get_node_by_direction( map, map.get_current_node(), dir ) ) ) {
-        map.queue_draw();
-      }
-    } else {
-      map.select_root_node();
-    }
+  public static void node_select_bottom( OutlineTable ot ) {
+    ot.change_selected( ot.node_bottom() );
   }
 
-  public static void node_select_root( OutlineTable ot ) {
-    node_select( map, "root" );
+  public static void node_select_page_top( OutlineTable ot ) {
+    ot.change_selected( ot.node_page_top() );
   }
 
-  public static void node_select_parent( OutlineTable ot ) {
-    node_select( map, "parent" );
-  }
-
-  public static void node_select_children( OutlineTable ot ) {
-    map.select_child_nodes();
-  }
-
-  public static void node_select_child( OutlineTable ot ) {
-    node_select( map, "child" );
-  }
-
-  public static void node_select_tree( OutlineTable ot ) {
-    map.select_node_tree();
-  }
-
-  public static void node_select_sibling_next( OutlineTable ot ) {
-    node_select( map, "sibling-next" );
-  }
-
-  public static void node_select_sibling_previous( OutlineTable ot ) {
-    node_select( map, "sibling-prev" );
-  }
-
-  public static void node_select_left( OutlineTable ot ) {
-    node_select( map, "left" );
-  }
-
-  public static void node_select_right( OutlineTable ot ) {
-    node_select( map, "right" );
+  public static void node_select_page_bottom( OutlineTable ot ) {
+    ot.change_selected( ot.node_page_bottom() );
   }
 
   public static void node_select_up( OutlineTable ot ) {
-    node_select( map, "up" );
+    ot.change_selected( ot.node_previous( ot.selected ) );
   }
 
   public static void node_select_down( OutlineTable ot ) {
-    node_select( map, "down" );
+    ot.change_selected( ot.node_next( ot.selected ) );
   }
 
-  private static void node_select_first_sibling( OutlineTable ot ) {
-    node_select( map, "sibling-first" );
+  public static void node_select_parent( OutlineTable ot ) {
+    ot.change_selected( ot.node_parent( ot.selected ) );
   }
 
-  private static void node_select_last_sibling( OutlineTable ot ) {
-    node_select( map, "sibling-last" );
+  public static void node_select_last_child( OutlineTable ot ) {
+    ot.change_selected( ot.node_last_child( ot.selected ) );
   }
 
-  public static void node_select_linked( OutlineTable ot ) {
-    map.select_linked_node();
+  public static void node_select_next_sibling( OutlineTable ot ) {
+    ot.change_selected( ot.node_next_sibling( ot.selected ) );
   }
 
-  public static void node_select_connection( OutlineTable ot ) {
-    map.select_attached_connection();
+  public static void node_select_prev_sibling( OutlineTable ot ) {
+    ot.change_selected( ot.node_previous_sibling( ot.selected ) );
   }
 
-  public static void node_select_callout( OutlineTable ot ) {
-    map.select_callout();
+  public static void node_indent( OutlineTable ot ) {
+    ot.indent();
   }
 
-  public static void node_change_link_color( OutlineTable ot ) {
-    map.change_current_link_color();
+  public static void node_unindent( OutlineTable ot ) {
+    ot.unindent();
   }
 
-  public static void node_randomize_link_color( OutlineTable ot ) {
-    map.model.randomize_current_link_color();
-  }
-
-  public static void node_reparent_link_color( OutlineTable ot ) {
-    map.model.reparent_current_link_color();
-  }
-
+  /*
   public static void node_change_task( OutlineTable ot ) {
     var current = map.get_current_node();
     if( current != null ) {
@@ -1323,59 +1122,28 @@ public enum KeyCommand {
     node_tab_helper( map, true );
   }
 
-  public static void node_change_image( OutlineTable ot ) {
-    var current = map.get_current_node();
-    if( (current != null) && (current.image != null) ) {
-      map.model.edit_current_image();
-    } else {
-      map.model.add_current_image();
-    }
-  }
-
-  public static void node_remove_image( OutlineTable ot ) {
-    map.model.delete_current_image();
-  }
-
-  public static void node_toggle_callout( OutlineTable ot ) {
-    if (map.model.node_has_callout() ) {
-      map.model.remove_callout();
-    } else {
-      map.model.add_callout();
-    }
-  }
-
-  public static void node_add_group( OutlineTable ot ) {
-    map.model.add_group();
-  }
-
-  public static void node_add_connection( OutlineTable ot ) {
-    if( map.selected.num_nodes() == 2 ) {
-      map.model.create_connection();
-    } else {
-      map.model.start_connection( true, false );
-    }
-  }
-
-  public static void node_toggle_folds_shallow( OutlineTable ot ) {
-    map.model.toggle_folds( false );
-  }
-
-  public static void node_toggle_folds_deep( OutlineTable ot ) {
-    map.model.toggle_folds( true );
-  }
-
-  public static void node_toggle_sequence( OutlineTable ot ) {
-    map.model.toggle_sequence();
-  }
-
-  public static void node_toggle_links( OutlineTable ot ) {
-    map.model.toggle_links();
-  }
-
   public static void node_center( OutlineTable ot ) {
     map.canvas.center_current_node();
   }
+  */
 
+  public static void node_expand_one( OutlineTable ot ) {
+    ot.node_expand( false );
+  }
+
+  public static void node_expand_all( OutlineTable ot ) {
+    ot.node_expand( true );
+  }
+
+  public static void node_collapse_one( OutlineTable ot ) {
+    ot.node_collapse( false );
+  }
+
+  public static void node_collapse_all( OutlineTable ot ) {
+    ot.node_collapse( true );
+  }
+
+  /*
   public static void node_sort_alphabetically( OutlineTable ot ) {
     map.model.sort_alphabetically();
   }

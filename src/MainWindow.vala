@@ -1045,9 +1045,13 @@ public class MainWindow : Gtk.ApplicationWindow {
     append_menu_item( misc_menu, KeyCommand.SHOW_SHORTCUTS,    _( "Shortcuts Cheatsheet" ) );
     append_menu_item( misc_menu, KeyCommand.TOGGLE_FOCUS_MODE, _( "Enter Distraction-Free Mode" ) );
 
+    var about_menu = new GLib.Menu();
+    append_menu_item( about_menu, KeyCommand.SHOW_ABOUT, _( "About Outliner" ) );
+
     var menu = new GLib.Menu();
     menu.append_section( null, top_menu );
     menu.append_section( null, misc_menu );
+    menu.append_section( null, about_menu );
 
     // Create the popover and associate it with the menu button
     var prop_popover = new PopoverMenu.from_model( menu );
