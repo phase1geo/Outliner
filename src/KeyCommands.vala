@@ -207,7 +207,6 @@ public enum KeyCommand {
       case NODE_ADD_PARENT           :  return( "node-shift-tab" );
       case NODE_REMOVE               :  return( "node-remove" );
       case NODE_REMOVE_ONLY          :  return( "node-remove-only" );
-      case NODE_PASTE_NODE_LINK      :  return( "node-paste-node-link" );
       */
       case NODE_PASTE_REPLACE        :  return( "node-paste-replace" );
       // case NODE_CENTER               :  return( "node-center" );
@@ -323,10 +322,9 @@ public enum KeyCommand {
       case "node-shift-tab"            :  return( NODE_ADD_PARENT );
       case "node-remove"               :  return( NODE_REMOVE );
       case "node-remove-only"          :  return( NODE_REMOVE_ONLY );
-      case "node-paste-node-link"      :  return( NODE_PASTE_NODE_LINK );
-      case "node-paste-replace"        :  return( NODE_PASTE_REPLACE );
       case "node-center"               :  return( NODE_CENTER );
       */
+      case "node-paste-replace"        :  return( NODE_PASTE_REPLACE );
       case "node-expand-one"           :  return( NODE_EXPAND_ONE );
       case "node-expand-all"           :  return( NODE_EXPAND_ALL );
       case "node-collapse-one"         :  return( NODE_COLLAPSE_ONE );
@@ -443,11 +441,10 @@ public enum KeyCommand {
       case NODE_ADD_PARENT           :  return( _( "Add parent node to current node" ) );
       case NODE_REMOVE_ONLY          :  return( _( "Remove selected node only (leave subtree)" ) );
       case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
-      case NODE_PASTE_NODE_LINK      :  return( _( "Paste node link from clipboard into current node" ) );
-      case NODE_PASTE_REPLACE        :  return( _( "Replace current node with clipboard content") );
       case NODE_VIEW_START           :  return( _( "View Commands" ) );
       case NODE_CENTER               :  return( _( "Center current node in map canvas" ) );
       */
+      case NODE_PASTE_REPLACE        :  return( _( "Replace current row with clipboard content") );
       case NODE_EXPAND_ONE           :  return( _( "Expand current row by one level" ) );
       case NODE_EXPAND_ALL           :  return( _( "Expand current row completely" ) );
       case NODE_COLLAPSE_ONE         :  return( _( "Collapse current row by one level" ) );
@@ -560,7 +557,6 @@ public enum KeyCommand {
       case NODE_ADD_PARENT           :  return( node_shift_tab );
       case NODE_REMOVE               :  return( node_remove );
       case NODE_REMOVE_ONLY          :  return( node_remove_only_selected );
-      case NODE_PASTE_NODE_LINK      :  return( node_paste_node_link );
       */
       case NODE_PASTE_REPLACE        :  return( node_paste_replace );
       // case NODE_CENTER               :  return( node_center );
