@@ -1221,42 +1221,13 @@ public class OutlineTable : DrawingArea {
           else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
           else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
           else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
-          else if( !shift && has_key( kvs, Key.h ) )          { unindent(); }
           else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
-          else if( !shift && has_key( kvs, Key.l ) )          { indent(); }
-          else if( !shift && has_key( kvs, Key.n ) )          { change_selected( node_next_sibling( selected ) ); }
-          else if( !shift && has_key( kvs, Key.p ) )          { change_selected( node_previous_sibling( selected ) ); }
           else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
-          else if(  shift && has_key( kvs, Key.numbersign ) ) { toggle_label(); }
-          else if(  shift && has_key( kvs, Key.asterisk ) )   { clear_all_labels(); }
-          else if( !shift && has_key( kvs, Key.@1 ) )         { goto_label( 0 ); }
-          else if( !shift && has_key( kvs, Key.@2 ) )         { goto_label( 1 ); }
-          else if( !shift && has_key( kvs, Key.@3 ) )         { goto_label( 2 ); }
-          else if( !shift && has_key( kvs, Key.@4 ) )         { goto_label( 3 ); }
-          else if( !shift && has_key( kvs, Key.@5 ) )         { goto_label( 4 ); }
-          else if( !shift && has_key( kvs, Key.@6 ) )         { goto_label( 5 ); }
-          else if( !shift && has_key( kvs, Key.@7 ) )         { goto_label( 6 ); }
-          else if( !shift && has_key( kvs, Key.@8 ) )         { goto_label( 7 ); }
-          else if( !shift && has_key( kvs, Key.@9 ) )         { goto_label( 8 ); }
           else if(  shift && has_key( kvs, Key.at ) )         { tagger.show_add_ui(); }
-          else if( has_key( kvs, Key.F10 ) )                  { if( shift ) show_contextual_menu(); }
-          else if( has_key( kvs, Key.Menu ) )                 { show_contextual_menu(); }
-        } else {
-          _im_context.filter_keypress( _key_controller.get_current_event() );
         }
       }
     } else {
       if( !control ) {
-        if( shift && has_key( kvs, Key.asterisk ) ) { clear_all_labels(); }
-        else if( !shift && has_key( kvs, Key.@1 ) ) { goto_label( 0 ); }
-        else if( !shift && has_key( kvs, Key.@2 ) ) { goto_label( 1 ); }
-        else if( !shift && has_key( kvs, Key.@3 ) ) { goto_label( 2 ); }
-        else if( !shift && has_key( kvs, Key.@4 ) ) { goto_label( 3 ); }
-        else if( !shift && has_key( kvs, Key.@5 ) ) { goto_label( 4 ); }
-        else if( !shift && has_key( kvs, Key.@6 ) ) { goto_label( 5 ); }
-        else if( !shift && has_key( kvs, Key.@7 ) ) { goto_label( 6 ); }
-        else if( !shift && has_key( kvs, Key.@8 ) ) { goto_label( 7 ); }
-        else if( !shift && has_key( kvs, Key.@9 ) ) { goto_label( 8 ); }
         else if( has_key( kvs, Key.Escape ) )       { handle_escape(); }
       }
     }
@@ -1311,8 +1282,8 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Displays the contextual menu based on what is currently selected
-  private void show_contextual_menu() {
-    if( (selected != null) && (selected.mode == NodeMode.SELECTED) ) {
+  public void show_contextual_menu() {
+    if( is_node_selected() ) {
       _node_menu.show( _motion_x, _motion_y );
     }
   }

@@ -35,7 +35,7 @@ public enum KeyCommand {
       FILE_PRINT,
     FILE_END,
     TAB_START,
-      TAB_GOTO_NEXT,
+      TAB_GOTO_NEXT,  // 10
       TAB_GOTO_PREV,
       TAB_CLOSE_CURRENT,
     TAB_END,
@@ -45,7 +45,7 @@ public enum KeyCommand {
     UNDO_END,
     ZOOM_START,
       ZOOM_IN,
-      ZOOM_OUT,
+      ZOOM_OUT,  // 20
       ZOOM_ACTUAL,
     ZOOM_END,
     MISCELLANEOUS_START,
@@ -55,7 +55,7 @@ public enum KeyCommand {
       SEARCH,
       SHOW_ABOUT,
       TOGGLE_FOCUS_MODE,
-      EDIT_NOTE,
+      EDIT_NOTE,  // 30
       EDIT_SELECTED,
       QUIT,
     MISCELLANEOUS_END,
@@ -63,32 +63,19 @@ public enum KeyCommand {
     ESCAPE,
   GENERAL_END,
   NODE_START,
-    /*
     NODE_EXIST_START,
-      NODE_ADD_ROOT,
-      NODE_ADD_SIBLING_AFTER,
-      NODE_ADD_SIBLING_BEFORE,
-      NODE_ADD_CHILD,
-      NODE_ADD_PARENT,
-      NODE_REMOVE,
-      NODE_REMOVE_ONLY,
     NODE_EXIST_END,
-    */
-    NODE_CLIPBOARD_START,
+    NODE_CLIPBOARD_START,  // 40
       NODE_PASTE_REPLACE,
     NODE_CLIPBOARD_END,
     NODE_VIEW_START,
-      // NODE_CENTER,
       NODE_EXPAND_ONE,
       NODE_EXPAND_ALL,
       NODE_COLLAPSE_ONE,
       NODE_COLLAPSE_ALL,
     NODE_VIEW_END,
-    /*
     NODE_CHANGE_START,
-      NODE_CHANGE_TASK,
-    NODE_CHANGE_END,
-    */
+    NODE_CHANGE_END,  // 50
     NODE_SELECT_START,
       NODE_SELECT_TOP,
       NODE_SELECT_BOTTOM,
@@ -98,7 +85,7 @@ public enum KeyCommand {
       NODE_SELECT_UP,
       NODE_SELECT_PARENT,
       NODE_SELECT_LAST_CHILD,
-      NODE_SELECT_NEXT_SIBLING,
+      NODE_SELECT_NEXT_SIBLING,  // 60
       NODE_SELECT_PREV_SIBLING,
     NODE_SELECT_END,
     NODE_MOVE_START,
@@ -107,6 +94,19 @@ public enum KeyCommand {
       NODE_MOVE_UP,
       NODE_MOVE_DOWN,
     NODE_MOVE_END,
+    NODE_LABEL_START,
+      NODE_LABEL_TOGGLE,  // 70
+      NODE_LABEL_CLEAR_ALL,
+      NODE_LABEL_GOTO_1,
+      NODE_LABEL_GOTO_2,
+      NODE_LABEL_GOTO_3,
+      NODE_LABEL_GOTO_4,
+      NODE_LABEL_GOTO_5,
+      NODE_LABEL_GOTO_6,
+      NODE_LABEL_GOTO_7,
+      NODE_LABEL_GOTO_8,
+      NODE_LABEL_GOTO_9,
+    NODE_LABEL_END,
   NODE_END,
   EDIT_START,
     EDIT_TEXT_START,
@@ -226,7 +226,20 @@ public enum KeyCommand {
       case NODE_SELECT_NEXT_SIBLING  :  return( "node-select-next-sibling" );
       case NODE_SELECT_PREV_SIBLING  :  return( "node-select-prev-sibling" );
       case NODE_INDENT               :  return( "node-indent" );
-      case NODE_UNINDENT             :  return( "node_unindent" );
+      case NODE_UNINDENT             :  return( "node-unindent" );
+      case NODE_MOVE_UP              :  return( "node-move-up" );
+      case NODE_MOVE_DOWN            :  return( "node-move-down" );
+      case NODE_LABEL_TOGGLE         :  return( "node-label-toggle" );
+      case NODE_LABEL_CLEAR_ALL      :  return( "node-label-clear-all" );
+      case NODE_LABEL_GOTO_1         :  return( "node-label-goto-1" );
+      case NODE_LABEL_GOTO_2         :  return( "node-label-goto-2" );
+      case NODE_LABEL_GOTO_3         :  return( "node-label-goto-3" );
+      case NODE_LABEL_GOTO_4         :  return( "node-label-goto-4" );
+      case NODE_LABEL_GOTO_5         :  return( "node-label-goto-5" );
+      case NODE_LABEL_GOTO_6         :  return( "node-label-goto-6" );
+      case NODE_LABEL_GOTO_7         :  return( "node-label-goto-7" );
+      case NODE_LABEL_GOTO_8         :  return( "node-label-goto-8" );
+      case NODE_LABEL_GOTO_9         :  return( "node-label-goto-9" );
       /*
       case NODE_SWAP_RIGHT           :  return( "node-swap-right" );
       case NODE_SWAP_LEFT            :  return( "node-swap-left" );
@@ -342,6 +355,19 @@ public enum KeyCommand {
       case "node-select-prev-sibling"  :  return( NODE_SELECT_PREV_SIBLING );
       case "node-indent"               :  return( NODE_INDENT );
       case "node-unindent"             :  return( NODE_UNINDENT );
+      case "node-move-down"            :  return( NODE_MOVE_DOWN );
+      case "node-move-up"              :  return( NODE_MOVE_UP );
+      case "node-label-toggle"         :  return( NODE_LABEL_TOGGLE );
+      case "node-label-clear-all"      :  return( NODE_LABEL_CLEAR_ALL );
+      case "node-label-goto-1"         :  return( NODE_LABEL_GOTO_1 );
+      case "node-label-goto-2"         :  return( NODE_LABEL_GOTO_2 );
+      case "node-label-goto-3"         :  return( NODE_LABEL_GOTO_3 );
+      case "node-label-goto-4"         :  return( NODE_LABEL_GOTO_4 );
+      case "node-label-goto-5"         :  return( NODE_LABEL_GOTO_5 );
+      case "node-label-goto-6"         :  return( NODE_LABEL_GOTO_6 );
+      case "node-label-goto-7"         :  return( NODE_LABEL_GOTO_7 );
+      case "node-label-goto-8"         :  return( NODE_LABEL_GOTO_8 );
+      case "node-label-goto-9"         :  return( NODE_LABEL_GOTO_9 );
       /*
       case "node-swap-right"           :  return( NODE_SWAP_RIGHT );
       case "node-swap-left"            :  return( NODE_SWAP_LEFT );
@@ -432,8 +458,9 @@ public enum KeyCommand {
       case EDIT_SELECTED             :  return( _( "Edit the currently selected node" ) );
       case QUIT                      :  return( _( "Quit the application" ) );
       case NODE_START                :  return( _( "Node" ) );
-      /*
       case NODE_EXIST_START          :  return( _( "Creation/Deletion Commands" ) );
+      case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
+      /*
       case NODE_ADD_ROOT             :  return( _( "Add root node" ) );
       case NODE_ADD_SIBLING_AFTER    :  return( _( "Add sibling node after current node" ) );
       case NODE_ADD_SIBLING_BEFORE   :  return( _( "Add sibling node before current node" ) );
@@ -441,18 +468,16 @@ public enum KeyCommand {
       case NODE_ADD_PARENT           :  return( _( "Add parent node to current node" ) );
       case NODE_REMOVE_ONLY          :  return( _( "Remove selected node only (leave subtree)" ) );
       case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
-      case NODE_VIEW_START           :  return( _( "View Commands" ) );
-      case NODE_CENTER               :  return( _( "Center current node in map canvas" ) );
       */
       case NODE_PASTE_REPLACE        :  return( _( "Replace current row with clipboard content") );
+      case NODE_VIEW_START           :  return( _( "View Commands" ) );
+      // case NODE_CENTER               :  return( _( "Center current node in map canvas" ) );
       case NODE_EXPAND_ONE           :  return( _( "Expand current row by one level" ) );
       case NODE_EXPAND_ALL           :  return( _( "Expand current row completely" ) );
       case NODE_COLLAPSE_ONE         :  return( _( "Collapse current row by one level" ) );
       case NODE_COLLAPSE_ALL         :  return( _( "Collapse current row completely" ) );
-      /*
       case NODE_CHANGE_START         :  return( _( "Change Commands" ) );
-      case NODE_CHANGE_TASK          :  return( _( "Change task status of current node" ) );
-      */
+      // case NODE_CHANGE_TASK          :  return( _( "Change task status of current node" ) );
       case NODE_SELECT_START         :  return( _( "Selection Commands" ) );
       case NODE_SELECT_TOP           :  return( _( "Select top-most row" ) );
       case NODE_SELECT_BOTTOM        :  return( _( "Select bottom-most row" ) );
@@ -464,10 +489,24 @@ public enum KeyCommand {
       case NODE_SELECT_LAST_CHILD    :  return( _( "Select last child row of current row" ) );
       case NODE_SELECT_NEXT_SIBLING  :  return( _( "Select next sibling row of current row" ) );
       case NODE_SELECT_PREV_SIBLING  :  return( _( "Select previous sibling row of current row" ) );
+      case NODE_MOVE_START           :  return( _( "Move Commands" ) );
       case NODE_INDENT               :  return( _( "Indent currently selected row" ) );
       case NODE_UNINDENT             :  return( _( "Unindent currently selected row" ) );
+      case NODE_MOVE_DOWN            :  return( _( "Move current row down" ) );
+      case NODE_MOVE_UP              :  return( _( "Move current row up" ) );
+      case NODE_LABEL_START          :  return( _( "Label Commands" ) );
+      case NODE_LABEL_TOGGLE         :  return( _( "Toggle label for current row" ) );
+      case NODE_LABEL_CLEAR_ALL      :  return( _( "Clear all set labels" ) );
+      case NODE_LABEL_GOTO_1         :  return( _( "Select row marked with label-1" ) );
+      case NODE_LABEL_GOTO_2         :  return( _( "Select row marked with label-2" ) );
+      case NODE_LABEL_GOTO_3         :  return( _( "Select row marked with label-3" ) );
+      case NODE_LABEL_GOTO_4         :  return( _( "Select row marked with label-4" ) );
+      case NODE_LABEL_GOTO_5         :  return( _( "Select row marked with label-5" ) );
+      case NODE_LABEL_GOTO_6         :  return( _( "Select row marked with label-6" ) );
+      case NODE_LABEL_GOTO_7         :  return( _( "Select row marked with label-7" ) );
+      case NODE_LABEL_GOTO_8         :  return( _( "Select row marked with label-8" ) );
+      case NODE_LABEL_GOTO_9         :  return( _( "Select row marked with label-9" ) );
       /*
-      case NODE_MOVE_START           :  return( _( "Move Commands" ) );
       case NODE_SWAP_UP              :  return( _( "Swap current node with above node" ) );
       case NODE_SWAP_DOWN            :  return( _( "Swap current node with below node" ) );
       case NODE_SORT_ALPHABETICALLY  :  return( _( "Sort child nodes of current node alphabetically" ) );
@@ -577,6 +616,19 @@ public enum KeyCommand {
       case NODE_SELECT_PREV_SIBLING  :  return( node_select_prev_sibling );
       case NODE_INDENT               :  return( node_indent );
       case NODE_UNINDENT             :  return( node_unindent );
+      case NODE_MOVE_DOWN            :  return( node_move_down );
+      case NODE_MOVE_UP              :  return( node_move_up );
+      case NODE_LABEL_TOGGLE         :  return( node_label_toggle );
+      case NODE_LABEL_CLEAR_ALL      :  return( node_label_clear_all );
+      case NODE_LABEL_GOTO_1         :  return( node_label_goto_1 );
+      case NODE_LABEL_GOTO_2         :  return( node_label_goto_2 );
+      case NODE_LABEL_GOTO_3         :  return( node_label_goto_3 );
+      case NODE_LABEL_GOTO_4         :  return( node_label_goto_4 );
+      case NODE_LABEL_GOTO_5         :  return( node_label_goto_5 );
+      case NODE_LABEL_GOTO_6         :  return( node_label_goto_6 );
+      case NODE_LABEL_GOTO_7         :  return( node_label_goto_7 );
+      case NODE_LABEL_GOTO_8         :  return( node_label_goto_8 );
+      case NODE_LABEL_GOTO_9         :  return( node_label_goto_9 );
       /*
       case NODE_SWAP_UP              :  return( node_swap_up );
       case NODE_SWAP_DOWN            :  return( node_swap_down );
@@ -712,10 +764,8 @@ public enum KeyCommand {
       (this != EDIT_CURSOR_DOWN) &&
       (this != EDIT_SELECT_CHAR_NEXT) &&
       (this != EDIT_SELECT_CHAR_PREV) &&
-      // (this != NODE_SELECT_UP) &&
-      // (this != NODE_SELECT_DOWN) &&
-      // (this != NODE_SELECT_PREV_SIBLING) &&
-      // (this != NODE_SELECT_NEXT_SIBLING) &&
+      (this != NODE_SELECT_UP) &&
+      (this != NODE_SELECT_DOWN) &&
       // (this != NODE_SWAP_UP) &&
       // (this != NODE_SWAP_DOWN) &&
       ((this < EDIT_MISC_START) || (EDIT_MISC_END < this))
@@ -781,12 +831,13 @@ public enum KeyCommand {
       case UNDO_START           :
       case ZOOM_START           :
       case MISCELLANEOUS_START  :
-      // case NODE_EXIST_START     :
+      case NODE_EXIST_START     :
       case NODE_CLIPBOARD_START :
       case NODE_VIEW_START      :
-      // case NODE_CHANGE_START    :
+      case NODE_CHANGE_START    :
       case NODE_SELECT_START    :
       case NODE_MOVE_START      :
+      case NODE_LABEL_START     :
       case EDIT_TEXT_START      :
       case EDIT_CLIPBOARD_START :
       case EDIT_URL_START       :
@@ -809,12 +860,13 @@ public enum KeyCommand {
       case UNDO_END           :
       case ZOOM_END           :
       case MISCELLANEOUS_END  :
-      // case NODE_EXIST_END     :
+      case NODE_EXIST_END     :
       case NODE_CLIPBOARD_END :
       case NODE_VIEW_END      :
-      // case NODE_CHANGE_END    :
+      case NODE_CHANGE_END    :
       case NODE_SELECT_END    :
       case NODE_MOVE_END      :
+      case NODE_LABEL_END     :
       case EDIT_TEXT_END      :
       case EDIT_CLIPBOARD_END :
       case EDIT_URL_END       :
@@ -940,7 +992,7 @@ public enum KeyCommand {
   }
 
   public static void show_contextual_menu( OutlineTable ot ) {
-    // ot.show_contextual_menu( map.canvas.scaled_x, map.canvas.scaled_y );
+    ot.show_contextual_menu();
   }
 
   public static void search( OutlineTable ot ) {
@@ -1050,6 +1102,66 @@ public enum KeyCommand {
   public static void node_unindent( OutlineTable ot ) {
     ot.unindent();
   }
+
+  public static void node_move_down( OutlineTable ot ) {
+    ot.move_node_down( ot.selected );
+  }
+
+  public static void node_move_up( OutlineTable ot ) {
+    ot.move_node_up( ot.selected );
+  }
+
+  public static void node_label_toggle( OutlineTable ot ) {
+    ot.toggle_label();
+  }
+
+  public static void node_label_clear_all( OutlineTable ot ) {
+    ot.clear_all_labels();
+  }
+
+  public static void node_label_goto_0( OutlineTable ot ) {
+    ot.goto_label( 0 );
+  }
+
+  public static void node_label_goto_1( OutlineTable ot ) {
+    ot.goto_label( 1 );
+  }
+
+  public static void node_label_goto_2( OutlineTable ot ) {
+    ot.goto_label( 2 );
+  }
+
+  public static void node_label_goto_3( OutlineTable ot ) {
+    ot.goto_label( 3 );
+  }
+
+  public static void node_label_goto_4( OutlineTable ot ) {
+    ot.goto_label( 4 );
+  }
+
+  public static void node_label_goto_5( OutlineTable ot ) {
+    ot.goto_label( 5 );
+  }
+
+  public static void node_label_goto_6( OutlineTable ot ) {
+    ot.goto_label( 6 );
+  }
+
+  public static void node_label_goto_7( OutlineTable ot ) {
+    ot.goto_label( 7 );
+  }
+
+  public static void node_label_goto_8( OutlineTable ot ) {
+    ot.goto_label( 8 );
+  }
+
+  public static void node_label_goto_9( OutlineTable ot ) {
+    ot.goto_label( 9 );
+  }
+
+
+
+
 
   /*
   public static void node_change_task( OutlineTable ot ) {
