@@ -685,17 +685,9 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Returns true if the currently selected node is editable and
-  // has text selected.
-  private bool is_node_text_selected() {
-    return( is_node_editable() && selected.name.is_selected() );
-  }
-
-  //-------------------------------------------------------------
-  // Returns true if the currently selected note is editable and
-  // has text selected
-  private bool is_note_text_selected() {
-    return( is_note_editable() && selected.note.is_selected() );
+  // Returns true if the given canvas text has selected text.
+  public bool is_text_selected( CanvasText ct ) {
+    return( ct.is_selected() );
   }
 
   //-------------------------------------------------------------
@@ -707,12 +699,12 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Returns the current CanvasText being edited.  If we are not
   // editing, returns null.
-  public CanvasText? get_current_text() {
+  public CanvasText? get_current_text( bool include_title = true ) {
     if( is_node_editable() ) {
       return( selected.name );
     } else if( is_note_editable() ) {
       return( selected.note );
-    } else if( is_title_editable() ) {
+    } else if( is_title_editable() && include_title ) {
       return( title );
     } else {
       return( null );
@@ -1179,37 +1171,12 @@ public class OutlineTable : DrawingArea {
       if( control ) {
         else if( has_key( kvs, Key.Home ) )                { handle_control_home( shift ); }
         else if( has_key( kvs, Key.End ) )                 { handle_control_end( shift ); }
-        else if( has_key( kvs, Key.BackSpace ) )           { handle_control_backspace(); }
-        else if( has_key( kvs, Key.Delete ) )              { handle_control_delete(); }
-        else if( !shift && has_key( kvs, Key.slash ) )     { handle_control_slash(); }
-        else if( !shift && has_key( kvs, Key.@1 ) )        { handle_control_number( 0 ); }
-        else if( !shift && has_key( kvs, Key.@2 ) )        { handle_control_number( 1 ); }
-        else if( !shift && has_key( kvs, Key.@3 ) )        { handle_control_number( 2 ); }
-        else if( !shift && has_key( kvs, Key.@4 ) )        { handle_control_number( 3 ); }
-        else if( !shift && has_key( kvs, Key.@5 ) )        { handle_control_number( 4 ); }
-        else if( !shift && has_key( kvs, Key.@6 ) )        { handle_control_number( 5 ); }
-        else if( !shift && has_key( kvs, Key.@7 ) )        { handle_control_number( 6 ); }
-        else if( !shift && has_key( kvs, Key.@8 ) )        { handle_control_number( 7 ); }
-        else if( !shift && has_key( kvs, Key.@9 ) )        { handle_control_number( 8 ); }
-        else if(  shift && has_key( kvs, Key.A ) )         { handle_control_a( true ); }
-        else if(  shift && has_key( kvs, Key.B ) )         { handle_control_b( true ); }
-        else if(  shift && has_key( kvs, Key.T ) )         { handle_control_t( true ); }
-        else if( !shift && has_key( kvs, Key.backslash ) ) { handle_control_backslash(); }
-        else if( !shift && has_key( kvs, Key.a ) )         { handle_control_a( false ); }
-        else if( !shift && has_key( kvs, Key.b ) )         { handle_control_b( false ); }
-        else if( !shift && has_key( kvs, Key.d ) )         { handle_control_d(); }
         else if( !shift && has_key( kvs, Key.h ) )         { handle_control_h(); }
-        else if( !shift && has_key( kvs, Key.i ) )         { handle_control_i(); }
         else if( !shift && has_key( kvs, Key.j ) )         { handle_control_j(); }
         else if( !shift && has_key( kvs, Key.k ) )         { handle_control_k(); }
-        else if( !shift && has_key( kvs, Key.t ) )         { handle_control_t( false ); }
-        else if( !shift && has_key( kvs, Key.u ) )         { handle_control_u(); }
         else if( !shift && has_key( kvs, Key.w ) )         { handle_control_w(); }
       } else if( nomod || shift ) {
-        if( has_key( kvs, Key.BackSpace ) )                 { handle_backspace(); }
-        else if( has_key( kvs, Key.Delete ) )               { handle_delete(); }
         else if( has_key( kvs, Key.Escape ) )               { handle_escape(); }
-        else if( has_key( kvs, Key.Return ) )               { handle_return( shift ); }
         else if( has_key( kvs, Key.Home ) )                 { handle_home( shift ); }
         else if( has_key( kvs, Key.End ) )                  { handle_end( shift ); }
         else if( has_key( kvs, Key.Page_Up ) )              { handle_pageup(); }
@@ -1217,8 +1184,6 @@ public class OutlineTable : DrawingArea {
         else if( !is_node_editable() && !is_note_editable() && !is_title_editable() ) {
           else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
           else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
-          else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }
-          else if(  shift && has_key( kvs, Key.at ) )         { tagger.show_add_ui(); }
         }
       }
     } else {
@@ -1595,7 +1560,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Handles a backspace keypress
-  private void handle_backspace() {
+  public void do_backspace() {
     if( is_node_editable() ) {
       if( selected.name.text.text == "" ) {
         var prev = node_previous( selected );
@@ -1627,65 +1592,6 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Deletes from the current cursor to the beginning of the
-  // current word
-  private void handle_control_backspace() {
-    if( is_node_editable() ) {
-      selected.name.backspace_word( undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.backspace_word( undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_title_editable() ) {
-      _title.backspace_word( undo_text );
-      queue_draw();
-    } else if( is_node_joinable() ) {
-      join_row();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a delete keypress
-  private void handle_delete() {
-    if( is_node_editable() ) {
-      selected.name.delete( undo_text );
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.delete( undo_text );
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      _title.delete( undo_text );
-      _im_context.reset();
-      queue_draw();
-    } else if( selected != null ) {
-      delete_current_node();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Deletes from the current cursor to the end of the current word
-  private void handle_control_delete() {
-    if( is_node_editable() ) {
-      selected.name.delete_word( undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.delete_word( undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_title_editable() ) {
-      _title.delete_word( undo_text );
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
   // Handles an escape keypress
   private void handle_escape() {
     if( is_node_editable() || is_note_editable() ) {
@@ -1701,36 +1607,6 @@ public class OutlineTable : DrawingArea {
       set_title_editable( false );
     } else if( root.alpha < 1.0 ) {
       focus_leave();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a return keypress
-  private void handle_return( bool shift ) {
-    if( is_note_editable() ) {
-      selected.note.insert( "\n", undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_node_editable() && (shift || _completion.shown) ) {
-      if( shift ) {
-        selected.name.insert( "\n", undo_text );
-        see( selected );
-        queue_draw();
-      } else {
-        _completion.select();
-        queue_draw();
-      }
-    } else if( is_title_editable() ) {
-      set_title_editable( false );
-      selected = root.get_last_node();
-      set_node_mode( selected, NodeMode.EDITABLE );
-      queue_draw();
-    } else if( selected != null ) {
-      if( (selected.children.length > 0) && selected.expanded ) {
-        add_child_node( 0 );
-      } else {
-        add_sibling_node( !shift );
-      }
     }
   }
 
@@ -1921,52 +1797,6 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Handles a Control-slash keypress
-  private void handle_control_slash() {
-    if( is_node_editable() ) {
-      selected.name.set_cursor_all( false );
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.set_cursor_all( false );
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      _title.set_cursor_all( false );
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a Control-backslash keypress
-  private void handle_control_backslash() {
-    if( is_node_editable() ) {
-      selected.name.clear_selection();
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      selected.note.clear_selection();
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      _title.clear_selection();
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
   // Handles a Control-number keypress which moves the currently
   // selected row within the labeled row (if one exists)
   public void move_node_to_label( int label ) {
@@ -1986,83 +1816,10 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Selects all text
-  private void handle_control_a( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.set_cursor_none();
-      } else {
-        selected.name.set_cursor_all( false );
-      }
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.set_cursor_none();
-      } else {
-        selected.note.set_cursor_all( false );
-      }
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.set_cursor_none();
-      } else {
-        _title.set_cursor_all( false );
-      }
-      _im_context.reset();
-      queue_draw();
-    } else if( is_node_selected() ) {
-      move_node_to_parent( selected, shift );
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Causes selected text to be bolded
-  private void handle_control_b( bool shift ) {
-    if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.BOLD, null, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.BOLD, null, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( shift && is_node_selected() ) {
-      move_node_to_bottom( selected );
-    }
-  }
-
-  //-------------------------------------------------------------
-  // This is just used from debugging purposes
-  private void handle_control_d() {
-    if( !_debug ) return;
-    if( selected != null ) {
-      // stdout.printf( "RTF: %s\n", ExportRTF.from_text( selected.name.text ) );
-    }
-  }
-
-  //-------------------------------------------------------------
   // Toggles the show all notes status given the state of the
   // currently selected node
   private void handle_control_h() {
     set_notes_display( !root.any_notes_shown() );
-  }
-
-  //-------------------------------------------------------------
-  // Causes selected text to be italicized
-  private void handle_control_i() {
-    if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.ITALICS, null, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.ITALICS, null, undo_text );
-      see( selected );
-      queue_draw();
-    }
   }
 
   //-------------------------------------------------------------
@@ -2082,31 +1839,9 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Causes selected text to be underlined
-  private void handle_control_u() {
-    if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.UNDERLINE, null, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.UNDERLINE, null, undo_text );
-      see( selected );
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
   // Causes selected text to be stricken.
   private void handle_control_t( bool shift ) {
-    if( is_node_text_selected() ) {
-      selected.name.add_tag( FormatTag.STRIKETHRU, null, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( is_note_text_selected() ) {
-      selected.note.add_tag( FormatTag.STRIKETHRU, null, undo_text );
-      see( selected );
-      queue_draw();
-    } else if( shift && is_node_selected() ) {
+    if( shift && is_node_selected() ) {
       move_node_to_top( selected );
     }
   }

@@ -60,13 +60,13 @@ public class NodeMenu : BaseMenu {
 
     append_menu_item( edit_menu, KeyCommand.NODE_PASTE_REPLACE, _( "Paste and Replace" ) );
     edit_menu.append_submenu( _( "Clone" ),     clone_menu );
-    edit_menu.append( _( "Delete" ),            "node.action_delete_node" );
+    append_menu_item( edit_menu, KeyCommand.NODE_REMOVE, _( "Delete" ) );
 
     var node_menu = new GLib.Menu();
     append_menu_item( node_menu, KeyCommand.NODE_CHANGE_TEXT, _( "Edit Text" ) );
     append_menu_item( node_menu, KeyCommand.NODE_CHANGE_NOTE, _( "Edit Note" ) );
     node_menu.append( _( "Toggle Note Visibility" ), "node.action_toggle_note" );
-    node_menu.append( _( "Add Tag" ),                "node.action_add_tag" );
+    append_menu_item( node_menu, KeyCommand.NODE_CHANGE_TAGS, _( "Add Tag" ) );
 
     var tree_menu = new GLib.Menu();
     append_menu_item( tree_menu, KeyCommand.NODE_INDENT,   _( "Indent" ) );

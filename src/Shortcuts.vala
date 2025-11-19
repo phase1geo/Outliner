@@ -483,11 +483,9 @@ public class Shortcuts {
     add_shortcut( Key.Escape,    false, false, false, KeyCommand.ESCAPE );
     add_shortcut( Key.Escape,    false, false, false, KeyCommand.EDIT_ESCAPE );
     add_shortcut( Key.BackSpace, false, false, false, KeyCommand.EDIT_BACKSPACE );
-    // add_shortcut( Key.BackSpace, false, false, false, KeyCommand.NODE_REMOVE );
-    // add_shortcut( Key.BackSpace, false, true,  false, KeyCommand.NODE_REMOVE_ONLY );
+    add_shortcut( Key.BackSpace, false, false, false, KeyCommand.NODE_REMOVE );
     add_shortcut( Key.Delete,    false, false, false, KeyCommand.EDIT_DELETE );
-    // add_shortcut( Key.Delete,    false, false, false, KeyCommand.NODE_REMOVE );
-    // add_shortcut( Key.Delete,    false, true,  false, KeyCommand.NODE_REMOVE_ONLY );
+    add_shortcut( Key.Delete,    false, false, false, KeyCommand.NODE_REMOVE );
 
     add_shortcut( Key.Return,    false, false, false, KeyCommand.EDIT_RETURN );
     // add_shortcut( Key.Return,    false, false, false, KeyCommand.NODE_ADD_SIBLING_AFTER );
@@ -560,10 +558,16 @@ public class Shortcuts {
     add_default( Key.End,          true, true,  false, KeyCommand.EDIT_SELECT_END_END );
     add_default( Key.End,          true, false, false, KeyCommand.EDIT_CURSOR_LINEEND );
     add_default( Key.a,            true, false, false, KeyCommand.EDIT_SELECT_ALL );
+    add_default( Key.slash,        true, false, false, KeyCommand.EDIT_SELECT_ALL );
     add_default( Key.a,            true, true,  false, KeyCommand.EDIT_SELECT_NONE );
+    add_default( Key.backslash,    true, false, false, KeyCommand.EDIT_SELECT_NONE );
     add_default( Key.period,       true, false, false, KeyCommand.EDIT_INSERT_EMOJI );
     add_default( Key.k,            true, false, false, KeyCommand.EDIT_ADD_URL );
     add_default( Key.k,            true, true,  false, KeyCommand.EDIT_REMOVE_URL );
+    add_default( Key.b,            true, false, false, KeyCommand.EDIT_BOLD );
+    add_default( Key.i,            true, false, false, KeyCommand.EDIT_ITALICS );
+    add_default( Key.u,            true, false, false, KeyCommand.EDIT_UNDERLINE );
+    add_default( Key.t,            true, false, false, KeyCommand.EDIT_STRIKETHRU );
 
     add_default( Key.F10,          false, true,  false, KeyCommand.SHOW_CONTEXTUAL_MENU );
 
@@ -571,6 +575,8 @@ public class Shortcuts {
     add_default( Key.Tab,          false, true,  false, KeyCommand.NODE_UNINDENT );
     add_default( Key.Down,         true,  false, false, KeyCommand.NODE_MOVE_DOWN );
     add_default( Key.Up,           true,  false, false, KeyCommand.NODE_MOVE_UP );
+    add_default( Key.a,            true,  false, false, KeyCommand.NODE_MOVE_PARENT_BELOW );
+    add_default( Key.a,            true,  true,  false, KeyCommand.NODE_MOVE_PARENT_ABOVE );
     add_default( Key.@1,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_1 );
     add_default( Key.@2,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_2 );
     add_default( Key.@3,           true,  false, false, KeyCommand.NODE_MOVE_TO_LABEL_3 );
@@ -590,8 +596,8 @@ public class Shortcuts {
     add_default( Key.n,            false, false, false, KeyCommand.NODE_SELECT_NEXT_SIBLING );
     add_default( Key.p,            false, false, false, KeyCommand.NODE_SELECT_PREV_SIBLING );
 
-    add_default( Key.numbersign,   false, false, false, KeyCommand.NODE_LABEL_TOGGLE );
-    add_default( Key.asterisk,     false, false, false, KeyCommand.NODE_LABEL_CLEAR_ALL );
+    add_default( Key.numbersign,   false, true,  false, KeyCommand.NODE_LABEL_TOGGLE );
+    add_default( Key.asterisk,     false, true,  false, KeyCommand.NODE_LABEL_CLEAR_ALL );
     add_default( Key.@1,           false, false, false, KeyCommand.NODE_LABEL_GOTO_1 );
     add_default( Key.@2,           false, false, false, KeyCommand.NODE_LABEL_GOTO_2 );
     add_default( Key.@3,           false, false, false, KeyCommand.NODE_LABEL_GOTO_3 );
@@ -605,6 +611,8 @@ public class Shortcuts {
     add_default( Key.e,            false, false, false, KeyCommand.NODE_CHANGE_TEXT );
     add_default( Key.e,            false, true,  false, KeyCommand.NODE_CHANGE_NOTE );
     add_default( Key.t,            false, false, false, KeyCommand.NODE_CHANGE_TASK );
+    add_default( Key.at,           false, true,  false, KeyCommand.NODE_CHANGE_TAGS );
+    add_default( Key.BackSpace,    true,  false, false, KeyCommand.NODE_JOIN );
     // add_default( Key.s,            false, false, false, KeyCommand.SHOW_SELECTED );
 
     /*
