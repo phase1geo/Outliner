@@ -1215,8 +1215,6 @@ public class OutlineTable : DrawingArea {
         else if( has_key( kvs, Key.Page_Up ) )              { handle_pageup(); }
         else if( has_key( kvs, Key.Page_Down ) )            { handle_pagedn(); }
         else if( !is_node_editable() && !is_note_editable() && !is_title_editable() ) {
-          else if( !shift && has_key( kvs, Key.e ) )          { edit_selected( true ); }
-          else if(  shift && has_key( kvs, Key.E ) )          { edit_selected( false ); }
           else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
           else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
           else if( !shift && has_key( kvs, Key.t ) )          { rotate_task(); }

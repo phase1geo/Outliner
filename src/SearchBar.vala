@@ -269,7 +269,7 @@ public class SearchBar : Box {
 
     var selchange = (match.node != _ot.selected);
     var curchange = (match.name ? match.node.name.cursor : match.node.note.cursor) != match.end;
-    var edit_selected = KeyCommand.EDIT_SELECTED;
+    var edit_selected = KeyCommand.NODE_CHANGE_TEXT;
     var edit_selected_func = edit_selected.get_func();
 
     /* Set the matched node to edit mode and select the matched text */

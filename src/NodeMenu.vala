@@ -63,8 +63,8 @@ public class NodeMenu : BaseMenu {
     edit_menu.append( _( "Delete" ),            "node.action_delete_node" );
 
     var node_menu = new GLib.Menu();
-    append_menu_item( node_menu, KeyCommand.EDIT_SELECTED, _( "Edit Text" ) );
-    append_menu_item( node_menu, KeyCommand.EDIT_NOTE,     _( "Edit Note" ) );
+    append_menu_item( node_menu, KeyCommand.NODE_CHANGE_TEXT, _( "Edit Text" ) );
+    append_menu_item( node_menu, KeyCommand.NODE_CHANGE_NOTE, _( "Edit Note" ) );
     node_menu.append( _( "Toggle Note Visibility" ), "node.action_toggle_note" );
     node_menu.append( _( "Add Tag" ),                "node.action_add_tag" );
 

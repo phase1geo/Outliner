@@ -601,11 +601,10 @@ public class Shortcuts {
     add_default( Key.@7,           false, false, false, KeyCommand.NODE_LABEL_GOTO_7 );
     add_default( Key.@8,           false, false, false, KeyCommand.NODE_LABEL_GOTO_8 );
     add_default( Key.@9,           false, false, false, KeyCommand.NODE_LABEL_GOTO_9 );
-    /*
+
+    add_default( Key.e,            false, false, false, KeyCommand.NODE_CHANGE_TEXT );
+    add_default( Key.e,            false, true,  false, KeyCommand.NODE_CHANGE_NOTE );
     add_default( Key.t,            false, false, false, KeyCommand.NODE_CHANGE_TASK );
-    */
-    add_default( Key.e,            false, true,  false, KeyCommand.EDIT_NOTE );
-    add_default( Key.e,            false, false, false, KeyCommand.EDIT_SELECTED );
     // add_default( Key.s,            false, false, false, KeyCommand.SHOW_SELECTED );
 
     /*

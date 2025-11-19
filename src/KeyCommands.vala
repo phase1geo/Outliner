@@ -52,11 +52,9 @@ public enum KeyCommand {
       SHOW_PREFERENCES,
       SHOW_SHORTCUTS,
       SHOW_CONTEXTUAL_MENU,
-      SEARCH,
       SHOW_ABOUT,
       TOGGLE_FOCUS_MODE,
-      EDIT_NOTE,  // 30
-      EDIT_SELECTED,
+      SEARCH,
       QUIT,
     MISCELLANEOUS_END,
     CONTROL_PRESSED,
@@ -75,6 +73,9 @@ public enum KeyCommand {
       NODE_COLLAPSE_ALL,
     NODE_VIEW_END,
     NODE_CHANGE_START,
+      NODE_CHANGE_TEXT,
+      NODE_CHANGE_NOTE,
+      NODE_CHANGE_TASK,
     NODE_CHANGE_END,  // 50
     NODE_SELECT_START,
       NODE_SELECT_TOP,
@@ -199,11 +200,9 @@ public enum KeyCommand {
       case SHOW_PREFERENCES          :  return( "show-preferences" );
       case SHOW_SHORTCUTS            :  return( "show-shortcuts" );
       case SHOW_CONTEXTUAL_MENU      :  return( "show-contextual_menu" );
-      case SEARCH                    :  return( "search" );
       case SHOW_ABOUT                :  return( "show-about" );
+      case SEARCH                    :  return( "search" );
       case TOGGLE_FOCUS_MODE         :  return( "toggle-focus-mode" );
-      case EDIT_NOTE                 :  return( "edit-note" );
-      case EDIT_SELECTED             :  return( "edit-selected" );
       case QUIT                      :  return( "quit" );
       case CONTROL_PRESSED           :  return( "control" );
       case ESCAPE                    :  return( "escape" );
@@ -223,7 +222,9 @@ public enum KeyCommand {
       case NODE_EXPAND_ALL           :  return( "node-expand-all" );
       case NODE_COLLAPSE_ONE         :  return( "node-collapse-one" );
       case NODE_COLLAPSE_ALL         :  return( "node-collapse-all" );
-      // case NODE_CHANGE_TASK          :  return( "node-change-task" );
+      case NODE_CHANGE_TEXT          :  return( "node-change-text" );
+      case NODE_CHANGE_NOTE          :  return( "node-change-note" );
+      case NODE_CHANGE_TASK          :  return( "node-change-task" );
       case NODE_SELECT_TOP           :  return( "node-select-top" );
       case NODE_SELECT_BOTTOM        :  return( "node-select-bottom" );
       case NODE_SELECT_PAGE_TOP      :  return( "node-select-page-top" );
@@ -337,11 +338,9 @@ public enum KeyCommand {
       case "show-preferences"          :  return( SHOW_PREFERENCES );
       case "show-shortcuts"            :  return( SHOW_SHORTCUTS );
       case "show-contextual-menu"      :  return( SHOW_CONTEXTUAL_MENU );
-      case "search"                    :  return( SEARCH );
       case "show-about"                :  return( SHOW_ABOUT );
       case "toggle-focus-mode"         :  return( TOGGLE_FOCUS_MODE );
-      case "edit-note"                 :  return( EDIT_NOTE );
-      case "edit-selected"             :  return( EDIT_SELECTED );
+      case "search"                    :  return( SEARCH );
       case "quit"                      :  return( QUIT );
       case "control"                   :  return( CONTROL_PRESSED );
       case "escape"                    :  return( ESCAPE );
@@ -360,7 +359,9 @@ public enum KeyCommand {
       case "node-expand-all"           :  return( NODE_EXPAND_ALL );
       case "node-collapse-one"         :  return( NODE_COLLAPSE_ONE );
       case "node-collapse-all"         :  return( NODE_COLLAPSE_ALL );
-      // case "node-change-task"          :  return( NODE_CHANGE_TASK );
+      case "node-change-text"          :  return( NODE_CHANGE_TEXT );
+      case "node-change-note"          :  return( NODE_CHANGE_NOTE );
+      case "node-change-task"          :  return( NODE_CHANGE_TASK );
       case "node-select-top"           :  return( NODE_SELECT_TOP );
       case "node-select-bottom"        :  return( NODE_SELECT_BOTTOM );
       case "node-select-page-top"      :  return( NODE_SELECT_PAGE_TOP );
@@ -478,11 +479,9 @@ public enum KeyCommand {
       case SHOW_PREFERENCES          :  return( _( "Show preferences window" ) );
       case SHOW_SHORTCUTS            :  return( _( "Show shortcuts cheatsheet" ) );
       case SHOW_CONTEXTUAL_MENU      :  return( _( "Show contextual menu" ) );
-      case SEARCH                    :  return( _( "Display search panel" ) );
       case SHOW_ABOUT                :  return( _( "Show About window" ) );
       case TOGGLE_FOCUS_MODE         :  return( _( "Toggle focus mode" ) );
-      case EDIT_NOTE                 :  return( _( "Edit the selected node note" ) );
-      case EDIT_SELECTED             :  return( _( "Edit the currently selected node" ) );
+      case SEARCH                    :  return( _( "Display search panel" ) );
       case QUIT                      :  return( _( "Quit the application" ) );
       case NODE_START                :  return( _( "Node" ) );
       case NODE_EXIST_START          :  return( _( "Creation/Deletion Commands" ) );
@@ -504,7 +503,9 @@ public enum KeyCommand {
       case NODE_COLLAPSE_ONE         :  return( _( "Collapse current row by one level" ) );
       case NODE_COLLAPSE_ALL         :  return( _( "Collapse current row completely" ) );
       case NODE_CHANGE_START         :  return( _( "Change Commands" ) );
-      // case NODE_CHANGE_TASK          :  return( _( "Change task status of current node" ) );
+      case NODE_CHANGE_TEXT          :  return( _( "Edit current row text" ) );
+      case NODE_CHANGE_NOTE          :  return( _( "Edit current row note" ) );
+      case NODE_CHANGE_TASK          :  return( _( "Toggle task status of current row" ) );
       case NODE_SELECT_START         :  return( _( "Selection Commands" ) );
       case NODE_SELECT_TOP           :  return( _( "Select top-most row" ) );
       case NODE_SELECT_BOTTOM        :  return( _( "Select bottom-most row" ) );
@@ -616,11 +617,9 @@ public enum KeyCommand {
       case SHOW_PREFERENCES          :  return( show_preferences );
       case SHOW_SHORTCUTS            :  return( show_shortcuts );
       case SHOW_CONTEXTUAL_MENU      :  return( show_contextual_menu );
-      case SEARCH                    :  return( search );
       case SHOW_ABOUT                :  return( show_about );
       case TOGGLE_FOCUS_MODE         :  return( toggle_focus_mode );
-      case EDIT_NOTE                 :  return( edit_note );
-      case EDIT_SELECTED             :  return( edit_selected );
+      case SEARCH                    :  return( search );
       case QUIT                      :  return( quit_application );
       case CONTROL_PRESSED           :  return( control_pressed );
       case ESCAPE                    :  return( escape );
@@ -639,7 +638,9 @@ public enum KeyCommand {
       case NODE_EXPAND_ALL           :  return( node_expand_all );
       case NODE_COLLAPSE_ONE         :  return( node_collapse_one ); 
       case NODE_COLLAPSE_ALL         :  return( node_collapse_all ); 
-      // case NODE_CHANGE_TASK          :  return( node_change_task );
+      case NODE_CHANGE_TEXT          :  return( node_change_text );
+      case NODE_CHANGE_NOTE          :  return( node_change_note );
+      case NODE_CHANGE_TASK          :  return( node_change_task );
       case NODE_SELECT_TOP           :  return( node_select_top );
       case NODE_SELECT_BOTTOM        :  return( node_select_bottom );
       case NODE_SELECT_PAGE_TOP      :  return( node_select_page_top );
@@ -733,7 +734,6 @@ public enum KeyCommand {
   public bool for_node() {
     return(
       ((NODE_START < this) && (this < NODE_END)) ||
-      (this == EDIT_NOTE) ||
       (this == EDIT_COPY) ||
       (this == EDIT_CUT)  ||
       (this == EDIT_PASTE) ||
@@ -1053,29 +1053,6 @@ public enum KeyCommand {
     ot.win.toggle_focus_mode();
   }
 
-  public static void edit_note( OutlineTable ot ) {
-    if( ot.selected != null ) {
-      ot.set_node_mode( ot.selected, NodeMode.NOTEEDIT );
-      ot.selected.note.move_cursor_to_end();
-      ot.selected.hide_note = false;
-      ot.queue_draw();
-    }
-  }
-
-  public static void edit_selected( OutlineTable ot ) {
-    if( ot.selected != null ) {
-      ot.set_node_mode( ot.selected, NodeMode.EDITABLE );
-      ot.selected.name.move_cursor_to_end();
-      ot.queue_draw();
-    }
-  }
-
-  /*
-  public static void show_selected( OutlineTable ot ) {
-    ot.see();
-  }
-  */
-
   public static void quit_application( OutlineTable ot ) {
     ot.win.destroy();
   }
@@ -1099,6 +1076,27 @@ public enum KeyCommand {
   //-------------------------------------------------------------
   // NODE FUNCTIONS
   //-------------------------------------------------------------
+
+  public static void node_change_text( OutlineTable ot ) {
+    if( ot.selected != null ) {
+      ot.set_node_mode( ot.selected, NodeMode.EDITABLE );
+      ot.selected.name.move_cursor_to_end();
+      ot.queue_draw();
+    }
+  }
+
+  public static void node_change_note( OutlineTable ot ) {
+    if( ot.selected != null ) {
+      ot.set_node_mode( ot.selected, NodeMode.NOTEEDIT );
+      ot.selected.note.move_cursor_to_end();
+      ot.selected.hide_note = false;
+      ot.queue_draw();
+    }
+  }
+
+  public static void node_change_task( OutlineTable ot ) {
+    ot.rotate_task();
+  }
 
   public static void node_select_top( OutlineTable ot ) {
     ot.change_selected( ot.node_top() );
