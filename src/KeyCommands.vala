@@ -62,6 +62,9 @@ public enum KeyCommand {
   GENERAL_END,
   NODE_START,
     NODE_EXIST_START,
+      NODE_CLONE_COPY,
+      NODE_CLONE_PASTE,
+      NODE_UNCLONE,
       NODE_REMOVE,
     NODE_EXIST_END,
     NODE_CLIPBOARD_START,  // 40
@@ -223,6 +226,9 @@ public enum KeyCommand {
       case NODE_ADD_CHILD            :  return( "node-tab" );
       case NODE_ADD_PARENT           :  return( "node-shift-tab" );
       */
+      case NODE_CLONE_COPY           :  return( "node-clone-copy" );
+      case NODE_CLONE_PASTE          :  return( "node-clone-paste" );
+      case NODE_UNCLONE              :  return( "node-unclone" );
       case NODE_REMOVE               :  return( "node-remove" );
       case NODE_PASTE_REPLACE        :  return( "node-paste-replace" );
       // case NODE_CENTER               :  return( "node-center" );
@@ -368,6 +374,9 @@ public enum KeyCommand {
       case "node-shift-tab"            :  return( NODE_ADD_PARENT );
       case "node-center"               :  return( NODE_CENTER );
       */
+      case "node-clone-copy"           :  return( NODE_CLONE_COPY );
+      case "node-clone-paste"          :  return( NODE_CLONE_PASTE );
+      case "node-unclone"              :  return( NODE_UNCLONE );
       case "node-remove"               :  return( NODE_REMOVE );
       case "node-paste-replace"        :  return( NODE_PASTE_REPLACE );
       case "node-expand-one"           :  return( NODE_EXPAND_ONE );
@@ -515,9 +524,11 @@ public enum KeyCommand {
       case NODE_ADD_SIBLING_BEFORE   :  return( _( "Add sibling node before current node" ) );
       case NODE_ADD_CHILD            :  return( _( "Add child node to current node" ) );
       case NODE_ADD_PARENT           :  return( _( "Add parent node to current node" ) );
-      case NODE_REMOVE_ONLY          :  return( _( "Remove selected node only (leave subtree)" ) );
       case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
       */
+      case NODE_CLONE_COPY           :  return( _( "Creates a clone copy of the current row" ) );
+      case NODE_CLONE_PASTE          :  return( _( "Pastes the cloned row from the clipboard" ) );
+      case NODE_UNCLONE              :  return( _( "Unclones the current row if it is a clone" ) );
       case NODE_REMOVE               :  return( _( "Remove current row" ) );
       case NODE_PASTE_REPLACE        :  return( _( "Replace current row with clipboard content") );
       case NODE_VIEW_START           :  return( _( "View Commands" ) );
@@ -662,6 +673,9 @@ public enum KeyCommand {
       case NODE_ADD_CHILD            :  return( node_tab );
       case NODE_ADD_PARENT           :  return( node_shift_tab );
       */
+      case NODE_CLONE_COPY           :  return( node_clone_copy );
+      case NODE_CLONE_PASTE          :  return( node_clone_paste );
+      case NODE_UNCLONE              :  return( node_unclone );
       case NODE_REMOVE               :  return( node_remove );
       case NODE_PASTE_REPLACE        :  return( node_paste_replace );
       // case NODE_CENTER               :  return( node_center );
@@ -1406,6 +1420,18 @@ public enum KeyCommand {
     ot.do_paste( true );
   }
 
+  public static void node_clone_copy( OutlineTable ot ) {
+    ot.clone_node( ot.selected );
+  }
+
+  public static void node_clone_paste( OutlineTable ot ) {
+    ot.paste_clone( true );
+  }
+
+  public static void node_unclone( OutlineTable ot ) {
+    ot.unclone_node( ot.selected );
+  }
+
   public static void node_remove( OutlineTable ot ) {
     ot.delete_current_node();
   }
@@ -1418,8 +1444,6 @@ public enum KeyCommand {
     if( current != null ) {
       Node? other = null;
       switch( dir ) {
-        case "left"  :  other = map.model.get_node_left( current );   break;
-        case "right" :  other = map.model.get_node_right( current );  break;
         case "up"    :  other = map.model.get_node_up( current );     break;
         case "down"  :  other = map.model.get_node_down( current );   break;
         default      :  return;

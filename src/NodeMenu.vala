@@ -24,12 +24,7 @@ using Gtk;
 public class NodeMenu : BaseMenu {
 
   private const GLib.ActionEntry action_entries[] = {
-    { "action_clone_copy",               action_clone_copy },
-    { "action_clone_paste",              action_clone_paste },
-    { "action_unclone",                  action_unclone },
-    { "action_delete_node",              action_delete_node },
     { "action_toggle_note",              action_toggle_note },
-    { "action_add_tag",                  action_add_tag },
     { "action_toggle_expand",            action_toggle_expand },
     { "action_focus",                    action_focus },
     { "action_add_row_above",            action_add_row_above },
@@ -43,11 +38,11 @@ public class NodeMenu : BaseMenu {
     base( app, ot, "node-tmp" );
 
     var clone1_menu = new GLib.Menu();
-    clone1_menu.append( _( "Copy As Clone" ), "node.action_clone_copy" );
-    clone1_menu.append( _( "Paste Clone" ),   "node.action_clone_paste" );
+    append_menu_item( clone1_menu, KeyCommand.NODE_CLONE_COPY,  _( "Copy As Clone" ) );
+    append_menu_item( clone1_menu, KeyCommand.NODE_CLONE_PASTE, _( "Paste Clone" ) );
 
     var clone2_menu = new GLib.Menu();
-    clone2_menu.append( _( "Unclone" ), "node.action_unclone" );
+    append_menu_item( clone2_menu, KeyCommand.NODE_UNCLONE, _( "Unclone" ) );
 
     var clone_menu = new GLib.Menu();
     clone_menu.append_section( null, clone1_menu );
@@ -157,20 +152,20 @@ public class NodeMenu : BaseMenu {
     var first_node = ot.root.get_first_node();
 
     /* Set the menu sensitivity */
-    set_enabled( KeyCommand.EDIT_PASTE,                  pasteable );
-    set_enabled( KeyCommand.NODE_PASTE_REPLACE,          pasteable );
-    ot.action_set_enabled( "node.action_unclone",                  ot.selected.is_clone() );
-    ot.action_set_enabled( "node.action_clone_paste",              ot.cloneable() );
-    set_enabled( KeyCommand.NODE_INDENT,                 ot.indentable() );
-    set_enabled( KeyCommand.NODE_UNINDENT,               ot.unindentable() );
-    set_enabled( KeyCommand.NODE_SELECT_UP,              (ot.selected.get_previous_node() != null) );
-    set_enabled( KeyCommand.NODE_SELECT_DOWN,            (ot.selected.get_next_node() != null) );
-    set_enabled( KeyCommand.NODE_SELECT_PREV_SIBLING,    (ot.selected.get_previous_sibling() != null ) );
-    set_enabled( KeyCommand.NODE_SELECT_NEXT_SIBLING,    (ot.selected.get_next_sibling() != null ) );
-    set_enabled( KeyCommand.NODE_SELECT_PARENT,          !ot.selected.parent.is_root() );
-    set_enabled( KeyCommand.NODE_SELECT_LAST_CHILD,      !ot.selected.is_leaf() );
-    set_enabled( KeyCommand.NODE_SELECT_TOP,             ((first_node != ot.selected) && !first_node.is_root()) );
-    set_enabled( KeyCommand.NODE_SELECT_BOTTOM,          ((ot.root.get_last_node() != ot.selected) && !first_node.is_root()) );
+    set_enabled( KeyCommand.EDIT_PASTE,               pasteable );
+    set_enabled( KeyCommand.NODE_PASTE_REPLACE,       pasteable );
+    set_enabled( KeyCommand.NODE_UNCLONE,             ot.selected.is_clone() );
+    set_enabled( KeyCommand.NODE_CLONE_PASTE,         ot.cloneable() );
+    set_enabled( KeyCommand.NODE_INDENT,              ot.indentable() );
+    set_enabled( KeyCommand.NODE_UNINDENT,            ot.unindentable() );
+    set_enabled( KeyCommand.NODE_SELECT_UP,           (ot.selected.get_previous_node() != null) );
+    set_enabled( KeyCommand.NODE_SELECT_DOWN,         (ot.selected.get_next_node() != null) );
+    set_enabled( KeyCommand.NODE_SELECT_PREV_SIBLING, (ot.selected.get_previous_sibling() != null ) );
+    set_enabled( KeyCommand.NODE_SELECT_NEXT_SIBLING, (ot.selected.get_next_sibling() != null ) );
+    set_enabled( KeyCommand.NODE_SELECT_PARENT,       !ot.selected.parent.is_root() );
+    set_enabled( KeyCommand.NODE_SELECT_LAST_CHILD,   !ot.selected.is_leaf() );
+    set_enabled( KeyCommand.NODE_SELECT_TOP,          ((first_node != ot.selected) && !first_node.is_root()) );
+    set_enabled( KeyCommand.NODE_SELECT_BOTTOM,       ((ot.root.get_last_node() != ot.selected) && !first_node.is_root()) );
     ot.action_set_enabled( "node.action_join_row",                 ot.is_node_joinable() );
     ot.action_set_enabled( "node.action_toggle_expand",            (ot.selected.children.length > 0) );
 
@@ -194,35 +189,6 @@ public class NodeMenu : BaseMenu {
       ot.action_set_enabled( "node.action_toggle_note", true );
     }
 
-  }
-
-  /* Pastes the given node as a sibling of the selected node */
-  private void action_paste_replace() {
-    OutlinerClipboard.paste( ot, true );
-  }
-
-  /* Clones the currently selected node */
-  private void action_clone_copy() {
-    ot.clone_node( ot.selected );
-  }
-
-  /* Pastes the given clone within the currently selected node */
-  private void action_clone_paste() {
-    ot.paste_clone( true );
-  }
-
-  /* Unclones the currently selected node */
-  private void action_unclone() {
-    ot.unclone_node( ot.selected );
-  }
-
-  /* Deletes the currently selected node */
-  private void action_delete_node() {
-    ot.delete_current_node();
-  }
-
-  private void action_add_tag() {
-    ot.tagger.show_add_ui();
   }
 
   /* Toggles the note display status of the currently selected node */
