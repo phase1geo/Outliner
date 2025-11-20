@@ -488,13 +488,11 @@ public class Shortcuts {
     add_shortcut( Key.Delete,    false, false, false, KeyCommand.NODE_REMOVE );
 
     add_shortcut( Key.Return,    false, false, false, KeyCommand.EDIT_RETURN );
-    // add_shortcut( Key.Return,    false, false, false, KeyCommand.NODE_ADD_SIBLING_AFTER );
+    add_shortcut( Key.Return,    false, false, false, KeyCommand.NODE_ADD_BELOW );
     add_shortcut( Key.Return,    false, true,  false, KeyCommand.EDIT_SHIFT_RETURN );
-    // add_shortcut( Key.Return,    false, true,  false, KeyCommand.NODE_ADD_SIBLING_BEFORE );
+    add_shortcut( Key.Return,    false, true,  false, KeyCommand.NODE_ADD_ABOVE );
     add_shortcut( Key.Tab,       false, false, false, KeyCommand.EDIT_TAB );
-    // add_shortcut( Key.Tab,       false, false, false, KeyCommand.NODE_ADD_CHILD );
     add_shortcut( Key.Tab,       false, true,  false, KeyCommand.EDIT_SHIFT_TAB );
-    // add_shortcut( Key.Tab,       false, true,  false, KeyCommand.NODE_ADD_PARENT );
     add_shortcut( Key.Right,     false, false, false, KeyCommand.EDIT_CURSOR_CHAR_NEXT );
     add_shortcut( Key.Right,     false, true,  false, KeyCommand.EDIT_SELECT_CHAR_NEXT );
     add_shortcut( Key.Left,      false, false, false, KeyCommand.EDIT_CURSOR_CHAR_PREV );
@@ -533,41 +531,48 @@ public class Shortcuts {
     add_default( Key.Tab,          true, false, false, KeyCommand.TAB_GOTO_NEXT );
     add_default( Key.Tab,          true, true,  false, KeyCommand.TAB_GOTO_PREV );
     add_default( Key.f,            true, true,  false, KeyCommand.TOGGLE_FOCUS_MODE );
+    add_default( Key.h,            true, false, false, KeyCommand.TOGGLE_NOTES );
     add_default( Key.f,            true, false, false, KeyCommand.SEARCH );
     add_default( Key.w,            true, false, false, KeyCommand.TAB_CLOSE_CURRENT );
 
-    add_default( Key.c,            true, false, false, KeyCommand.EDIT_COPY );
-    add_default( Key.x,            true, false, false, KeyCommand.EDIT_CUT );
-    add_default( Key.v,            true, false, false, KeyCommand.EDIT_PASTE );
-    add_default( Key.v,            true, true,  false, KeyCommand.NODE_PASTE_REPLACE );
-    add_default( Key.Return,       true, false, false, KeyCommand.EDIT_INSERT_NEWLINE );
-    add_default( Key.Return,       true, true,  false, KeyCommand.EDIT_SPLIT_LINE );
-    add_default( Key.BackSpace,    true, false, false, KeyCommand.EDIT_REMOVE_WORD_PREV );
-    add_default( Key.Delete,       true, false, false, KeyCommand.EDIT_REMOVE_WORD_NEXT );
-    add_default( Key.Tab,          true, false, false, KeyCommand.EDIT_INSERT_TAB );
-    add_default( Key.Right,        true, true,  false, KeyCommand.EDIT_SELECT_WORD_NEXT );
-    add_default( Key.Right,        true, false, false, KeyCommand.EDIT_CURSOR_WORD_NEXT );
-    add_default( Key.Left,         true, true,  false, KeyCommand.EDIT_SELECT_WORD_PREV );
-    add_default( Key.Left,         true, false, false, KeyCommand.EDIT_CURSOR_WORD_PREV );
-    add_default( Key.Up,           true, true,  false, KeyCommand.EDIT_SELECT_START_UP );
-    add_default( Key.Up,           true, false, false, KeyCommand.EDIT_CURSOR_FIRST );
-    add_default( Key.Down,         true, true,  false, KeyCommand.EDIT_SELECT_END_DOWN );
-    add_default( Key.Down,         true, false, false, KeyCommand.EDIT_CURSOR_LAST );
-    add_default( Key.Home,         true, true,  false, KeyCommand.EDIT_SELECT_START_HOME );
-    add_default( Key.Home,         true, false, false, KeyCommand.EDIT_CURSOR_LINESTART );
-    add_default( Key.End,          true, true,  false, KeyCommand.EDIT_SELECT_END_END );
-    add_default( Key.End,          true, false, false, KeyCommand.EDIT_CURSOR_LINEEND );
-    add_default( Key.a,            true, false, false, KeyCommand.EDIT_SELECT_ALL );
-    add_default( Key.slash,        true, false, false, KeyCommand.EDIT_SELECT_ALL );
-    add_default( Key.a,            true, true,  false, KeyCommand.EDIT_SELECT_NONE );
-    add_default( Key.backslash,    true, false, false, KeyCommand.EDIT_SELECT_NONE );
-    add_default( Key.period,       true, false, false, KeyCommand.EDIT_INSERT_EMOJI );
-    add_default( Key.k,            true, false, false, KeyCommand.EDIT_ADD_URL );
-    add_default( Key.k,            true, true,  false, KeyCommand.EDIT_REMOVE_URL );
-    add_default( Key.b,            true, false, false, KeyCommand.EDIT_BOLD );
-    add_default( Key.i,            true, false, false, KeyCommand.EDIT_ITALICS );
-    add_default( Key.u,            true, false, false, KeyCommand.EDIT_UNDERLINE );
-    add_default( Key.t,            true, false, false, KeyCommand.EDIT_STRIKETHRU );
+    add_default( Key.c,            true,  false, false, KeyCommand.EDIT_COPY );
+    add_default( Key.x,            true,  false, false, KeyCommand.EDIT_CUT );
+    add_default( Key.v,            true,  false, false, KeyCommand.EDIT_PASTE );
+    add_default( Key.v,            true,  true,  false, KeyCommand.NODE_PASTE_REPLACE );
+    add_default( Key.c,            false, false, true,  KeyCommand.NODE_ADD_CHILD );
+    add_default( Key.a,            false, false, true,  KeyCommand.NODE_ADD_PARENT );
+    add_default( Key.Return,       true,  false, false, KeyCommand.EDIT_INSERT_NEWLINE );
+    add_default( Key.Return,       true,  true,  false, KeyCommand.EDIT_SPLIT_LINE );
+    add_default( Key.BackSpace,    true,  false, false, KeyCommand.EDIT_REMOVE_WORD_PREV );
+    add_default( Key.Delete,       true,  false, false, KeyCommand.EDIT_REMOVE_WORD_NEXT );
+    add_default( Key.Tab,          true,  false, false, KeyCommand.EDIT_INSERT_TAB );
+    add_default( Key.Right,        true,  false, false, KeyCommand.EDIT_CURSOR_WORD_NEXT );
+    add_default( Key.Right,        true,  true,  false, KeyCommand.EDIT_SELECT_WORD_NEXT );
+    add_default( Key.Left,         true,  false, false, KeyCommand.EDIT_CURSOR_WORD_PREV );
+    add_default( Key.Left,         true,  true,  false, KeyCommand.EDIT_SELECT_WORD_PREV );
+    add_default( Key.Up,           true,  false, false, KeyCommand.EDIT_CURSOR_FIRST );
+    add_default( Key.Up,           true,  true,  false, KeyCommand.EDIT_SELECT_START_UP );
+    add_default( Key.Down,         true,  false, false, KeyCommand.EDIT_CURSOR_LAST );
+    add_default( Key.Down,         true,  true,  false, KeyCommand.EDIT_SELECT_END_DOWN );
+    add_default( Key.Home,         true,  false, false, KeyCommand.EDIT_CURSOR_FIRST );
+    add_default( Key.Home,         true,  true,  false, KeyCommand.EDIT_SELECT_START_HOME );
+    add_default( Key.Home,         false, false, false, KeyCommand.EDIT_CURSOR_LINESTART );
+    add_default( Key.Home,         false, true,  false, KeyCommand.EDIT_SELECT_LINESTART );
+    add_default( Key.End,          true,  false, false, KeyCommand.EDIT_CURSOR_LAST );
+    add_default( Key.End,          true,  true,  false, KeyCommand.EDIT_SELECT_END_END );
+    add_default( Key.End,          false, false, false, KeyCommand.EDIT_CURSOR_LINEEND );
+    add_default( Key.End,          false, true,  false, KeyCommand.EDIT_SELECT_LINEEND );
+    add_default( Key.a,            true,  false, false, KeyCommand.EDIT_SELECT_ALL );
+    add_default( Key.slash,        true,  false, false, KeyCommand.EDIT_SELECT_ALL );
+    add_default( Key.a,            true,  true,  false, KeyCommand.EDIT_SELECT_NONE );
+    add_default( Key.backslash,    true,  false, false, KeyCommand.EDIT_SELECT_NONE );
+    add_default( Key.period,       true,  false, false, KeyCommand.EDIT_INSERT_EMOJI );
+    add_default( Key.k,            true,  false, false, KeyCommand.EDIT_ADD_URL );
+    add_default( Key.k,            true,  true,  false, KeyCommand.EDIT_REMOVE_URL );
+    add_default( Key.b,            true,  false, false, KeyCommand.EDIT_BOLD );
+    add_default( Key.i,            true,  false, false, KeyCommand.EDIT_ITALICS );
+    add_default( Key.u,            true,  false, false, KeyCommand.EDIT_UNDERLINE );
+    add_default( Key.t,            true,  false, false, KeyCommand.EDIT_STRIKETHRU );
 
     add_default( Key.F10,          false, true,  false, KeyCommand.SHOW_CONTEXTUAL_MENU );
 
@@ -615,16 +620,14 @@ public class Shortcuts {
     add_default( Key.BackSpace,    true,  false, false, KeyCommand.NODE_JOIN );
     // add_default( Key.s,            false, false, false, KeyCommand.SHOW_SELECTED );
 
-    /*
-    add_default( Key.c,            false, true,  false, KeyCommand.NODE_CENTER );
-    add_default( Key.s,            false, true,  false, KeyCommand.NODE_SORT_ALPHABETICALLY );
-    add_default( Key.Up,           false, false, true,  KeyCommand.NODE_SWAP_UP );
-    add_default( Key.Down,         false, false, true,  KeyCommand.NODE_SWAP_DOWN );
-    */
     add_default( Key.Right,        false, false, false, KeyCommand.NODE_EXPAND_ONE );
     add_default( Key.Right,        false, true,  false, KeyCommand.NODE_EXPAND_ALL );
     add_default( Key.Left,         false, false, false, KeyCommand.NODE_COLLAPSE_ONE );
     add_default( Key.Left,         false, true,  false, KeyCommand.NODE_COLLAPSE_ALL );
+    add_default( Key.Page_Up,      false, false, false, KeyCommand.NODE_PAGE_UP );
+    add_default( Key.Page_Down,    false, false, false, KeyCommand.NODE_PAGE_DOWN );
+    add_default( Key.h,            false, true,  false, KeyCommand.NODE_PLACE_AT_TOP );
+    add_default( Key.f,            false, false, false, KeyCommand.NODE_FOCUS );
 
   }
 

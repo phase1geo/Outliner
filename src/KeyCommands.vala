@@ -54,6 +54,7 @@ public enum KeyCommand {
       SHOW_CONTEXTUAL_MENU,
       SHOW_ABOUT,
       TOGGLE_FOCUS_MODE,
+      TOGGLE_NOTES,
       SEARCH,
       QUIT,
     MISCELLANEOUS_END,
@@ -62,6 +63,10 @@ public enum KeyCommand {
   GENERAL_END,
   NODE_START,
     NODE_EXIST_START,
+      NODE_ADD_ABOVE,
+      NODE_ADD_BELOW,
+      NODE_ADD_CHILD,
+      NODE_ADD_PARENT,
       NODE_CLONE_COPY,
       NODE_CLONE_PASTE,
       NODE_UNCLONE,
@@ -75,6 +80,10 @@ public enum KeyCommand {
       NODE_EXPAND_ALL,
       NODE_COLLAPSE_ONE,
       NODE_COLLAPSE_ALL,
+      NODE_PAGE_UP,
+      NODE_PAGE_DOWN,
+      NODE_PLACE_AT_TOP,
+      NODE_FOCUS,
     NODE_VIEW_END,
     NODE_CHANGE_START,
       NODE_CHANGE_TEXT,
@@ -215,6 +224,7 @@ public enum KeyCommand {
       case SHOW_ABOUT                :  return( "show-about" );
       case SEARCH                    :  return( "search" );
       case TOGGLE_FOCUS_MODE         :  return( "toggle-focus-mode" );
+      case TOGGLE_NOTES              :  return( "toggle-notes" );
       case QUIT                      :  return( "quit" );
       case CONTROL_PRESSED           :  return( "control" );
       case ESCAPE                    :  return( "escape" );
@@ -226,6 +236,10 @@ public enum KeyCommand {
       case NODE_ADD_CHILD            :  return( "node-tab" );
       case NODE_ADD_PARENT           :  return( "node-shift-tab" );
       */
+      case NODE_ADD_ABOVE            :  return( "node-add-above" );
+      case NODE_ADD_BELOW            :  return( "node-add-below" );
+      case NODE_ADD_CHILD            :  return( "node-add-child" );
+      case NODE_ADD_PARENT           :  return( "node-add-parent" );
       case NODE_CLONE_COPY           :  return( "node-clone-copy" );
       case NODE_CLONE_PASTE          :  return( "node-clone-paste" );
       case NODE_UNCLONE              :  return( "node-unclone" );
@@ -236,6 +250,10 @@ public enum KeyCommand {
       case NODE_EXPAND_ALL           :  return( "node-expand-all" );
       case NODE_COLLAPSE_ONE         :  return( "node-collapse-one" );
       case NODE_COLLAPSE_ALL         :  return( "node-collapse-all" );
+      case NODE_PAGE_UP              :  return( "node-page-up" );
+      case NODE_PAGE_DOWN            :  return( "node-page-down" );
+      case NODE_PLACE_AT_TOP         :  return( "node-place-at-top" );
+      case NODE_FOCUS                :  return( "node-focus" );
       case NODE_CHANGE_TEXT          :  return( "node-change-text" );
       case NODE_CHANGE_NOTE          :  return( "node-change-note" );
       case NODE_CHANGE_TASK          :  return( "node-change-task" );
@@ -362,6 +380,7 @@ public enum KeyCommand {
       case "show-contextual-menu"      :  return( SHOW_CONTEXTUAL_MENU );
       case "show-about"                :  return( SHOW_ABOUT );
       case "toggle-focus-mode"         :  return( TOGGLE_FOCUS_MODE );
+      case "toggle-notes"              :  return( TOGGLE_NOTES );
       case "search"                    :  return( SEARCH );
       case "quit"                      :  return( QUIT );
       case "control"                   :  return( CONTROL_PRESSED );
@@ -374,6 +393,10 @@ public enum KeyCommand {
       case "node-shift-tab"            :  return( NODE_ADD_PARENT );
       case "node-center"               :  return( NODE_CENTER );
       */
+      case "node-add-above"            :  return( NODE_ADD_ABOVE );
+      case "node-add-below"            :  return( NODE_ADD_BELOW );
+      case "node-add-child"            :  return( NODE_ADD_CHILD );
+      case "node-add-parent"           :  return( NODE_ADD_PARENT );
       case "node-clone-copy"           :  return( NODE_CLONE_COPY );
       case "node-clone-paste"          :  return( NODE_CLONE_PASTE );
       case "node-unclone"              :  return( NODE_UNCLONE );
@@ -383,6 +406,10 @@ public enum KeyCommand {
       case "node-expand-all"           :  return( NODE_EXPAND_ALL );
       case "node-collapse-one"         :  return( NODE_COLLAPSE_ONE );
       case "node-collapse-all"         :  return( NODE_COLLAPSE_ALL );
+      case "node-page-up"              :  return( NODE_PAGE_UP );
+      case "node-page-down"            :  return( NODE_PAGE_DOWN );
+      case "node-place-at-top"         :  return( NODE_PLACE_AT_TOP );
+      case "node-focus"                :  return( NODE_FOCUS );
       case "node-change-text"          :  return( NODE_CHANGE_TEXT );
       case "node-change-note"          :  return( NODE_CHANGE_NOTE );
       case "node-change-task"          :  return( NODE_CHANGE_TASK );
@@ -513,6 +540,7 @@ public enum KeyCommand {
       case SHOW_CONTEXTUAL_MENU      :  return( _( "Show contextual menu" ) );
       case SHOW_ABOUT                :  return( _( "Show About window" ) );
       case TOGGLE_FOCUS_MODE         :  return( _( "Toggle focus mode" ) );
+      case TOGGLE_NOTES              :  return( _( "Toggle display of all notes" ) );
       case SEARCH                    :  return( _( "Display search panel" ) );
       case QUIT                      :  return( _( "Quit the application" ) );
       case NODE_START                :  return( _( "Node" ) );
@@ -526,6 +554,10 @@ public enum KeyCommand {
       case NODE_ADD_PARENT           :  return( _( "Add parent node to current node" ) );
       case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
       */
+      case NODE_ADD_ABOVE            :  return( _( "Add new row above current row" ) );
+      case NODE_ADD_BELOW            :  return( _( "Add new row below current row" ) );
+      case NODE_ADD_CHILD            :  return( _( "Add new child row to current row" ) );
+      case NODE_ADD_PARENT           :  return( _( "Add new parent row of current row" ) );
       case NODE_CLONE_COPY           :  return( _( "Creates a clone copy of the current row" ) );
       case NODE_CLONE_PASTE          :  return( _( "Pastes the cloned row from the clipboard" ) );
       case NODE_UNCLONE              :  return( _( "Unclones the current row if it is a clone" ) );
@@ -537,6 +569,10 @@ public enum KeyCommand {
       case NODE_EXPAND_ALL           :  return( _( "Expand current row completely" ) );
       case NODE_COLLAPSE_ONE         :  return( _( "Collapse current row by one level" ) );
       case NODE_COLLAPSE_ALL         :  return( _( "Collapse current row completely" ) );
+      case NODE_PAGE_UP              :  return( _( "Page the document up from the current row" ) );
+      case NODE_PAGE_DOWN            :  return( _( "Page the document down from the current row" ) );
+      case NODE_PLACE_AT_TOP         :  return( _( "Adjust document view to show current row at the top" ) );
+      case NODE_FOCUS                :  return( _( "Focus on current row" ) );
       case NODE_CHANGE_START         :  return( _( "Change Commands" ) );
       case NODE_CHANGE_TEXT          :  return( _( "Edit current row text" ) );
       case NODE_CHANGE_NOTE          :  return( _( "Edit current row note" ) );
@@ -662,17 +698,15 @@ public enum KeyCommand {
       case SHOW_CONTEXTUAL_MENU      :  return( show_contextual_menu );
       case SHOW_ABOUT                :  return( show_about );
       case TOGGLE_FOCUS_MODE         :  return( toggle_focus_mode );
+      case TOGGLE_NOTES              :  return( toggle_notes );
       case SEARCH                    :  return( search );
       case QUIT                      :  return( quit_application );
       case CONTROL_PRESSED           :  return( control_pressed );
       case ESCAPE                    :  return( escape );
-      /*
-      case NODE_ADD_ROOT             :  return( node_add_root );
-      case NODE_ADD_SIBLING_AFTER    :  return( node_return );
-      case NODE_ADD_SIBLING_BEFORE   :  return( node_shift_return );
-      case NODE_ADD_CHILD            :  return( node_tab );
-      case NODE_ADD_PARENT           :  return( node_shift_tab );
-      */
+      case NODE_ADD_ABOVE            :  return( node_add_above );
+      case NODE_ADD_BELOW            :  return( node_add_below );
+      case NODE_ADD_CHILD            :  return( node_add_child );
+      case NODE_ADD_PARENT           :  return( node_add_parent );
       case NODE_CLONE_COPY           :  return( node_clone_copy );
       case NODE_CLONE_PASTE          :  return( node_clone_paste );
       case NODE_UNCLONE              :  return( node_unclone );
@@ -683,6 +717,10 @@ public enum KeyCommand {
       case NODE_EXPAND_ALL           :  return( node_expand_all );
       case NODE_COLLAPSE_ONE         :  return( node_collapse_one ); 
       case NODE_COLLAPSE_ALL         :  return( node_collapse_all ); 
+      case NODE_PAGE_UP              :  return( node_page_up );
+      case NODE_PAGE_DOWN            :  return( node_page_down );
+      case NODE_PLACE_AT_TOP         :  return( node_place_at_top );
+      case NODE_FOCUS                :  return( node_focus );
       case NODE_CHANGE_TEXT          :  return( node_change_text );
       case NODE_CHANGE_NOTE          :  return( node_change_note );
       case NODE_CHANGE_TASK          :  return( node_change_task );
@@ -1104,24 +1142,16 @@ public enum KeyCommand {
     ot.win.toggle_focus_mode();
   }
 
+  public static void toggle_notes( OutlineTable ot ) {
+    ot.toggle_show_notes();
+  }
+
   public static void quit_application( OutlineTable ot ) {
     ot.win.destroy();
   }
 
   public static void escape( OutlineTable ot ) {
-    /*
-    if( map.is_connection_connecting() ) {
-      var current = map.get_current_connection();
-      map.connections.remove_connection( current, true );
-      map.selected.remove_connection( current );
-      map.model.set_attach_node( null );
-      map.selected.set_current_node( map.model.last_node );
-      map.canvas.last_connection = null;
-      map.queue_draw();
-    } else {
-      map.hide_properties();
-    }
-    */
+    ot.do_escape();
   }
 
   //-------------------------------------------------------------
@@ -1391,6 +1421,22 @@ public enum KeyCommand {
     ot.node_collapse( true );
   }
 
+  public static void node_page_up( OutlineTable ot ) {
+    ot.pageup();
+  }
+
+  public static void node_page_down( OutlineTable ot ) {
+    ot.pagedn();
+  }
+
+  public static void node_place_at_top( OutlineTable ot ) {
+    ot.place_at_top( ot.selected );
+  }
+
+  public static void node_focus( OutlineTable ot ) {
+    ot.focus_on_selected();
+  }
+
   /*
   public static void node_sort_alphabetically( OutlineTable ot ) {
     map.model.sort_alphabetically();
@@ -1418,6 +1464,22 @@ public enum KeyCommand {
 
   public static void node_paste_replace( OutlineTable ot ) {
     ot.do_paste( true );
+  }
+
+  public static void node_add_above( OutlineTable ot ) {
+    ot.add_sibling_node( false );
+  }
+
+  public static void node_add_below( OutlineTable ot ) {
+    ot.add_sibling_node( true );
+  }
+
+  public static void node_add_child( OutlineTable ot ) {
+    ot.add_child_node();
+  }
+
+  public static void node_add_parent( OutlineTable ot ) {
+    ot.add_parent_node();
   }
 
   public static void node_clone_copy( OutlineTable ot ) {

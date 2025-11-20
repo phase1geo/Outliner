@@ -1,4 +1,5 @@
 sources += files(
+  'UndoNodeAddParent.vala',
   'UndoNodeCut.vala',
   'UndoNodeDelete.vala',
   'UndoNodeExpander.vala',

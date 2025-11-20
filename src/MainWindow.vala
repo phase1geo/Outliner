@@ -632,10 +632,9 @@ public class MainWindow : Gtk.ApplicationWindow {
   private void add_search_button() {
 
     // Create the menu button
-    _search_btn = new Button.from_icon_name( get_icon_name( "edit-find" ) ) {
-      tooltip_markup = Utils.tooltip_with_accel( _( "Search" ), "<Control>f" )
-    };
-    _search_btn.clicked.connect( toggle_search_bar );
+    _search_btn = new Button.from_icon_name( get_icon_name( "edit-find" ) );
+    register_widget_for_shortcut( _search_btn, KeyCommand.SEARCH, _( "Search" ) );
+    _search_btn.clicked.connect(() => { execute_command( KeyCommand.SEARCH ); });
     _header.pack_end( _search_btn );
 
   }
@@ -1376,7 +1375,7 @@ public class MainWindow : Gtk.ApplicationWindow {
   //-------------------------------------------------------------
   // Called when the user uses the Control-f keyboard shortcut
   public void do_search() {
-    _search_btn.clicked();
+    toggle_search_bar();
   }
 
   //-------------------------------------------------------------

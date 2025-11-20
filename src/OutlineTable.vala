@@ -1152,51 +1152,6 @@ public class OutlineTable : DrawingArea {
 
   }
 
-  /*
-  //-------------------------------------------------------------
-  // Handles keypress events.
-  private bool on_keypress( uint keyval, uint keycode, ModifierType state ) {
-
-    // Figure out which modifiers were used
-    var control    = (bool)(state & ModifierType.CONTROL_MASK);
-    var shift      = (bool)(state & ModifierType.SHIFT_MASK);
-    var nomod      = !(control || shift);
-    KeymapKey[] ks = {};
-    uint[] kvs     = {};
-
-    Display.get_default().map_keycode( keycode, out ks, out kvs );
-
-    // If there is a current node or connection selected, operate on it
-    if( (selected != null) || is_title_editable() ) {
-      if( control ) {
-        else if( has_key( kvs, Key.Home ) )                { handle_control_home( shift ); }
-        else if( has_key( kvs, Key.End ) )                 { handle_control_end( shift ); }
-        else if( !shift && has_key( kvs, Key.h ) )         { handle_control_h(); }
-        else if( !shift && has_key( kvs, Key.j ) )         { handle_control_j(); }
-        else if( !shift && has_key( kvs, Key.k ) )         { handle_control_k(); }
-        else if( !shift && has_key( kvs, Key.w ) )         { handle_control_w(); }
-      } else if( nomod || shift ) {
-        else if( has_key( kvs, Key.Escape ) )               { handle_escape(); }
-        else if( has_key( kvs, Key.Home ) )                 { handle_home( shift ); }
-        else if( has_key( kvs, Key.End ) )                  { handle_end( shift ); }
-        else if( has_key( kvs, Key.Page_Up ) )              { handle_pageup(); }
-        else if( has_key( kvs, Key.Page_Down ) )            { handle_pagedn(); }
-        else if( !is_node_editable() && !is_note_editable() && !is_title_editable() ) {
-          else if( !shift && has_key( kvs, Key.f ) )          { focus_on_selected(); }
-          else if(  shift && has_key( kvs, Key.H ) )          { place_at_top( selected ); }
-        }
-      }
-    } else {
-      if( !control ) {
-        else if( has_key( kvs, Key.Escape ) )       { handle_escape(); }
-      }
-    }
-
-    return( true );
-
-  }
-  */
-
   //-------------------------------------------------------------
   // Called whenever a key is released
   private void on_keyrelease( uint keyval, uint keycode, ModifierType state ) {
@@ -1593,7 +1548,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Handles an escape keypress
-  private void handle_escape() {
+  public void do_escape() {
     if( is_node_editable() || is_note_editable() ) {
       if( _completion.shown ) {
         _completion.hide();
@@ -1818,24 +1773,8 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Toggles the show all notes status given the state of the
   // currently selected node
-  private void handle_control_h() {
+  public void toggle_show_notes() {
     set_notes_display( !root.any_notes_shown() );
-  }
-
-  //-------------------------------------------------------------
-  // If the current node is selected, moves the node down
-  private void handle_control_j() {
-    if( is_node_selected() ) {
-      move_node_down( selected );
-    }
-  }
-
-  //-------------------------------------------------------------
-  // If the current node is selected, moves the node up
-  private void handle_control_k() {
-    if( is_node_selected() ) {
-      move_node_up( selected );
-    }
   }
 
   //-------------------------------------------------------------
@@ -1847,154 +1786,8 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
-  // Closes the current tab, requesting a save if necessary
-  private void handle_control_w() {
-    win.close_current_tab();
-  }
-
-  //-------------------------------------------------------------
-  // Handles a Control-Home keypress
-  private void handle_control_home( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_to_start( true );
-      } else {
-        selected.name.move_cursor_to_start();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_to_start( true );
-      } else {
-        selected.note.move_cursor_to_start();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_to_start( true );
-      } else {
-        _title.move_cursor_to_start();
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a Home keypress
-  private void handle_home( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_to_linestart( true );
-      } else {
-        selected.name.move_cursor_to_linestart();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_to_linestart( true );
-      } else {
-        selected.note.move_cursor_to_linestart();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_to_linestart( true );
-      } else {
-        _title.move_cursor_to_linestart();
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles a Control-End keypress
-  private void handle_control_end( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_to_end( true );
-      } else {
-        selected.name.move_cursor_to_end();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_to_end( true );
-      } else {
-        selected.note.move_cursor_to_end();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_to_end( true );
-      } else {
-        _title.move_cursor_to_end();
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
-  // Handles an End keypress
-  private void handle_end( bool shift ) {
-    if( is_node_editable() ) {
-      if( shift ) {
-        selected.name.selection_to_lineend( true );
-      } else {
-        selected.name.move_cursor_to_lineend();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_note_editable() ) {
-      if( shift ) {
-        selected.note.selection_to_lineend( true );
-      } else {
-        selected.note.move_cursor_to_lineend();
-      }
-      undo_text.mergeable = false;
-      see( selected );
-      _im_context.reset();
-      queue_draw();
-    } else if( is_title_editable() ) {
-      if( shift ) {
-        _title.selection_to_lineend( true );
-      } else {
-        _title.move_cursor_to_lineend();
-      }
-      undo_text.mergeable = false;
-      _im_context.reset();
-      queue_draw();
-    }
-  }
-
-  //-------------------------------------------------------------
   // Moves the selection down by a page
-  private void handle_pageup() {
+  public void pageup() {
     if( is_node_selected() ) {
       var vp   = parent.parent as Viewport;
       var vh   = vp.get_allocated_height();
@@ -2015,7 +1808,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Moves the selection up by a page
-  private void handle_pagedn() {
+  public void pagedn() {
     if( is_node_selected() ) {
       var vp = parent.parent as Viewport;
       var vh = vp.get_allocated_height();
@@ -2881,6 +2674,25 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
+  // Adds a parent node of the currently selected node.
+  public void add_parent_node() {
+    if( selected == null ) return;
+    var sel    = selected;
+    var parent = selected.parent;
+    var node   = create_node();
+    var index  = selected.index();
+    parent.add_child( node, index );
+    parent.remove_child( sel );
+    node.add_child( sel, 0 );
+    selected = node;
+    queue_draw();
+    changed();
+    see( node );
+    set_node_mode( selected, NodeMode.EDITABLE );
+    undo_buffer.add_item( new UndoNodeAddParent( node ) );
+  }
+
+  //-------------------------------------------------------------
   // Removes the specified node from the table
   public void delete_node( Node node ) {
     var was_selected = (node == selected);
@@ -2988,7 +2800,9 @@ public class OutlineTable : DrawingArea {
   public void set_notes_display( bool show ) {
     root.set_notes_display( show );
     root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "set_notes_display" );
-    see( selected );
+    if( selected != null ) {
+      see( selected );
+    }
     queue_draw();
     changed();
   }

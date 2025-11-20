@@ -26,10 +26,6 @@ public class NodeMenu : BaseMenu {
   private const GLib.ActionEntry action_entries[] = {
     { "action_toggle_note",              action_toggle_note },
     { "action_toggle_expand",            action_toggle_expand },
-    { "action_focus",                    action_focus },
-    { "action_add_row_above",            action_add_row_above },
-    { "action_add_row_below",            action_add_row_below },
-    { "action_join_row",                 action_join_row },
   };
 
   /* Constructor */
@@ -67,12 +63,17 @@ public class NodeMenu : BaseMenu {
     append_menu_item( tree_menu, KeyCommand.NODE_INDENT,   _( "Indent" ) );
     append_menu_item( tree_menu, KeyCommand.NODE_UNINDENT, _( "Unindent" ) );
     tree_menu.append( _( "Toggle Children Visibility" ), "node.action_toggle_expand" );
-    tree_menu.append( _( "Focus" ),                      "node.action_focus" );
+    append_menu_item( tree_menu, KeyCommand.NODE_FOCUS,    _( "Focus" ) );
+
+    var add1_menu = new GLib.Menu();
+    append_menu_item( add1_menu, KeyCommand.NODE_ADD_ABOVE,  _( "Add Sibling Row Above" ) );
+    append_menu_item( add1_menu, KeyCommand.NODE_ADD_BELOW,  _( "Add Sibling Row Below" ) );
+    append_menu_item( add1_menu, KeyCommand.NODE_ADD_CHILD,  _( "Add Child Row" ) );
+    append_menu_item( add1_menu, KeyCommand.NODE_ADD_PARENT, _( "Add Parent Row" ) );
 
     var add_menu = new GLib.Menu();
-    add_menu.append( _( "Add Row Above" ),     "node.action_add_row_above" );
-    add_menu.append( _( "Add Row Below" ),     "node.action_add_row_below" );
-    add_menu.append( _( "Join To Row Above" ), "node.action_join_row" );
+    add_menu.append_submenu( _( "Add Row" ), add1_menu );
+    append_menu_item( add_menu, KeyCommand.NODE_JOIN, _( "Join To Row Above" ) );
 
     var select1_menu = new GLib.Menu();
     append_menu_item( select1_menu, KeyCommand.NODE_SELECT_UP,   _( "Select Row Above" ) );
@@ -214,11 +215,6 @@ public class NodeMenu : BaseMenu {
   /* Toggles the expand/collapse property of the node */
   private void action_toggle_expand() {
     ot.toggle_expand( ot.selected );
-  }
-
-  /* Enters focus mode */
-  private void action_focus() {
-    ot.focus_on_selected();
   }
 
 }
