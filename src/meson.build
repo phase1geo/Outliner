@@ -1,54 +1,7 @@
 sources += files(
-  'exports/ExportHTML.vala',
-  'exports/ExportMarkdown.vala',
-  'exports/ExportMinder.vala',
-  'exports/ExportOPML.vala',
-  'exports/ExportOrgMode.vala',
-  'exports/ExportPDF.vala',
-  'exports/ExportPrint.vala',
-  'exports/ExportRTF.vala',
-  'exports/ExportText.vala',
-
-  'parsers/MarkdownParser.vala',
-  'parsers/TaggerParser.vala',
-  'parsers/UnicodeParser.vala',
-  'parsers/UrlParser.vala',
-
-  'themes/ThemeDark.vala',
-  'themes/ThemeDefault.vala',
-  'themes/ThemeMaterial.vala',
-  'themes/ThemeMild.vala',
-  'themes/ThemePrintColor.vala',
-  'themes/ThemePrintGrayscale.vala',
-  'themes/ThemeSolarizedDark.vala',
-  'themes/ThemeSolarizedLight.vala',
-
-  'undo_actions/UndoNodeCut.vala',
-  'undo_actions/UndoNodeDelete.vala',
-  'undo_actions/UndoNodeExpander.vala',
-  'undo_actions/UndoNodeIndent.vala',
-  'undo_actions/UndoNodeInsert.vala',
-  'undo_actions/UndoNodeJoin.vala',
-  'undo_actions/UndoNodeMove.vala',
-  'undo_actions/UndoNodeName.vala',
-  'undo_actions/UndoNodeNote.vala',
-  'undo_actions/UndoNodePaste.vala',
-  'undo_actions/UndoNodeReplace.vala',
-  'undo_actions/UndoNodeSplit.vala',
-  'undo_actions/UndoNodeUnclone.vala',
-  'undo_actions/UndoNodeUnindent.vala',
-  'undo_actions/UndoReplaceAll.vala',
-  'undo_actions/UndoTextBackspace.vala',
-  'undo_actions/UndoTextClearTags.vala',
-  'undo_actions/UndoTextDelete.vala',
-  'undo_actions/UndoTextInsert.vala',
-  'undo_actions/UndoTextMultiInsert.vala',
-  'undo_actions/UndoTextReplace.vala',
-  'undo_actions/UndoTextTagAdd.vala',
-  'undo_actions/UndoTextTagRemove.vala',
-  'undo_actions/UndoTitleChange.vala',
-
+  'About.vala',
   'Application.vala',
+  'BaseMenu.vala',
   'CanvasText.vala',
   'Clipboard.vala',
   'ColorPicker.vala',
@@ -59,6 +12,7 @@ sources += files(
   'ExportUtils.vala',
   'FormatBar.vala',
   'FormattedText.vala',
+  'KeyCommands.vala',
   'LinkEditor.vala',
   'MainWindow.vala',
   'ModeGroup.vala',
@@ -68,6 +22,7 @@ sources += files(
   'OutlineTable.vala',
   'Preferences.vala',
   'SearchBar.vala',
+  'Shortcuts.vala',
   'Tagger.vala',
   'TextCompletion.vala',
   'TextParser.vala',
@@ -81,3 +36,8 @@ sources += files(
   'Utils.vala',
   'ZoomWidget.vala'
 )
+
+subdir('exports')
+subdir('parsers')
+subdir('themes')
+subdir('undo_actions')

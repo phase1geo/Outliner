@@ -23,6 +23,8 @@ using Gtk;
 using Gdk;
 using Cairo;
 
+public delegate void ConfirmationDialogFunc();
+
 public class Utils {
 
   /* Returns true if the specified version is older than this version */
@@ -223,6 +225,40 @@ public class Utils {
     ctx.arc( (x + radius),     (y + h - radius), radius, (90 * deg),  (180 * deg) );
     ctx.arc( (x + radius),     (y + radius),     radius, (180 * deg), (270 * deg) );
     ctx.close_path();
+
+  }
+
+  //-------------------------------------------------------------
+  // Creates a confirmation dialog window.  If the user accepts
+  // message, executes function.
+  public static void create_confirmation_dialog( Gtk.Window win, string message, string detail, ConfirmationDialogFunc confirm_func ) {
+
+    var dialog = new Granite.MessageDialog.with_image_from_icon_name(
+      message,
+      detail,
+      "dialog-warning",
+      ButtonsType.NONE
+    );
+
+    var no = new Button.with_label( _( "No" ) );
+    dialog.add_action_widget( no, ResponseType.CANCEL );
+
+    var yes = new Button.with_label( _( "Yes" ) );
+    yes.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
+    dialog.add_action_widget( yes, ResponseType.ACCEPT );
+
+    dialog.set_transient_for( win );
+    dialog.set_default_response( ResponseType.CANCEL );
+    dialog.set_title( "" );
+
+    dialog.response.connect((id) => {
+      if( id == ResponseType.ACCEPT ) {
+        confirm_func();
+      }
+      dialog.close();
+    });
+
+    dialog.present();
 
   }
 

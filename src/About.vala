@@ -1,0 +1,84 @@
+/*
+* Copyright (c) 2019-2021 (https://github.com/phase1geo/Outliner)
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public
+* License along with this program; if not, write to the
+* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA
+*
+* Authored by: Trevor Williams <phase1geo@gmail.com>
+*/
+
+using Gtk;
+using Gdk;
+
+public class About {
+
+  private AboutDialog _about;
+
+  //-------------------------------------------------------------
+  // Constructor
+  public About( MainWindow win ) {
+
+    var image = new Image.from_resource( "/com/github/phase1geo/outliner/images/outliner-logo" );
+
+    _about = new AboutDialog() {
+      authors            = { "Trevor Williams" },
+      program_name       = "Outliner",
+      comments           = _( "Outlining application" ),
+      copyright          = _( "Copyright © 2018-2025 Trevor Williams" ),
+      version            = Outliner.version,
+      license_type       = License.GPL_3_0,
+      website            = "https://appcenter.elementary.io/com.github.phase1geo.outliner/",
+      website_label      = _( "Outliner in AppCenter" ),
+      system_information = get_system_info(),
+      logo               = image.get_paintable()
+    };
+
+   	_about.set_destroy_with_parent( true );
+	  _about.set_transient_for( win);
+	  _about.set_modal( true );
+
+  }
+
+  //-------------------------------------------------------------
+  // Returns the system information about how this application was
+  // built.
+  private string get_system_info() {
+
+    // Determine the Flatpak runtime being used
+    try {
+      var keyfile = new GLib.KeyFile();
+      keyfile.load_from_file( "/.flatpak-info", GLib.KeyFileFlags.NONE );
+
+      var runtime = keyfile.get_string( "Application", "runtime" );
+
+      return( "Flatpak Runtime: %s".printf( runtime ) );
+
+    } catch( Error e ) {
+      stdout.printf( "Error: %s\n", e.message );
+    }
+
+    return( "" );
+
+  }
+
+  //-------------------------------------------------------------
+  // Displays the About window
+  public void show() {
+    _about.present();
+  }
+
+}
+
+

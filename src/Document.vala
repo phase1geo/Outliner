@@ -26,7 +26,6 @@ using GLib;
 public class Document : Object {
 
   private OutlineTable  _table;
-  private GLib.Settings _settings;
   private string        _filename;
   private bool          _from_user;  // Set to true if _filename was set by the user
 
@@ -39,7 +38,7 @@ public class Document : Object {
         }
         _filename  = value;
         _from_user = true;
-        _settings.set_string( "last-file", value );
+        Outliner.settings.set_string( "last-file", value );
       }
     }
     get {
@@ -54,10 +53,9 @@ public class Document : Object {
   public bool save_needed { private set; get; default = false; }
 
   /* Default constructor */
-  public Document( OutlineTable table, GLib.Settings settings ) {
+  public Document( OutlineTable table ) {
 
-    _table    = table;
-    _settings = settings;
+    _table = table;
 
     /* Create the temporary file */
     var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
