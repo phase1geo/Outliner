@@ -1,5 +1,7 @@
 name: CI
 
+debug: true
+
 on:
   pull_request:
     types:
