@@ -79,6 +79,9 @@ case $1 in
     initialize
     ./com.github.phase1geo.outliner "${@:2}"
     ;;
+"run-flatpak")
+    flatpak run com.github.phase1geo.outliner
+    ;;
 "debug")
     initialize
     G_DEBUG=fatal-criticals gdb --args ./com.github.phase1geo.outliner "${@:2}"
@@ -96,7 +99,8 @@ case $1 in
     sudo ninja uninstall
     ;;
 "flatpak")
-    sudo flatpak-builder --install --force-clean ../build-outliner com.github.phase1geo.outliner.yml
+    flatpak-builder --user --install --force-clean ../build-outliner com.github.phase1geo.outliner.yml
+    flatpak install --user --reinstall --assumeyes "$(pwd)/.flatpak-builder/cache" com.github.phase1geo.outliner.Debug
     ;;
 *)
     echo "Usage:"
