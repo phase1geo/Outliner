@@ -30,7 +30,7 @@ public class About {
   // Constructor
   public About( MainWindow win ) {
 
-    var image = new Image.from_resource( "/com/github/phase1geo/outliner/images/outliner-logo.svg" );
+    var image = new Image.from_resource( "/com/github/phase1geo/outliner/images/outliner-logo" );
 
     _about = new AboutDialog() {
       authors            = { "Trevor Williams" },
