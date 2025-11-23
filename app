@@ -98,8 +98,12 @@ case $1 in
     initialize
     sudo ninja uninstall
     ;;
-"flatpak")
-    flatpak-builder --user --install --force-clean ../build-outliner com.github.phase1geo.outliner.yml
+"elementary")
+    flatpak-builder --user --install --force-clean ../build-outliner-elementary com.github.phase1geo.outliner.elementary.yml
+    flatpak install --user --reinstall --assumeyes "$(pwd)/.flatpak-builder/cache" com.github.phase1geo.outliner.Debug
+    ;;
+"flathub")
+    flatpak-builder --user --install --force-clean ../build-outliner-flathub com.github.phase1geo.outliner.flathub.yml
     flatpak install --user --reinstall --assumeyes "$(pwd)/.flatpak-builder/cache" com.github.phase1geo.outliner.Debug
     ;;
 *)

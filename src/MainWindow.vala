@@ -78,7 +78,7 @@ public class MainWindow : Gtk.ApplicationWindow {
   private Shortcuts                   _shortcuts;
   private Gee.HashMap<KeyCommand, ShortcutTooltip> _shortcut_widgets;
 
-  private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
+  private bool on_elementary = Utils.on_elementary();
 
   public Exports exports {
     get {
