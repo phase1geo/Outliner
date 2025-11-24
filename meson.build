@@ -57,6 +57,7 @@ dependencies = [
     dependency('granite-7'),
     dependency('gtk4'),
     dependency('libxml-2.0'),
+    dependency('libarchive'),
     dependency('webkitgtk-6.0'),
     libmarkdown,
     math_dep
