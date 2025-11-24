@@ -3,23 +3,14 @@ runtime: io.elementary.Platform
 runtime-version: '8.2'
 sdk: io.elementary.Sdk
 command: com.github.phase1geo.outliner
+
 finish-args:
   - '--share=ipc'
   - '--socket=fallback-x11'
   - '--socket=wayland'
   - '--filesystem=home'
-cleanup:
-  - '/include'
-  - '/lib/pkgconfig'
-  - '/man'
-  - '/share/gtk-doc'
-  - '/share/man'
-  - '/share/pkgconfig'
-  - '/share/vala'
-  - '*.a'
-  - '*.la'
-modules:
 
+modules:
   - name: libmarkdown
     buildsystem: simple
     build-commands:
@@ -34,8 +25,6 @@ modules:
 
   - name: Outliner
     buildsystem: meson
-    config-opts:
-     - '--libdir=lib'
     sources:
       - type: dir
         path: .
