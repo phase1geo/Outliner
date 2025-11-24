@@ -29,18 +29,38 @@ public class Tagger {
   private HashMap<string,int>  _tags;
   private Gtk.SearchEntry      _entry;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public Tagger( OutlineTable ot ) {
     _ot   = ot;
     _tags = new HashMap<string,int>();
   }
 
-  /* Loads the tags prior to edits being made */
+  //-------------------------------------------------------------
+  // Adds a tag.
+  public void add_tag( string name ) {
+    var count = _tags.has_key( name ) ? _tags.@get( name ) : 0;
+    _tags.@set( name, (count + 1) );
+  }
+
+  //-------------------------------------------------------------
+  // Populates the given array with the list of tag names.
+  public void populate_tag_array( Array<string> tags ) {
+    var it = _tags.map_iterator();
+    while( it.next() ) {
+      var name = it.get_key();
+      tags.append_val( name );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Loads the tags prior to edits being made
   public void preedit_load_tags( FormattedText text ) {
     _pre_tags = text.get_extras_for_tag( FormatTag.TAG );
   }
 
-  /* Updates the stored list of tags in use. */
+  //-------------------------------------------------------------
+  // Updates the stored list of tags in use
   public void postedit_load_tags( FormattedText text ) {
     var tags = text.get_extras_for_tag( FormatTag.TAG );
     var it   = tags.map_iterator();
@@ -63,7 +83,8 @@ public class Tagger {
     }
   }
 
-  /* Called whenever the user clicks on a tag */
+  //-------------------------------------------------------------
+  // Called whenever the user clicks on a tag
   public void tag_clicked( string tag ) {
     _ot.filter_nodes(
       _( "Nodes are currently filtered by tag @%s." ).printf( tag ), true,
@@ -73,7 +94,8 @@ public class Tagger {
     );
   }
 
-  /* Gets the list of matching keys */
+  //-------------------------------------------------------------
+  // Gets the list of matching keys
   public GLib.List<TextCompletionItem> get_matches( string partial ) {
     var it = _tags.map_iterator();
     var matches = new GLib.List<TextCompletionItem>();
@@ -88,7 +110,8 @@ public class Tagger {
     return( matches );
   }
 
-  /* Returns the XML version of this class for saving purposes */
+  //-------------------------------------------------------------
+  // Returns the XML version of this class for saving purposes
   public Xml.Node* save() {
     Xml.Node* tags = new Xml.Node( null, "tags" );
     var it = _tags.map_iterator();
@@ -101,7 +124,8 @@ public class Tagger {
     return( tags );
   }
 
-  /* Loads the tag information from the XML save file */
+  //-------------------------------------------------------------
+  // Loads the tag information from the XML save file
   public void load( Xml.Node* tags ) {
     for( Xml.Node* it = tags->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "tag") ) {
@@ -114,7 +138,8 @@ public class Tagger {
     }
   }
 
-  /* Creates the UI for selecting/creating tags */
+  //-------------------------------------------------------------
+  // Creates the UI for selecting/creating tags
   public void show_add_ui() {
 
     var    name = _ot.selected.name;
@@ -168,15 +193,16 @@ public class Tagger {
 
     popover.child = box;
 
-    /* Display the popover */
+    // Display the popover
     popover.popup();
 
-    /* Preload the tags */
+    // Preload the tags
     populate_listbox( listbox, get_matches( "" ) );
 
   }
 
-  /* Filters the tag text */
+  //-------------------------------------------------------------
+  // Filters the tag text
   private void filter_tag_text( string str, int slen, ref int pos ) {
     var filtered = str.replace( " ", "" ).replace( "\t", "" ).replace( "@", "" );
     if( str != filtered ) {
@@ -187,7 +213,8 @@ public class Tagger {
     }
   }
 
-  /* Populates the listbox with the list of text completions */
+  //-------------------------------------------------------------
+  // Populates the listbox with the list of text completions
   private void populate_listbox( ListBox listbox, GLib.List<TextCompletionItem> tags ) {
 
     var row = listbox.get_row_at_index( 0 );

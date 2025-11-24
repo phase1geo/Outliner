@@ -26,17 +26,20 @@ public class TextCompletionItem {
   public string label { get; private set; default = ""; }
   public string alt   { get; private set; default = ""; }
 
+  //-------------------------------------------------------------
   // Constructor
   public TextCompletionItem( string label ) {
     this.label = label;
   }
 
+  //-------------------------------------------------------------
   // Constructor
   public TextCompletionItem.with_alt( string label, string alt ) {
     this.label = label;
     this.alt   = alt;
   }
 
+  //-------------------------------------------------------------
   // Creates the row for the listbox
   public Box create_row() {
     var box = new Box( Orientation.HORIZONTAL, 0 );
@@ -88,7 +91,8 @@ public class TextCompletion {
     }
   }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public TextCompletion( OutlineTable ot ) {
     _ot = ot;
     _list = new ListBox() {
@@ -99,36 +103,37 @@ public class TextCompletion {
     _list.row_activated.connect( activate_row );
   }
 
-  /* Displays the auto-completion text with the given list */
+  //-------------------------------------------------------------
+  // Displays the auto-completion text with the given list
   public void show( CanvasText ct, List<TextCompletionItem> list, int start, int end ) {
 
-    /* If there is nothing to show, hide the contents */
+    // If there is nothing to show, hide the contents
     if( list.length() == 0 ) {
       hide();
       return;
     }
 
-    /* Get the maximum number of items that we will display */
+    // Get the maximum number of items that we will display
     var max_items = Outliner.settings.get_int( "max-auto-completion-items" );
 
-    /* Remember the text positions that will be replaced */
+    // Remember the text positions that will be replaced
     _ct        = ct;
     _start_pos = start;
     _end_pos   = end;
     _size      = (max_items < (int)list.length()) ? max_items : (int)list.length();
 
-    /* Get the position of the cursor so that we know where to place the box */
+    // Get the position of the cursor so that we know where to place the box
     int x, ytop, ybot;
     ct.get_cursor_pos( out x, out ytop, out ybot );
 
-    /* Calculate the position of the widget */
+    // Calculate the position of the widget
     var lbl_height = _ot.win.get_label_height();
     var height     = _size * (lbl_height + 10);
     int win_top, win_bottom;
     _ot.get_window_ys( out win_top, out win_bottom );
     var below = (ybot + (max_items * (lbl_height + 10))) <= win_bottom;
 
-    /* Set the position */
+    // Set the position
     _list.margin_start = x;
     if( below ) {
       _list.margin_top = ybot + 5;
@@ -137,7 +142,7 @@ public class TextCompletion {
       _list.margin_top = (ytop - 5) - height;
     }
 
-    /* Populate the list */
+    // Populate the list
     var row = _list.get_row_at_index( 0 );
     while( row != null ) {
       _list.remove( row );
@@ -150,10 +155,10 @@ public class TextCompletion {
       }
     }
 
-    /* Select the first row */
+    // Select the first row
     _list.select_row( _list.get_row_at_index( below ? 0 : (_size - 1) ) );
 
-    /* If the list isn't being shown, show it */
+    // If the list isn't being shown, show it
     if( !_shown ) {
       var overlay = (Overlay)_ot.get_parent();
       overlay.add_overlay( _list );
@@ -163,14 +168,16 @@ public class TextCompletion {
 
   }
 
-  /* Hides the auto-completion box */
+  //-------------------------------------------------------------
+  // Hides the auto-completion box
   public void hide() {
     if( !_shown ) return;
     _list.unparent();
     _shown = false;
   }
 
-  /* Moves the selection down by one row */
+  //-------------------------------------------------------------
+  // Moves the selection down by one row
   public void down() {
     if( !_shown ) return;
     var row = _list.get_selected_row();
@@ -179,7 +186,8 @@ public class TextCompletion {
     }
   }
 
-  /* Moves the selection up by one row */
+  //-------------------------------------------------------------
+  // Moves the selection up by one row
   public void up() {
     if( !_shown ) return;
     var row = _list.get_selected_row();
@@ -188,13 +196,15 @@ public class TextCompletion {
     }
   }
 
-  /* Substitutes the currently selected entry */
+  //-------------------------------------------------------------
+  // Substitutes the currently selected entry
   public void select() {
     if( !_shown ) return;
     activate_row( _list.get_selected_row() );
   }
 
-  /* Handle a mouse event on the listbox */
+  //-------------------------------------------------------------
+  // Handle a mouse event on the listbox
   private void activate_row( ListBoxRow row ) {
     var box   = (Box)row.get_child();
     var value = TextCompletionItem.get_text( box );

@@ -971,7 +971,6 @@ public class OutlineTable : DrawingArea {
       if( current != null ) {
         var orig_over = current.over_note_icon;
         current.over_note_icon = false;
-        set_tooltip_markup( null );
         if( current.is_within_note_icon( ex, ey ) ) {
           current.over_note_icon = true;
           set_tooltip_markup( current.hide_note ? _( "Show note" ) : _( "Hide note" ) );
@@ -1000,14 +999,17 @@ public class OutlineTable : DrawingArea {
           }
         } else {
           set_cursor( null );
+          set_tooltip_markup( null );
         }
         if( orig_over != current.over_note_icon ) {
           queue_draw();
         }
       } else if( (_title != null) && _title.is_within( ex, ey ) ) {
         set_cursor( text_cursor );
+        set_tooltip_markup( null );
       } else {
         set_cursor( null );
+        set_tooltip_markup( null );
       }
 
       // If the current node is not the active node, set the mode to HOVER

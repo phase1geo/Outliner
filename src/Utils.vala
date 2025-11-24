@@ -280,4 +280,31 @@ public class Utils {
 
   }
 
+  //-------------------------------------------------------------
+  // Recursively deletes a given directory.
+  private static void delete_recursively( File file ) throws Error {
+
+    try {
+      var enumerator = file.enumerate_children ( FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NOFOLLOW_SYMLINKS );
+      FileInfo? info;
+      while( (info = enumerator.next_file ()) != null ) {
+        var child = file.get_child (info.get_name ());
+        delete_recursively( child );
+      }
+    } catch (Error e) {
+      // ignore if not a directory
+    }
+
+    // Finally delete the file or directory itself
+    file.delete ();
+
+  }
+
+  //-------------------------------------------------------------
+  // Deletes the given directory.
+  public static void delete_directory( string dirpath ) {
+    var dir = File.new_for_path( dirpath );
+    delete_recursively( dir );
+  }
+
 }

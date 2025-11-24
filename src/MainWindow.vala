@@ -178,7 +178,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     var open_btn = new Button.from_icon_name( get_icon_name( "document-open" ) );
     register_widget_for_shortcut( open_btn, KeyCommand.FILE_OPEN, _( "Open File" ) );
-    new_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_OPEN ); });
+    open_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_OPEN ); });
     _header.pack_start( open_btn );
 
     var save_btn = new Button.from_icon_name( get_icon_name( "document-save-as" ) );

@@ -33,7 +33,8 @@ public class Export {
   public bool     exportable { get; private set; }
   public bool     dir        { get; private set; }
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public Export( string name, string label, string[] extensions, bool exportable, bool importable, bool dir ) {
     _settings = new HashMap<string,Widget>();
     this.name       = name;
@@ -46,24 +47,30 @@ public class Export {
 
   public signal void settings_changed();
 
-  /* Performs export to the given filename */
+  //-------------------------------------------------------------
+  // Performs export to the given filename
   public virtual bool export( string fname, OutlineTable ot ) {
     return( false );
   }
 
-  /* Imports given filename into drawing area */
+  //-------------------------------------------------------------
+  // Imports given filename into drawing area
   public virtual bool import( string fname, OutlineTable ot ) {
     return( false );
   }
 
+  //-------------------------------------------------------------
+  // Returns true if there are setting specified for this export
   public bool settings_available() {
     return( _settings.size > 0 );
   }
 
-  /* Adds settings to the export dialog page */
+  //-------------------------------------------------------------
+  // Adds settings to the export dialog page
   public virtual void add_settings( Grid grid ) {}
 
-  /* Creates a help widget */
+  //-------------------------------------------------------------
+  // Creates a help widget
   private Label make_help( string help ) {
 
     var lbl = new Label( help ) {
@@ -80,7 +87,8 @@ public class Export {
 
   }
 
-  /* Add boolean export setting */
+  //-------------------------------------------------------------
+  // Add boolean export setting
   protected void add_setting_bool( string name, Grid grid, string label, string? help, bool dflt ) {
 
     var row = _settings.size * 2;
@@ -110,7 +118,8 @@ public class Export {
 
   }
 
-  /* Adds a scale setting to the given grid */
+  //-------------------------------------------------------------
+  // Adds a scale setting to the given grid
   protected void add_setting_scale( string name, Grid grid, string label, string? help, int min, int max, int step, int dflt ) {
 
     var row = _settings.size * 2;
@@ -143,28 +152,36 @@ public class Export {
 
   }
 
-  /* Returns true if the given setting is a boolean */
+  //-------------------------------------------------------------
+  // Returns true if the given setting is a boolean
   public bool is_bool_setting( string name ) {
     return( _settings.has_key( name ) && ((_settings.@get( name ) as Switch) != null) );
   }
 
-  /* Returns true if the given setting is a scale */
+  //-------------------------------------------------------------
+  // Returns true if the given setting is a scale
   public bool is_scale_setting( string name ) {
     return( _settings.has_key( name ) && ((_settings.@get( name ) as Scale) != null) );
   }
 
+  //-------------------------------------------------------------
+  // Sets a boolean setting value of the given name to the specified value.
   public void set_bool( string name, bool value ) {
     assert( _settings.has_key( name ) );
     var sw = (Switch)_settings.@get( name );
     sw.active = value;
   }
 
+  //-------------------------------------------------------------
+  // Retrieves the current value of the boolean settings value with name.
   protected bool get_bool( string name ) {
     assert( _settings.has_key( name ) );
     var sw = (Switch)_settings.@get( name );
     return( sw.active );
   }
 
+  //-------------------------------------------------------------
+  // Sets a scale setting value of the given name to the specified value.
   public void set_scale( string name, int value ) {
     assert( _settings.has_key( name ) );
     var scale = (Scale)_settings.@get( name );
@@ -172,19 +189,25 @@ public class Export {
     scale.set_value( double_value );
   }
 
+  //-------------------------------------------------------------
+  // Retrieves the current value of a scale settings value with name.
   protected int get_scale( string name ) {
     assert( _settings.has_key( name ) );
     var scale = (Scale)_settings.@get( name );
     return( (int)scale.get_value() );
   }
 
-  /* Saves the settings */
+  //-------------------------------------------------------------
+  // Saves the settings
   public virtual void save_settings( Xml.Node* node ) {}
 
-  /* Loads the settings */
+  //-------------------------------------------------------------
+  // Loads the settings
   public virtual void load_settings( Xml.Node* node ) {}
 
-  /* Returns true if the given filename is targetted for this export type */
+  //-------------------------------------------------------------
+  // Returns true if the given filename is targetted for this
+  // export type
   public bool filename_matches( string fname, out string basename ) {
     if( dir ) {
       basename = fname;
@@ -200,7 +223,8 @@ public class Export {
     }
   }
 
-  /* Saves the state of this export */
+  //-------------------------------------------------------------
+  // Saves the state of this export
   public Xml.Node* save() {
     Xml.Node* node = new Xml.Node( null, "export" );
     node->set_prop( "name", name );
@@ -208,7 +232,8 @@ public class Export {
     return( node );
   }
 
-  /* Loads the state of this export */
+  //-------------------------------------------------------------
+  // Loads the state of this export
   public void load( Xml.Node* node ) {
     load_settings( node );
   }
