@@ -413,7 +413,7 @@ public class ExportMinder : Export {
     var tags = new Array<string>();
 
     // Read in the contents of the Minder file
-    var doc = Xml.Parser.read_file( fname, null, Xml.ParserOption.HUGE );
+    var doc = Xml.Parser.read_file( fname, null, (Xml.ParserOption.HUGE| Xml.ParserOption.NOWARNING) );
     if( doc == null ) {
       return( false );
     }
@@ -545,6 +545,22 @@ public class ExportMinder : Export {
   }
 
   //-------------------------------------------------------------
+  // Loads the node name XML node.
+  private void import_node_name( Xml.Node* n, Node node ) {
+    var content = "";
+    if( (n->children != null) && (n->children->type == Xml.ElementType.TEXT_NODE) ) {
+      content = n->children->get_content().strip();
+    }
+    if( content != "" ) {
+      stdout.printf( "Inserting content: (%s)\n", n->children->get_content() );
+      node.name.text.insert_text( 0, n->children->get_content() );
+    } else {
+      stdout.printf( "Loading name\n" );
+      node.name.load( n );
+    }
+  }
+
+  //-------------------------------------------------------------
   // Imports all Minder information useful for the node
   private Node import_node( Xml.Node* n, OutlineTable table, Array<string> tags ) {
 
@@ -567,15 +583,7 @@ public class ExportMinder : Export {
         stdout.printf( "Node element_node, name: %s\n", it->name );
         switch( it->name ) {
           case "formatting" :  import_node_formatting( it, node.name, formatting );  break;
-          case "nodename"   :  // import_node_text( it, node.name, formatting );        break;
-            if( (it->children != null) && (it->children->type == Xml.ElementType.TEXT_NODE) ) {
-              stdout.printf( "Inserting content: (%s)\n", it->children->get_content() );
-              node.name.text.insert_text( 0, it->children->get_content() );
-            } else {
-              stdout.printf( "Loading name\n" );
-              node.name.load( it );
-            }
-            break;
+          case "nodename"   :  import_node_name( it, node );                         break;
           case "nodenote"   :  import_node_text( it, node.note, null );              break;
           case "taglist"    :  import_taglist( it, node, table, tags );              break;
           case "nodes" :
