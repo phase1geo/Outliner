@@ -215,6 +215,30 @@ public class MainWindow : Gtk.ApplicationWindow {
       update_themes( "prefers-color-scheme" );
     });
 
+    close_request.connect(() => {
+      save_window_size();
+      save_tabs();
+      return( false );
+    });
+
+    // Setup shortcuts not associated with UI elements
+    set_action_for_command( KeyCommand.QUIT );
+
+    set_window_size();
+
+  }
+
+  //-------------------------------------------------------------
+  // Saves the current application window size to gsettings.
+  private void save_window_size() {
+    Outliner.settings.set_int( "window-w", get_width() );
+    Outliner.settings.set_int( "window-h", get_height() );
+  }
+
+  //-------------------------------------------------------------
+  // Set the window size to the values in gsettings
+  private void set_window_size() {
+    set_default_size( Outliner.settings.get_int( "window-w" ), Outliner.settings.get_int( "window-h" ) );
   }
 
   //-------------------------------------------------------------
@@ -1399,7 +1423,18 @@ public class MainWindow : Gtk.ApplicationWindow {
   //-------------------------------------------------------------
   // Called when the user uses the Control-q keyboard shortcut
   private void action_quit() {
+    save_window_size();
+    save_tabs();
     destroy();
+  }
+
+  //-------------------------------------------------------------
+  // Forces all tabs to save when the application is quit.
+  private void save_tabs() {
+    for( int i=0; i<_nb.get_n_pages(); i++ ) {
+      var ot = get_table( i );
+      ot.changed();
+    }
   }
 
   //-------------------------------------------------------------
