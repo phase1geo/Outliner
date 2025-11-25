@@ -125,15 +125,17 @@ public class FormattedText {
       }
       public bool combine( int s, int e, string? x, int p ) {
         bool changed = false;
-        if( ((x != null) && (x != extra)) || (p != pid) ) {
+        if( ((x != null) && ((s == end) || (e == start)) && (x != extra)) || (p != pid) ) {
           return( false );
         }
         if( (s <= end) && (e > end) ) {
           end     = e;
+          extra   = x;
           changed = true;
         }
         if( (s < start) && (e >= start) ) {
           start   = s;
+          extra   = x;
           changed = true;
         }
         return( changed );
