@@ -77,6 +77,7 @@ public class MainWindow : Gtk.ApplicationWindow {
   private SimpleActionGroup           _actions;
   private Shortcuts                   _shortcuts;
   private Gee.HashMap<KeyCommand, ShortcutTooltip> _shortcut_widgets;
+  private bool                        _tabs_loaded = false;
 
   private bool on_elementary = Utils.on_elementary();
 
@@ -322,31 +323,32 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   //-------------------------------------------------------------
   // This needs to be called whenever the tab is changed
-  private void tab_changed( OutlineTable ot ) {
+  private void tab_changed( int page_num ) {
+    var ot = get_table( page_num );
     do_buffer_changed( ot.undo_buffer );
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
     ot.grab_focus();
-    save_tab_state( "tab-changed" );
+    save_tab_state( page_num );
   }
 
   //-------------------------------------------------------------
   // Called whenever the current tab is switched in the notebook
   private void tab_switched( Widget page, uint page_num ) {
-    tab_changed( get_table( (int)page_num ) );
+    tab_changed( (int)page_num );
   }
 
   //-------------------------------------------------------------
   // Called whenever the current tab is moved to a new position
   private void tab_reordered( Widget page, uint page_num ) {
-    save_tab_state( "tab-reordered" );
+    save_tab_state( (int)page_num );
   }
 
   //-------------------------------------------------------------
   // Called whenever the current tab is moved to a new position
   private void tab_removed( Widget page, uint page_num ) {
-    save_tab_state( "tab-removed");
+    save_tab_state( _nb.page );
   }
 
   //-------------------------------------------------------------
@@ -370,8 +372,6 @@ public class MainWindow : Gtk.ApplicationWindow {
   //-------------------------------------------------------------
   // Adds a new tab to the notebook
   public OutlineTable add_tab( string? fname, TabAddReason reason ) {
-
-    stdout.printf( "In add_tab\n" );
 
     // Create and pack the canvas
     var ot = new OutlineTable( this );
@@ -531,9 +531,9 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   //-------------------------------------------------------------
   // Save the current tab state
-  private void save_tab_state(string msg = "") {
+  private void save_tab_state( int current_page ) {
 
-    stdout.printf( "In save_tab_state, msg: %s\n", msg );
+    if( !_tabs_loaded ) return;
 
     var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
 
@@ -547,8 +547,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     doc->set_root_element( root );
 
-    stdout.printf( "Saving tab state, n_pages: %u\n", _nb.get_n_pages() );
-
     for( int i=0; i<_nb.get_n_pages(); i++ ) {
       var table = get_table( i );
       Xml.Node* node  = new Xml.Node( null, "tab" );
@@ -557,7 +555,7 @@ public class MainWindow : Gtk.ApplicationWindow {
       root->add_child( node );
     }
 
-    root->new_prop( "selected", _nb.page.to_string() );
+    root->new_prop( "selected", current_page.to_string() );
 
     // Save the file
     doc->save_format_file( fname, 1 );
@@ -615,13 +613,14 @@ public class MainWindow : Gtk.ApplicationWindow {
     } else {
       var s = root->get_prop( "selected" );
       if( s != null ) {
-        stdout.printf( "Setting current tab to %d\n", _nb.page );
         _nb.page = int.parse( s );
       }
     }
 
+    _tabs_loaded = true;
+
     if( (tabs == 0) || tab_skipped ) {
-      save_tab_state( "load-tab-state" );
+      save_tab_state( _nb.page );
     }
 
     delete doc;
@@ -1105,7 +1104,6 @@ public class MainWindow : Gtk.ApplicationWindow {
   private void update_themes( string msg = "" ) {
 
     if( _themes == null ) {
-      stdout.printf( "Attempting to update themes before _themes is allocated: %s\n", msg );
       return;
     }
 
@@ -1267,7 +1265,7 @@ public class MainWindow : Gtk.ApplicationWindow {
             var table = add_tab_conditionally( new_fname, TabAddReason.IMPORT );
             update_title( table );
             if( exports.index( i ).import( fname, table ) ) {
-              save_tab_state( "open-file" );
+              save_tab_state( _nb.page );
               return( true );
             }
             close_current_tab();
@@ -1353,7 +1351,7 @@ public class MainWindow : Gtk.ApplicationWindow {
         tab_label.label = ot.document.label;
         tab_label.tooltip_text = fname;
         update_title( ot );
-        save_tab_state( "save-file" );
+        save_tab_state( _nb.page );
         if( close_tab ) {
           _nb.detach_tab( _nb.get_nth_page( _nb.page ) );
         } else {
