@@ -35,7 +35,7 @@ public class ExportMinder : Export {
   //-------------------------------------------------------------
   // Adds the settings for exporting.
   public override void add_settings( Grid grid ) {
-    var help_text = _( "Minder 1.0 and 2.0 have different, incompatible save formats.  If left unset, the Minder 2.x and beyond version will be used." );
+    var help_text = _( "Minder 1.0 and 2.0 have different, incompatible save formats.\nIf left unset, the Minder 2.x and beyond version will be used." );
     add_setting_bool( "minder-1-x", grid, _( "Save As Minder 1.x Version" ), help_text, false );
   }
  
@@ -301,7 +301,16 @@ public class ExportMinder : Export {
   // Exports the node name string.
   private Xml.Node* export_node_name( Node node ) {
     Xml.Node* name = new Xml.Node( null, "nodename" );
-    name->add_content( node.name.text.text );
+    var tags = node.name.text.get_extras_for_tag( FormatTag.TAG );
+    var text = node.name.text.text;
+    var it = tags.map_iterator();
+    while( it.next() ) {
+      try {
+        var re = new Regex( "\\s*@%s\\b".printf( it.get_key() ) );
+        text = re.replace( text, text.length, 0, "" );
+      } catch( RegexError e ) {}
+    }
+    name->add_content( text );
     return( name );
   }
 
@@ -552,10 +561,8 @@ public class ExportMinder : Export {
       content = n->children->get_content().strip();
     }
     if( content != "" ) {
-      stdout.printf( "Inserting content: (%s)\n", n->children->get_content() );
       node.name.text.insert_text( 0, n->children->get_content() );
     } else {
-      stdout.printf( "Loading name\n" );
       node.name.load( n );
     }
   }
@@ -580,7 +587,6 @@ public class ExportMinder : Export {
     /* Parse any children nodes */
     for( Xml.Node* it=n->children; it!=null; it=it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
-        stdout.printf( "Node element_node, name: %s\n", it->name );
         switch( it->name ) {
           case "formatting" :  import_node_formatting( it, node.name, formatting );  break;
           case "nodename"   :  import_node_name( it, node );                         break;
