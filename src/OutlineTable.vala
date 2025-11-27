@@ -898,7 +898,6 @@ public class OutlineTable : DrawingArea {
   // Handle mouse motion
   private void on_motion( double ex, double ey ) {
 
-    _motion   = true;
     _motion_x = ex;
     _motion_y = ey;
 
@@ -965,6 +964,8 @@ public class OutlineTable : DrawingArea {
         }
 
       }
+
+      _motion = true;
 
     } else {
 
@@ -1217,7 +1218,7 @@ public class OutlineTable : DrawingArea {
   public void toggle_expand( Node node ) {
     var nodes = new Array<Node>();
     node.expanded = !node.expanded;
-    if( !node.expanded && selected.is_descendant_of( node ) ) {
+    if( !node.expanded && (selected != null) && selected.is_descendant_of( node ) ) {
       selected = node;
     }
     nodes.append_val( node );
