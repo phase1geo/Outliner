@@ -1064,6 +1064,9 @@ public class MainWindow : Gtk.ApplicationWindow {
     top_menu.append_item( size_mi );
     top_menu.append_item( markdown_mi );
 
+    var edit_menu = new GLib.Menu();
+    append_menu_item( edit_menu, KeyCommand.EDIT_TITLE, _( "Edit Title" ) );
+
     var misc_menu = new GLib.Menu();
     append_menu_item( misc_menu, KeyCommand.SHOW_PREFERENCES,  _( "Preferences" ) );
     append_menu_item( misc_menu, KeyCommand.SHOW_SHORTCUTS,    _( "Shortcuts Cheatsheet" ) );
@@ -1074,6 +1077,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     var menu = new GLib.Menu();
     menu.append_section( null, top_menu );
+    menu.append_section( null, edit_menu );
     menu.append_section( null, misc_menu );
     menu.append_section( null, about_menu );
 

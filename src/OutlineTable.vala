@@ -620,6 +620,13 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
+  // Puts the title into view.
+  public void see_title() {
+    _scroll_adjust = 0;
+    see_internal();
+  }
+
+  //-------------------------------------------------------------
   // Resizes this table such that the last row can be positioned
   // at the top of the window.
   public bool resize_table() {

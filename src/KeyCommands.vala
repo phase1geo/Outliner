@@ -56,6 +56,7 @@ public enum KeyCommand {
       TOGGLE_FOCUS_MODE,
       TOGGLE_NOTES,
       SEARCH,
+      EDIT_TITLE,
       QUIT,
     MISCELLANEOUS_END,
     CONTROL_PRESSED,
@@ -223,6 +224,7 @@ public enum KeyCommand {
       case SHOW_CONTEXTUAL_MENU      :  return( "show-contextual_menu" );
       case SHOW_ABOUT                :  return( "show-about" );
       case SEARCH                    :  return( "search" );
+      case EDIT_TITLE                :  return( "edit-title" );
       case TOGGLE_FOCUS_MODE         :  return( "toggle-focus-mode" );
       case TOGGLE_NOTES              :  return( "toggle-notes" );
       case QUIT                      :  return( "quit" );
@@ -382,6 +384,7 @@ public enum KeyCommand {
       case "toggle-focus-mode"         :  return( TOGGLE_FOCUS_MODE );
       case "toggle-notes"              :  return( TOGGLE_NOTES );
       case "search"                    :  return( SEARCH );
+      case "edit-title"                :  return( EDIT_TITLE );
       case "quit"                      :  return( QUIT );
       case "control"                   :  return( CONTROL_PRESSED );
       case "escape"                    :  return( ESCAPE );
@@ -542,6 +545,7 @@ public enum KeyCommand {
       case TOGGLE_FOCUS_MODE         :  return( _( "Toggle focus mode" ) );
       case TOGGLE_NOTES              :  return( _( "Toggle display of all notes" ) );
       case SEARCH                    :  return( _( "Display search panel" ) );
+      case EDIT_TITLE                :  return( _( "Edit the document title" ) );
       case QUIT                      :  return( _( "Quit the application" ) );
       case NODE_START                :  return( _( "Node" ) );
       case NODE_EXIST_START          :  return( _( "Creation/Deletion Commands" ) );
@@ -700,6 +704,7 @@ public enum KeyCommand {
       case TOGGLE_FOCUS_MODE         :  return( toggle_focus_mode );
       case TOGGLE_NOTES              :  return( toggle_notes );
       case SEARCH                    :  return( search );
+      case EDIT_TITLE                :  return( edit_title );
       case QUIT                      :  return( quit_application );
       case CONTROL_PRESSED           :  return( control_pressed );
       case ESCAPE                    :  return( escape );
@@ -1131,6 +1136,13 @@ public enum KeyCommand {
 
   public static void search( OutlineTable ot ) {
     ot.win.do_search();
+  }
+
+  public static void edit_title( OutlineTable ot ) {
+    ot.set_title_editable( true );
+    ot.title.set_cursor_all( false );
+    ot.see_title();
+    ot.grab_focus();
   }
 
   public static void show_about( OutlineTable ot ) {
