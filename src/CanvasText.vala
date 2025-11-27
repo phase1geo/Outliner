@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2018 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -496,14 +496,39 @@ public class CanvasText : Object {
   }
 
   //-------------------------------------------------------------
+  // The parameter dir assumes left-to-right; however, if the
+  // current layout is a right-to-left language, we will invert
+  // the value.
+  private int calc_direction( int dir ) {
+    var ldir = _pango_layout.get_direction( text.text.index_of_nth_char( _cursor ) );
+    return( (ldir == Pango.Direction.RTL) ? (0 - dir) : dir );
+  }
+
+  //-------------------------------------------------------------
   // Adjusts the cursor by the given amount of characters
   private void cursor_by_char( int dir ) {
-    var last = text.text.char_count();
-    var cpos = _cursor + dir;
-    if( cpos < 0 ) {
-      cpos = 0;
-    } else if( cpos > last ) {
-      cpos = last;
+    var cpos = _cursor;
+    if( _selstart != _selend ) {
+      if( calc_direction( dir ) > 0 ) {
+        cpos = _selend;
+      } else {
+        cpos = _selstart;
+      }
+    } else {
+      var last      = text.text.char_count();
+      var next_byte = false;
+      do {
+        cpos += calc_direction( dir );
+        next_byte = false;
+        if( cpos < 0 ) {
+          cpos = 0;
+        } else if( cpos > last ) {
+          cpos = last;
+        } else {
+          var ch = text.text.get_char( text.text.index_of_nth_char( cpos ) );
+          next_byte = !ch.isprint();
+        }
+      } while( next_byte );
     }
     set_cursor_only( cpos );
   }
@@ -561,11 +586,16 @@ public class CanvasText : Object {
   //-------------------------------------------------------------
   // Finds the start or end character of a line
   private int find_line_extent( bool start ) {
-    int line, column;
+    int line, line2, column;
     _pango_layout.index_to_line_x( text.text.index_of_nth_char( _cursor ), false, out line, out column );
     var line_layout = _pango_layout.get_line_readonly( line );
-    return( start ? text.text.char_count( line_layout.start_index ) :
-            (text.text.char_count( line_layout.start_index + line_layout.length ) - 1) );
+    if( start ) {
+      return( text.text.char_count( line_layout.start_index ) );
+    } else {
+      var eol = line_layout.start_index + line_layout.length;
+      _pango_layout.index_to_line_x( eol, false, out line2, out column );
+      return( text.text.char_count( eol ) - ((line != line2) ? 1 : 0) );
+    }
   }
 
   //-------------------------------------------------------------
@@ -582,7 +612,8 @@ public class CanvasText : Object {
     clear_selection( "move_cursor_to_lineend" );
   }
 
-  /* Causes the selection to continue from the start of the line */
+  //-------------------------------------------------------------
+  // Causes the selection to continue from the start of the line
   public void selection_to_linestart( bool home ) {
     int line_start = find_line_extent( true );
     if( (_selstart == _selend) || home ) {
@@ -596,7 +627,8 @@ public class CanvasText : Object {
     }
   }
 
-  /* Causes the selection to continue to the end of the line */
+  //-------------------------------------------------------------
+  // Causes the selection to continue to the end of the line
   public void selection_to_lineend( bool end ) {
     int line_end = find_line_extent( false );
     if( (_selstart == _selend) || end ) {
@@ -610,19 +642,22 @@ public class CanvasText : Object {
     }
   }
 
-  /* Moves the cursor to the beginning of the name */
+  //-------------------------------------------------------------
+  // Moves the cursor to the beginning of the name
   public void move_cursor_to_start() {
     set_cursor_only( 0 );
     clear_selection( "move_cursor_to_start" );
   }
 
-  /* Moves the cursor to the end of the name */
+  //-------------------------------------------------------------
+  // Moves the cursor to the end of the name
   public void move_cursor_to_end() {
     set_cursor_only( text.text.char_count() );
     clear_selection( "move_cursor_to_end" );
   }
 
-  /* Causes the selection to continue from the start of the text */
+  //-------------------------------------------------------------
+  // Causes the selection to continue from the start of the text
   public void selection_to_start( bool home ) {
     if( (_selstart == _selend) || home ) {
       change_selection( 0, _cursor, "selection_to_start A" );
@@ -630,12 +665,13 @@ public class CanvasText : Object {
         set_cursor_only( 0 );
       }
     } else {
-      change_selection( _cursor, null, "selection_to_start B" );
+      change_selection( 0, null, "selection_to_start B" );
       set_cursor_only( 0 );
     }
   }
 
-  /* Causes the selection to continue to the end of the text */
+  //-------------------------------------------------------------
+  // Causes the selection to continue to the end of the text
   public void selection_to_end( bool end ) {
     if( (_selstart == _selend) || end ) {
       change_selection( _cursor, text.text.char_count(), "selection_to_end A" );
@@ -648,10 +684,11 @@ public class CanvasText : Object {
     }
   }
 
-  /* Finds the next/previous word boundary */
+  //-------------------------------------------------------------
+  // Finds the next/previous word boundary
   private int find_word( int start, int dir ) {
     bool alnum_found = false;
-    if( dir == 1 ) {
+    if( calc_direction( dir ) == 1 ) {
       for( int i=start; i<text.text.char_count(); i++ ) {
         int index = text.text.index_of_nth_char( i );
         if( text.text.get_char( index ).isalnum() ) {
@@ -674,13 +711,15 @@ public class CanvasText : Object {
     }
   }
 
-  /* Moves the cursor to the next or previous word beginning */
+  //-------------------------------------------------------------
+  // Moves the cursor to the next or previous word beginning
   public void move_cursor_by_word( int dir ) {
     set_cursor_only( find_word( _cursor, dir ) );
     change_selection( null, _selstart, "move_cursor_by_word" );
   }
 
-  /* Change the selection by a word in the given direction */
+  //-------------------------------------------------------------
+  // Change the selection by a word in the given direction
   public void selection_by_word( int dir ) {
     if( _cursor == _selstart ) {
       set_cursor_only( find_word( _cursor, dir ) );
@@ -699,33 +738,33 @@ public class CanvasText : Object {
     }
   }
 
-  /* Handles a backspace key event */
+  //-------------------------------------------------------------
+  // Handles a backspace key event
   public void backspace( UndoTextBuffer undo_buffer ) {
-    if( _cursor > 0 ) {
-      var cur = _cursor;
-      if( _selstart != _selend ) {
-        var spos = text.text.index_of_nth_char( _selstart );
-        var epos = text.text.index_of_nth_char( _selend );
-        var str  = text.text.slice( spos, epos );
-        var tags = text.get_tags_in_range( spos, epos );
-        set_cursor_only( _selstart );
-        change_selection( null, _selstart, "backspace" );
-        text.remove_text( spos, (epos - spos) );
-        undo_buffer.add_backspace( spos, str, tags, cur );
-      } else {
-        var spos = text.text.index_of_nth_char( _cursor - 1 );
-        var epos = text.text.index_of_nth_char( _cursor );
-        var str  = text.text.slice( spos, epos );
-        var tags = text.get_tags_in_range( spos, epos );
-        set_cursor_only( _cursor - 1 );
-        clear_selection( "backspace" );
-        text.remove_text( spos, (epos - spos) );
-        undo_buffer.add_backspace( spos, str, tags, cur );
-      }
+    var cur = _cursor;
+    if( _selstart != _selend ) {
+      var spos = text.text.index_of_nth_char( _selstart );
+      var epos = text.text.index_of_nth_char( _selend );
+      var str  = text.text.slice( spos, epos );
+      var tags = text.get_tags_in_range( spos, epos );
+      set_cursor_only( _selstart );
+      change_selection( null, _selstart, "backspace" );
+      text.remove_text( spos, (epos - spos) );
+      undo_buffer.add_backspace( spos, str, tags, cur );
+    } else if( _cursor > 0 ) {
+      var spos = text.text.index_of_nth_char( _cursor - 1 );
+      var epos = text.text.index_of_nth_char( _cursor );
+      var str  = text.text.slice( spos, epos );
+      var tags = text.get_tags_in_range( spos, epos );
+      set_cursor_only( _cursor - 1 );
+      change_selection( (_cursor - 1), (_cursor - 1), "backspace 2" );
+      text.remove_text( spos, (epos - spos) );
+      undo_buffer.add_backspace( spos, str, tags, cur );
     }
   }
 
-  /* Handles a backspace to wordstart key event */
+  //-------------------------------------------------------------
+  // Handles a backspace to wordstart key event
   public void backspace_word( UndoTextBuffer undo_buffer ) {
     if( _cursor > 0 ) {
       var cur  = _cursor;
@@ -748,29 +787,31 @@ public class CanvasText : Object {
     }
   }
 
-  /* Handles a delete key event */
+  //-------------------------------------------------------------
+  // Handles a delete key event
   public void delete( UndoTextBuffer undo_buffer ) {
-    if( _cursor < text.text.length ) {
-      var cur = _cursor;
-      if( _selstart != _selend ) {
-        var spos = text.text.index_of_nth_char( _selstart );
-        var epos = text.text.index_of_nth_char( _selend );
-        var str  = text.text.slice( spos, epos );
-        var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, (epos - spos) );
-        undo_buffer.add_delete( spos, str, tags, cur );
-      } else {
-        var spos = text.text.index_of_nth_char( _cursor );
-        var epos = text.text.index_of_nth_char( _cursor + 1 );
-        var str  = text.text.slice( spos, epos );
-        var tags = text.get_tags_in_range( spos, epos );
-        text.remove_text( spos, (epos - spos) );
-        undo_buffer.add_delete( spos, str, tags, cur );
-      }
+    var cur = _cursor;
+    if( _selstart != _selend ) {
+      var spos = text.text.index_of_nth_char( _selstart );
+      var epos = text.text.index_of_nth_char( _selend );
+      var str  = text.text.slice( spos, epos );
+      var tags = text.get_tags_in_range( spos, epos );
+      set_cursor_only( _selstart );
+      change_selection( null, _selstart, "delete" );
+      text.remove_text( spos, (epos - spos) );
+      undo_buffer.add_delete( spos, str, tags, cur );
+    } else if( _cursor < text.text.char_count() ) {
+      var spos = text.text.index_of_nth_char( _cursor );
+      var epos = text.text.index_of_nth_char( _cursor + 1 );
+      var str  = text.text.slice( spos, epos );
+      var tags = text.get_tags_in_range( spos, epos );
+      text.remove_text( spos, (epos - spos) );
+      undo_buffer.add_delete( spos, str, tags, cur );
     }
   }
 
-  /* Deletes all characters in the given range */
+  //-------------------------------------------------------------
+  // Deletes all characters in the given range
   public void delete_range( int startpos, int endpos, UndoTextBuffer undo_buffer ) {
     var cur  = _cursor;
     var spos = text.text.index_of_nth_char( startpos );
@@ -778,12 +819,12 @@ public class CanvasText : Object {
     var str  = text.text.slice( spos, epos );
     var tags = text.get_tags_in_range( spos, epos );
     set_cursor_only( startpos );
-    clear_selection( "delete_range" );
     text.remove_text( spos, (epos - spos) );
     undo_buffer.add_delete( spos, str, tags, cur );
   }
 
-  /* Handles a delete to end of word key event */
+  //-------------------------------------------------------------
+  // Handles a delete to end of word key event
   public void delete_word( UndoTextBuffer undo_buffer ) {
     if( _cursor < text.text.length ) {
       var spos = text.text.index_of_nth_char( _cursor );
@@ -804,7 +845,9 @@ public class CanvasText : Object {
     }
   }
 
-  /* Inserts the given string at the current cursor position and adjusts cursor */
+  //-------------------------------------------------------------
+  // Inserts the given string at the current cursor position and
+  // adjusts cursor
   public void insert( string s, UndoTextBuffer undo_buffer ) {
     var slen = s.char_count();
     var cur  = _cursor;
@@ -815,18 +858,20 @@ public class CanvasText : Object {
       var tags = text.get_tags_in_range( spos, epos );
       text.replace_text( spos, (epos - spos), s );
       set_cursor_only( _selstart + slen );
-      change_selection( null, _selstart, "insert" );
+      change_selection( _cursor, _cursor, "insert A" );
       undo_buffer.add_replace( spos, str, s, tags, cur );
     } else {
       var cpos = text.text.index_of_nth_char( _cursor );
       text.insert_text( cpos, s );
       set_cursor_only( _cursor + slen );
-      clear_selection( "insert" );
+      change_selection( _cursor, _cursor, "insert B" );
       undo_buffer.add_insert( cpos, s, cur );
     }
   }
 
-  /* Inserts the given formatted text at the current cursor position */
+  //-------------------------------------------------------------
+  // Inserts the given formatted text at the current cursor
+  // position
   public void insert_formatted_text( FormattedText t, UndoTextBuffer undo_buffer ) {
     var slen  = t.text.char_count();
     var ttags = t.get_tags_in_range( 0, slen );
@@ -842,7 +887,7 @@ public class CanvasText : Object {
         text.add_tag( (FormatTag)ttag.tag, (ttag.start + spos), (ttag.end + spos), ttag.extra );
       }
       set_cursor_only( _selstart + slen );
-      change_selection( null, _selstart, "insert" );
+      change_selection( _cursor, _cursor, "insert" );
       undo_buffer.add_replace( spos, str, t.text, tags, cur );
     } else {
       var cpos = text.text.index_of_nth_char( _cursor );
@@ -852,12 +897,13 @@ public class CanvasText : Object {
         text.add_tag( (FormatTag)ttag.tag, (ttag.start + cpos), (ttag.end + cpos), ttag.extra );
       }
       set_cursor_only( _cursor + slen );
-      clear_selection( "insert_formatted_text" );
+      change_selection( _cursor, _cursor, "insert_formatted_text A" );
       undo_buffer.add_insert( cpos, t.text, cur );
     }
   }
 
-  /* Inserts a range of text messages */
+  //-------------------------------------------------------------
+  // Inserts a range of text messages
   public void insert_ranges( Array<InsertText?> its, UndoTextBuffer undo_buffer ) {
     var cur = _cursor;
     for( int i=(int)(its.length - 1); i>=0; i-- ) {
@@ -874,7 +920,8 @@ public class CanvasText : Object {
     undo_buffer.add_inserts( its, cur );
   }
 
-  /* Replaces the given range with the specified string */
+  //-------------------------------------------------------------
+  // Replaces the given range with the specified string
   public void replace( int start, int end, string s, UndoTextBuffer undo_buffer ) {
     var slen = s.char_count();
     var cur  = _cursor;
@@ -886,10 +933,9 @@ public class CanvasText : Object {
     undo_buffer.add_replace( start, str, s, tags, cur );
   }
 
-  /*
-   Returns the currently selected text or, if no text is currently selected,
-   returns null.
-  */
+  //-------------------------------------------------------------
+  // Returns the currently selected text or, if no text is
+  // currently selected, returns null.
   public string? get_selected_text() {
     if( _selstart != _selend ) {
       var spos = text.text.index_of_nth_char( _selstart );
@@ -899,14 +945,17 @@ public class CanvasText : Object {
     return( null );
   }
 
-  /* Returns the current cursor, selection start and selection end values. */
+  //-------------------------------------------------------------
+  // Returns the current cursor, selection start and selection
+  // end values.
   public void get_cursor_info( out int cursor, out int start, out int end ) {
     cursor = _cursor;
     start  = _selstart;
     end    = _selend;
   }
 
-  /* Returns the current cursor position */
+  //-------------------------------------------------------------
+  // Returns the current cursor position
   public void get_cursor_pos( out int x, out int ytop, out int ybot ) {
     var index = text.text.index_of_nth_char( _cursor );
     var rect  = _pango_layout.index_to_pos( index );
@@ -915,7 +964,8 @@ public class CanvasText : Object {
     ybot = ytop + (int)(rect.height / Pango.SCALE);
   }
 
-  /* Returns the x and y position of the given character position */
+  //-------------------------------------------------------------
+  // Returns the x and y position of the given character position
   public void get_char_pos( int pos, out double left, out double top, out double bottom, out int line ) {
     var index = text.text.index_of_nth_char( pos );
     var rect  = _pango_layout.index_to_pos( index );
@@ -926,7 +976,9 @@ public class CanvasText : Object {
     _pango_layout.index_to_line_x( index, false, out line, out x_pos );
   }
 
-  /* Returns a populated FormattedText instance containing the selected text range */
+  //-------------------------------------------------------------
+  // Returns a populated FormattedText instance containing the
+  // selected text range
   public FormattedText? get_selected_formatted_text( OutlineTable table ) {
     if( _selstart != _selend ) {
       var spos = text.text.index_of_nth_char( _selstart );
@@ -936,7 +988,8 @@ public class CanvasText : Object {
     return( null );
   }
 
-  /* Add tag to selected area */
+  //-------------------------------------------------------------
+  // Add tag to selected area
   public void add_tag( FormatTag tag, string? extra, UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
@@ -944,7 +997,8 @@ public class CanvasText : Object {
     undo_buffer.add_tag_add( spos, epos, tag, extra, _cursor );
   }
 
-  /* Removes the specified tag for the selected range */
+  //-------------------------------------------------------------
+  // Removes the specified tag for the selected range
   public void remove_tag( FormatTag tag, UndoTextBuffer undo_buffer ) {
     var spos  = text.text.index_of_nth_char( _selstart );
     var epos  = text.text.index_of_nth_char( _selend );
@@ -953,7 +1007,8 @@ public class CanvasText : Object {
     undo_buffer.add_tag_remove( spos, epos, tag, extra, _cursor );
   }
 
-  /* Removes the specified tag for the selected range */
+  //-------------------------------------------------------------
+  // Removes the specified tag for the selected range
   public void remove_all_tags( UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
@@ -962,34 +1017,34 @@ public class CanvasText : Object {
     undo_buffer.add_tag_clear( spos, epos, tags, _cursor );
   }
 
-  /*
-   Call this method to change the current selection.  If a parameter
-   is specified as null, this selection index will not change value.
-  */
+  //-------------------------------------------------------------
+  // Call this method to change the current selection.  If a
+  // parameter is specified as null, this selection index will
+  // not change value.
   public void change_selection( int? selstart, int? selend, string? msg = null ) {
 
     if( _debug && (msg != null) ) {
       stdout.printf( "In change_selection, msg: %s\n", msg );
     }
 
-    /* Get the selection state prior to changing it */
+    // Get the selection state prior to changing it
     var old_selected = (_selstart != _selend);
 
-    /* Update the selection range */
+    // Update the selection range
     _selstart = selstart ?? _selstart;
     _selend   = selend   ?? _selend;
 
-    /* Get the selection state after the change */
+    // Get the selection state after the change
     var new_selected = (_selstart != _selend);
 
-    /* Update the selection tag */
+    // Update the selection tag
     if( new_selected ) {
       _text.replace_tag( FormatTag.SELECT, text.text.index_of_nth_char( _selstart ), text.text.index_of_nth_char( _selend ) );
     } else if( old_selected ) {
       _text.remove_tag_all( FormatTag.SELECT );
     }
 
-    /* Alert anyone listening if the selection mode changed */
+    // Alert anyone listening if the selection mode changed
     if( old_selected && !new_selected ) {
       select_mode( false );
     } else if( !old_selected && new_selected ) {
@@ -998,7 +1053,8 @@ public class CanvasText : Object {
 
   }
 
-  /* Draws the node font to the screen */
+  //-------------------------------------------------------------
+  // Draws the node font to the screen
   public void draw( Cairo.Context ctx, Theme theme, RGBA fg, double alpha, bool copy_layout ) {
 
     var layout = _pango_layout;
@@ -1018,13 +1074,13 @@ public class CanvasText : Object {
       layout.set_attributes( attrs );
     }
 
-    /* Output the text */
+    // Output the text
     ctx.move_to( posx, posy );
     Utils.set_context_color_with_alpha( ctx, fg, alpha );
     Pango.cairo_show_layout( ctx, layout );
     ctx.new_path();
 
-    /* Draw the insertion cursor if we are in the 'editable' state */
+    // Draw the insertion cursor if we are in the 'editable' state
     if( edit ) {
       var cpos = text.text.index_of_nth_char( _cursor );
       var rect = layout.index_to_pos( cpos );
