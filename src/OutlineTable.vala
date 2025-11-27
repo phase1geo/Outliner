@@ -2162,9 +2162,9 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Creates a title and makes it editable, if specified.
-  private void create_title( bool edit ) {
+  public void create_title( bool edit, string text = _( "Title" ) ) {
 
-    _title = new CanvasText.with_text( this, get_allocated_width(), _( "Title" ) );
+    _title = new CanvasText.with_text( this, get_allocated_width(), text );
     _title.posy = top_margin;
     _title.set_font( _title_family, _title_size );
     _title.set_alignment( Pango.Alignment.CENTER );

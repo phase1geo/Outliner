@@ -92,6 +92,36 @@ public class Utils {
   }
 
   //-------------------------------------------------------------
+  // Transforms a filename into a document title.
+  public static string make_title_from_filename( string fname ) {
+
+    var root = rootname( fname );
+    root = root.replace( "_", " " );
+    root = root.replace( "-", " " );
+    root = root.replace( ".", " - " );
+
+    var title = "";
+    var capitalize = true;
+    for( int i=0; i<root.length; i++ ) {
+      if( root.valid_char( i ) ) {
+        var c = root.@get( i );
+        if( capitalize && c.isalpha() ) {
+          title += c.toupper().to_string();
+          capitalize = false;
+        } else {
+          title += c.to_string();
+        }
+        if( c == ' ' ) {
+          capitalize = true;
+        }
+      }
+    }
+
+    return( title );
+
+  }
+
+  //-------------------------------------------------------------
   // Returns a string that is used to display a tooltip with
   // displayed accelerator
   public static string tooltip_with_accel( string tooltip, string accel ) {

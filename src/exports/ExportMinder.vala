@@ -407,6 +407,11 @@ public class ExportMinder : Export {
     // Finally, load the minder file
     var retval = import_xml( Path.build_filename( tmp_dir, "map.xml" ), table );
 
+    // If the title hasn't been set yet, make it match the filename
+    if( retval && (table.title == null) ) {
+      table.create_title( false, Utils.make_title_from_filename( fname ) );
+    }
+
     // Delete the temporary directory
     Utils.delete_directory( tmp_dir );
 
@@ -463,9 +468,23 @@ public class ExportMinder : Export {
   //-------------------------------------------------------------
   // Parses the given top-level nodes
   private void import_nodes( Xml.Node* nodes, OutlineTable table, Array<string> tags ) {
+    var top_nodes = new Array<Node>();
     for( Xml.Node* it=nodes->children; it!=null; it=it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
-        table.root.add_child( import_node( it, table, tags ) );
+        top_nodes.append_val( import_node( it, table, tags ) );
+      }
+    }
+    if( top_nodes.length == 1 ) {
+      var root = top_nodes.index( 0 );
+      table.create_title( false, root.name.text.text );
+      for( int i=(int)(root.children.length - 1); i>=0; i-- ) {
+        var child = root.children.index( i );
+        root.remove_child( child );
+        table.root.add_child( child, 0 );
+      }
+    } else {
+      for( int i=0; i<top_nodes.length; i++ ) {
+        table.root.add_child( top_nodes.index( i ) );
       }
     }
   }
