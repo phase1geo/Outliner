@@ -545,12 +545,12 @@ public class OutlineTable : DrawingArea {
         changed();
       }
       if( edit ) {
+        set_node_mode( selected, NodeMode.NONE );
         _orig_title.copy( _title );
         undo_text.ct = _title;
         update_im_cursor( _title );
         _im_context.focus_in();
         _tagger.preedit_load_tags( _title.text );
-        set_node_mode( selected, NodeMode.NONE );
       } else {
         _tagger.postedit_load_tags( _title.text );
         _im_context.focus_out();
