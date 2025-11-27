@@ -580,6 +580,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     // If the file does not exist, skip the rest and return false
     if( !FileUtils.test( tab_state, FileTest.EXISTS ) ) {
       do_new_file();
+      _tabs_loaded = true;
       return;
     }
 
@@ -587,6 +588,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     if( doc == null ) {
       do_new_file();
+      _tabs_loaded = true;
       return;
     }
 
@@ -1433,6 +1435,7 @@ public class MainWindow : Gtk.ApplicationWindow {
       var ot = get_table( i );
       ot.changed();
     }
+    save_tab_state( _nb.page );
   }
 
   //-------------------------------------------------------------
