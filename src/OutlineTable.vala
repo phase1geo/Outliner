@@ -435,11 +435,13 @@ public class OutlineTable : DrawingArea {
       button = Gdk.BUTTON_SECONDARY
     };
     var motion_controller = new EventControllerMotion();
+    var focus_controller = new EventControllerFocus();
 
     this.add_controller( _key_controller );
     this.add_controller( pri_click_controller );
     this.add_controller( sec_click_controller );
     this.add_controller( motion_controller );
+    this.add_controller( focus_controller );
 
     _key_controller.key_pressed.connect( on_keypress );
     _key_controller.key_released.connect( on_keyrelease );
@@ -448,6 +450,7 @@ public class OutlineTable : DrawingArea {
     pri_click_controller.released.connect( on_release );
     sec_click_controller.pressed.connect( on_secondary_press );
     motion_controller.motion.connect( on_motion );
+    focus_controller.leave.connect( on_focus_leave );
 
     this.set_draw_func( on_draw );
 
@@ -1111,6 +1114,12 @@ public class OutlineTable : DrawingArea {
 
     _pressed = false;
 
+  }
+
+  //-------------------------------------------------------------
+  // Hides the format bar if we lose keyboard focus.
+  private void on_focus_leave() {
+    hide_format_bar();
   }
 
   //-------------------------------------------------------------
@@ -2276,6 +2285,9 @@ public class OutlineTable : DrawingArea {
     }
 
     _format_bar.popup();
+
+    // Keep the keyboard focus on the OutlineTable
+    grab_focus();
 
   }
 

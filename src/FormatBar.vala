@@ -45,6 +45,8 @@ public class FormatBar : Gtk.Popover {
   /* Construct the formatting bar */
   public FormatBar( OutlineTable table ) {
 
+    Object( autohide: false );
+
     _table = table;
 
     _link_editor = new LinkEditor( table );
