@@ -1,15 +1,18 @@
+src/About.vala
+src/Application.vala
 src/Document.vala
-src/DynamicNotebook.vala
 src/Exporter.vala
 src/exports/ExportHTML.vala
 src/exports/ExportMarkdown.vala
 src/exports/ExportMinder.vala
+src/exports/ExportODT.vala
 src/exports/ExportOPML.vala
 src/exports/ExportOrgMode.vala
 src/exports/ExportPDF.vala
 src/exports/ExportRTF.vala
 src/exports/ExportText.vala
 src/FormatBar.vala
+src/KeyCommands.vala
 src/LinkEditor.vala
 src/MainWindow.vala
 src/NodeMenu.vala
@@ -17,6 +20,7 @@ src/Node.vala
 src/OutlineTable.vala
 src/Preferences.vala
 src/SearchBar.vala
+src/Shortcuts.vala
 src/Tagger.vala
 src/themes/ThemeDark.vala
 src/themes/ThemeDefault.vala
@@ -26,6 +30,7 @@ src/themes/ThemePrintColor.vala
 src/themes/ThemePrintGrayscale.vala
 src/themes/ThemeSolarizedDark.vala
 src/themes/ThemeSolarizedLight.vala
+src/undo_actions/UndoNodeAddParent.vala
 src/undo_actions/UndoNodeCut.vala
 src/undo_actions/UndoNodeDelete.vala
 src/undo_actions/UndoNodeExpander.vala
@@ -52,5 +57,6 @@ src/undo_actions/UndoTextTagRemove.vala
 src/undo_actions/UndoTitleChange.vala
 src/UndoBuffer.vala
 src/UnicodeInsert.vala
+src/Utils.vala
 src/ZoomWidget.vala
 data/com.github.phase1geo.outliner.shortcuts.ui

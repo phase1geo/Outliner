@@ -13,6 +13,7 @@
   <developer_name>Trevor Williams</developer_name>
   <developer_name xml:lang="nl">Trevor Williams</developer_name>
   <developer_name xml:lang="fr">Trevor Williams</developer_name>
+  <developer>com.github.phase1geo</developer>
   <provides>
     <binary>com.github.phase1geo.outliner</binary>
   </provides>

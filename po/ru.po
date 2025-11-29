@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-21 13:20-0500\n"
+"POT-Creation-Date: 2025-11-28 22:35-0600\n"
 "PO-Revision-Date: 2023-05-21 10:26+0200\n"
 "Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
@@ -20,101 +20,107 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/Document.vala:67
+#: src/About.vala:38
+#, fuzzy
+msgid "Outlining application"
+msgstr "Завершить работу"
+
+#: src/About.vala:39
+msgid "Copyright © 2018-2025 Trevor Williams"
+msgstr ""
+
+#: src/About.vala:43
+msgid "Outliner in AppCenter"
+msgstr ""
+
+#: src/Application.vala:108
+#, c-format
+msgid "ERROR: %s\n"
+msgstr ""
+
+#: src/Application.vala:109
+#, c-format
+msgid "Run '%s --help' to see valid options\n"
+msgstr ""
+
+#: src/Application.vala:131
+#, c-format
+msgid "ERROR:  Unable to open file '%s'\n"
+msgstr ""
+
+#: src/Document.vala:65
 msgid "unnamed"
 msgstr "безымянный"
 
-#: src/DynamicNotebook.vala:234 src/DynamicNotebook.vala:258
-msgid "Close Tab"
-msgstr "Закрыть вкладку"
-
-#: src/DynamicNotebook.vala:261
-msgid "Open in a New Window"
-msgstr "Открыть в новом окне"
-
-#: src/DynamicNotebook.vala:262
-msgid "Duplicate"
-msgstr "Создать копию"
-
-#: src/DynamicNotebook.vala:314
-msgid "Close Other Tab"
-msgstr "Закрыть другую вкладку"
-
-#: src/DynamicNotebook.vala:314
-msgid "Close Other Tabs"
-msgstr "Закрыть остальные вкладки"
-
-#: src/DynamicNotebook.vala:485
-msgid "Clear All"
-msgstr "Стереть всё"
-
-#: src/DynamicNotebook.vala:767 src/DynamicNotebook.vala:798
-msgid "New Tab"
-msgstr "Создать вкладку"
-
-#: src/DynamicNotebook.vala:768
-msgid "Undo Close Tab"
-msgstr "Отменить закрытие вкладки"
-
-#: src/DynamicNotebook.vala:810
-msgid "Closed Tabs"
-msgstr "Закрытые вкладки"
-
-#: src/Exporter.vala:43
+#: src/Exporter.vala:60
 msgid "Export…"
 msgstr "Экспортировать…"
 
-#: src/Exporter.vala:44
+#: src/Exporter.vala:62
 msgid "Export With Current Settings"
 msgstr "Экспортировать с текущими параметрами"
 
-#: src/Exporter.vala:110
+#: src/Exporter.vala:139
 msgid "Export Options"
 msgstr "Параметры экспорта"
 
-#: src/Exporter.vala:131
+#: src/Exporter.vala:162
 #, c-format
 msgid "Export As %s"
 msgstr "Экспортировать как %s"
 
-#: src/Exporter.vala:132 src/LinkEditor.vala:62 src/MainWindow.vala:969
-#: src/MainWindow.vala:1009 src/MainWindow.vala:1116
+#: src/Exporter.vala:163 src/LinkEditor.vala:62 src/MainWindow.vala:1178
+#: src/MainWindow.vala:1223 src/MainWindow.vala:1339
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/Exporter.vala:132 src/MainWindow.vala:674
+#: src/Exporter.vala:163 src/MainWindow.vala:800
 msgid "Export"
 msgstr "Экспортировать"
 
-#: src/Exporter.vala:158
+#: src/Exporter.vala:190
 msgid "Minder Export Completed"
 msgstr "Экспорт в файл Minder завершён"
 
-#: src/exports/ExportHTML.vala:29
+#: src/exports/ExportHTML.vala:30
 msgid "HTML"
 msgstr "HTML"
 
-#: src/exports/ExportHTML.vala:34 src/exports/ExportRTF.vala:34
+#: src/exports/ExportHTML.vala:36
 msgid "Use unordered lists"
 msgstr "Использовать маркированные списки"
 
-#: src/exports/ExportHTML.vala:34 src/exports/ExportRTF.vala:34
+#: src/exports/ExportHTML.vala:36
 msgid "Export using unordered lists"
 msgstr "Экспортировать как маркированные списки"
 
-#: src/exports/ExportMarkdown.vala:28
+#: src/exports/ExportMarkdown.vala:29
 msgid "Markdown"
 msgstr "Markdown"
 
-#: src/exports/ExportMinder.vala:30
+#: src/exports/ExportMinder.vala:32
 msgid "Minder"
 msgstr "Minder"
 
-#: src/exports/ExportMinder.vala:103
+#: src/exports/ExportMinder.vala:38
+msgid ""
+"Minder 1.0 and 2.0 have different, incompatible save formats.\n"
+"If left unset, the Minder 2.x and beyond version will be used."
+msgstr ""
+
+#: src/exports/ExportMinder.vala:39
+msgid "Save As Minder 1.x Version"
+msgstr ""
+
+#: src/exports/ExportMinder.vala:247
 msgid "To right"
 msgstr "Вправо"
 
-#: src/exports/ExportOPML.vala:27
+#: src/exports/ExportODT.vala:29
+msgid "ODT"
+msgstr ""
+
+#: src/exports/ExportOPML.vala:29
 msgid "OPML"
 msgstr "OPML"
 
@@ -142,379 +148,1008 @@ msgstr "RTF"
 msgid "PlainText"
 msgstr "Простой текст"
 
-#: src/FormatBar.vala:60 src/NodeMenu.vala:64
+#: src/FormatBar.vala:63 src/NodeMenu.vala:48
 msgid "Copy"
 msgstr "Скопировать"
 
-#: src/FormatBar.vala:65 src/NodeMenu.vala:68
+#: src/FormatBar.vala:69 src/NodeMenu.vala:49
 msgid "Cut"
 msgstr "Вырезать"
 
-#: src/FormatBar.vala:71
+#: src/FormatBar.vala:75
 msgid "Bold"
 msgstr "Полужирный"
 
-#: src/FormatBar.vala:77
+#: src/FormatBar.vala:82
 msgid "Italic"
 msgstr "Наклонный"
 
-#: src/FormatBar.vala:83
+#: src/FormatBar.vala:89
 msgid "Underline"
 msgstr "Подчёркивание"
 
-#: src/FormatBar.vala:89
+#: src/FormatBar.vala:96
 msgid "Strikethrough"
 msgstr "Зачёркивание"
 
-#: src/FormatBar.vala:95
+#: src/FormatBar.vala:103
 msgid "Code Block"
 msgstr "Блок кода"
 
-#: src/FormatBar.vala:101
+#: src/FormatBar.vala:110
 msgid "Superscript"
 msgstr "Верхний индекс"
 
-#: src/FormatBar.vala:107
+#: src/FormatBar.vala:117
 msgid "Subscript"
 msgstr "Нижний индекс"
 
-#: src/FormatBar.vala:113
-msgid "Header"
-msgstr "Заголовок"
-
-#: src/FormatBar.vala:117 src/Node.vala:57
+#: src/FormatBar.vala:124 src/Node.vala:57 src/Preferences.vala:436
 msgid "None"
 msgstr "Нет"
 
-#: src/FormatBar.vala:130
+#: src/FormatBar.vala:129
+msgid "Header"
+msgstr "Заголовок"
+
+#: src/FormatBar.vala:135
 msgid "Apply Highlight Color"
 msgstr "Применить цвет выделения"
 
-#: src/FormatBar.vala:131
+#: src/FormatBar.vala:136
 msgid "Change Highlight Color"
 msgstr "Изменить цвет выделения"
 
-#: src/FormatBar.vala:135
+#: src/FormatBar.vala:141
 msgid "Apply Font Color"
 msgstr "Применить цвет шрифта"
 
-#: src/FormatBar.vala:136
+#: src/FormatBar.vala:142
 msgid "Change Font Color"
 msgstr "Изменить цвет шрифта"
 
-#: src/FormatBar.vala:142
+#: src/FormatBar.vala:149
 msgid "Link"
 msgstr "Ссылка"
 
-#: src/FormatBar.vala:147
+#: src/FormatBar.vala:155
 msgid "Clear all formatting"
 msgstr "Очистить форматирование"
 
-#: src/LinkEditor.vala:43
+#: src/KeyCommands.vala:522 data/com.github.phase1geo.outliner.shortcuts.ui:12
+msgid "General"
+msgstr "Общие"
+
+#: src/KeyCommands.vala:523
+#, fuzzy
+msgid "File Commands"
+msgstr "Команды работы с метками"
+
+#: src/KeyCommands.vala:524
+msgid "Create new outline"
+msgstr ""
+
+#: src/KeyCommands.vala:525
+msgid "Open saved outline"
+msgstr ""
+
+#: src/KeyCommands.vala:526
+msgid "Save outline to current file"
+msgstr ""
+
+#: src/KeyCommands.vala:527
+msgid "Save outline to new file"
+msgstr ""
+
+#: src/KeyCommands.vala:528
+msgid "Show print dialog for current outline"
+msgstr ""
+
+#: src/KeyCommands.vala:529
+#, fuzzy
+msgid "Tab Commands"
+msgstr "Команды работы с метками"
+
+#: src/KeyCommands.vala:530
+#, fuzzy
+msgid "Select next tab"
+msgstr "Выбрать следующий ряд"
+
+#: src/KeyCommands.vala:531
+#, fuzzy
+msgid "Select previous tab"
+msgstr "Выбрать предыдущий ряд"
+
+#: src/KeyCommands.vala:532
+#, fuzzy
+msgid "Close the current mindmap"
+msgstr "Закрыть другую вкладку"
+
+#: src/KeyCommands.vala:533
+#, fuzzy
+msgid "Undo/Redo Commands"
+msgstr "Команды работы с рядами"
+
+#: src/KeyCommands.vala:534
+#, fuzzy
+msgid "Undo last action"
+msgstr "Отменить последнее изменение"
+
+#: src/KeyCommands.vala:535
+#, fuzzy
+msgid "Redo last undone action"
+msgstr "Вернуть последнюю правку"
+
+#: src/KeyCommands.vala:536
+#, fuzzy
+msgid "Zoom Commands"
+msgstr "Команды работы с рядами"
+
+#: src/KeyCommands.vala:537
+#, fuzzy
+msgid "Zoom in"
+msgstr "Приблизить"
+
+#: src/KeyCommands.vala:538
+#, fuzzy
+msgid "Zoom out"
+msgstr "Отдалить"
+
+#: src/KeyCommands.vala:539
+#, fuzzy
+msgid "Zoom to 100%"
+msgstr "Отдалить"
+
+#: src/KeyCommands.vala:540
+#, fuzzy
+msgid "Miscellaneous Commands"
+msgstr "Разное"
+
+#: src/KeyCommands.vala:541
+msgid "Show preferences window"
+msgstr ""
+
+#: src/KeyCommands.vala:542
+#, fuzzy
+msgid "Show shortcuts cheatsheet"
+msgstr "Справка по клавиатурным комбинациям"
+
+#: src/KeyCommands.vala:543
+#, fuzzy
+msgid "Show contextual menu"
+msgstr "Показать контекстное меню"
+
+#: src/KeyCommands.vala:544
+msgid "Show About window"
+msgstr ""
+
+#: src/KeyCommands.vala:545
+#, fuzzy
+msgid "Toggle focus mode"
+msgstr "Включить режим фокусировки"
+
+#: src/KeyCommands.vala:546
+msgid "Toggle display of all notes"
+msgstr ""
+
+#: src/KeyCommands.vala:547
+msgid "Display search panel"
+msgstr ""
+
+#: src/KeyCommands.vala:548
+#, fuzzy
+msgid "Edit the document title"
+msgstr "смену названия документа"
+
+#: src/KeyCommands.vala:549
+#, fuzzy
+msgid "Quit the application"
+msgstr "Завершить работу"
+
+#: src/KeyCommands.vala:550
+msgid "Node"
+msgstr ""
+
+#: src/KeyCommands.vala:551
+#, fuzzy
+msgid "Creation/Deletion Commands"
+msgstr "Создание и удаление"
+
+#: src/KeyCommands.vala:552 src/KeyCommands.vala:643
+#, fuzzy
+msgid "Clipboard Commands"
+msgstr "Команды работы с рядами"
+
+#: src/KeyCommands.vala:561
+msgid "Add new row above current row"
+msgstr ""
+
+#: src/KeyCommands.vala:562
+msgid "Add new row below current row"
+msgstr ""
+
+#: src/KeyCommands.vala:563
+msgid "Add new child row to current row"
+msgstr ""
+
+#: src/KeyCommands.vala:564
+msgid "Add new parent row of current row"
+msgstr ""
+
+#: src/KeyCommands.vala:565
+msgid "Creates a clone copy of the current row"
+msgstr ""
+
+#: src/KeyCommands.vala:566
+msgid "Pastes the cloned row from the clipboard"
+msgstr ""
+
+#: src/KeyCommands.vala:567
+msgid "Unclones the current row if it is a clone"
+msgstr ""
+
+#: src/KeyCommands.vala:568
+msgid "Remove current row"
+msgstr ""
+
+#: src/KeyCommands.vala:569
+msgid "Replace current row with clipboard content"
+msgstr ""
+
+#: src/KeyCommands.vala:570
+#, fuzzy
+msgid "View Commands"
+msgstr "Команды работы с рядами"
+
+#: src/KeyCommands.vala:572
+#, fuzzy
+msgid "Expand current row by one level"
+msgstr "Развернуть ряд уровнем ниже"
+
+#: src/KeyCommands.vala:573
+#, fuzzy
+msgid "Expand current row completely"
+msgstr "Развернуть ряд уровнем ниже"
+
+#: src/KeyCommands.vala:574
+#, fuzzy
+msgid "Collapse current row by one level"
+msgstr "Свернуть ряд уровнем ниже"
+
+#: src/KeyCommands.vala:575
+#, fuzzy
+msgid "Collapse current row completely"
+msgstr "Свернуть ряд уровнем ниже"
+
+#: src/KeyCommands.vala:576
+msgid "Page the document up from the current row"
+msgstr ""
+
+#: src/KeyCommands.vala:577
+msgid "Page the document down from the current row"
+msgstr ""
+
+#: src/KeyCommands.vala:578
+msgid "Adjust document view to show current row at the top"
+msgstr ""
+
+#: src/KeyCommands.vala:579
+msgid "Focus on current row"
+msgstr ""
+
+#: src/KeyCommands.vala:580
+#, fuzzy
+msgid "Change Commands"
+msgstr "Команды работы с метками"
+
+#: src/KeyCommands.vala:581
+msgid "Edit current row text"
+msgstr ""
+
+#: src/KeyCommands.vala:582
+msgid "Edit current row note"
+msgstr ""
+
+#: src/KeyCommands.vala:583
+msgid "Toggle task status of current row"
+msgstr ""
+
+#: src/KeyCommands.vala:584
+msgid "Add tags to current row"
+msgstr ""
+
+#: src/KeyCommands.vala:585
+msgid "Join current row with previous row"
+msgstr ""
+
+#: src/KeyCommands.vala:586 src/KeyCommands.vala:663
+#, fuzzy
+msgid "Selection Commands"
+msgstr "Команды работы с метками"
+
+#: src/KeyCommands.vala:587
+#, fuzzy
+msgid "Select top-most row"
+msgstr "Выбрать самый верхний ряд"
+
+#: src/KeyCommands.vala:588
+#, fuzzy
+msgid "Select bottom-most row"
+msgstr "Выбрать самый нижний ряд"
+
+#: src/KeyCommands.vala:589
+msgid "Select row at the top of the current view"
+msgstr ""
+
+#: src/KeyCommands.vala:590
+msgid "Select row at the bottom of the current view"
+msgstr ""
+
+#: src/KeyCommands.vala:591
+msgid "Select row below the current row"
+msgstr ""
+
+#: src/KeyCommands.vala:592
+#, fuzzy
+msgid "Select row above the current row"
+msgstr "Выбрать родительский ряд"
+
+#: src/KeyCommands.vala:593
+#, fuzzy
+msgid "Select parent of current row"
+msgstr "Выбрать родительский ряд"
+
+#: src/KeyCommands.vala:594
+#, fuzzy
+msgid "Select last child row of current row"
+msgstr "Выбрать последний ряд-потомок"
+
+#: src/KeyCommands.vala:595
+#, fuzzy
+msgid "Select next sibling row of current row"
+msgstr "Выбрать следующий ряд-потомок"
+
+#: src/KeyCommands.vala:596
+#, fuzzy
+msgid "Select previous sibling row of current row"
+msgstr "Выбрать предыдущий ряд-потомок"
+
+#: src/KeyCommands.vala:597
+#, fuzzy
+msgid "Move Commands"
+msgstr "Команды работы с рядами"
+
+#: src/KeyCommands.vala:598
+msgid "Indent currently selected row"
+msgstr ""
+
+#: src/KeyCommands.vala:599
+msgid "Unindent currently selected row"
+msgstr ""
+
+#: src/KeyCommands.vala:600
+#, fuzzy
+msgid "Move current row down"
+msgstr "Переместить выбранную группу ниже"
+
+#: src/KeyCommands.vala:601
+msgid "Move current row up"
+msgstr ""
+
+#: src/KeyCommands.vala:602
+msgid "Move current row above parent"
+msgstr ""
+
+#: src/KeyCommands.vala:603
+msgid "Move current row below parent"
+msgstr ""
+
+#: src/KeyCommands.vala:604
+#, fuzzy
+msgid "Move current row to label 1"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:605
+#, fuzzy
+msgid "Move current row to label 2"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:606
+#, fuzzy
+msgid "Move current row to label 3"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:607
+#, fuzzy
+msgid "Move current row to label 4"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:608
+#, fuzzy
+msgid "Move current row to label 5"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:609
+#, fuzzy
+msgid "Move current row to label 6"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:610
+#, fuzzy
+msgid "Move current row to label 7"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:611
+#, fuzzy
+msgid "Move current row to label 8"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:612
+#, fuzzy
+msgid "Move current row to label 9"
+msgstr "Переместить ряд в ряд с меткой"
+
+#: src/KeyCommands.vala:613 data/com.github.phase1geo.outliner.shortcuts.ui:444
+msgid "Label Commands"
+msgstr "Команды работы с метками"
+
+#: src/KeyCommands.vala:614
+msgid "Toggle label for current row"
+msgstr ""
+
+#: src/KeyCommands.vala:615
+#, fuzzy
+msgid "Clear all set labels"
+msgstr "Стереть все метки"
+
+#: src/KeyCommands.vala:616
+msgid "Select row marked with label-1"
+msgstr ""
+
+#: src/KeyCommands.vala:617
+msgid "Select row marked with label-2"
+msgstr ""
+
+#: src/KeyCommands.vala:618
+msgid "Select row marked with label-3"
+msgstr ""
+
+#: src/KeyCommands.vala:619
+msgid "Select row marked with label-4"
+msgstr ""
+
+#: src/KeyCommands.vala:620
+msgid "Select row marked with label-5"
+msgstr ""
+
+#: src/KeyCommands.vala:621
+msgid "Select row marked with label-6"
+msgstr ""
+
+#: src/KeyCommands.vala:622
+msgid "Select row marked with label-7"
+msgstr ""
+
+#: src/KeyCommands.vala:623
+msgid "Select row marked with label-8"
+msgstr ""
+
+#: src/KeyCommands.vala:624
+msgid "Select row marked with label-9"
+msgstr ""
+
+#: src/KeyCommands.vala:631 data/com.github.phase1geo.outliner.shortcuts.ui:609
+msgid "Text Editing"
+msgstr "Редактирование текста"
+
+#: src/KeyCommands.vala:632
+#, fuzzy
+msgid "Insertion/Deletion Commands"
+msgstr "Создание и удаление"
+
+#: src/KeyCommands.vala:633
+msgid "Insert newline character"
+msgstr ""
+
+#: src/KeyCommands.vala:634
+msgid "Split current line at current character"
+msgstr ""
+
+#: src/KeyCommands.vala:635
+#, fuzzy
+msgid "Insert TAB character"
+msgstr "Следующий символ"
+
+#: src/KeyCommands.vala:636
+#, fuzzy
+msgid "Insert emoji"
+msgstr "вставку объекта"
+
+#: src/KeyCommands.vala:637
+msgid "Remove next word"
+msgstr ""
+
+#: src/KeyCommands.vala:638
+#, fuzzy
+msgid "Remove previous word"
+msgstr "Предыдущее слово"
+
+#: src/KeyCommands.vala:639
+#, fuzzy
+msgid "Bold selected text"
+msgstr "Скопировать выделенный текст"
+
+#: src/KeyCommands.vala:640
+#, fuzzy
+msgid "Italicize selected text"
+msgstr "Вырезать выделенный текст"
+
+#: src/KeyCommands.vala:641
+#, fuzzy
+msgid "Underline selected text"
+msgstr "Вырезать выделенный текст"
+
+#: src/KeyCommands.vala:642
+#, fuzzy
+msgid "Strike-out selected text"
+msgstr "Вырезать выделенный текст"
+
+#: src/KeyCommands.vala:644
+#, fuzzy
+msgid "Copy selected nodes or text"
+msgstr "Скопировать выделенный текст"
+
+#: src/KeyCommands.vala:645
+#, fuzzy
+msgid "Cut selected nodes or text"
+msgstr "Вырезать выделенный текст"
+
+#: src/KeyCommands.vala:646
+msgid "Paste nodes or text from clipboard"
+msgstr ""
+
+#: src/KeyCommands.vala:647
+#, fuzzy
+msgid "URL Commands"
+msgstr "Команды работы с рядами"
+
+#: src/KeyCommands.vala:648
+msgid "Open URL link at current cursor position"
+msgstr ""
+
+#: src/KeyCommands.vala:649
+msgid "Add URL link at current cursor position"
+msgstr ""
+
+#: src/KeyCommands.vala:650
+msgid "Change URL link at current cursor position"
+msgstr ""
+
+#: src/KeyCommands.vala:651
+msgid "Remove URL link at current cursor position"
+msgstr ""
+
+#: src/KeyCommands.vala:652
+#, fuzzy
+msgid "Cursor Commands"
+msgstr "Команды работы с рядами"
+
+#: src/KeyCommands.vala:653
+msgid "Move cursor to next character"
+msgstr ""
+
+#: src/KeyCommands.vala:654
+#, fuzzy
+msgid "Move cursor to previous character"
+msgstr "Предыдущий символ"
+
+#: src/KeyCommands.vala:655
+msgid "Move cursor up one line"
+msgstr ""
+
+#: src/KeyCommands.vala:656
+msgid "Move cursor down one line"
+msgstr ""
+
+#: src/KeyCommands.vala:657
+msgid "Move cursor to beginning of next word"
+msgstr ""
+
+#: src/KeyCommands.vala:658
+msgid "Move cursor to beginning of previous word"
+msgstr ""
+
+#: src/KeyCommands.vala:659
+msgid "Move cursor to start of text"
+msgstr ""
+
+#: src/KeyCommands.vala:660
+msgid "Move cursor to end of text"
+msgstr ""
+
+#: src/KeyCommands.vala:661
+msgid "Move cursor to start of current line"
+msgstr ""
+
+#: src/KeyCommands.vala:662
+msgid "Move cursor to end of current line"
+msgstr ""
+
+#: src/KeyCommands.vala:664
+msgid "Add next character to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:665
+#, fuzzy
+msgid "Add previous character to current selection"
+msgstr "Добавить предыдущий символ"
+
+#: src/KeyCommands.vala:666
+msgid "Add line up to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:667
+msgid "Add line down to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:668
+msgid "Add next word to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:669
+msgid "Add previous word to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:670
+msgid "Add start of text to current selection (Control-Up)"
+msgstr ""
+
+#: src/KeyCommands.vala:671
+msgid "Add start of text to current selection (Control-Home)"
+msgstr ""
+
+#: src/KeyCommands.vala:672
+msgid "Add end of text to current selection (Control-Down)"
+msgstr ""
+
+#: src/KeyCommands.vala:673
+msgid "Add end of text to current selection (Control-End)"
+msgstr ""
+
+#: src/KeyCommands.vala:674
+msgid "Add start of current line to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:675
+msgid "Add end of current line to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:676
+#, fuzzy
+msgid "Select all text"
+msgstr "Выбрать всё"
+
+#: src/KeyCommands.vala:677
+#, fuzzy
+msgid "Deselect all text"
+msgstr "Снять выделение"
+
+#: src/LinkEditor.vala:39
 msgid "URL:"
 msgstr "URL:"
 
-#: src/LinkEditor.vala:55
+#: src/LinkEditor.vala:53
 msgid "Apply"
 msgstr "Применить"
 
-#: src/MainWindow.vala:159 src/MainWindow.vala:1119
+#: src/MainWindow.vala:135 src/MainWindow.vala:1342
 msgid "Outliner"
 msgstr "Outliner"
 
-#: src/MainWindow.vala:190 data/com.github.phase1geo.outliner.shortcuts.ui:21
+#: src/MainWindow.vala:176 data/com.github.phase1geo.outliner.shortcuts.ui:21
 msgid "New File"
 msgstr "Создать документ"
 
-#: src/MainWindow.vala:195 src/MainWindow.vala:1009
+#: src/MainWindow.vala:181 src/MainWindow.vala:1223
 #: data/com.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr "Открыть документ"
 
-#: src/MainWindow.vala:200 data/com.github.phase1geo.outliner.shortcuts.ui:42
+#: src/MainWindow.vala:186 data/com.github.phase1geo.outliner.shortcuts.ui:42
 msgid "Save File As"
 msgstr "Сохранить файл как"
 
-#: src/MainWindow.vala:205 src/UndoBuffer.vala:80
+#: src/MainWindow.vala:193 src/UndoBuffer.vala:80
 msgid "Undo"
 msgstr "Отменить"
 
-#: src/MainWindow.vala:211 src/UndoBuffer.vala:86
+#: src/MainWindow.vala:200 src/UndoBuffer.vala:86
 msgid "Redo"
 msgstr "Вернуть"
 
-#: src/MainWindow.vala:299
+#: src/MainWindow.vala:318
 msgid "Unnamed Document"
 msgstr "Безымянный документ"
 
-#: src/MainWindow.vala:552
+#: src/MainWindow.vala:661
 msgid "Search"
 msgstr "Найти"
 
-#: src/MainWindow.vala:563
-msgid "Statistics"
-msgstr "Статистика"
-
-#: src/MainWindow.vala:574
+#: src/MainWindow.vala:702
 msgid "<b>Text Statistics</b>"
 msgstr "<b>Статистика текста</b>"
 
-#: src/MainWindow.vala:578
+#: src/MainWindow.vala:709
 msgid "Characters:"
 msgstr "Символов:"
 
-#: src/MainWindow.vala:583
+#: src/MainWindow.vala:710
 msgid "Words:"
 msgstr "Слов:"
 
-#: src/MainWindow.vala:588
+#: src/MainWindow.vala:711
 msgid "Rows:"
 msgstr "Рядов:"
 
-#: src/MainWindow.vala:593
+#: src/MainWindow.vala:715
 msgid "<b>Checkbox Statistics</b>"
 msgstr "<b>Статистика по задачам</b>"
 
-#: src/MainWindow.vala:597
+#: src/MainWindow.vala:722
 msgid "Total:"
 msgstr "Всего:"
 
-#: src/MainWindow.vala:602
+#: src/MainWindow.vala:723
 msgid "Incomplete:"
 msgstr "Не завершено:"
 
-#: src/MainWindow.vala:607
+#: src/MainWindow.vala:724
 msgid "In Progress:"
 msgstr "В процессе:"
 
-#: src/MainWindow.vala:612
+#: src/MainWindow.vala:725
 msgid "Completed:"
 msgstr "Завершено:"
 
-#: src/MainWindow.vala:689
+#: src/MainWindow.vala:733
+msgid "Statistics"
+msgstr "Статистика"
+
+#: src/MainWindow.vala:785
 msgid "Print…"
 msgstr "Печать…"
 
-#: src/MainWindow.vala:713
-msgid "Properties"
-msgstr "Свойства"
-
-#: src/MainWindow.vala:727
+#: src/MainWindow.vala:814
 msgid "Theme:"
 msgstr "Тема:"
 
-#: src/MainWindow.vala:760
+#: src/MainWindow.vala:892
 msgid "Enumeration Style:"
 msgstr "Стиль нумерации:"
 
-#: src/MainWindow.vala:776
+#: src/MainWindow.vala:919
 msgid "Condensed Mode:"
 msgstr "Компактный режим:"
 
-#: src/MainWindow.vala:789
+#: src/MainWindow.vala:943
 msgid "Show Checkboxes"
 msgstr "Показывать чекбоксы"
 
-#: src/MainWindow.vala:802
+#: src/MainWindow.vala:967
 msgid "Show Depth Lines"
 msgstr "Показывать линии вложенности"
 
-#: src/MainWindow.vala:815
+#: src/MainWindow.vala:991
 msgid "Enable Blank Rows"
 msgstr "Включить пустые ряды"
 
-#: src/MainWindow.vala:828
+#: src/MainWindow.vala:1015
 msgid "Enable Header Auto-Sizing"
 msgstr "Включить автоподбор размера заголовка"
 
-#: src/MainWindow.vala:841
+#: src/MainWindow.vala:1039
 msgid "Enable Markdown Highlighting"
 msgstr "Включить форматирование Markdown"
 
-#: src/MainWindow.vala:860 src/Preferences.vala:36
+#: src/MainWindow.vala:1068
+#, fuzzy
+msgid "Edit Title"
+msgstr "Изменить текст"
+
+#: src/MainWindow.vala:1071 src/Preferences.vala:46
 msgid "Preferences"
 msgstr "Параметры"
 
-#: src/MainWindow.vala:867
+#: src/MainWindow.vala:1072
 msgid "Shortcuts Cheatsheet"
 msgstr "Справка по клавиатурным комбинациям"
 
-#: src/MainWindow.vala:874
+#: src/MainWindow.vala:1073
 msgid "Enter Distraction-Free Mode"
 msgstr "Режим без отвлекающих факторов"
 
-#: src/MainWindow.vala:960
+#: src/MainWindow.vala:1076
+#, fuzzy
+msgid "About Outliner"
+msgstr "Outliner"
+
+#: src/MainWindow.vala:1099
+msgid "Properties"
+msgstr "Свойства"
+
+#: src/MainWindow.vala:1169
 msgid "Save current unnamed document?"
 msgstr "Сохранить текущий безымянный документ?"
 
-#: src/MainWindow.vala:961
+#: src/MainWindow.vala:1170
 msgid "Changes will be permanently lost if not saved."
 msgstr "Если не сохранить документ, изменения будут утрачены навсегда."
 
-#: src/MainWindow.vala:966
+#: src/MainWindow.vala:1175
 msgid "Discard Changes"
 msgstr "Отказаться от изменений"
 
-#: src/MainWindow.vala:972 src/MainWindow.vala:1116
+#: src/MainWindow.vala:1181 src/MainWindow.vala:1339
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/MainWindow.vala:1009
+#: src/MainWindow.vala:1223
 msgid "Open"
 msgstr "Открыть"
 
-#: src/MainWindow.vala:1115
+#: src/MainWindow.vala:1338
 msgid "Save File"
 msgstr "Сохранить документ"
 
-#: src/NodeMenu.vala:72
-msgid "Paste"
-msgstr "Вставить"
-
-#: src/NodeMenu.vala:76
-msgid "Paste and Replace"
-msgstr "Вставить и заменить"
-
-#: src/NodeMenu.vala:80
-msgid "Delete"
-msgstr "Удалить"
-
-#: src/NodeMenu.vala:83
-msgid "Clone"
-msgstr "Клонировать"
-
-#: src/NodeMenu.vala:87
+#: src/NodeMenu.vala:37
 msgid "Copy As Clone"
 msgstr "Скопировать как клон"
 
-#: src/NodeMenu.vala:90
+#: src/NodeMenu.vala:38
 msgid "Paste Clone"
 msgstr "Вставить клон"
 
-#: src/NodeMenu.vala:93
+#: src/NodeMenu.vala:41
 msgid "Unclone"
 msgstr "Расклонировать"
 
-#: src/NodeMenu.vala:97 data/com.github.phase1geo.outliner.shortcuts.ui:232
+#: src/NodeMenu.vala:50
+msgid "Paste"
+msgstr "Вставить"
+
+#: src/NodeMenu.vala:52
+msgid "Paste and Replace"
+msgstr "Вставить и заменить"
+
+#: src/NodeMenu.vala:53
+msgid "Clone"
+msgstr "Клонировать"
+
+#: src/NodeMenu.vala:54
+msgid "Delete"
+msgstr "Удалить"
+
+#: src/NodeMenu.vala:57 data/com.github.phase1geo.outliner.shortcuts.ui:232
 msgid "Edit Text"
 msgstr "Изменить текст"
 
-#: src/NodeMenu.vala:101 data/com.github.phase1geo.outliner.shortcuts.ui:246
+#: src/NodeMenu.vala:58 data/com.github.phase1geo.outliner.shortcuts.ui:246
 msgid "Edit Note"
 msgstr "Изменить примечание"
 
-#: src/NodeMenu.vala:104 src/NodeMenu.vala:321
-msgid "Show Note"
-msgstr "Показать примечание"
+#: src/NodeMenu.vala:59
+msgid "Toggle Note Visibility"
+msgstr ""
 
-#: src/NodeMenu.vala:107 src/Tagger.vala:132
+#: src/NodeMenu.vala:60 src/Tagger.vala:151
 #: data/com.github.phase1geo.outliner.shortcuts.ui:253
 msgid "Add Tag"
 msgstr "Добавить тег"
 
-#: src/NodeMenu.vala:111 data/com.github.phase1geo.outliner.shortcuts.ui:178
-msgid "Add Row Above"
-msgstr "Добавить ряд выше"
-
-#: src/NodeMenu.vala:115 data/com.github.phase1geo.outliner.shortcuts.ui:171
-msgid "Add Row Below"
-msgstr "Добавить ряд ниже"
-
-#: src/NodeMenu.vala:119
-msgid "Join To Row Above"
-msgstr "Объединить с рядом выше"
-
-#: src/NodeMenu.vala:123
+#: src/NodeMenu.vala:63
 msgid "Indent"
 msgstr "Отступ вправо"
 
-#: src/NodeMenu.vala:127
+#: src/NodeMenu.vala:64
 msgid "Unindent"
 msgstr "Отступ влево"
 
-#: src/NodeMenu.vala:130
-msgid "Expand Children"
-msgstr "Развернуть потомков"
+#: src/NodeMenu.vala:65
+msgid "Toggle Children Visibility"
+msgstr ""
 
-#: src/NodeMenu.vala:134
+#: src/NodeMenu.vala:66
 msgid "Focus"
 msgstr "Режим фокусировки"
 
-#: src/NodeMenu.vala:137
-msgid "Select Row"
-msgstr "Выбрать ряд"
+#: src/NodeMenu.vala:69
+#, fuzzy
+msgid "Add Sibling Row Above"
+msgstr "Добавить ряд выше"
 
-#: src/NodeMenu.vala:142
+#: src/NodeMenu.vala:70
+#, fuzzy
+msgid "Add Sibling Row Below"
+msgstr "Добавить ряд ниже"
+
+#: src/NodeMenu.vala:71
+msgid "Add Child Row"
+msgstr ""
+
+#: src/NodeMenu.vala:72
+#, fuzzy
+msgid "Add Parent Row"
+msgstr "Выбрать родительский ряд"
+
+#: src/NodeMenu.vala:75
+#, fuzzy
+msgid "Add Row"
+msgstr "Добавить ряд выше"
+
+#: src/NodeMenu.vala:76
+msgid "Join To Row Above"
+msgstr "Объединить с рядом выше"
+
+#: src/NodeMenu.vala:79
 msgid "Select Row Above"
 msgstr "Выбрать ряд выше"
 
-#: src/NodeMenu.vala:146
+#: src/NodeMenu.vala:80
 msgid "Select Row Below"
 msgstr "Выбрать ряд ниже"
 
-#: src/NodeMenu.vala:150
+#: src/NodeMenu.vala:83
 msgid "Select Previous Sibling Row"
 msgstr "Выбрать предыдущий ряд-потомок"
 
-#: src/NodeMenu.vala:154
+#: src/NodeMenu.vala:84
 msgid "Select Next Sibling Row"
 msgstr "Выбрать следующий ряд-потомок"
 
-#: src/NodeMenu.vala:158 data/com.github.phase1geo.outliner.shortcuts.ui:342
+#: src/NodeMenu.vala:87 data/com.github.phase1geo.outliner.shortcuts.ui:342
 msgid "Select Parent Row"
 msgstr "Выбрать родительский ряд"
 
-#: src/NodeMenu.vala:162
+#: src/NodeMenu.vala:88
 msgid "Select Last Child Row"
 msgstr "Выбрать последний ряд-потомок"
 
-#: src/NodeMenu.vala:166
+#: src/NodeMenu.vala:91
 msgid "Select First Row"
 msgstr "Выбрать первый ряд"
 
-#: src/NodeMenu.vala:170
+#: src/NodeMenu.vala:92
 msgid "Select Last Row"
 msgstr "Выбрать последний ряд"
 
-#: src/NodeMenu.vala:173
+#: src/NodeMenu.vala:99
 msgid "Select Labeled Row"
 msgstr "Выбрать ряд с меткой"
 
-#: src/NodeMenu.vala:177
-msgid "Labels"
-msgstr "Метки"
-
-#: src/NodeMenu.vala:182 src/NodeMenu.vala:304
+#: src/NodeMenu.vala:109
 msgid "Add Label"
 msgstr "Добавить метку"
 
-#: src/NodeMenu.vala:185
+#: src/NodeMenu.vala:110
 msgid "Move To Label"
 msgstr "Перенести в метку"
 
-#: src/NodeMenu.vala:189
+#: src/NodeMenu.vala:113
 msgid "Clear All Labels"
 msgstr "Стереть все метки"
 
-#: src/NodeMenu.vala:254 src/NodeMenu.vala:262
-msgid "Label-"
+#: src/NodeMenu.vala:120
+msgid "Select Row"
+msgstr "Выбрать ряд"
+
+#: src/NodeMenu.vala:121
+msgid "Labels"
+msgstr "Метки"
+
+#: src/NodeMenu.vala:133
+#, fuzzy, c-format
+msgid "Label-%d"
 msgstr "Метка-"
-
-#: src/NodeMenu.vala:307
-msgid "Remove Label"
-msgstr "Снять метку"
-
-#: src/NodeMenu.vala:324
-msgid "Hide Note"
-msgstr "Скрыть примечание"
-
-#: src/NodeMenu.vala:328
-msgid "Hide Children"
-msgstr "Скрыть потомков"
-
-#: src/NodeMenu.vala:328
-msgid "Show Children"
-msgstr "Показать потомков"
 
 #: src/Node.vala:58
 msgid "Outline"
@@ -524,151 +1159,217 @@ msgstr "План"
 msgid "Section"
 msgstr "Раздел"
 
-#: src/Node.vala:77
+#: src/Node.vala:79
 msgid "No enumeration will be displayed"
 msgstr "План без нумерации"
 
-#: src/Node.vala:78
+#: src/Node.vala:80
 msgid "Shows outline-like enumeration (ex., I., A., 1.)"
 msgstr "Показывать нумерацию как в плане (например, I., A., 1.)"
 
-#: src/Node.vala:79
+#: src/Node.vala:81
 msgid "Shows section enumeration (ex., 2., 2.1., 2.1.3.)"
 msgstr "Показывать нумерацию как в разделах (например, 2., 2.1., 2.1.3.)"
 
-#: src/OutlineTable.vala:843
+#: src/OutlineTable.vala:919
 msgid "Exit Focus Mode"
 msgstr "Выйти из режима фокусировки"
 
-#: src/OutlineTable.vala:913
+#: src/OutlineTable.vala:1004
 msgid "Show note"
 msgstr "Показать примечание"
 
-#: src/OutlineTable.vala:913
+#: src/OutlineTable.vala:1004
 msgid "Hide note"
 msgstr "Скрыть примечание"
 
-#: src/OutlineTable.vala:917
+#: src/OutlineTable.vala:1008
 #, c-format
 msgid "%u subrows"
 msgstr "%u субрядов"
 
-#: src/OutlineTable.vala:2858
+#: src/OutlineTable.vala:2249
 msgid "Title"
 msgstr "Название"
 
-#: src/OutlineTable.vala:3230
+#: src/OutlineTable.vala:2634
 msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr "В режиме фокусировки. Нажмите Escape для выхода."
 
-#: src/OutlineTable.vala:3258
+#: src/OutlineTable.vala:2664
 msgid "Hit the Escape key to exit."
 msgstr "Нажмите Escape, чтобы выйти"
 
-#: src/Preferences.vala:47
+#: src/Preferences.vala:59
 msgid "Behavior"
 msgstr "Поведение"
 
-#: src/Preferences.vala:48
+#: src/Preferences.vala:60
 msgid "Appearance"
 msgstr "Внешний вид"
 
 #: src/Preferences.vala:61
+#, fuzzy
+msgid "Shortcuts"
+msgstr "Клавиатурные комбинации Outliner"
+
+#: src/Preferences.vala:86
 msgid "Close"
 msgstr "Закрыть"
 
-#: src/Preferences.vala:77
+#: src/Preferences.vala:110
 msgid "Minimize displayed depth lines"
 msgstr "Ограничить число показываемой вложенности"
 
-#: src/Preferences.vala:79
+#: src/Preferences.vala:112
 msgid ""
 "Only draws depth lines (when enabled) in cases where a row has a sibling row "
 "below it."
 msgstr ""
 "Рисовать линии вложенности (когда включены) только когда есть заметки-потомки"
 
-#: src/Preferences.vala:82
+#: src/Preferences.vala:115
 msgid "Automatically make embedded URLs into links"
 msgstr "Превращать встроенные URL в ссылки"
 
-#: src/Preferences.vala:84
+#: src/Preferences.vala:117
 msgid "Specifies if embedded URLs should be automatically highlighted."
 msgstr "Подсвечивать ли встроенные URL"
 
-#: src/Preferences.vala:87
+#: src/Preferences.vala:120
 msgid "Enable Markdown syntax by default"
 msgstr "Включить синтаксис Markdown по умолчанию"
 
-#: src/Preferences.vala:91
+#: src/Preferences.vala:124
 msgid "Enable Unicode input"
 msgstr "Включить ввод Unicode"
 
-#: src/Preferences.vala:95
+#: src/Preferences.vala:128
 msgid "Enable tag auto-completion"
 msgstr "Включить автозаполнение меток"
 
-#: src/Preferences.vala:99
+#: src/Preferences.vala:132
 msgid "Maximum auto-completion items shown"
 msgstr "Как много вариантов автоподсказки показывать"
 
-#: src/Preferences.vala:115
+#: src/Preferences.vala:147
 msgid "Hide themes not matching visual style"
 msgstr "Скрывать темы, которые не соответствуют визуальному стилю"
 
-#: src/Preferences.vala:120
+#: src/Preferences.vala:151
 msgid "Default theme"
 msgstr "Тема по умолчанию"
 
-#: src/Preferences.vala:124
+#: src/Preferences.vala:155
 msgid "Title font"
 msgstr "Шрифт названия документа"
 
-#: src/Preferences.vala:128
+#: src/Preferences.vala:159
 msgid "Row font"
 msgstr "Шрифт ряда"
 
-#: src/Preferences.vala:132
+#: src/Preferences.vala:163
 msgid "Note font"
 msgstr "Шрифт заметки"
 
-#: src/Preferences.vala:136
+#: src/Preferences.vala:167
 msgid "Position checkboxes on right"
 msgstr "Показывать переключатели готовности справа"
 
-#: src/Preferences.vala:140
+#: src/Preferences.vala:171
 msgid "Enable blank rows by default"
 msgstr "Включить пустые ряды по умолчанию"
 
-#: src/Preferences.vala:144
+#: src/Preferences.vala:175
 msgid "Enable row auto-sizing by default"
 msgstr "Включить автоподбор размера рядов"
 
-#: src/Preferences.vala:146
+#: src/Preferences.vala:177
 msgid "Automatically size row fonts based on row depth."
 msgstr "Подбирать кегль шрифта для рядов по степени вложенности"
 
-#: src/Preferences.vala:149
+#: src/Preferences.vala:180
 msgid "Auto-size rows up to depth"
 msgstr "Автоматически подбирать размер рядов по степени вложенности"
 
-#: src/SearchBar.vala:94
+#: src/Preferences.vala:253
+msgid "Double-click to edit shortcut.  Select + Delete to remove shortcut."
+msgstr ""
+
+#: src/Preferences.vala:254
+msgid "Escape to cancel.  Press key combination to set."
+msgstr ""
+
+#: src/Preferences.vala:262
+#, fuzzy
+msgid "Set Outliner Defaults"
+msgstr "Клавиатурные комбинации Outliner"
+
+#: src/Preferences.vala:265
+#, fuzzy
+msgid "Clear All Shortcuts"
+msgstr "Клавиатурные комбинации Outliner"
+
+#: src/Preferences.vala:274
+#, fuzzy
+msgid "Search commands"
+msgstr "Команды работы с метками"
+
+#: src/Preferences.vala:276
+#, fuzzy
+msgid "Search shortcuts"
+msgstr "Показать клавиатурные комбинации"
+
+#: src/Preferences.vala:437
+#, fuzzy
+msgid "Enter shortcut"
+msgstr "Клавиатурные комбинации Outliner"
+
+#: src/Preferences.vala:605
+msgid "Unable to set new shortcut due to conflicts"
+msgstr ""
+
+#: src/Preferences.vala:606
+#, c-format
+msgid "%s conflicts with '%s'"
+msgstr ""
+
+#: src/Preferences.vala:669
+#, fuzzy
+msgid "Clear all shortcuts?"
+msgstr "Очистить форматирование"
+
+#: src/Preferences.vala:669 src/Preferences.vala:680
+msgid "Current shortcut settings will be lost"
+msgstr ""
+
+#: src/Preferences.vala:680
+#, fuzzy
+msgid "Use Outliner Default Shortcuts?"
+msgstr "Клавиатурные комбинации Outliner"
+
+#: src/SearchBar.vala:102
 msgid "Find text…"
 msgstr "Найти текст…"
 
-#: src/SearchBar.vala:334
+#: src/SearchBar.vala:344
 msgid "Replace with…"
 msgstr "Заменить на…"
 
-#: src/SearchBar.vala:364
+#: src/SearchBar.vala:371
 msgid "Replace"
 msgstr "Заменить"
 
-#: src/SearchBar.vala:385
+#: src/SearchBar.vala:392
 msgid "Replace All"
 msgstr "Заменить все"
 
-#: src/Tagger.vala:69
+#: src/Shortcuts.vala:742 src/Shortcuts.vala:748
+#, fuzzy
+msgid "No Commands Listed"
+msgstr "Команды работы с рядами"
+
+#: src/Tagger.vala:90
 #, c-format
 msgid "Nodes are currently filtered by tag @%s."
 msgstr "Примечания фильтруются сейчас по тегу @%s."
@@ -704,6 +1405,10 @@ msgstr "Solarized тёмная"
 #: src/themes/ThemeSolarizedLight.vala:31
 msgid "Solarized Light"
 msgstr "Solarized светлая"
+
+#: src/undo_actions/UndoNodeAddParent.vala:31
+msgid "add parent"
+msgstr ""
 
 #: src/undo_actions/UndoNodeCut.vala:30
 msgid "cut item"
@@ -803,25 +1508,30 @@ msgstr "Отменить: "
 msgid "Redo: "
 msgstr "Вернуть: "
 
-#: src/ZoomWidget.vala:92 data/com.github.phase1geo.outliner.shortcuts.ui:103
+#: src/Utils.vala:291
+#, fuzzy
+msgid "No"
+msgstr "Нет"
+
+#: src/Utils.vala:294
+msgid "Yes"
+msgstr ""
+
+#: src/ZoomWidget.vala:93 data/com.github.phase1geo.outliner.shortcuts.ui:103
 msgid "Zoom Out"
 msgstr "Отдалить"
 
-#: src/ZoomWidget.vala:97
+#: src/ZoomWidget.vala:100
 msgid "Zoom Actual"
 msgstr "Масштаб 100%"
 
-#: src/ZoomWidget.vala:102 data/com.github.phase1geo.outliner.shortcuts.ui:96
+#: src/ZoomWidget.vala:107 data/com.github.phase1geo.outliner.shortcuts.ui:96
 msgid "Zoom In"
 msgstr "Приблизить"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:6
 msgid "Outliner Shortcuts"
 msgstr "Клавиатурные комбинации Outliner"
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:12
-msgid "General"
-msgstr "Общие"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:16
 msgid "File"
@@ -896,6 +1606,14 @@ msgstr "Команды работы с рядами"
 #: data/com.github.phase1geo.outliner.shortcuts.ui:448
 msgid "Creation/Deletion"
 msgstr "Создание и удаление"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:171
+msgid "Add Row Below"
+msgstr "Добавить ряд ниже"
+
+#: data/com.github.phase1geo.outliner.shortcuts.ui:178
+msgid "Add Row Above"
+msgstr "Добавить ряд выше"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:185
 msgid "Delete Row"
@@ -1030,10 +1748,6 @@ msgstr "Переместить выбранную группу вниз"
 msgid "Join Row To Row Above"
 msgstr "Объединить ряд с рядом выше"
 
-#: data/com.github.phase1geo.outliner.shortcuts.ui:444
-msgid "Label Commands"
-msgstr "Команды работы с метками"
-
 #: data/com.github.phase1geo.outliner.shortcuts.ui:452
 msgid "Add/Remove Label"
 msgstr "Добавить или удалить метку"
@@ -1122,10 +1836,6 @@ msgstr "Переместить в ряд с меткой 8"
 #: data/com.github.phase1geo.outliner.shortcuts.ui:597
 msgid "Move To Label-9 Row"
 msgstr "Переместить в ряд с меткой 9"
-
-#: data/com.github.phase1geo.outliner.shortcuts.ui:609
-msgid "Text Editing"
-msgstr "Редактирование текста"
 
 #: data/com.github.phase1geo.outliner.shortcuts.ui:614
 msgid "Cursor Movement"
@@ -1227,11 +1937,50 @@ msgstr "Разделить ряд по курсору"
 msgid "End Editing"
 msgstr "Завершить редактирование"
 
+#~ msgid "Close Tab"
+#~ msgstr "Закрыть вкладку"
+
+#~ msgid "Open in a New Window"
+#~ msgstr "Открыть в новом окне"
+
+#~ msgid "Duplicate"
+#~ msgstr "Создать копию"
+
+#~ msgid "Close Other Tabs"
+#~ msgstr "Закрыть остальные вкладки"
+
+#~ msgid "Clear All"
+#~ msgstr "Стереть всё"
+
+#~ msgid "New Tab"
+#~ msgstr "Создать вкладку"
+
+#~ msgid "Undo Close Tab"
+#~ msgstr "Отменить закрытие вкладки"
+
+#~ msgid "Closed Tabs"
+#~ msgstr "Закрытые вкладки"
+
+#~ msgid "Show Note"
+#~ msgstr "Показать примечание"
+
+#~ msgid "Expand Children"
+#~ msgstr "Развернуть потомков"
+
+#~ msgid "Remove Label"
+#~ msgstr "Снять метку"
+
+#~ msgid "Hide Note"
+#~ msgstr "Скрыть примечание"
+
+#~ msgid "Hide Children"
+#~ msgstr "Скрыть потомков"
+
+#~ msgid "Show Children"
+#~ msgstr "Показать потомков"
+
 #~ msgid "Reset Fonts to Defaults"
 #~ msgstr "Вернуть исходные шрифты"
 
 #~ msgid "Zoom (%):"
 #~ msgstr "Масштаб (%):"
-
-#~ msgid "Enter Focus Mode"
-#~ msgstr "Включить режим фокусировки"
