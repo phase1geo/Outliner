@@ -23,12 +23,14 @@ using GLib;
 
 public class ExportMarkdown : Export {
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public ExportMarkdown() {
     base( "markdown", _( "Markdown" ), {".md", ".markdown"}, true, false, false );
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     var  file   = File.new_for_path( fname );
     bool retval = true;
@@ -41,14 +43,21 @@ public class ExportMarkdown : Export {
     return( retval );
   }
 
-  /* Draws each of the top-level nodes */
+  //-------------------------------------------------------------
+  // Draws each of the top-level nodes
   private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
+    if( table.title != null ) {
+      var title = "# " + from_text( table.title.text ) + "\n\n";
+      os.write( title.data );
+    }
     var nodes = table.root.children;
     for( int i=0; i<nodes.length; i++ ) {
       export_node( os, nodes.index( i ), table, "" );
     }
   }
 
+  //-------------------------------------------------------------
+  // Transforms formatted text to Markdown.
   public static string from_text( FormattedText text ) {
     ExportUtils.ExportStartFunc start_func = (tag, start, extra) => {
       switch( tag ) {
@@ -92,7 +101,8 @@ public class ExportMarkdown : Export {
     return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
-  /* Draws the given node and its children to the output stream */
+  //-------------------------------------------------------------
+  // Draws the given node and its children to the output stream
   private void export_node( FileOutputStream os, Node node, OutlineTable table, string prefix = "  " ) {
 
     try {

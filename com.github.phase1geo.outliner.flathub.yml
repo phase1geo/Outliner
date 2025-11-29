@@ -68,6 +68,18 @@ modules:
         url: https://github.com/elementary/granite/archive/refs/tags/7.6.0.tar.gz
         sha256: 4b4e4f7f86eb3f55116faec42ebd87e04c3e424d82715ecd967ed39540dca5ef
 
+  - name: pandoc
+    sources:
+      - type: archive
+        archive-type: tar-gzip
+        url: https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-linux-amd64.tar.gz
+        sha256: 74bc434908e4d858b3edbfd6271d2e9e499477837e5df1d630df4e62f113803d
+    buildsystem: simple
+    build-commands:
+      - pwd
+    post-install:
+      - install -m 755 bin/pandoc /app/bin/pandoc
+
   - name: Outliner
     buildsystem: meson
     config-opts:

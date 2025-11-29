@@ -20,16 +20,17 @@
 */
 
 using GLib;
-using Gtk;
 
-public class ExportRTF : Export {
+public class ExportODT : Export {
 
-  /* Constructor */
-  public ExportRTF() {
-    base( "rtf", _( "RTF" ), {".rtf"}, true, false, false );
+  //-------------------------------------------------------------
+  // Constructor
+  public ExportODT() {
+    base( "odt", _( "ODT" ), {".odt"}, true, false, false );
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     return( export_with_pandoc( fname, table ) );
   }

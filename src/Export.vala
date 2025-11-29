@@ -54,6 +54,76 @@ public class Export {
   }
 
   //-------------------------------------------------------------
+  // Handles exporting Markdown text to the desired filename using
+  // Pandoc.
+  protected bool export_with_pandoc( string fname, OutlineTable ot ) {
+
+    var ext_filename = fname;
+    var md_filename  = fname + ".md";
+    var lang_dir     = "";
+
+    // Generate the Markdown file
+    var markdown = new ExportMarkdown();
+    if( !markdown.export( md_filename, ot ) ) {
+      stdout.printf( "ERROR:  Unable to export documentation to Markdown" );
+      return( false );
+    }
+
+    /*
+    // Find the directory that contains the pandoc languages
+    foreach( var data_dir in Environment.get_system_data_dirs() ) {
+      lang_dir = GLib.Path.build_filename( data_dir, "outliner", "pandoc-langs" );
+      if( FileUtils.test( lang_dir, FileTest.EXISTS ) ) {
+        break;
+      }
+    }
+    */
+
+    // Call pandoc (use async method) to generate the documentation
+    try {
+
+      string[] command = {};
+      command += "pandoc";
+
+      /*
+      // Figure out which languages we need to add to Pandoc
+      if( lang_dir != "" ) {
+        needed_langs.foreach((lang) => {
+          var lang_file = Path.build_filename( lang_dir, lang + ".xml" );
+          if( FileUtils.test( lang_file, FileTest.EXISTS ) ) {
+            command += "--syntax-definition";
+            command += lang_file;
+          }    
+          return( true );
+        });
+      }
+      */
+
+      command += "-f";
+
+      // Added extensions:
+      // +mark = Adds support for highlighting text surrounded by "=="
+      command += "markdown+mark";
+      command += "--embed-resources";
+      command += "--standalone";
+      command += "-o";
+      command += "'" + ext_filename + "'";
+      command += "'" + md_filename + "'";
+
+      stdout.printf( "command: %s\n", string.joinv( " ", command ) );
+
+      Process.spawn_command_line_async( string.joinv( " ", command ) );
+
+    } catch( SpawnError e ) {
+      stdout.printf( "ERROR:  %s\n", e.message );
+      FileUtils.remove( md_filename );
+      return( false );
+    }
+
+    return( true );
+  }
+
+  //-------------------------------------------------------------
   // Imports given filename into drawing area
   public virtual bool import( string fname, OutlineTable ot ) {
     return( false );

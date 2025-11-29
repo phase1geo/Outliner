@@ -40,6 +40,9 @@ cc = meson.get_compiler('c')
 math_dep    = cc.find_library('m', required: false)
 libmarkdown = cc.find_library('markdown', required: true)
 
+# Check externally used programs
+pandoc = find_program('pandoc', required: true)
+
 add_project_arguments([
         '--vapidir', join_paths(meson.current_source_dir(), 'vapi'),
         '--disable-warnings'

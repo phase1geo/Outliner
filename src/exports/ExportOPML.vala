@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2025 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,11 +23,14 @@ using GLib;
 
 public class ExportOPML : Export {
 
+  //-------------------------------------------------------------
+  // Constructor
   public ExportOPML() {
     base( "opml", _( "OPML" ), {".opml"}, true, true, false );
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* opml = new Xml.Node( null, "opml" );
@@ -42,7 +45,8 @@ public class ExportOPML : Export {
     return( true );
   }
 
-  /* Generates the header for the document */
+  //-------------------------------------------------------------
+  // Generates the header for the document
   private Xml.Node* export_head( string? title, string expand_state ) {
     Xml.Node* head = new Xml.Node( null, "head" );
     var now  = new DateTime.now_local();
@@ -54,7 +58,8 @@ public class ExportOPML : Export {
     return( head );
   }
 
-  /* Generates the body for the document */
+  //-------------------------------------------------------------
+  // Generates the body for the document
   private Xml.Node* export_body( OutlineTable table, out string expand_state ) {
     Xml.Node*  body    = new Xml.Node( null, "body" );
     Array<int> estate  = new Array<int>();
@@ -71,34 +76,35 @@ public class ExportOPML : Export {
     return( body );
   }
 
-  /* Traverses the node tree exporting XML nodes in OPML format */
+  //-------------------------------------------------------------
+  // Traverses the node tree exporting XML nodes in OPML format
   private Xml.Node* export_node( OutlineTable table, Node node, ref Array<int> expand_state ) {
 
     Xml.Node* n = new Xml.Node( null, "outline" );
 
-    /* Add the node text */
+    // Add the node text
     var name      = new FormattedText.copy_clean( table, node.name.text );
     var name_html = ExportHTML.from_text( name );
     n->new_prop( "text", name_html );
 
-    /* Add the task */
+    // Add the task
     if( node.task != NodeTaskMode.NONE ) {
       n->new_prop( "checked", (node.task == NodeTaskMode.DONE).to_string() );
     }
 
-    /* Add the note */
+    // Add the note
     if( node.note.text.text != "" ) {
       var note      = new FormattedText.copy_clean( table, node.note.text );
       var note_html = ExportHTML.from_text( note );
       n->new_prop( "note", note_html );
     }
 
-    /* Calculate the expanded state value */
+    // Calculate the expanded state value
     if( (node.children.length > 1) && node.expanded ) {
       expand_state.append_val( node.id );
     }
 
-    /* Include any other child nodes */
+    // Include any other child nodes
     for( int i=0; i<node.children.length; i++ ) {
       n->add_child( export_node( table, node.children.index( i ), ref expand_state ) );
     }
@@ -109,19 +115,18 @@ public class ExportOPML : Export {
 
   //----------------------------------------------------------------------------
 
-  /*
-   Reads the contents of an OPML file and creates a new document based on
-   the stored information.
-  */
+  //-------------------------------------------------------------
+  // Reads the contents of an OPML file and creates a new document
+  // based on the stored information.
   public override bool import( string fname, OutlineTable table ) {
 
-    /* Read in the contents of the OPML file */
+    // Read in the contents of the OPML file
     var doc = Xml.Parser.read_file( fname, null, Xml.ParserOption.HUGE );
     if( doc == null ) {
       return( false );
     }
 
-    /* Load the contents of the file */
+    // Load the contents of the file
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         Array<int>? expand_state = null;
@@ -136,14 +141,15 @@ public class ExportOPML : Export {
       }
     }
 
-    /* Delete the OPML document */
+    // Delete the OPML document
     delete doc;
 
     return( true );
 
   }
 
-  /* Parses the OPML head block for information that we will use */
+  //-------------------------------------------------------------
+  // Parses the OPML head block for information that we will use
   private void import_header( Xml.Node* n, ref Array<int>? expand_state ) {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "expansionState") ) {
@@ -159,13 +165,14 @@ public class ExportOPML : Export {
     }
   }
 
-  /* Imports the OPML data, creating a mind map */
+  //-------------------------------------------------------------
+  // Imports the OPML data, creating a mind map
   public void import_body( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state) {
 
-    /* Clear the existing nodes */
+    // Clear the existing nodes
     table.root.children.remove_range( 0, table.root.children.length );
 
-    /* Load the contents of the file */
+    // Load the contents of the file
     var i = 0;
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "outline") ) {
@@ -175,30 +182,31 @@ public class ExportOPML : Export {
 
   }
 
-  /* Main method for importing an OPML <outline> into a node */
+  //-------------------------------------------------------------
+  // Main method for importing an OPML <outline> into a node
   public Node import_node( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state ) {
 
     Node node = new Node( table );
 
-    /* Get the node name */
+    // Get the node name
     string? t = n->get_prop( "text" );
     if( t != null ) {
       ExportHTML.to_text( "<div>" + t + "</div>", node.name.text );
     }
 
-    /* Add the task */
+    // Add the task
     var c = n->get_prop( "checked" );
     if( c != null ) {
       node.task = bool.parse( c ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
     }
 
-    /* Get the note information */
+    // Get the note information
     string? o = n->get_prop( "note" );
     if( o != null ) {
       ExportHTML.to_text( "<div>" + o + "</div>", node.note.text );
     }
 
-    /* Figure out if this node is folded */
+    // Figure out if this node is folded
     if( expand_state != null ) {
       node.expanded = false;
       for( int i=0; i<expand_state.length; i++ ) {
@@ -210,7 +218,7 @@ public class ExportOPML : Export {
       }
     }
 
-    /* Parse the child nodes */
+    // Parse the child nodes
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "outline") ) {
         var child = import_node( table, it, ref expand_state );
