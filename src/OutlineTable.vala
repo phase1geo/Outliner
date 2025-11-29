@@ -37,8 +37,13 @@ public enum FontTarget {
 
 public class OutlineTable : DrawingArea {
 
-  private const double dim_selected   = 0.3;
-  private const double dim_unselected = 0.1;
+  private const double dim_selected          = 0.3;
+  private const double dim_unselected        = 0.1;
+  private const double autoscroll_inner_edge = 20;
+  private const double autoscroll_outer_edge = 5;
+  private const double autoscroll_min_speed  = 5;
+  private const double autoscroll_max_speed  = 15;
+  private const uint   autoscroll_frame_rate = 20;
 
   private Cursor          click_cursor = new Cursor.from_name( "hand2", null );
   private Cursor          text_cursor  = new Cursor.from_name( "text", null );
@@ -98,6 +103,7 @@ public class OutlineTable : DrawingArea {
   private bool            _shift_set   = false;
   private bool            _alt_set     = false;
   private EventControllerKey _key_controller;
+  private uint               _autoscroll_id = 0;
 
   public MainWindow     win         { get { return( _win ); } }
   public Document       document    { get { return( _doc ); } }
@@ -942,6 +948,17 @@ public class OutlineTable : DrawingArea {
 
         // Otherwise, we are moving the current node
         } else {
+
+          // Pan the canvas if we are dragging something to the edge
+          int top, bottom;
+          var edge = autoscroll_inner_edge;
+          get_window_ys( out top, out bottom );
+          if( (ey < (top + edge)) || (ey > (bottom - edge)) ) {
+            start_autoscroll();
+          } else {
+            stop_autoscroll();
+          }
+
           selected.y = ey;
           var current = node_at_coordinates( ex, ey );
           if( current != null ) {
@@ -1041,10 +1058,60 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
+  // Starts the autoscroller
+  private void start_autoscroll() {
+    if( _autoscroll_id == 0 ) {
+      _autoscroll_id = Timeout.add( autoscroll_frame_rate, do_autoscroll );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Stops the autoscroller
+  private void stop_autoscroll() {
+    if( _autoscroll_id > 0 ) {
+      Source.remove( _autoscroll_id );
+      _autoscroll_id = 0;
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Handles automatically scrolling the ScrolledWindow when a
+  // node is dragged to the bottom or top edge.  We will support
+  // two different scroll speeds.
+  private bool do_autoscroll() {
+
+    double diffy   = 0.0;
+    int top, bottom;
+    var inner_edge = autoscroll_inner_edge;
+    var outer_edge = autoscroll_outer_edge;
+    var max_speed  = autoscroll_max_speed;
+    var min_speed  = autoscroll_min_speed;
+
+    get_window_ys( out top, out bottom );
+
+    if( _motion_y < (top + inner_edge) ) {
+      diffy = (_motion_y < (top + outer_edge)) ? (0 - max_speed) : (0 - min_speed);
+    } else if( _motion_y >= (bottom - inner_edge) ) {
+      diffy = (_motion_y >= (bottom - outer_edge)) ? max_speed : min_speed;
+    }
+
+    if( diffy != 0 ) {
+      var sw = parent.parent.parent as ScrolledWindow;
+      sw.vadjustment.value += diffy;
+    }
+
+    return( true );
+
+  }
+
+  //-------------------------------------------------------------
   // Handles the release of the mouse button
   private void on_release( int n_press, double x, double y ) {
 
     if( _pressed ) {
+
+      // If we are auto-scrolling, stop
+      stop_autoscroll();
 
       // Handles a click on the focus mode exit button
       if( _in_focus_exit ) {
