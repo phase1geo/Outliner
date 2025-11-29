@@ -1648,6 +1648,8 @@ public class OutlineTable : DrawingArea {
       set_title_editable( false );
     } else if( root.alpha < 1.0 ) {
       focus_leave();
+    } else if( _filtered ) {
+      filter_nodes( "", true, null );
     }
   }
 
@@ -2654,7 +2656,7 @@ public class OutlineTable : DrawingArea {
       root.children.index( i ).hidden &= !show_parent || !shown;
     }
     if( _filtered || (func == null) ) {
-      root.adjust_nodes( 0, false, "filter_nodes" );
+      root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "filter_nodes" );
       queue_draw();
       if( selected != null ) {
         see( selected );

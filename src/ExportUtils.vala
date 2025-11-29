@@ -25,7 +25,8 @@ public class ExportUtils {
   public delegate string ExportEndFunc( FormatTag tag, int start, string? extra );
   public delegate string ExportEncodeFunc( string str );
 
-  /* Used by the export function */
+  //-------------------------------------------------------------
+  // Used by the export function
   public class PosTag {
     public FormatTag tag   { private set; get; }
     public int       pos   { private set; get; }
@@ -105,10 +106,11 @@ public class ExportUtils {
     return( (first == null) || (second == null) || (first.tag != second.tag) || (first.pos != second.pos) || (first.extra != second.extra) );
   }
 
-  /* Exports the given FormattedText using markup or markdown */
+  //-------------------------------------------------------------
+  // Exports the given FormattedText using markup or markdown
   public static string export( FormattedText text, ExportStartFunc start_func, ExportEndFunc end_func, ExportEncodeFunc encode_func ) {
 
-    /* Create the tree version and create an ordered list of tags */
+    // Create the tree version and create an ordered list of tags
     var tags     = text.get_tags_in_range( 0, text.text.length );
     var root     = new TagTreeItem( null, null );
     var pos_tags = new Array<PosTag>();
@@ -117,7 +119,7 @@ public class ExportUtils {
     }
     root.get_array( ref pos_tags );
 
-    /* Output the text */
+    // Output the text
     var str   = "";
     var start = 0;
     for( int i=0; i<pos_tags.length; i++ ) {
