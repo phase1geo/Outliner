@@ -231,13 +231,6 @@ public enum KeyCommand {
       case CONTROL_PRESSED           :  return( "control" );
       case ESCAPE                    :  return( "escape" );
       case NODE_START                :  return( "node" );
-      /*
-      case NODE_ADD_ROOT             :  return( "node-add-root" );
-      case NODE_ADD_SIBLING_AFTER    :  return( "node-return" );
-      case NODE_ADD_SIBLING_BEFORE   :  return( "node-shift-return" );
-      case NODE_ADD_CHILD            :  return( "node-tab" );
-      case NODE_ADD_PARENT           :  return( "node-shift-tab" );
-      */
       case NODE_ADD_ABOVE            :  return( "node-add-above" );
       case NODE_ADD_BELOW            :  return( "node-add-below" );
       case NODE_ADD_CHILD            :  return( "node-add-child" );
@@ -247,7 +240,6 @@ public enum KeyCommand {
       case NODE_UNCLONE              :  return( "node-unclone" );
       case NODE_REMOVE               :  return( "node-remove" );
       case NODE_PASTE_REPLACE        :  return( "node-paste-replace" );
-      // case NODE_CENTER               :  return( "node-center" );
       case NODE_EXPAND_ONE           :  return( "node-expand-one" );
       case NODE_EXPAND_ALL           :  return( "node-expand-all" );
       case NODE_COLLAPSE_ONE         :  return( "node-collapse-one" );
@@ -297,15 +289,6 @@ public enum KeyCommand {
       case NODE_LABEL_GOTO_7         :  return( "node-label-goto-7" );
       case NODE_LABEL_GOTO_8         :  return( "node-label-goto-8" );
       case NODE_LABEL_GOTO_9         :  return( "node-label-goto-9" );
-      /*
-      case NODE_SWAP_RIGHT           :  return( "node-swap-right" );
-      case NODE_SWAP_LEFT            :  return( "node-swap-left" );
-      case NODE_SWAP_UP              :  return( "node-swap-up" );
-      case NODE_SWAP_DOWN            :  return( "node-swap-down" );
-      case NODE_SORT_ALPHABETICALLY  :  return( "node-sort-alphabetically" );
-      case NODE_SORT_RANDOMLY        :  return( "node-sort-randomly" );
-      case NODE_DETACH               :  return( "node-detach" );
-      */
       case EDIT_START                :  return( "editing" );
       case EDIT_INSERT_NEWLINE       :  return( "edit-insert-newline" );
       case EDIT_SPLIT_LINE           :  return( "edit-split-line" );
@@ -394,7 +377,6 @@ public enum KeyCommand {
       case "node-shift-return"         :  return( NODE_ADD_SIBLING_BEFORE );
       case "node-tab"                  :  return( NODE_ADD_CHILD );
       case "node-shift-tab"            :  return( NODE_ADD_PARENT );
-      case "node-center"               :  return( NODE_CENTER );
       */
       case "node-add-above"            :  return( NODE_ADD_ABOVE );
       case "node-add-below"            :  return( NODE_ADD_BELOW );
@@ -454,14 +436,6 @@ public enum KeyCommand {
       case "node-label-goto-7"         :  return( NODE_LABEL_GOTO_7 );
       case "node-label-goto-8"         :  return( NODE_LABEL_GOTO_8 );
       case "node-label-goto-9"         :  return( NODE_LABEL_GOTO_9 );
-      /*
-      case "node-swap-right"           :  return( NODE_SWAP_RIGHT );
-      case "node-swap-left"            :  return( NODE_SWAP_LEFT );
-      case "node-swap-up"              :  return( NODE_SWAP_UP );
-      case "node-swap-down"            :  return( NODE_SWAP_DOWN );
-      case "node-sort-alphabetically"  :  return( NODE_SORT_ALPHABETICALLY );
-      case "node-sort-randomly"        :  return( NODE_SORT_RANDOMLY );
-      */
       case "edit-insert-newline"       :  return( EDIT_INSERT_NEWLINE );
       case "edit-split-line"           :  return( EDIT_SPLIT_LINE );
       case "edit-insert-tab"           :  return( EDIT_INSERT_TAB );
@@ -550,14 +524,6 @@ public enum KeyCommand {
       case NODE_START                :  return( _( "Node" ) );
       case NODE_EXIST_START          :  return( _( "Creation/Deletion Commands" ) );
       case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
-      /*
-      case NODE_ADD_ROOT             :  return( _( "Add root node" ) );
-      case NODE_ADD_SIBLING_AFTER    :  return( _( "Add sibling node after current node" ) );
-      case NODE_ADD_SIBLING_BEFORE   :  return( _( "Add sibling node before current node" ) );
-      case NODE_ADD_CHILD            :  return( _( "Add child node to current node" ) );
-      case NODE_ADD_PARENT           :  return( _( "Add parent node to current node" ) );
-      case NODE_CLIPBOARD_START      :  return( _( "Clipboard Commands" ) );
-      */
       case NODE_ADD_ABOVE            :  return( _( "Add new row above current row" ) );
       case NODE_ADD_BELOW            :  return( _( "Add new row below current row" ) );
       case NODE_ADD_CHILD            :  return( _( "Add new child row to current row" ) );
@@ -568,7 +534,6 @@ public enum KeyCommand {
       case NODE_REMOVE               :  return( _( "Remove current row" ) );
       case NODE_PASTE_REPLACE        :  return( _( "Replace current row with clipboard content") );
       case NODE_VIEW_START           :  return( _( "View Commands" ) );
-      // case NODE_CENTER               :  return( _( "Center current node in map canvas" ) );
       case NODE_EXPAND_ONE           :  return( _( "Expand current row by one level" ) );
       case NODE_EXPAND_ALL           :  return( _( "Expand current row completely" ) );
       case NODE_COLLAPSE_ONE         :  return( _( "Collapse current row by one level" ) );
@@ -622,12 +587,6 @@ public enum KeyCommand {
       case NODE_LABEL_GOTO_7         :  return( _( "Select row marked with label-7" ) );
       case NODE_LABEL_GOTO_8         :  return( _( "Select row marked with label-8" ) );
       case NODE_LABEL_GOTO_9         :  return( _( "Select row marked with label-9" ) );
-      /*
-      case NODE_SWAP_UP              :  return( _( "Swap current node with above node" ) );
-      case NODE_SWAP_DOWN            :  return( _( "Swap current node with below node" ) );
-      case NODE_SORT_ALPHABETICALLY  :  return( _( "Sort child nodes of current node alphabetically" ) );
-      case NODE_SORT_RANDOMLY        :  return( _( "Sort child nodes of current node randomly" ) );
-      */
       case EDIT_START                :  return( _( "Text Editing" ) );
       case EDIT_TEXT_START           :  return( _( "Insertion/Deletion Commands" ) );
       case EDIT_INSERT_NEWLINE       :  return( _( "Insert newline character" ) );
@@ -717,7 +676,6 @@ public enum KeyCommand {
       case NODE_UNCLONE              :  return( node_unclone );
       case NODE_REMOVE               :  return( node_remove );
       case NODE_PASTE_REPLACE        :  return( node_paste_replace );
-      // case NODE_CENTER               :  return( node_center );
       case NODE_EXPAND_ONE           :  return( node_expand_one );
       case NODE_EXPAND_ALL           :  return( node_expand_all );
       case NODE_COLLAPSE_ONE         :  return( node_collapse_one ); 
@@ -767,12 +725,6 @@ public enum KeyCommand {
       case NODE_LABEL_GOTO_7         :  return( node_label_goto_7 );
       case NODE_LABEL_GOTO_8         :  return( node_label_goto_8 );
       case NODE_LABEL_GOTO_9         :  return( node_label_goto_9 );
-      /*
-      case NODE_SWAP_UP              :  return( node_swap_up );
-      case NODE_SWAP_DOWN            :  return( node_swap_down );
-      case NODE_SORT_ALPHABETICALLY  :  return( node_sort_alphabetically );
-      case NODE_SORT_RANDOMLY        :  return( node_sort_randomly );
-      */
       case EDIT_INSERT_NEWLINE       :  return( edit_insert_newline );
       case EDIT_SPLIT_LINE           :  return( edit_split_line );
       case EDIT_INSERT_TAB           :  return( edit_insert_tab );
@@ -894,10 +846,6 @@ public enum KeyCommand {
       (this != EDIT_BACKSPACE) &&
       (this != NODE_REMOVE) &&
       (this != EDIT_DELETE) &&
-      // (this != NODE_ADD_SIBLING_AFTER) &&
-      // (this != NODE_ADD_SIBLING_BEFORE) &&
-      // (this != NODE_ADD_CHILD) &&
-      // (this != NODE_ADD_PARENT) &&
       (this != EDIT_CURSOR_CHAR_NEXT) &&
       (this != EDIT_CURSOR_CHAR_PREV) &&
       (this != EDIT_CURSOR_UP) &&
@@ -926,10 +874,6 @@ public enum KeyCommand {
         case EDIT_SHIFT_RETURN :
         case EDIT_TAB          :
         case EDIT_SHIFT_TAB    :
-        // case NODE_ADD_SIBLING_AFTER  :
-        // case NODE_ADD_SIBLING_BEFORE :
-        // case NODE_ADD_CHILD    :
-        // case NODE_ADD_PARENT   :
           return( false );
         default :
           return( true );
@@ -1345,78 +1289,6 @@ public enum KeyCommand {
     ot.goto_label( 8 );
   }
 
-  /*
-  public static void node_change_task( OutlineTable ot ) {
-    var current = map.get_current_node();
-    if( current != null ) {
-      if( current.task_enabled() ) {
-        if( current.task_done() ) {
-          map.model.change_current_task( false, false );
-        } else {
-          map.model.change_current_task( true, true );
-        }
-      } else {
-        map.model.change_current_task( true, false );
-      }
-    }
-  }
-
-  public static void node_add_root( OutlineTable ot ) {
-    map.model.add_root_node();
-  }
-
-  //-------------------------------------------------------------
-  // Helper function that handles a press of the return key when
-  // a node is selected (or is attached to a connecting connection).
-  private static void node_return_helper( OutlineTable ot, bool shift ) {
-    if( map.is_connection_connecting() && (map.model.attach_node != null) ) {
-      map.model.end_connection( map.model.attach_node );
-    } else if( map.is_node_selected() ) {
-      if( !map.get_current_node().is_root() ) {
-        map.model.add_sibling_node( shift );
-      } else if( shift ) {
-        map.model.add_connected_node();
-      } else {
-        map.model.add_root_node();
-      }
-    } else if( map.selected.num_nodes() == 0 ) {
-      map.model.add_root_node();
-    }
-  }
-
-  public static void node_return( OutlineTable ot ) {
-    node_return_helper( map, false );
-  }
-
-  public static void node_shift_return( OutlineTable ot ) {
-    node_return_helper( map, true );
-  }
-
-  private static void node_tab_helper( OutlineTable ot, bool shift ) {
-    if( map.is_node_selected() ) {
-      if( shift ) {
-        map.model.add_parent_node();
-      } else {
-        map.model.add_child_node();
-      }
-    } else if( map.selected.num_nodes() > 1 ) {
-      // map.model.add_summary_node_from_selected();
-    }
-  }
-
-  public static void node_tab( OutlineTable ot ) {
-    node_tab_helper( map, false );
-  }
-
-  public static void node_shift_tab( OutlineTable ot ) {
-    node_tab_helper( map, true );
-  }
-
-  public static void node_center( OutlineTable ot ) {
-    map.canvas.center_current_node();
-  }
-  */
-
   public static void node_expand_one( OutlineTable ot ) {
     ot.node_expand( false );
   }
@@ -1448,31 +1320,6 @@ public enum KeyCommand {
   public static void node_focus( OutlineTable ot ) {
     ot.focus_on_selected();
   }
-
-  /*
-  public static void node_sort_alphabetically( OutlineTable ot ) {
-    map.model.sort_alphabetically();
-  }
-
-  public static void node_sort_randomly( OutlineTable ot ) {
-    map.model.sort_randomly();
-  }
-
-  public static void node_quick_entry_insert( OutlineTable ot ) {
-    var quick_entry = new QuickEntry( map, false, map.settings );
-    quick_entry.preload( "- " );
-  }
-
-  public static void node_quick_entry_replace( OutlineTable ot ) {
-    var quick_entry = new QuickEntry( map, true, map.settings );
-    var export      = (ExportText)map.win.exports.get_by_name( "text" );
-    quick_entry.preload( export.export_node( map, map.get_current_node(), "" ) );
-  }
-
-  public static void node_paste_node_link( OutlineTable ot ) {
-    map.do_paste_node_link();
-  }
-  */
 
   public static void node_paste_replace( OutlineTable ot ) {
     ot.do_paste( true );
@@ -1510,35 +1357,9 @@ public enum KeyCommand {
     ot.delete_current_node();
   }
 
-  /*
-  //-------------------------------------------------------------
-  // Swaps the current node with the one in the specified direction.
-  private static void node_swap( OutlineTable ot, string dir ) {
-    var current = map.get_current_node();
-    if( current != null ) {
-      Node? other = null;
-      switch( dir ) {
-        case "up"    :  other = map.model.get_node_up( current );     break;
-        case "down"  :  other = map.model.get_node_down( current );   break;
-        default      :  return;
-      }
-      if( other != null ) {
-        map.swap_nodes( current, other );
-      }
-    }
-  }
-
-  public static void node_swap_up( OutlineTable ot ) {
-    node_swap( map, "up" );
-  }
-
-  public static void node_swap_down( OutlineTable ot ) {
-    node_swap( map, "down" );
-  }
-  */
-
   //-------------------------------------------------------------
   // EDITING FUNCTIONS
+  //-------------------------------------------------------------
 
   //-------------------------------------------------------------
   // Helper function that should be called whenever text changes

@@ -328,7 +328,7 @@ public class FormattedText {
         if( (start < info.end) && (end > info.start) ) {
           var save_start = (info.start < start) ? start : info.start;
           var save_end   = (info.end   > end)   ? end   : info.end;
-          tags.append_val( new UndoTagInfo( tag, (save_start - start), (save_end - start), info.extra, info.pid ) );
+          tags.append_val( new UndoTagInfo( tag, save_start, save_end, info.extra, info.pid ) );
         }
       }
     }
@@ -1085,7 +1085,7 @@ public class FormattedText {
     var spos = get_next ? start : 0;
     var epos = get_next ? text.length : start;
     _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, spos, epos, ref tags );
-    var index = get_next ? (tags.length - 1) : 0;
+    var index = get_next ? 0 : (tags.length - 1);
     if( tags.length > 0 ) {
       match.start = tags.index( index ).start;
       match.end   = tags.index( index ).end;

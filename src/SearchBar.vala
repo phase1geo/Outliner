@@ -29,8 +29,21 @@ public class SearchMatch {
   public int   start { set; get; default = -1; }
   public int   end   { set; get; default = -1; }
 
+  //-------------------------------------------------------------
+  // Constructor
   public SearchMatch() {}
 
+  //-------------------------------------------------------------
+  // Copy constructor
+  public SearchMatch.copy( SearchMatch other ) {
+    node  = other.node;
+    name  = other.name;
+    start = other.start;
+    end   = other.end;
+  }
+
+  //-------------------------------------------------------------
+  // Outputs the contents as a printable string.
   public string to_string() {
     return( (node == null) ? "none" : "name: %s, str: %s, start: %d, end: %d".printf( name.to_string(), (name ? node.name.text.text : node.note.text.text), start, end ) );
   }
@@ -48,7 +61,7 @@ public class SearchBar : Box {
   private Button       _replace_all;
   private SearchMatch  _next;
   private SearchMatch  _prev;
-  private int          _ignore_update;
+  private bool         _ignore_update;
 
   //-------------------------------------------------------------
   // Default constructor
@@ -66,7 +79,7 @@ public class SearchBar : Box {
 
     _next = new SearchMatch();
     _prev = new SearchMatch();
-    _ignore_update = 0;
+    _ignore_update = false;
 
     add_search_entry();
     add_search_next();
@@ -87,11 +100,9 @@ public class SearchBar : Box {
     if( !show ) {
       _search_entry.text = "";
       search();
-      _ignore_update = 2;
     } else {
       _search_entry.grab_focus();
       update_state();
-      _ignore_update = 0;
     }
   }
 
@@ -118,7 +129,7 @@ public class SearchBar : Box {
 
     // Perform search
     _ot.do_search( _search_entry.text );
-
+    
     // Update the UI state
     update_next_previous();
 
@@ -129,12 +140,7 @@ public class SearchBar : Box {
   // node changes
   private void update_next_previous() {
 
-    if( _ignore_update > 0 ) {
-      if( _ignore_update == 1 ) {
-        _ignore_update = 0;
-      }
-      return;
-    }
+    if( _ignore_update ) return;
 
     // Get the next and previous matches
     find_next_match();
@@ -279,27 +285,28 @@ public class SearchBar : Box {
 
     if( match.node == null ) return;
 
-    var selchange = (match.node != _ot.selected);
-    var curchange = (match.name ? match.node.name.cursor : match.node.note.cursor) != match.end;
-    var edit_selected = KeyCommand.NODE_CHANGE_TEXT;
+    var goto = new SearchMatch.copy( match );
+    var ct   = goto.name ? goto.node.name : goto.node.note;
+
+    var selchange = (goto.node != _ot.selected);
+    var curchange = (ct.cursor != goto.end);
+    var edit_selected = goto.name ? KeyCommand.NODE_CHANGE_TEXT : KeyCommand.NODE_CHANGE_NOTE;
     var edit_selected_func = edit_selected.get_func();
 
+    _ignore_update = true;
+
     // Set the matched node to edit mode and select the matched text
-    _ignore_update = selchange ? 1 : 0;
-    _ot.selected   = match.node;
+    _ot.selected   = goto.node;
     edit_selected_func( _ot );
 
-    if( match.name ) {
-      _ot.selected.name.change_selection( match.start, match.end );
-      _ot.selected.name.set_cursor_only( match.end );
-    } else {
-      _ot.selected.note.change_selection( match.start, match.end );
-      _ot.selected.note.set_cursor_only( match.end );
-    }
+    ct.change_selection( goto.start, goto.end );
+    ct.set_cursor_only( goto.end );
 
-    // Make sure that we update the search bar
-    if( !curchange ) {
-      _ot.cursor_changed();
+    _ignore_update = false;
+
+    // Make sure that we update next/previous if we are changing position
+    if( selchange || curchange ) {
+      update_next_previous();
     }
 
   }
@@ -352,15 +359,16 @@ public class SearchBar : Box {
   // Adds the replace text entry field and adds it to this box
   private void add_replace_entry() {
 
-    var focus_controller = new EventControllerFocus();
     _replace_entry = new Gtk.SearchEntry() {
       halign            = Align.FILL,
       hexpand           = true,
       placeholder_text  = _( "Replace with…")
     };
-    _replace_entry.add_controller( focus_controller );
 
     _replace_entry.search_changed.connect( replace_text_changed );
+
+    var focus_controller = new EventControllerFocus();
+    _replace_entry.add_controller( focus_controller );
 
     focus_controller.enter.connect( replace_focus_in );
 
