@@ -58,6 +58,7 @@ public class SearchBar : Box {
   private Button       _search_prev;
   private SearchEntry  _replace_entry;
   private Button       _replace_current;
+  private Button       _skip_current;
   private Button       _replace_all;
   private SearchMatch  _next;
   private SearchMatch  _prev;
@@ -87,6 +88,7 @@ public class SearchBar : Box {
     add_spacer();
     add_replace_entry();
     add_replace_current();
+    add_skip_current();
     add_replace_all();
 
     _ot.selected_changed.connect( update_next_previous );
@@ -162,6 +164,7 @@ public class SearchBar : Box {
     _replace_entry.editable  = found;
     _replace_entry.can_focus = found;
     _replace_current.set_sensitive( (_replace_entry.text != "") && is_match_selected() );
+    _skip_current.set_sensitive( (_replace_entry.text != "") && is_match_selected() );
     _replace_all.set_sensitive( (_replace_entry.text != "") && found );
 
   }
@@ -410,6 +413,17 @@ public class SearchBar : Box {
 
     // Jump to the next match
     select_matched_text( _next );
+
+  }
+
+  //-------------------------------------------------------------
+  // Adds the skip current button and adds it to this box
+  private void add_skip_current() {
+
+    _skip_current = new Gtk.Button.with_label( _( "Skip" ) );
+    _skip_current.clicked.connect( search_next );
+
+    append( _skip_current );
 
   }
 
