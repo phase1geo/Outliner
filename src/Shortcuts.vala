@@ -567,8 +567,6 @@ public class Shortcuts {
     add_default( Key.a,            true,  true,  false, KeyCommand.EDIT_SELECT_NONE );
     add_default( Key.backslash,    true,  false, false, KeyCommand.EDIT_SELECT_NONE );
     add_default( Key.period,       true,  false, false, KeyCommand.EDIT_INSERT_EMOJI );
-    add_default( Key.k,            true,  false, false, KeyCommand.EDIT_ADD_URL );
-    add_default( Key.k,            true,  true,  false, KeyCommand.EDIT_REMOVE_URL );
     add_default( Key.b,            true,  false, false, KeyCommand.EDIT_BOLD );
     add_default( Key.i,            true,  false, false, KeyCommand.EDIT_ITALICS );
     add_default( Key.u,            true,  false, false, KeyCommand.EDIT_UNDERLINE );

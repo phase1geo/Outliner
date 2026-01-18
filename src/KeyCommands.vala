@@ -157,12 +157,6 @@ public enum KeyCommand {
       EDIT_CUT,
       EDIT_PASTE,
     EDIT_CLIPBOARD_END,
-    EDIT_URL_START,
-      EDIT_OPEN_URL,  // 170
-      EDIT_ADD_URL,
-      EDIT_EDIT_URL,
-      EDIT_REMOVE_URL,
-    EDIT_URL_END,
     EDIT_CURSOR_START,
       EDIT_CURSOR_CHAR_NEXT,
       EDIT_CURSOR_CHAR_PREV,
@@ -306,10 +300,6 @@ public enum KeyCommand {
       case EDIT_COPY                 :  return( "edit-copy" );
       case EDIT_CUT                  :  return( "edit-cut" );
       case EDIT_PASTE                :  return( "edit-paste" );
-      case EDIT_OPEN_URL             :  return( "edit-open-url" );
-      case EDIT_ADD_URL              :  return( "edit-add-url" );
-      case EDIT_EDIT_URL             :  return( "edit-edit-url" );
-      case EDIT_REMOVE_URL           :  return( "edit-remove-url" );
       case EDIT_CURSOR_CHAR_NEXT     :  return( "edit-cursor-char-next" );
       case EDIT_CURSOR_CHAR_PREV     :  return( "edit-cursor-char-prev" );
       case EDIT_CURSOR_UP            :  return( "edit-cursor-up" );
@@ -452,10 +442,6 @@ public enum KeyCommand {
       case "edit-copy"                 :  return( EDIT_COPY );
       case "edit-cut"                  :  return( EDIT_CUT );
       case "edit-paste"                :  return( EDIT_PASTE );
-      case "edit-open-url"             :  return( EDIT_OPEN_URL );
-      case "edit-add-url"              :  return( EDIT_ADD_URL );
-      case "edit-edit-url"             :  return( EDIT_EDIT_URL );
-      case "edit-remove-url"           :  return( EDIT_REMOVE_URL );
       case "edit-cursor-char-next"     :  return( EDIT_CURSOR_CHAR_NEXT );
       case "edit-cursor-char-prev"     :  return( EDIT_CURSOR_CHAR_PREV );
       case "edit-cursor-up"            :  return( EDIT_CURSOR_UP );
@@ -603,11 +589,6 @@ public enum KeyCommand {
       case EDIT_COPY                 :  return( _( "Copy selected nodes or text" ) );
       case EDIT_CUT                  :  return( _( "Cut selected nodes or text" ) );
       case EDIT_PASTE                :  return( _( "Paste nodes or text from clipboard" ) );
-      case EDIT_URL_START            :  return( _( "URL Commands" ) );
-      case EDIT_OPEN_URL             :  return( _( "Open URL link at current cursor position" ) );
-      case EDIT_ADD_URL              :  return( _( "Add URL link at current cursor position" ) );
-      case EDIT_EDIT_URL             :  return( _( "Change URL link at current cursor position" ) );
-      case EDIT_REMOVE_URL           :  return( _( "Remove URL link at current cursor position" ) );
       case EDIT_CURSOR_START         :  return( _( "Cursor Commands" ) );
       case EDIT_CURSOR_CHAR_NEXT     :  return( _( "Move cursor to next character" ) );
       case EDIT_CURSOR_CHAR_PREV     :  return( _( "Move cursor to previous character" ) );
@@ -741,10 +722,6 @@ public enum KeyCommand {
       case EDIT_COPY                 :  return( edit_copy );
       case EDIT_CUT                  :  return( edit_cut );
       case EDIT_PASTE                :  return( edit_paste );
-      case EDIT_OPEN_URL             :  return( edit_open_url );
-      case EDIT_ADD_URL              :  return( edit_add_url );
-      case EDIT_EDIT_URL             :  return( edit_edit_url );
-      case EDIT_REMOVE_URL           :  return( edit_remove_url );
       case EDIT_CURSOR_CHAR_NEXT     :  return( edit_cursor_char_next );
       case EDIT_CURSOR_CHAR_PREV     :  return( edit_cursor_char_previous );
       case EDIT_CURSOR_UP            :  return( edit_cursor_up );
@@ -923,7 +900,6 @@ public enum KeyCommand {
       case NODE_LABEL_START     :
       case EDIT_TEXT_START      :
       case EDIT_CLIPBOARD_START :
-      case EDIT_URL_START       :
       case EDIT_CURSOR_START    :
       case EDIT_SELECT_START    :
       case EDIT_MISC_START      :
@@ -952,7 +928,6 @@ public enum KeyCommand {
       case NODE_LABEL_END     :
       case EDIT_TEXT_END      :
       case EDIT_CLIPBOARD_END :
-      case EDIT_URL_END       :
       case EDIT_CURSOR_END    :
       case EDIT_SELECT_END    :
       case EDIT_MISC_END      :
@@ -1608,30 +1583,6 @@ public enum KeyCommand {
 
   public static void edit_deselect_all( OutlineTable ot ) {
     edit_selection( ot, "none" );
-  }
-
-  public static void edit_open_url( OutlineTable ot ) {
-    /*
-    var text = map.get_current_text();
-    if( text != null ) {
-      int cursor, selstart, selend;
-      text.get_cursor_info( out cursor, out selstart, out selend );
-      var links = text.text.get_full_tags_in_range( FormatTag.URL, cursor, cursor );
-      Utils.open_url( links.index( 0 ).extra );
-    }
-    */
-  }
-
-  public static void edit_add_url( OutlineTable ot ) {
-    // map.canvas.url_editor.add_url();
-  }
-
-  public static void edit_edit_url( OutlineTable ot ) {
-    // map.canvas.url_editor.edit_url();
-  }
-
-  public static void edit_remove_url( OutlineTable ot ) {
-    // map.canvas.url_editor.remove_url();
   }
 
   public static void edit_copy( OutlineTable ot ) {
