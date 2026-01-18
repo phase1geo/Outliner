@@ -6,24 +6,12 @@
     <project_license>GPL-3.0+</project_license>
     <name>Outliner</name>
     <summary>Organize your words</summary>
-    <developer_name>Trevor Williams</developer_name>
-    <developer>com.github.phase1geo</developer>
-    <provides>
-      <binary>com.github.phase1geo.outliner</binary>
-    </provides>
-    <screenshots>
-      <screenshot>
-        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-light.png</image>
-      </screenshot>
-      <screenshot>
-        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-dark.png</image>
-      </screenshot>
-      <screenshot>
-        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-dark.png</image>
-      </screenshot>
-    </screenshots>
     <description>
-      <p>Quickly create outlines and export them in a number of useful formats.</p>
+      <p>
+        Quickly create outlines and export them in a number of useful formats.  Outliner contains powerful features to
+        quickly create, edit, navigate, and search your outlines while using a clean interface to keep you focused on
+        your ideas.
+      </p>
       <ul>
         <li>Quickly create and navigate outlines using the keyboard or mouse.</li>
         <li>Full support for rich text formatting and/or Markdown formatting.</li>
@@ -41,39 +29,31 @@
         <li>Built-in themes.</li>
         <li>Support for changing fonts within a document.</li>
         <li>Import from Minder and OPML.</li>
-        <li>Export to HTML, Markdown, Minder, OPML, Org-Mode, PDF and PlainText.</li>
+        <li>Export to HTML, Markdown, Minder, ODT, OPML, Org-Mode, PDF, PlainText and RTF.</li>
         <li>Printer support.</li>
       </ul>
     </description>
-    <content_rating type="oars-1.1">
-      <content_attribute id="violence-cartoon">none</content_attribute>
-      <content_attribute id="violence-fantasy">none</content_attribute>
-      <content_attribute id="violence-realistic">none</content_attribute>
-      <content_attribute id="violence-bloodshed">none</content_attribute>
-      <content_attribute id="violence-sexual">none</content_attribute>
-      <content_attribute id="violence-desecration">none</content_attribute>
-      <content_attribute id="violence-slavery">none</content_attribute>
-      <content_attribute id="violence-worship">none</content_attribute>
-      <content_attribute id="drugs-alcohol">none</content_attribute>
-      <content_attribute id="drugs-narcotics">none</content_attribute>
-      <content_attribute id="drugs-tobacco">none</content_attribute>
-      <content_attribute id="sex-nudity">none</content_attribute>
-      <content_attribute id="sex-themes">none</content_attribute>
-      <content_attribute id="sex-homosexuality">none</content_attribute>
-      <content_attribute id="sex-prostitution">none</content_attribute>
-      <content_attribute id="sex-adultery">none</content_attribute>
-      <content_attribute id="sex-appearance">none</content_attribute>
-      <content_attribute id="language-profanity">none</content_attribute>
-      <content_attribute id="language-humor">none</content_attribute>
-      <content_attribute id="language-discrimination">none</content_attribute>
-      <content_attribute id="social-chat">none</content_attribute>
-      <content_attribute id="social-info">none</content_attribute>
-      <content_attribute id="social-audio">none</content_attribute>
-      <content_attribute id="social-location">none</content_attribute>
-      <content_attribute id="social-contacts">none</content_attribute>
-      <content_attribute id="money-purchasing">none</content_attribute>
-      <content_attribute id="money-gambling">none</content_attribute>
-    </content_rating>
+    <launchable type="desktop-id">com.github.phase1geo.outliner.desktop</launchable>
+    <provides>
+      <binary>com.github.phase1geo.outliner</binary>
+    </provides>
+    <screenshots>
+      <screenshot type="default">
+        <caption>Solarized Light Theme</caption>
+        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-light.png</image>
+      </screenshot>
+      <screenshot>
+        <caption>Solarized Dark Theme</caption>
+        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-solarized-dark.png</image>
+      </screenshot>
+      <screenshot>
+        <caption>Dark Theme</caption>
+        <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-dark.png</image>
+      </screenshot>
+    </screenshots>
+    <developer id="com.github.phase1geo">
+      <name>Trevor Williams</name>
+    </developer>
     <url type="homepage">https://github.com/phase1geo/Outliner</url>
     <url type="bugtracker">https://github.com/phase1geo/Outliner/issues</url>
     <url type="help">https://github.com/phase1geo/Outliner/wiki</url>
@@ -84,7 +64,43 @@
       <value key="x-appcenter-suggested-price">10</value>
       <value key="x-appcenter-stripe">pk_live_wsAhF3dNEsmhB6oQIQknujgL00dBOT1gsG</value>
     </custom>
+    <content_rating type="oars-1.1" />
     <releases>
+      <release version="2.0.0" date="2026-01-18">
+        <description>
+          <p>New</p>
+          <ul>
+            <li>Added ability to customize keyboard shortcuts in preferences.</li>
+            <li>Added file icon for .outliner files.</li>
+            <li>Added support for Flathub flatpak builds.</li>
+            <li>Added an 'Edit Title' menu command.</li>
+            <li>Added autoscroll behavior when dragging node.</li>
+            <li>Added export support for ODT and RTF formats.</li>
+            <li>Added find-replace skip button.</li>
+          </ul>
+          <p>Changes</p>
+          <ul>
+            <li>Updated from gtk3 to gtk4.</li>
+            <li>Changed application icon.</li>
+            <li>Updated Minder import and export support for Minder version 2.x.</li>
+            <li>Improved title support for Minder maps with multiple root nodes.</li>
+          </ul>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Fixed issue with Control-W when only one tab is opened.</li>
+            <li>Fixed application icon installation issues.</li>
+            <li>Fixed issue in item selection when title does not exist.</li>
+            <li>Fixed various issues with closing application.</li>
+            <li>Fixed issues with saving and loading tab state.</li>
+            <li>Fixed issue with combining text formatting.</li> 
+            <li>Fixed critical error with editing title.</li>
+            <li>Fixed various minor issues with text editing and selection.</li>
+            <li>Fixed various issues with mouse clicking in outline.</li>
+            <li>Fixed tag filtering support.</li>
+            <li>Fixed find functionality.</li>
+          </ul>
+        </description>
+      </release>
       <release version="1.7.0" date="2023-05-20">
         <description>
           <p>New</p>

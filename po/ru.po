@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-28 22:35-0600\n"
+"POT-Creation-Date: 2026-01-18 15:29-0600\n"
 "PO-Revision-Date: 2023-05-21 10:26+0200\n"
 "Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
@@ -216,620 +216,599 @@ msgstr "Ссылка"
 msgid "Clear all formatting"
 msgstr "Очистить форматирование"
 
-#: src/KeyCommands.vala:522 data/com.github.phase1geo.outliner.shortcuts.ui:12
+#: src/KeyCommands.vala:482 data/com.github.phase1geo.outliner.shortcuts.ui:12
 msgid "General"
 msgstr "Общие"
 
-#: src/KeyCommands.vala:523
+#: src/KeyCommands.vala:483
 #, fuzzy
 msgid "File Commands"
 msgstr "Команды работы с метками"
 
-#: src/KeyCommands.vala:524
+#: src/KeyCommands.vala:484
 msgid "Create new outline"
 msgstr ""
 
-#: src/KeyCommands.vala:525
+#: src/KeyCommands.vala:485
 msgid "Open saved outline"
 msgstr ""
 
-#: src/KeyCommands.vala:526
+#: src/KeyCommands.vala:486
 msgid "Save outline to current file"
 msgstr ""
 
-#: src/KeyCommands.vala:527
+#: src/KeyCommands.vala:487
 msgid "Save outline to new file"
 msgstr ""
 
-#: src/KeyCommands.vala:528
+#: src/KeyCommands.vala:488
 msgid "Show print dialog for current outline"
 msgstr ""
 
-#: src/KeyCommands.vala:529
+#: src/KeyCommands.vala:489
 #, fuzzy
 msgid "Tab Commands"
 msgstr "Команды работы с метками"
 
-#: src/KeyCommands.vala:530
+#: src/KeyCommands.vala:490
 #, fuzzy
 msgid "Select next tab"
 msgstr "Выбрать следующий ряд"
 
-#: src/KeyCommands.vala:531
+#: src/KeyCommands.vala:491
 #, fuzzy
 msgid "Select previous tab"
 msgstr "Выбрать предыдущий ряд"
 
-#: src/KeyCommands.vala:532
+#: src/KeyCommands.vala:492
 #, fuzzy
 msgid "Close the current mindmap"
 msgstr "Закрыть другую вкладку"
 
-#: src/KeyCommands.vala:533
+#: src/KeyCommands.vala:493
 #, fuzzy
 msgid "Undo/Redo Commands"
 msgstr "Команды работы с рядами"
 
-#: src/KeyCommands.vala:534
+#: src/KeyCommands.vala:494
 #, fuzzy
 msgid "Undo last action"
 msgstr "Отменить последнее изменение"
 
-#: src/KeyCommands.vala:535
+#: src/KeyCommands.vala:495
 #, fuzzy
 msgid "Redo last undone action"
 msgstr "Вернуть последнюю правку"
 
-#: src/KeyCommands.vala:536
+#: src/KeyCommands.vala:496
 #, fuzzy
 msgid "Zoom Commands"
 msgstr "Команды работы с рядами"
 
-#: src/KeyCommands.vala:537
+#: src/KeyCommands.vala:497
 #, fuzzy
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: src/KeyCommands.vala:538
+#: src/KeyCommands.vala:498
 #, fuzzy
 msgid "Zoom out"
 msgstr "Отдалить"
 
-#: src/KeyCommands.vala:539
+#: src/KeyCommands.vala:499
 #, fuzzy
 msgid "Zoom to 100%"
 msgstr "Отдалить"
 
-#: src/KeyCommands.vala:540
+#: src/KeyCommands.vala:500
 #, fuzzy
 msgid "Miscellaneous Commands"
 msgstr "Разное"
 
-#: src/KeyCommands.vala:541
+#: src/KeyCommands.vala:501
 msgid "Show preferences window"
 msgstr ""
 
-#: src/KeyCommands.vala:542
+#: src/KeyCommands.vala:502
 #, fuzzy
 msgid "Show shortcuts cheatsheet"
 msgstr "Справка по клавиатурным комбинациям"
 
-#: src/KeyCommands.vala:543
+#: src/KeyCommands.vala:503
 #, fuzzy
 msgid "Show contextual menu"
 msgstr "Показать контекстное меню"
 
-#: src/KeyCommands.vala:544
+#: src/KeyCommands.vala:504
 msgid "Show About window"
 msgstr ""
 
-#: src/KeyCommands.vala:545
+#: src/KeyCommands.vala:505
 #, fuzzy
 msgid "Toggle focus mode"
 msgstr "Включить режим фокусировки"
 
-#: src/KeyCommands.vala:546
+#: src/KeyCommands.vala:506
 msgid "Toggle display of all notes"
 msgstr ""
 
-#: src/KeyCommands.vala:547
+#: src/KeyCommands.vala:507
 msgid "Display search panel"
 msgstr ""
 
-#: src/KeyCommands.vala:548
+#: src/KeyCommands.vala:508
 #, fuzzy
 msgid "Edit the document title"
 msgstr "смену названия документа"
 
-#: src/KeyCommands.vala:549
+#: src/KeyCommands.vala:509
 #, fuzzy
 msgid "Quit the application"
 msgstr "Завершить работу"
 
-#: src/KeyCommands.vala:550
+#: src/KeyCommands.vala:510
 msgid "Node"
 msgstr ""
 
-#: src/KeyCommands.vala:551
+#: src/KeyCommands.vala:511
 #, fuzzy
 msgid "Creation/Deletion Commands"
 msgstr "Создание и удаление"
 
-#: src/KeyCommands.vala:552 src/KeyCommands.vala:643
+#: src/KeyCommands.vala:512 src/KeyCommands.vala:588
 #, fuzzy
 msgid "Clipboard Commands"
 msgstr "Команды работы с рядами"
 
-#: src/KeyCommands.vala:561
+#: src/KeyCommands.vala:513
 msgid "Add new row above current row"
 msgstr ""
 
-#: src/KeyCommands.vala:562
+#: src/KeyCommands.vala:514
 msgid "Add new row below current row"
 msgstr ""
 
-#: src/KeyCommands.vala:563
+#: src/KeyCommands.vala:515
 msgid "Add new child row to current row"
 msgstr ""
 
-#: src/KeyCommands.vala:564
+#: src/KeyCommands.vala:516
 msgid "Add new parent row of current row"
 msgstr ""
 
-#: src/KeyCommands.vala:565
+#: src/KeyCommands.vala:517
 msgid "Creates a clone copy of the current row"
 msgstr ""
 
-#: src/KeyCommands.vala:566
+#: src/KeyCommands.vala:518
 msgid "Pastes the cloned row from the clipboard"
 msgstr ""
 
-#: src/KeyCommands.vala:567
+#: src/KeyCommands.vala:519
 msgid "Unclones the current row if it is a clone"
 msgstr ""
 
-#: src/KeyCommands.vala:568
+#: src/KeyCommands.vala:520
 msgid "Remove current row"
 msgstr ""
 
-#: src/KeyCommands.vala:569
+#: src/KeyCommands.vala:521
 msgid "Replace current row with clipboard content"
 msgstr ""
 
-#: src/KeyCommands.vala:570
+#: src/KeyCommands.vala:522
 #, fuzzy
 msgid "View Commands"
 msgstr "Команды работы с рядами"
 
-#: src/KeyCommands.vala:572
+#: src/KeyCommands.vala:523
 #, fuzzy
 msgid "Expand current row by one level"
 msgstr "Развернуть ряд уровнем ниже"
 
-#: src/KeyCommands.vala:573
+#: src/KeyCommands.vala:524
 #, fuzzy
 msgid "Expand current row completely"
 msgstr "Развернуть ряд уровнем ниже"
 
-#: src/KeyCommands.vala:574
+#: src/KeyCommands.vala:525
 #, fuzzy
 msgid "Collapse current row by one level"
 msgstr "Свернуть ряд уровнем ниже"
 
-#: src/KeyCommands.vala:575
+#: src/KeyCommands.vala:526
 #, fuzzy
 msgid "Collapse current row completely"
 msgstr "Свернуть ряд уровнем ниже"
 
-#: src/KeyCommands.vala:576
+#: src/KeyCommands.vala:527
 msgid "Page the document up from the current row"
 msgstr ""
 
-#: src/KeyCommands.vala:577
+#: src/KeyCommands.vala:528
 msgid "Page the document down from the current row"
 msgstr ""
 
-#: src/KeyCommands.vala:578
+#: src/KeyCommands.vala:529
 msgid "Adjust document view to show current row at the top"
 msgstr ""
 
-#: src/KeyCommands.vala:579
+#: src/KeyCommands.vala:530
 msgid "Focus on current row"
 msgstr ""
 
-#: src/KeyCommands.vala:580
+#: src/KeyCommands.vala:531
 #, fuzzy
 msgid "Change Commands"
 msgstr "Команды работы с метками"
 
-#: src/KeyCommands.vala:581
+#: src/KeyCommands.vala:532
 msgid "Edit current row text"
 msgstr ""
 
-#: src/KeyCommands.vala:582
+#: src/KeyCommands.vala:533
 msgid "Edit current row note"
 msgstr ""
 
-#: src/KeyCommands.vala:583
+#: src/KeyCommands.vala:534
 msgid "Toggle task status of current row"
 msgstr ""
 
-#: src/KeyCommands.vala:584
+#: src/KeyCommands.vala:535
 msgid "Add tags to current row"
 msgstr ""
 
-#: src/KeyCommands.vala:585
+#: src/KeyCommands.vala:536
 msgid "Join current row with previous row"
 msgstr ""
 
-#: src/KeyCommands.vala:586 src/KeyCommands.vala:663
+#: src/KeyCommands.vala:537 src/KeyCommands.vala:603
 #, fuzzy
 msgid "Selection Commands"
 msgstr "Команды работы с метками"
 
-#: src/KeyCommands.vala:587
+#: src/KeyCommands.vala:538
 #, fuzzy
 msgid "Select top-most row"
 msgstr "Выбрать самый верхний ряд"
 
-#: src/KeyCommands.vala:588
+#: src/KeyCommands.vala:539
 #, fuzzy
 msgid "Select bottom-most row"
 msgstr "Выбрать самый нижний ряд"
 
-#: src/KeyCommands.vala:589
+#: src/KeyCommands.vala:540
 msgid "Select row at the top of the current view"
 msgstr ""
 
-#: src/KeyCommands.vala:590
+#: src/KeyCommands.vala:541
 msgid "Select row at the bottom of the current view"
 msgstr ""
 
-#: src/KeyCommands.vala:591
+#: src/KeyCommands.vala:542
 msgid "Select row below the current row"
 msgstr ""
 
-#: src/KeyCommands.vala:592
+#: src/KeyCommands.vala:543
 #, fuzzy
 msgid "Select row above the current row"
 msgstr "Выбрать родительский ряд"
 
-#: src/KeyCommands.vala:593
+#: src/KeyCommands.vala:544
 #, fuzzy
 msgid "Select parent of current row"
 msgstr "Выбрать родительский ряд"
 
-#: src/KeyCommands.vala:594
+#: src/KeyCommands.vala:545
 #, fuzzy
 msgid "Select last child row of current row"
 msgstr "Выбрать последний ряд-потомок"
 
-#: src/KeyCommands.vala:595
+#: src/KeyCommands.vala:546
 #, fuzzy
 msgid "Select next sibling row of current row"
 msgstr "Выбрать следующий ряд-потомок"
 
-#: src/KeyCommands.vala:596
+#: src/KeyCommands.vala:547
 #, fuzzy
 msgid "Select previous sibling row of current row"
 msgstr "Выбрать предыдущий ряд-потомок"
 
-#: src/KeyCommands.vala:597
+#: src/KeyCommands.vala:548
 #, fuzzy
 msgid "Move Commands"
 msgstr "Команды работы с рядами"
 
-#: src/KeyCommands.vala:598
+#: src/KeyCommands.vala:549
 msgid "Indent currently selected row"
 msgstr ""
 
-#: src/KeyCommands.vala:599
+#: src/KeyCommands.vala:550
 msgid "Unindent currently selected row"
 msgstr ""
 
-#: src/KeyCommands.vala:600
+#: src/KeyCommands.vala:551
 #, fuzzy
 msgid "Move current row down"
 msgstr "Переместить выбранную группу ниже"
 
-#: src/KeyCommands.vala:601
+#: src/KeyCommands.vala:552
 msgid "Move current row up"
 msgstr ""
 
-#: src/KeyCommands.vala:602
+#: src/KeyCommands.vala:553
 msgid "Move current row above parent"
 msgstr ""
 
-#: src/KeyCommands.vala:603
+#: src/KeyCommands.vala:554
 msgid "Move current row below parent"
 msgstr ""
 
-#: src/KeyCommands.vala:604
+#: src/KeyCommands.vala:555
 #, fuzzy
 msgid "Move current row to label 1"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:605
+#: src/KeyCommands.vala:556
 #, fuzzy
 msgid "Move current row to label 2"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:606
+#: src/KeyCommands.vala:557
 #, fuzzy
 msgid "Move current row to label 3"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:607
+#: src/KeyCommands.vala:558
 #, fuzzy
 msgid "Move current row to label 4"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:608
+#: src/KeyCommands.vala:559
 #, fuzzy
 msgid "Move current row to label 5"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:609
+#: src/KeyCommands.vala:560
 #, fuzzy
 msgid "Move current row to label 6"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:610
+#: src/KeyCommands.vala:561
 #, fuzzy
 msgid "Move current row to label 7"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:611
+#: src/KeyCommands.vala:562
 #, fuzzy
 msgid "Move current row to label 8"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:612
+#: src/KeyCommands.vala:563
 #, fuzzy
 msgid "Move current row to label 9"
 msgstr "Переместить ряд в ряд с меткой"
 
-#: src/KeyCommands.vala:613 data/com.github.phase1geo.outliner.shortcuts.ui:444
+#: src/KeyCommands.vala:564 data/com.github.phase1geo.outliner.shortcuts.ui:444
 msgid "Label Commands"
 msgstr "Команды работы с метками"
 
-#: src/KeyCommands.vala:614
+#: src/KeyCommands.vala:565
 msgid "Toggle label for current row"
 msgstr ""
 
-#: src/KeyCommands.vala:615
+#: src/KeyCommands.vala:566
 #, fuzzy
 msgid "Clear all set labels"
 msgstr "Стереть все метки"
 
-#: src/KeyCommands.vala:616
+#: src/KeyCommands.vala:567
 msgid "Select row marked with label-1"
 msgstr ""
 
-#: src/KeyCommands.vala:617
+#: src/KeyCommands.vala:568
 msgid "Select row marked with label-2"
 msgstr ""
 
-#: src/KeyCommands.vala:618
+#: src/KeyCommands.vala:569
 msgid "Select row marked with label-3"
 msgstr ""
 
-#: src/KeyCommands.vala:619
+#: src/KeyCommands.vala:570
 msgid "Select row marked with label-4"
 msgstr ""
 
-#: src/KeyCommands.vala:620
+#: src/KeyCommands.vala:571
 msgid "Select row marked with label-5"
 msgstr ""
 
-#: src/KeyCommands.vala:621
+#: src/KeyCommands.vala:572
 msgid "Select row marked with label-6"
 msgstr ""
 
-#: src/KeyCommands.vala:622
+#: src/KeyCommands.vala:573
 msgid "Select row marked with label-7"
 msgstr ""
 
-#: src/KeyCommands.vala:623
+#: src/KeyCommands.vala:574
 msgid "Select row marked with label-8"
 msgstr ""
 
-#: src/KeyCommands.vala:624
+#: src/KeyCommands.vala:575
 msgid "Select row marked with label-9"
 msgstr ""
 
-#: src/KeyCommands.vala:631 data/com.github.phase1geo.outliner.shortcuts.ui:609
+#: src/KeyCommands.vala:576 data/com.github.phase1geo.outliner.shortcuts.ui:609
 msgid "Text Editing"
 msgstr "Редактирование текста"
 
-#: src/KeyCommands.vala:632
+#: src/KeyCommands.vala:577
 #, fuzzy
 msgid "Insertion/Deletion Commands"
 msgstr "Создание и удаление"
 
-#: src/KeyCommands.vala:633
+#: src/KeyCommands.vala:578
 msgid "Insert newline character"
 msgstr ""
 
-#: src/KeyCommands.vala:634
+#: src/KeyCommands.vala:579
 msgid "Split current line at current character"
 msgstr ""
 
-#: src/KeyCommands.vala:635
+#: src/KeyCommands.vala:580
 #, fuzzy
 msgid "Insert TAB character"
 msgstr "Следующий символ"
 
-#: src/KeyCommands.vala:636
+#: src/KeyCommands.vala:581
 #, fuzzy
 msgid "Insert emoji"
 msgstr "вставку объекта"
 
-#: src/KeyCommands.vala:637
+#: src/KeyCommands.vala:582
 msgid "Remove next word"
 msgstr ""
 
-#: src/KeyCommands.vala:638
+#: src/KeyCommands.vala:583
 #, fuzzy
 msgid "Remove previous word"
 msgstr "Предыдущее слово"
 
-#: src/KeyCommands.vala:639
+#: src/KeyCommands.vala:584
 #, fuzzy
 msgid "Bold selected text"
 msgstr "Скопировать выделенный текст"
 
-#: src/KeyCommands.vala:640
+#: src/KeyCommands.vala:585
 #, fuzzy
 msgid "Italicize selected text"
 msgstr "Вырезать выделенный текст"
 
-#: src/KeyCommands.vala:641
+#: src/KeyCommands.vala:586
 #, fuzzy
 msgid "Underline selected text"
 msgstr "Вырезать выделенный текст"
 
-#: src/KeyCommands.vala:642
+#: src/KeyCommands.vala:587
 #, fuzzy
 msgid "Strike-out selected text"
 msgstr "Вырезать выделенный текст"
 
-#: src/KeyCommands.vala:644
+#: src/KeyCommands.vala:589
 #, fuzzy
 msgid "Copy selected nodes or text"
 msgstr "Скопировать выделенный текст"
 
-#: src/KeyCommands.vala:645
+#: src/KeyCommands.vala:590
 #, fuzzy
 msgid "Cut selected nodes or text"
 msgstr "Вырезать выделенный текст"
 
-#: src/KeyCommands.vala:646
+#: src/KeyCommands.vala:591
 msgid "Paste nodes or text from clipboard"
 msgstr ""
 
-#: src/KeyCommands.vala:647
-#, fuzzy
-msgid "URL Commands"
-msgstr "Команды работы с рядами"
-
-#: src/KeyCommands.vala:648
-msgid "Open URL link at current cursor position"
-msgstr ""
-
-#: src/KeyCommands.vala:649
-msgid "Add URL link at current cursor position"
-msgstr ""
-
-#: src/KeyCommands.vala:650
-msgid "Change URL link at current cursor position"
-msgstr ""
-
-#: src/KeyCommands.vala:651
-msgid "Remove URL link at current cursor position"
-msgstr ""
-
-#: src/KeyCommands.vala:652
+#: src/KeyCommands.vala:592
 #, fuzzy
 msgid "Cursor Commands"
 msgstr "Команды работы с рядами"
 
-#: src/KeyCommands.vala:653
+#: src/KeyCommands.vala:593
 msgid "Move cursor to next character"
 msgstr ""
 
-#: src/KeyCommands.vala:654
+#: src/KeyCommands.vala:594
 #, fuzzy
 msgid "Move cursor to previous character"
 msgstr "Предыдущий символ"
 
-#: src/KeyCommands.vala:655
+#: src/KeyCommands.vala:595
 msgid "Move cursor up one line"
 msgstr ""
 
-#: src/KeyCommands.vala:656
+#: src/KeyCommands.vala:596
 msgid "Move cursor down one line"
 msgstr ""
 
-#: src/KeyCommands.vala:657
+#: src/KeyCommands.vala:597
 msgid "Move cursor to beginning of next word"
 msgstr ""
 
-#: src/KeyCommands.vala:658
+#: src/KeyCommands.vala:598
 msgid "Move cursor to beginning of previous word"
 msgstr ""
 
-#: src/KeyCommands.vala:659
+#: src/KeyCommands.vala:599
 msgid "Move cursor to start of text"
 msgstr ""
 
-#: src/KeyCommands.vala:660
+#: src/KeyCommands.vala:600
 msgid "Move cursor to end of text"
 msgstr ""
 
-#: src/KeyCommands.vala:661
+#: src/KeyCommands.vala:601
 msgid "Move cursor to start of current line"
 msgstr ""
 
-#: src/KeyCommands.vala:662
+#: src/KeyCommands.vala:602
 msgid "Move cursor to end of current line"
 msgstr ""
 
-#: src/KeyCommands.vala:664
+#: src/KeyCommands.vala:604
 msgid "Add next character to current selection"
 msgstr ""
 
-#: src/KeyCommands.vala:665
+#: src/KeyCommands.vala:605
 #, fuzzy
 msgid "Add previous character to current selection"
 msgstr "Добавить предыдущий символ"
 
-#: src/KeyCommands.vala:666
+#: src/KeyCommands.vala:606
 msgid "Add line up to current selection"
 msgstr ""
 
-#: src/KeyCommands.vala:667
+#: src/KeyCommands.vala:607
 msgid "Add line down to current selection"
 msgstr ""
 
-#: src/KeyCommands.vala:668
+#: src/KeyCommands.vala:608
 msgid "Add next word to current selection"
 msgstr ""
 
-#: src/KeyCommands.vala:669
+#: src/KeyCommands.vala:609
 msgid "Add previous word to current selection"
 msgstr ""
 
-#: src/KeyCommands.vala:670
+#: src/KeyCommands.vala:610
 msgid "Add start of text to current selection (Control-Up)"
 msgstr ""
 
-#: src/KeyCommands.vala:671
+#: src/KeyCommands.vala:611
 msgid "Add start of text to current selection (Control-Home)"
 msgstr ""
 
-#: src/KeyCommands.vala:672
+#: src/KeyCommands.vala:612
 msgid "Add end of text to current selection (Control-Down)"
 msgstr ""
 
-#: src/KeyCommands.vala:673
+#: src/KeyCommands.vala:613
 msgid "Add end of text to current selection (Control-End)"
 msgstr ""
 
-#: src/KeyCommands.vala:674
+#: src/KeyCommands.vala:614
 msgid "Add start of current line to current selection"
 msgstr ""
 
-#: src/KeyCommands.vala:675
+#: src/KeyCommands.vala:615
 msgid "Add end of current line to current selection"
 msgstr ""
 
-#: src/KeyCommands.vala:676
+#: src/KeyCommands.vala:616
 #, fuzzy
 msgid "Select all text"
 msgstr "Выбрать всё"
 
-#: src/KeyCommands.vala:677
+#: src/KeyCommands.vala:617
 #, fuzzy
 msgid "Deselect all text"
 msgstr "Снять выделение"
@@ -1188,15 +1167,15 @@ msgstr "Скрыть примечание"
 msgid "%u subrows"
 msgstr "%u субрядов"
 
-#: src/OutlineTable.vala:2249
+#: src/OutlineTable.vala:2251
 msgid "Title"
 msgstr "Название"
 
-#: src/OutlineTable.vala:2634
+#: src/OutlineTable.vala:2636
 msgid "In Focus Mode.  Hit the Escape key to exit."
 msgstr "В режиме фокусировки. Нажмите Escape для выхода."
 
-#: src/OutlineTable.vala:2664
+#: src/OutlineTable.vala:2666
 msgid "Hit the Escape key to exit."
 msgstr "Нажмите Escape, чтобы выйти"
 
@@ -1348,23 +1327,27 @@ msgstr ""
 msgid "Use Outliner Default Shortcuts?"
 msgstr "Клавиатурные комбинации Outliner"
 
-#: src/SearchBar.vala:102
+#: src/SearchBar.vala:118
 msgid "Find text…"
 msgstr "Найти текст…"
 
-#: src/SearchBar.vala:344
+#: src/SearchBar.vala:368
 msgid "Replace with…"
 msgstr "Заменить на…"
 
-#: src/SearchBar.vala:371
+#: src/SearchBar.vala:400
 msgid "Replace"
 msgstr "Заменить"
 
-#: src/SearchBar.vala:392
+#: src/SearchBar.vala:423
+msgid "Skip"
+msgstr ""
+
+#: src/SearchBar.vala:434
 msgid "Replace All"
 msgstr "Заменить все"
 
-#: src/Shortcuts.vala:742 src/Shortcuts.vala:748
+#: src/Shortcuts.vala:740 src/Shortcuts.vala:746
 #, fuzzy
 msgid "No Commands Listed"
 msgstr "Команды работы с рядами"
@@ -1936,6 +1919,10 @@ msgstr "Разделить ряд по курсору"
 #: data/com.github.phase1geo.outliner.shortcuts.ui:797
 msgid "End Editing"
 msgstr "Завершить редактирование"
+
+#, fuzzy
+#~ msgid "URL Commands"
+#~ msgstr "Команды работы с рядами"
 
 #~ msgid "Close Tab"
 #~ msgstr "Закрыть вкладку"
