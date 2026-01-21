@@ -26,15 +26,16 @@ public class UndoTextBuffer : UndoBuffer {
   public CanvasText? ct        { set; get; default = null; }
   public bool        mergeable { set; get; default = true; }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoTextBuffer( OutlineTable table ) {
     base( table );
   }
 
-  /*
-   Checks to see if the given item is mergeable with the last item in the buffer.
-   If it is mergeable, merge it and return true; otherwise, return false.
-  */
+  //-------------------------------------------------------------
+  // Checks to see if the given item is mergeable with the last
+  // item in the buffer.  If it is mergeable, merge it and return
+  // true; otherwise, return false.
   private bool merge_with_last( UndoTextItem item ) {
     if( (_undo_buffer.length > 0) && (_redo_buffer.length == 0) && mergeable ) {
       var it = _undo_buffer.index( _undo_buffer.length - 1 ) as UndoTextItem;
@@ -50,7 +51,8 @@ public class UndoTextBuffer : UndoBuffer {
     return( cursor );
   }
 
-  /* Call after text has been inserted */
+  //-------------------------------------------------------------
+  // Call after text has been inserted
   public void add_insert( int start, string text, int start_cursor ) {
     var item = new UndoTextInsert( text, start, start_cursor, get_ct_cursor() );
     if( !merge_with_last( item ) ) {
@@ -58,7 +60,8 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
-  /* Call after multiple pieces of text have been inserted */
+  //-------------------------------------------------------------
+  // Call after multiple pieces of text have been inserted
   public void add_inserts( Array<InsertText?> its, int start_cursor ) {
     var item = new UndoTextMultiInsert( its, start_cursor, get_ct_cursor() );
     if( !merge_with_last( item ) ) {
@@ -66,7 +69,8 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
-  /* Call after text has been deleted */
+  //-------------------------------------------------------------
+  // Call after text has been deleted
   public void add_delete( int start, string orig_text, Array<UndoTagInfo>? tags, int start_cursor ) {
     var item = new UndoTextDelete( orig_text, start, tags, start_cursor, get_ct_cursor() );
     if( !merge_with_last( item ) ) {
@@ -74,7 +78,8 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
-  /* Call after text has been deleted */
+  //-------------------------------------------------------------
+  // Call after text has been deleted
   public void add_backspace( int start, string orig_text, Array<UndoTagInfo>? tags, int start_cursor ) {
     var item = new UndoTextBackspace( orig_text, start, tags, start_cursor, get_ct_cursor() );
     if( !merge_with_last( item ) ) {
@@ -82,7 +87,8 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
-  /* Call after text has been replaced */
+  //-------------------------------------------------------------
+  // Call after text has been replaced
   public void add_replace( int start, string orig_text, string text, Array<UndoTagInfo>? tags, int start_cursor ) {
     var item = new UndoTextReplace( orig_text, text, start, tags, start_cursor, get_ct_cursor() );
     if( !merge_with_last( item ) ) {
@@ -90,24 +96,36 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
-  /* Call after tag has been applied to text */
+  //-------------------------------------------------------------
+  // Call after tag has been applied to text
   public void add_tag_add( int start, int end, FormatTag tag, string? extra, int cursor ) {
     var item = new UndoTextTagAdd( start, end, tag, extra, cursor );
     add_item( item );
   }
 
-  /* Call after tag has been removed from text */
+  //-------------------------------------------------------------
+  // Call after tag has been applied to text
+  public void add_tag_replace( int start, int end, FormatTag tag, string? extra, Array<UndoTagInfo> removed_tags, int cursor ) {
+    var item = new UndoTextTagReplace( start, end, tag, extra, removed_tags, cursor );
+    add_item( item );
+  }
+
+  //-------------------------------------------------------------
+  // Call after tag has been removed from text
   public void add_tag_remove( int start, int end, FormatTag tag, string? extra, int cursor ) {
     var item = new UndoTextTagRemove( start, end, tag, extra, cursor );
     add_item( item );
   }
 
+  //-------------------------------------------------------------
+  // Clears all tags in the CanvasText range.
   public void add_tag_clear( int start, int end, Array<UndoTagInfo> tags, int cursor ) {
     var item = new UndoTextClearTags( start, end, tags, cursor );
     add_item( item );
   }
 
-  /* Performs the next undo action in the buffer */
+  //-------------------------------------------------------------
+  // Performs the next undo action in the buffer
   public override void undo() {
     if( undoable() ) {
       var item      = _undo_buffer.index( _undo_buffer.length - 1 );
@@ -122,7 +140,8 @@ public class UndoTextBuffer : UndoBuffer {
     }
   }
 
-  /* Performs the next redo action in the buffer */
+  //-------------------------------------------------------------
+  // Performs the next redo action in the buffer
   public override void redo() {
     if( redoable() ) {
       var item      = _redo_buffer.index( _redo_buffer.length - 1 );

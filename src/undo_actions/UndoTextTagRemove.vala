@@ -26,7 +26,8 @@ public class UndoTextTagRemove : UndoTextItem {
   public FormatTag tag   { private set; get; }
   public string?   extra { private set; get; }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoTextTagRemove( int start, int end, FormatTag tag, string? extra, int cursor ) {
     base( _( "format tag remove" ), UndoTextOp.TAGDEL, cursor, cursor );
     this.start = start;
@@ -35,21 +36,24 @@ public class UndoTextTagRemove : UndoTextItem {
     this.extra = extra;
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo_text( OutlineTable table, CanvasText ct ) {
     ct.text.add_tag( tag, start, end, extra );
     ct.set_cursor_only( start_cursor );
     table.queue_draw();
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo_text( OutlineTable table, CanvasText ct ) {
     ct.text.remove_tag( tag, start, end );
     ct.set_cursor_only( end_cursor );
     table.queue_draw();
   }
 
-  /* Merges the given item with the current one */
+  //-------------------------------------------------------------
+  // Merges the given item with the current one
   public override bool merge( CanvasText ct, UndoTextItem item ) {
     return( false );
   }

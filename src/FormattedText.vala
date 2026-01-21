@@ -897,6 +897,14 @@ public class FormattedText {
   }
 
   //-------------------------------------------------------------
+  // Replaces the tag in the given range with a new tag.
+  public void replace_tag_in_range( FormatTag tag, int start, int end, string? extra=null, int pid=0 ) {
+    _formats[tag].remove_tag( start, end, pid );
+    _formats[tag].add_tag( start, end, extra, pid );
+    changed();
+  }
+
+  //-------------------------------------------------------------
   // Removes the given tag
   public void remove_tag( FormatTag tag, int start, int end, int pid=0 ) {
     _formats[tag].remove_tag( start, end, pid );

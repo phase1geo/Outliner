@@ -19,51 +19,49 @@
 * Authored by: Trevor Williams <phase1geo@gmail.com>
 */
 
-public class UndoTextReplace : UndoTextItem {
+public class UndoTextTagReplace : UndoTextItem {
 
-  public string             orig_text { private set; get; }
-  public string             new_text  { private set; get; }
-  public int                start     { private set; get; }
-  public Array<UndoTagInfo> tags      { private set; get; }
+  public int                start { private set; get; }
+  public int                end   { private set; get; }
+  public FormatTag          tag   { private set; get; }
+  public string?            extra { private set; get; }
+  public Array<UndoTagInfo> removed_tags { private set; get; }
 
   //-------------------------------------------------------------
   // Default constructor
-  public UndoTextReplace( string orig_text, string new_text, int start, Array<UndoTagInfo> tags, int start_cursor, int end_cursor ) {
-    base( _( "text replacement" ), UndoTextOp.REPLACE, start_cursor, end_cursor );
-    this.orig_text = orig_text;
-    this.new_text  = new_text;
-    this.start     = start;
-    this.tags      = tags;
+  public UndoTextTagReplace( int start, int end, FormatTag tag, string? extra, Array<UndoTagInfo> removed_tags, int cursor ) {
+    base( _( "format tag replace" ), UndoTextOp.TAGREPLACE, cursor, cursor );
+    this.start = start;
+    this.end   = end;
+    this.tag   = tag;
+    this.extra = extra;
+    this.removed_tags = removed_tags;
   }
 
   //-------------------------------------------------------------
   // Causes the stored item to be put into the before state
   public override void undo_text( OutlineTable table, CanvasText ct ) {
-    ct.text.replace_text( start, new_text.length, orig_text );
-    ct.text.apply_tags( tags, start );
+    ct.text.remove_tag( tag, start, end );
+    for( int i=0; i<removed_tags.length; i++ ) {
+      var tag = removed_tags.index( i );
+      ct.text.add_tag( tag.tag, tag.start, tag.end, tag.extra );
+    }
     ct.set_cursor_only( start_cursor );
-    ct.clear_selection();
     table.queue_draw();
   }
 
   //-------------------------------------------------------------
   // Causes the stored item to be put into the after state
   public override void redo_text( OutlineTable table, CanvasText ct ) {
-    ct.text.replace_text( start, orig_text.length, new_text );
+    ct.text.remove_tag( tag, start, end );
+    ct.text.add_tag( tag, start, end, extra );
     ct.set_cursor_only( end_cursor );
-    ct.clear_selection();
     table.queue_draw();
   }
 
   //-------------------------------------------------------------
-  // Merges the given item with this item, if possible
+  // Merges the given item with the current one
   public override bool merge( CanvasText ct, UndoTextItem item ) {
-    if( (end_cursor == item.start_cursor) && (item.op == UndoTextOp.INSERT) ) {
-      var insert = item as UndoTextInsert;
-      new_text  += insert.text;
-      end_cursor = insert.end_cursor;
-      return( true );
-    }
     return( false );
   }
 

@@ -25,6 +25,7 @@ public enum UndoTextOp {
   BACKSPACE,
   REPLACE,
   TAGADD,
+  TAGREPLACE,
   TAGDEL,
   TAGCLEAR
 }

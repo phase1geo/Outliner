@@ -22,6 +22,7 @@ sources += files(
   'UndoTextMultiInsert.vala',
   'UndoTextReplace.vala',
   'UndoTextTagAdd.vala',
+  'UndoTextTagReplace.vala',
   'UndoTextTagRemove.vala',
   'UndoTitleChange.vala',
 )

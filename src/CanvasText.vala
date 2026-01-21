@@ -1003,8 +1003,14 @@ public class CanvasText : Object {
   public void add_tag( FormatTag tag, string? extra, UndoTextBuffer undo_buffer ) {
     var spos = text.text.index_of_nth_char( _selstart );
     var epos = text.text.index_of_nth_char( _selend );
-    text.add_tag( tag, spos, epos, extra );
-    undo_buffer.add_tag_add( spos, epos, tag, extra, _cursor );
+    var info = text.get_full_tags_in_range( tag, spos, epos );
+    if( info.length == 0 ) {
+      text.add_tag( tag, spos, epos, extra );
+      undo_buffer.add_tag_add( spos, epos, tag, extra, _cursor );
+    } else {
+      text.replace_tag_in_range( tag, spos, epos, extra );
+      undo_buffer.add_tag_replace( spos, epos, tag, extra, info, _cursor );
+    }
   }
 
   //-------------------------------------------------------------
