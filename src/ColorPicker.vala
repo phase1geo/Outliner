@@ -59,6 +59,7 @@ public class ColorPicker : Box {
   private ColorChooserWidget _chooser;
   private MenuButton         _select;
   private bool               _ignore_active;
+  private RGBA               _bg_color;
 
   public string toggle_tooltip {
     get {
@@ -80,9 +81,10 @@ public class ColorPicker : Box {
 
   public signal void color_changed( RGBA? color );
 
-  public ColorPicker( RGBA init_color, ColorPickerType type ) {
+  public ColorPicker( RGBA init_color, RGBA bg_color, ColorPickerType type ) {
 
-    _type = type;
+    _type     = type;
+    _bg_color = bg_color;
 
     _toggle = new ToggleButton() {
       has_frame = false
@@ -93,7 +95,11 @@ public class ColorPicker : Box {
     type.set_image( _toggle );
 
     _chooser = new ColorChooserWidget() {
-      rgba = init_color
+      rgba          = init_color,
+      margin_start  = 5,
+      margin_end    = 5,
+      margin_top    = 5,
+      margin_bottom = 5
     };
 
     var click_controller = new GestureClick();
@@ -129,8 +135,18 @@ public class ColorPicker : Box {
   private void update_css( RGBA rgba ) {
     var provider = new CssProvider();
     try {
-      var color    = Utils.color_from_rgba( rgba );
-      var css_data = ".%s { background: %s; }".printf( _type.get_css_class(), color );
+      var css_data = "";
+      if( _type == ColorPickerType.FCOLOR ) {
+        css_data = "background: %s; color: %s;".printf( Utils.color_from_rgba( _bg_color ), Utils.color_from_rgba( rgba ) );
+      } else {
+        var a = 1.0;
+        var r = (rgba.red   * 0.5) + (_bg_color.red   * 0.5);
+        var g = (rgba.green * 0.5) + (_bg_color.green * 0.5);
+        var b = (rgba.blue  * 0.5) + (_bg_color.blue  * 0.5);
+        RGBA bg = {(float)r, (float)g, (float)b, (float)a};
+        css_data = "background: %s;".printf( Utils.color_from_rgba( bg ) );
+      }
+      css_data = ".%s { %s }".printf( _type.get_css_class(), css_data );
       provider.load_from_data( css_data.data );
       StyleContext.add_provider_for_display(
         Display.get_default(),

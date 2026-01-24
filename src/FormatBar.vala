@@ -131,15 +131,19 @@ public class FormatBar : Gtk.Popover {
       tooltip_text = _( "Header" ),
       menu_model   = header_menu
     };
+    var menu_popover = (_header.popover as Gtk.PopoverMenu);
+    if( menu_popover != null ) {
+      menu_popover.cascade_popdown = false;
+    }
     add_markup( _header, false, "H<i>x</i>" );
 
-    _hilite = new ColorPicker( get_hilite_color(), ColorPickerType.HCOLOR ) {
+    _hilite = new ColorPicker( get_hilite_color(), table.get_theme().background, ColorPickerType.HCOLOR ) {
       toggle_tooltip = _( "Apply Highlight Color" ),
       select_tooltip = _( "Change Highlight Color" )
     };
     _hilite.color_changed.connect( handle_hilite );
 
-    _color = new ColorPicker( get_font_color(), ColorPickerType.FCOLOR ) {
+    _color = new ColorPicker( get_font_color(), table.get_theme().background, ColorPickerType.FCOLOR ) {
       toggle_tooltip = _( "Apply Font Color" ),
       select_tooltip = _( "Change Font Color" )
     };
@@ -176,9 +180,9 @@ public class FormatBar : Gtk.Popover {
       box.append( _super );
       box.append( _sub );
       box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( new Label( spacer ) );
+      // box.append( new Label( spacer ) );
       box.append( _hilite );
-      box.append( new Label( spacer ) );
+      // box.append( new Label( spacer ) );
       box.append( _color );
       box.append( new Separator( Orientation.VERTICAL ) );
       box.append( _clear );
