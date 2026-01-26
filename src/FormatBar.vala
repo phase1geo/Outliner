@@ -22,7 +22,7 @@
 using Gtk;
 using Gdk;
 
-public class FormatBar : Gtk.Popover {
+public class FormatBar : Box {
 
   private OutlineTable _table;
   private Button       _copy;
@@ -43,22 +43,22 @@ public class FormatBar : Gtk.Popover {
   private Button       _clear;
   private SimpleAction _header_action;
 
+  public signal void close_requested();
+
   //-------------------------------------------------------------
   // Construct the formatting bar
   public FormatBar( OutlineTable table ) {
 
-    Object( autohide: false );
+    Object( orientation: Orientation.HORIZONTAL, spacing: 0, margin_start: 5, margin_end: 5, margin_top: 5, margin_bottom: 5 );
 
     _table = table;
 
     _link_editor = new LinkEditor( table );
-
-    var box = new Box( Orientation.HORIZONTAL, 0 ) {
-      margin_start  = 5,
-      margin_end    = 5,
-      margin_top    = 5,
-      margin_bottom = 5
-    };
+    _link_editor.edit_cancelled.connect(() => {
+      _ignore_active = true;
+      _link.active   = false;
+      _ignore_active = false;
+    });
 
     _copy = new Button.from_icon_name( "edit-copy-symbolic" ) {
       has_frame = false,
@@ -137,13 +137,13 @@ public class FormatBar : Gtk.Popover {
     }
     add_markup( _header, false, "H<i>x</i>" );
 
-    _hilite = new ColorPicker( get_hilite_color(), table.get_theme().background, ColorPickerType.HCOLOR ) {
+    _hilite = new ColorPicker( get_hilite_color(), table.get_theme().background, table.get_theme().foreground, ColorPickerType.HCOLOR ) {
       toggle_tooltip = _( "Apply Highlight Color" ),
       select_tooltip = _( "Change Highlight Color" )
     };
     _hilite.color_changed.connect( handle_hilite );
 
-    _color = new ColorPicker( get_font_color(), table.get_theme().background, ColorPickerType.FCOLOR ) {
+    _color = new ColorPicker( get_font_color(), table.get_theme().background, table.get_theme().foreground, ColorPickerType.FCOLOR ) {
       toggle_tooltip = _( "Apply Font Color" ),
       select_tooltip = _( "Change Font Color" )
     };
@@ -164,33 +164,29 @@ public class FormatBar : Gtk.Popover {
 
     var spacer = "    ";
 
-    box.append( _copy );
-    box.append( _cut );
+    append( _copy );
+    append( _cut );
     if( !table.markdown ) {
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _bold );
-      box.append( _italics );
-      box.append( _underline );
-      box.append( _strike );
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _code );
-      box.append( _header );
-      box.append( _link );
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _super );
-      box.append( _sub );
-      box.append( new Separator( Orientation.VERTICAL ) );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _bold );
+      append( _italics );
+      append( _underline );
+      append( _strike );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _code );
+      append( _header );
+      append( _link );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _super );
+      append( _sub );
+      append( new Separator( Orientation.VERTICAL ) );
       // box.append( new Label( spacer ) );
-      box.append( _hilite );
+      append( _hilite );
       // box.append( new Label( spacer ) );
-      box.append( _color );
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _clear );
+      append( _color );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _clear );
     }
-
-    child = box;
-    position = PositionType.TOP;
-    set_parent( table );
 
     // Create the action group
     var group = new SimpleActionGroup();
@@ -243,8 +239,10 @@ public class FormatBar : Gtk.Popover {
   // Returns the font that the outline table is currently using.
   private RGBA get_font_color() {
     if( _table.font_color == null ) {
+      stdout.printf( "In get_font_color, use foreground\n" );
       return( _table.get_theme().foreground );
     } else {
+      stdout.printf( "In get_font_color, use table font_color\n" );
       RGBA color = {(float)1.0, (float)1.0, (float)1.0, (float)1.0};
       color.parse( _table.font_color );
       return( color );
@@ -253,8 +251,9 @@ public class FormatBar : Gtk.Popover {
 
   //-------------------------------------------------------------
   // Closes this popover.
-  private void close() {
-    Utils.hide_popover( this );
+  public void close() {
+    stdout.printf( "Closing\n" );
+    destroy();
   }
 
   //-------------------------------------------------------------
@@ -284,14 +283,14 @@ public class FormatBar : Gtk.Popover {
   // Copies the selected text to the clipboard
   private void handle_copy() {
     _table.do_copy();
-    close();
+    close_requested();
   }
 
   //-------------------------------------------------------------
   // Cuts the selected text to the clipboard
   private void handle_cut() {
     _table.do_cut();
-    close();
+    close_requested();
   }
 
   //-------------------------------------------------------------
@@ -430,6 +429,8 @@ public class FormatBar : Gtk.Popover {
   private void handle_link() {
     if( !_ignore_active ) {
       if( _link.active ) {
+        // _link_editor.pointing_to = {0, 0, 1, 1};
+        _link_editor.set_parent( _link );
         if( _table.selected.mode == NodeMode.EDITABLE ) {
           _link_editor.add_url( _table.selected.name );
         } else {

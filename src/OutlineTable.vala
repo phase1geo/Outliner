@@ -1186,7 +1186,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Hides the format bar if we lose keyboard focus.
   private void on_focus_leave() {
-    hide_format_bar();
+    // hide_format_bar();
   }
 
   //-------------------------------------------------------------
@@ -2329,7 +2329,16 @@ public class OutlineTable : DrawingArea {
 
     // If the format bar is currently displayed, just reposition it
     if( _format_bar == null ) {
-      _format_bar = new FormatBar( this );
+      _format_bar        = new FormatBar( this );
+      _format_bar.halign = Align.START;
+      _format_bar.valign = Align.START;
+      _format_bar.add_css_class( "overlay-box" );
+      _format_bar.close_requested.connect(() => {
+        hide_format_bar();
+      });
+
+      var ol = (Overlay)this.parent;
+      ol.add_overlay( _format_bar );
     }
 
     int selstart, selend, cursor;
@@ -2344,16 +2353,12 @@ public class OutlineTable : DrawingArea {
 
     // If this is the first line of the first row, change the popover point to the bottom of the text
     if( (selected == root.children.index( 0 )) && (line == 0) ) {
-      Gdk.Rectangle rect = {(int)left, (int)bottom, 1, 1};
-      _format_bar.pointing_to = rect;
-      _format_bar.position    = PositionType.BOTTOM;
+      _format_bar.margin_start = (int)((left < 50) ? 0 : (left - 50));
+      _format_bar.margin_top   = (int)bottom;
     } else {
-      Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
-      _format_bar.pointing_to = rect;
-      _format_bar.position    = PositionType.TOP;
+      _format_bar.margin_start = (int)((left < 50) ? 0 : (left - 50));
+      _format_bar.margin_top   = (int)(top - (_format_bar.get_allocated_height() + 40));
     }
-
-    _format_bar.popup();
 
     // Keep the keyboard focus on the OutlineTable
     grab_focus();
@@ -2364,7 +2369,12 @@ public class OutlineTable : DrawingArea {
   // Hides the format bar if it is currently visible and destroys it
   private void hide_format_bar() {
     if( _format_bar != null ) {
-      Utils.hide_popover( _format_bar );
+      /*
+      var ol = (Overlay)this.parent;
+      ol.remove_overlay( _format_bar );
+      */
+      _format_bar.unparent();
+      _format_bar.close();
       _format_bar = null;
     }
   }

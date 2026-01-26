@@ -30,8 +30,13 @@ public class LinkEditor : Popover {
   private string       _url_re = "^(mailto:.+@[a-z0-9-]+\\.[a-z0-9.-]+|[a-zA-Z0-9]+://[a-z0-9-]+\\.[a-z0-9.-]+(?:/|(?:/[][a-zA-Z0-9!#$%&'*+,.:;=?@_~-]+)*))$";
   private CanvasText   _text;
 
-  /* Default constructor */
+  public signal void edit_cancelled();
+
+  //-------------------------------------------------------------
+  // Default constructor
   public LinkEditor( OutlineTable ot ) {
+
+    Object( autohide: false );
 
     _ot = ot;
 
@@ -53,23 +58,27 @@ public class LinkEditor : Popover {
     _apply = new Button.with_label( _( "Apply" ) ) {
       halign = Align.END
     };
-    _apply.get_style_context().add_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
+    _apply.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
     _apply.clicked.connect(() => {
       set_url();
       show_popover( false );
     });
 
     var cancel = new Button.with_label( _( "Cancel" ) ) {
-      halign = Align.END
+      halign = Align.END,
+      hexpand = true
     };
     cancel.clicked.connect(() => {
       _text.clear_selection();
       show_popover( false );
+      edit_cancelled();
     });
 
-    var bbox = new Box( Orientation.HORIZONTAL, 5 );
-    bbox.append( _apply );
+    var bbox = new Box( Orientation.HORIZONTAL, 5 ) {
+      halign = Align.FILL
+    };
     bbox.append( cancel );
+    bbox.append( _apply );
 
     var box = new Box( Orientation.VERTICAL, 5 ) {
       margin_start  = 5,
@@ -85,27 +94,28 @@ public class LinkEditor : Popover {
 
   }
 
-  /* Shows or hides this popover */
+  //-------------------------------------------------------------
+  // Shows or hides this popover
   private void show_popover( bool show ) {
     if( show ) {
       Utils.show_popover( this );
     } else {
+      unparent();
       Utils.hide_popover( this );
     }
   }
 
-  /*
-   Checks the contents of the entry string.  If it is a URL, make the action button active;
-   otherwise, inactivate the action button.
-  */
+  //-------------------------------------------------------------
+  // Checks the contents of the entry string.  If it is a URL,
+  // make the action button active; otherwise, inactivate the
+  // action button.
   private void check_entry() {
     _apply.set_sensitive( Regex.match_simple( _url_re, _entry.text ) );
   }
 
-  /*
-   Sets the URL of the current node's selected text to the value stored in the
-   popover entry.
-  */
+  //-------------------------------------------------------------
+  // Sets the URL of the current node's selected text to the value
+  // stored in the popover entry.
   private void set_url() {
     if( _ot.markdown ) {
       _ot.markdown_parser.insert_tag( _text, FormatTag.URL, _text.selstart, _text.selend, _ot.undo_text, _entry.text );
@@ -115,7 +125,9 @@ public class LinkEditor : Popover {
     _ot.changed();
   }
 
-  /* Called when we want to add a URL to the currently selected text of the given node. */
+  //-------------------------------------------------------------
+  // Called when we want to add a URL to the currently selected
+  // text of the given node.
   public void add_url( CanvasText text ) {
 
     _text = text;
@@ -123,20 +135,15 @@ public class LinkEditor : Popover {
     int selstart, selend, cursor;
     text.get_cursor_info( out cursor, out selstart, out selend );
 
-    /* Position the popover */
-    double left, top, bottom;
-    int    line;
-    text.get_char_pos( selstart, out left, out top, out bottom, out line );
-    Gdk.Rectangle rect = {(int)left, (int)top, 1, 1};
-    pointing_to = rect;
-
-    /* Check to see if the selected text is already a valid URL */
+    // Check to see if the selected text is already a valid URL
     var selected_text = text.get_selected_text();
+    var selected_link = text.text.get_tag_extra_at_index( FormatTag.URL, selstart );
     var use_selected  = (selected_text != null) && Regex.match_simple( _url_re, selected_text );
 
     _add        = true;
-    _entry.text = use_selected ? selected_text : "";
-    _apply.set_sensitive( use_selected );
+    _entry.text = (selected_link != null) ? selected_link :
+                  use_selected            ? selected_text : "";
+    _apply.set_sensitive( (selected_link != null) || use_selected );
 
     show_popover( true );
 

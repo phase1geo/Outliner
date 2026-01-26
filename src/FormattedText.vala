@@ -359,6 +359,19 @@ public class FormattedText {
     }
 
     //-------------------------------------------------------------
+    // Returns the tag extra value at the given index, if it exists;
+    // otherwise, returns null.
+    public string? get_extra_at_index( int index ) {
+      for( int i=0; i<_info.length; i++ ) {
+        var info = _info.index( i );
+        if( (info.start <= index) && (index < info.end) ) {
+          return( info.extra );
+        }
+      }
+      return( null );
+    }
+
+    //-------------------------------------------------------------
     // Inserts all of the attributes for this tag
     public void get_attributes( TagAttr tag_attr, ref AttrList attrs ) {
       for( int i=0; i<_info.length; i++ ) {
@@ -945,6 +958,13 @@ public class FormattedText {
   // Returns true if the given tag is applied within the given range
   public bool is_tag_applied_in_range( FormatTag tag, int start, int end ) {
     return( _formats[tag].is_applied_in_range( start, end ) );
+  }
+
+  //-------------------------------------------------------------
+  // Returns the tag extra value at the given index, if one exists;
+  // otherwise, returns null.
+  public string? get_tag_extra_at_index( FormatTag tag, int index ) {
+    return( _formats[tag].get_extra_at_index( index ) );
   }
 
   //-------------------------------------------------------------

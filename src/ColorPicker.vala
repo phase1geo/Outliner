@@ -60,6 +60,7 @@ public class ColorPicker : Box {
   private MenuButton         _select;
   private bool               _ignore_active;
   private RGBA               _bg_color;
+  private RGBA               _fg_color;
 
   public string toggle_tooltip {
     get {
@@ -81,10 +82,13 @@ public class ColorPicker : Box {
 
   public signal void color_changed( RGBA? color );
 
-  public ColorPicker( RGBA init_color, RGBA bg_color, ColorPickerType type ) {
+  //-------------------------------------------------------------
+  // Default constructor.
+  public ColorPicker( RGBA init_color, RGBA bg_color, RGBA fg_color, ColorPickerType type ) {
 
     _type     = type;
     _bg_color = bg_color;
+    _fg_color = fg_color;
 
     _toggle = new ToggleButton() {
       has_frame = false
@@ -126,17 +130,26 @@ public class ColorPicker : Box {
 
   }
 
+  //-------------------------------------------------------------
+  // Activates or deactivates main button.
   public void set_active( bool active ) {
+    stdout.printf( "In set_active, active: %s, type: %s\n", active.to_string(), _type.to_string() );
     _ignore_active = true;
     _toggle.active = active;
+    update_css( _chooser.rgba );
     _ignore_active = false;
   }
 
+  //-------------------------------------------------------------
+  // Updates the CSS used to display the main toggle button.
   private void update_css( RGBA rgba ) {
     var provider = new CssProvider();
     try {
       var css_data = "";
-      if( _type == ColorPickerType.FCOLOR ) {
+      if( !_toggle.active ) {
+        css_data = "background: %s; color: %s;".printf( Utils.color_from_rgba( _bg_color ), Utils.color_from_rgba( _fg_color ) );
+      } else if( _type == ColorPickerType.FCOLOR ) {
+        stdout.printf( "rgba: %s\n", Utils.color_from_rgba( rgba ) );
         css_data = "background: %s; color: %s;".printf( Utils.color_from_rgba( _bg_color ), Utils.color_from_rgba( rgba ) );
       } else {
         var a = 1.0;
@@ -158,8 +171,11 @@ public class ColorPicker : Box {
     }
   }
 
+  //-------------------------------------------------------------
+  // Handles a change to the main toggle button.
   private void handle_toggle() {
     if( !_ignore_active ) {
+      update_css( _chooser.rgba );
       if( _toggle.active ) {
         color_changed( _chooser.rgba );
       } else {
@@ -168,11 +184,14 @@ public class ColorPicker : Box {
     }
   }
 
+  //-------------------------------------------------------------
+  // Handles a change to the color chooser widget.
   private void handle_chooser( int n_press, double x, double y ) {
-    update_css( _chooser.rgba );
+    stdout.printf( "In handle_chooser\n" );
     set_active( true );
     color_changed( _chooser.rgba );
-    _select.popover.popup();
+    stdout.printf( "Calling popup\n" );
+    _select.active = false; // popover.popup();
   }
 
 }
