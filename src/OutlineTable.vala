@@ -2341,27 +2341,36 @@ public class OutlineTable : DrawingArea {
       ol.add_overlay( _format_bar );
     }
 
-    int selstart, selend, cursor;
-    var text = (selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note;
+    Idle.add(() => {
 
-    text.get_cursor_info( out cursor, out selstart, out selend );
+      int selstart, selend, cursor;
+      var text = (selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note;
 
-    // Position the popover
-    double left, top, bottom;
-    int    line;
-    text.get_char_pos( cursor, out left, out top, out bottom, out line );
+      text.get_cursor_info( out cursor, out selstart, out selend );
 
-    // If this is the first line of the first row, change the popover point to the bottom of the text
-    if( (selected == root.children.index( 0 )) && (line == 0) ) {
-      _format_bar.margin_start = (int)((left < 50) ? 0 : (left - 50));
-      _format_bar.margin_top   = (int)bottom;
-    } else {
-      _format_bar.margin_start = (int)((left < 50) ? 0 : (left - 50));
-      _format_bar.margin_top   = (int)(top - (_format_bar.get_allocated_height() + 40));
-    }
+      // Position the popover
+      double left, top, bottom;
+      int    line;
+      text.get_char_pos( cursor, out left, out top, out bottom, out line );
 
-    // Keep the keyboard focus on the OutlineTable
-    grab_focus();
+      var width  = (_format_bar.get_allocated_width() / 2);
+      var height = _format_bar.get_allocated_height();
+
+      // If this is the first line of the first row, change the popover point to the bottom of the text
+      if( (selected == root.children.index( 0 )) && (line == 0) ) {
+        _format_bar.margin_start = (int)((left < width) ? 0 : (left - width));
+        _format_bar.margin_top   = (int)(bottom + 10);
+      } else {
+        _format_bar.margin_start = (int)((left < width) ? 0 : (left - width));
+        _format_bar.margin_top   = (int)(top - (height + 10));
+      }
+
+      // Keep the keyboard focus on the OutlineTable
+      grab_focus();
+
+      return( false );
+
+    });
 
   }
 
