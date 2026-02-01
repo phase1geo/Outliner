@@ -82,6 +82,7 @@ e = executable('com.github.phase1geo.outliner',
 gnome.post_install(
   glib_compile_schemas: true,
   gtk_update_icon_cache: true,
+  update_mime_database: true,
   update_desktop_database: true
 )
 

@@ -11,10 +11,34 @@
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
-     id="defs9" />
+     id="defs9">
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#bfbfbf;stop-opacity:0.98000002;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1"
+       id="linearGradient2"
+       x1="63.652309"
+       y1="16.554928"
+       x2="63.652309"
+       y2="111.85954"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0.34769249)" />
+  </defs>
   <sodipodi:namedview
      id="namedview9"
      pagecolor="#ffffff"
@@ -43,15 +67,15 @@
   <!-- Second line of squiggles between rulings -->
   <!-- Row 3 -->
   <rect
-     style="display:inline;fill:none;stroke:#313131;stroke-width:0.935414;stroke-opacity:1"
+     style="display:inline;fill:url(#linearGradient2);stroke:#313131;stroke-width:0.935414;stroke-opacity:1"
      id="rect1-3"
      width="94.369202"
      height="126.26048"
-     x="16.467707"
+     x="16.815399"
      y="1.0769936" />
   <g
      id="g9"
-     transform="matrix(0.803244,0,0,0.81662032,12.447424,11.88126)">
+     transform="matrix(0.68817204,0,0,0.69963208,19.956989,6.5549669)">
     <rect
        x="20"
        y="16"
