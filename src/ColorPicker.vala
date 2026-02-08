@@ -133,7 +133,6 @@ public class ColorPicker : Box {
   //-------------------------------------------------------------
   // Activates or deactivates main button.
   public void set_active( bool active ) {
-    stdout.printf( "In set_active, active: %s, type: %s\n", active.to_string(), _type.to_string() );
     _ignore_active = true;
     _toggle.active = active;
     update_css( _chooser.rgba );
@@ -149,7 +148,6 @@ public class ColorPicker : Box {
       if( !_toggle.active ) {
         css_data = "background: %s; color: %s;".printf( Utils.color_from_rgba( _bg_color ), Utils.color_from_rgba( _fg_color ) );
       } else if( _type == ColorPickerType.FCOLOR ) {
-        stdout.printf( "rgba: %s\n", Utils.color_from_rgba( rgba ) );
         css_data = "background: %s; color: %s;".printf( Utils.color_from_rgba( _bg_color ), Utils.color_from_rgba( rgba ) );
       } else {
         var a = 1.0;
@@ -187,10 +185,8 @@ public class ColorPicker : Box {
   //-------------------------------------------------------------
   // Handles a change to the color chooser widget.
   private void handle_chooser( int n_press, double x, double y ) {
-    stdout.printf( "In handle_chooser\n" );
     set_active( true );
     color_changed( _chooser.rgba );
-    stdout.printf( "Calling popup\n" );
     _select.active = false; // popover.popup();
   }
 

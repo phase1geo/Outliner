@@ -62,40 +62,40 @@ public class FormatBar : Box {
 
     _copy = new Button.from_icon_name( "edit-copy-symbolic" ) {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Copy" ), "<Control>c" )
+      tooltip_markup = get_tooltip_markup( _( "Copy" ), KeyCommand.EDIT_COPY )
     };
     _copy.clicked.connect( handle_copy );
 
     _cut = new Button.from_icon_name( "edit-cut-symbolic" ) {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Cut" ), "<Control>x" )
+      tooltip_markup = get_tooltip_markup( _( "Cut" ), KeyCommand.EDIT_CUT )
     };
     _cut.clicked.connect( handle_cut );
 
     _bold = new ToggleButton() {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Bold" ), "<Control>b" )
+      tooltip_markup = get_tooltip_markup( _( "Bold" ), KeyCommand.EDIT_BOLD )
     };
     add_markup( _bold, true, "<b>B</b>" );
     _bold.toggled.connect( handle_bold );
 
     _italics = new ToggleButton() {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Italic" ), "<Control>i" )
+      tooltip_markup = get_tooltip_markup( _( "Italic" ), KeyCommand.EDIT_ITALICS )
     };
     add_markup( _italics, true, "<i>I</i>" );
     _italics.toggled.connect( handle_italics );
 
     _underline = new ToggleButton() {
       has_frame = false,
-      tooltip_text = _( "Underline" )
+      tooltip_text = get_tooltip_markup( _( "Underline" ), KeyCommand.EDIT_UNDERLINE )
     };
     add_markup( _underline, true, "<u>U</u>" );
     _underline.toggled.connect( handle_underline );
 
     _strike = new ToggleButton() {
       has_frame = false,
-      tooltip_text = _( "Strikethrough" )
+      tooltip_text = get_tooltip_markup( _( "Strikethrough" ), KeyCommand.EDIT_STRIKETHRU )
     };
     add_markup( _strike, true, "<s>S</s>" );
     _strike.toggled.connect( handle_strikethru );
@@ -205,6 +205,13 @@ public class FormatBar : Box {
     // Initialize the format bar
     initialize();
 
+  }
+
+  //-------------------------------------------------------------
+  // Returns the tooltip to show for the given command.
+  private string get_tooltip_markup( string lbl, KeyCommand command ) {
+    var shortcut = _table.win.shortcuts.get_shortcut( command );
+    return( (shortcut == null) ? lbl : Utils.tooltip_with_accel( lbl, shortcut.get_accelerator() ) );
   }
 
   //-------------------------------------------------------------
