@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,13 +24,14 @@ using Gtk;
 
 public class ThemeSolarizedLight : Theme {
 
-  /* Create the theme colors */
+  //-------------------------------------------------------------
+  // Create the theme colors
   public ThemeSolarizedLight() {
 
     name  = "solarized_light";
     label = _( "Solarized Light" );
 
-    /* Generate the non-link colors */
+    // Generate the non-link colors
     even               = get_color( "#FDF6E3" );
     odd                = get_color( "#FDF6E3" );
     background         = get_color( "#FDF6E3" );

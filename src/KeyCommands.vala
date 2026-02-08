@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2025 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2025-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -369,13 +369,6 @@ public enum KeyCommand {
       case "quit"                      :  return( QUIT );
       case "control"                   :  return( CONTROL_PRESSED );
       case "escape"                    :  return( ESCAPE );
-      /*
-      case "node-add-root"             :  return( NODE_ADD_ROOT );
-      case "node-return"               :  return( NODE_ADD_SIBLING_AFTER );
-      case "node-shift-return"         :  return( NODE_ADD_SIBLING_BEFORE );
-      case "node-tab"                  :  return( NODE_ADD_CHILD );
-      case "node-shift-tab"            :  return( NODE_ADD_PARENT );
-      */
       case "node-add-above"            :  return( NODE_ADD_ABOVE );
       case "node-add-below"            :  return( NODE_ADD_BELOW );
       case "node-add-child"            :  return( NODE_ADD_CHILD );
@@ -1053,7 +1046,7 @@ public enum KeyCommand {
     win.transient_for = ot.win;
     win.view_name     = null;
 
-    /* Display the most relevant information based on the current state */
+    // Display the most relevant information based on the current state
     if( ot.selected != null ) {
       if( (ot.selected.mode == NodeMode.EDITABLE) ||
           (ot.selected.mode == NodeMode.NOTEEDIT) ) {

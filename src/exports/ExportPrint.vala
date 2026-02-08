@@ -1,5 +1,5 @@
  /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -28,10 +28,12 @@ public class ExportPrint : Object {
   private Array<double?>  _boundaries;
   private NodeDrawOptions _draw_options;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public ExportPrint() {}
 
-  /* Perform print operation */
+  //-------------------------------------------------------------
+  // Perform print operation
   public void print( OutlineTable table, MainWindow main ) {
 
     _table        = table;
@@ -39,7 +41,7 @@ public class ExportPrint : Object {
     _boundaries   = new Array<double?>();
     _draw_options = new NodeDrawOptions();
 
-    /* Initialize the draw options */
+    // Initialize the draw options
     _draw_options.show_modes     = false;
     _draw_options.show_note_icon = false;
     _draw_options.show_note_bg   = false;
@@ -52,7 +54,7 @@ public class ExportPrint : Object {
     _op.unit               = Unit.NONE;
     _op.embed_page_setup   = true;
 
-    /* Connect to the draw_page signal */
+    // Connect to the draw_page signal
     _op.begin_print.connect( begin_print );
     _op.draw_page.connect( draw_page );
 
@@ -64,19 +66,20 @@ public class ExportPrint : Object {
           Outliner.settings.set_value( "page-setup",     _op.default_page_setup.to_gvariant() );
           break;
         case PrintOperationResult.ERROR :
-          /* TBD - Display the print error */
+          // TBD - Display the print error
           break;
         case PrintOperationResult.IN_PROGRESS :
-          /* TBD */
+          // TBD
           break;
       }
     } catch( GLib.Error e ) {
-      /* TBD */
+      // TBD
     }
 
   }
 
-  /* Calculates the page breaks in the document */
+  //-------------------------------------------------------------
+  // Calculates the page breaks in the document
   public void begin_print( PrintContext context ) {
 
     var include_size = 1.0;
@@ -101,7 +104,8 @@ public class ExportPrint : Object {
 
   }
 
-  /* Draws the page */
+  //-------------------------------------------------------------
+  // Draws the page
   public void draw_page( PrintOperation op, PrintContext context, int page_nr ) {
 
     var settings    = op.get_print_settings();
@@ -114,15 +118,15 @@ public class ExportPrint : Object {
     var start       = _boundaries.index( page_nr );
     var end         = _boundaries.index( page_nr + 1 ) - 1;
 
-    /* Scale and translate the image */
+    // Scale and translate the image
     ctx.translate( margin, ((0 - start) * sf) + margin );
     ctx.scale( sf, sf );
 
-    /* Clip the area */
+    // Clip the area
     ctx.rectangle( 0, start, (alloc_width - (margin * sf)), end );
     ctx.clip();
 
-    /* Draw all of the nodes */
+    // Draw all of the nodes
     _table.print_all( ctx, (page_nr == 0), theme, _draw_options );
 
   }

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -34,14 +34,15 @@ public class Exporter : Box {
 
   public signal void export_done();
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public Exporter( MainWindow win ) {
 
     Object( orientation: Orientation.VERTICAL, spacing: 0 );
 
     _win = win;
 
-    /* Create the exporter dropdown menu */
+    // Create the exporter dropdown menu
     var menu = new GLib.Menu();
     for( int i=0; i<win.exports.length(); i++ ) {
       var export = win.exports.index( i );
@@ -85,17 +86,18 @@ public class Exporter : Box {
     append( bbox );
     append( _stack_reveal );
 
-    /* Initialize the UI */
+    // Initialize the UI
     select_export( Outliner.settings.get_string( "last-export" ) );
 
-    /* Add the menu actions */
+    // Add the menu actions
     var actions = new SimpleActionGroup();
     actions.add_action_entries( action_entries, this );
     insert_action_group( "exporter", actions );
 
   }
 
-  /* Populates the exporter widget with the available export types */
+  //-------------------------------------------------------------
+  // Populates the exporter widget with the available export types
   private void populate() {
     for( int i=0; i<_win.exports.length(); i++ ) {
       var export = _win.exports.index( i );
@@ -105,7 +107,8 @@ public class Exporter : Box {
     }
   }
 
-  /* Selecting the export */
+  //-------------------------------------------------------------
+  // Selecting the export
   private void select_export( string name ) {
     var export = _win.exports.get_by_name( name );
     if( export != null ) {
@@ -116,15 +119,17 @@ public class Exporter : Box {
     }
   }
 
-  /* Menu action to select an export */
+  //-------------------------------------------------------------
+  // Menu action to select an export
   private void action_select_export( SimpleAction action, Variant? variant ) {
     select_export( variant.get_string() );
   }
 
-  /* Add the given export */
+  //-------------------------------------------------------------
+  // Add the given export
   private void add_export_options( Export export ) {
 
-    /* Add the page */
+    // Add the page
     var opts = new Grid() {
       margin_start   = 5,
       margin_end     = 5,
@@ -148,12 +153,13 @@ public class Exporter : Box {
       child = opts
     };
 
-    /* Add the options to the options stack */
+    // Add the options to the options stack
     _stack.add_named( frame, export.name );
 
   }
 
-  /* Perform the export */
+  //-------------------------------------------------------------
+  // Perform the export
   public void do_export() {
 
     var name   = _stack.visible_child_name;
@@ -163,11 +169,11 @@ public class Exporter : Box {
       _( "Cancel" ), ResponseType.CANCEL, _( "Export" ), ResponseType.ACCEPT );
     Utils.set_chooser_folder( dialog );
 
-    /* Set the default filename */
+    // Set the default filename
     var default_fname = Utils.rootname( _win.get_current_table().document.filename );
     dialog.set_current_name( _win.repair_filename( default_fname, export.extensions ) );
 
-    /* Set the filter */
+    // Set the filter
     FileFilter filter = new FileFilter();
     filter.set_filter_name( export.label );
     foreach( string extension in export.extensions ) {
@@ -178,16 +184,16 @@ public class Exporter : Box {
     dialog.response.connect((id) => {
       if( id == ResponseType.ACCEPT ) {
 
-        /* Close the dialog and parent window */
+        // Close the dialog and parent window
         dialog.hide();
 
-        /* Perform the export */
+        // Perform the export
         var fname = dialog.get_file().get_path();
         export.export( fname = _win.repair_filename( fname, export.extensions ), _win.get_current_table() );
         Utils.store_chooser_folder( fname, false );
 
-        /* Generate notification to indicate that the export completed */
-        _win.notification( _( "Minder Export Completed" ), fname );
+        // Generate notification to indicate that the export completed
+        _win.notification( _( "Outliner Export Completed" ), fname );
 
       }
       dialog.destroy();

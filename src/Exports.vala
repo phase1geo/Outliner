@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -29,7 +29,7 @@ public class Exports {
 
     _exports = new Array<Export>();
 
-    /* Add the exports */
+    // Add the exports
     add( new ExportHTML(), save_settings );
     add( new ExportMarkdown(), save_settings );
     add( new ExportMinder(), save_settings );

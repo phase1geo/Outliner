@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -69,36 +69,11 @@ public class Export {
       return( false );
     }
 
-    /*
-    // Find the directory that contains the pandoc languages
-    foreach( var data_dir in Environment.get_system_data_dirs() ) {
-      lang_dir = GLib.Path.build_filename( data_dir, "outliner", "pandoc-langs" );
-      if( FileUtils.test( lang_dir, FileTest.EXISTS ) ) {
-        break;
-      }
-    }
-    */
-
     // Call pandoc (use async method) to generate the documentation
     try {
 
       string[] command = {};
       command += "pandoc";
-
-      /*
-      // Figure out which languages we need to add to Pandoc
-      if( lang_dir != "" ) {
-        needed_langs.foreach((lang) => {
-          var lang_file = Path.build_filename( lang_dir, lang + ".xml" );
-          if( FileUtils.test( lang_file, FileTest.EXISTS ) ) {
-            command += "--syntax-definition";
-            command += lang_file;
-          }    
-          return( true );
-        });
-      }
-      */
-
       command += "-f";
 
       // Added extensions:
@@ -109,8 +84,6 @@ public class Export {
       command += "-o";
       command += "'" + ext_filename + "'";
       command += "'" + md_filename + "'";
-
-      stdout.printf( "command: %s\n", string.joinv( " ", command ) );
 
       Process.spawn_command_line_async( string.joinv( " ", command ) );
 

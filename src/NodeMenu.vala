@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -28,7 +28,8 @@ public class NodeMenu : BaseMenu {
     { "action_toggle_expand",            action_toggle_expand },
   };
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public NodeMenu( Gtk.Application app, OutlineTable ot ) {
 
     base( app, ot, "node-tmp" );
@@ -120,14 +121,14 @@ public class NodeMenu : BaseMenu {
     target_menu.append_submenu( _( "Select Row" ), select_menu );
     target_menu.append_submenu( _( "Labels" ),     label_menu );
 
-    /* Add all of the submenus to ourself */
+    // Add all of the submenus to ourself
     menu.append_section( null, edit_menu );
     menu.append_section( null, node_menu );
     menu.append_section( null, tree_menu );
     menu.append_section( null, add_menu );
     menu.append_section( null, target_menu );
 
-    /* Populate the select and move label submenus */
+    // Populate the select and move label submenus
     for( int i=0; i<9; i++ ) {
 
       var name = _( "Label-%d" ).printf( i + 1 );
@@ -139,20 +140,21 @@ public class NodeMenu : BaseMenu {
 
     }
 
-    /* Add the menu actions */
+    // Add the menu actions
     var actions = new SimpleActionGroup();
     actions.add_action_entries( action_entries, this );
     ot.insert_action_group( "node", actions );
 
   }
 
-  /* Called when the menu is popped up */
+  //-------------------------------------------------------------
+  // Called when the menu is popped up
   protected override void on_popup() {
 
     var pasteable  = OutlinerClipboard.node_pasteable();
     var first_node = ot.root.get_first_node();
 
-    /* Set the menu sensitivity */
+    // Set the menu sensitivity
     set_enabled( KeyCommand.EDIT_PASTE,               pasteable );
     set_enabled( KeyCommand.NODE_PASTE_REPLACE,       pasteable );
     set_enabled( KeyCommand.NODE_UNCLONE,             ot.selected.is_clone() );
@@ -192,27 +194,32 @@ public class NodeMenu : BaseMenu {
 
   }
 
-  /* Toggles the note display status of the currently selected node */
+  //-------------------------------------------------------------
+  // Toggles the note display status of the currently selected node
   private void action_toggle_note() {
     ot.toggle_note( ot.selected, false );
   }
 
-  /* Adds a new row above the currently selected row */
+  //-------------------------------------------------------------
+  // Adds a new row above the currently selected row
   private void action_add_row_above() {
     ot.add_sibling_node( false );
   }
 
-  /* Adds a new row below the currently selected row */
+  //-------------------------------------------------------------
+  // Adds a new row below the currently selected row
   private void action_add_row_below() {
     ot.add_sibling_node( true );
   }
 
-  /* Joins the current row to the one above it */
+  //-------------------------------------------------------------
+  // Joins the current row to the one above it
   private void action_join_row() {
     ot.join_row();
   }
 
-  /* Toggles the expand/collapse property of the node */
+  //-------------------------------------------------------------
+  // Toggles the expand/collapse property of the node
   private void action_toggle_expand() {
     ot.toggle_expand( ot.selected );
   }

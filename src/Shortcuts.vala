@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2025 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2025-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -406,7 +406,7 @@ public class Shortcuts {
       }
     }
 
-    /* Save the file */
+    // Save the file
     doc->save_format_file( shortcuts_path(), 1 );
 
     delete doc;
@@ -727,7 +727,7 @@ public class Shortcuts {
 
     window->add_child( make_property( "modal", "0" ) );
     window->add_child( make_property( "resizable", "0" ) );
-    window->add_child( make_property( "title", "Minder Shortcuts", "yes" ) );
+    window->add_child( make_property( "title", "Outliner Shortcuts", "yes" ) );
     window->add_child( make_property( "section-name", "global" ) );
     window->add_child( make_property( "view-name", "file" ) );
 

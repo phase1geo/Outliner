@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -2398,10 +2398,6 @@ public class OutlineTable : DrawingArea {
   // Hides the format bar if it is currently visible and destroys it
   public void hide_format_bar() {
     if( _format_bar != null ) {
-      /*
-      var ol = (Overlay)this.parent;
-      ol.remove_overlay( _format_bar );
-      */
       _format_bar.unparent();
       _format_bar.close();
       _format_bar = null;

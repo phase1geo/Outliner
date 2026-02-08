@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -43,14 +43,16 @@ public class TextParser {
     }
   }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public TextParser( string name, int id ) {
     _name = name;
     _id   = id;
     _res  = new Array<ReCallback?>();
   }
 
-  /* Adds a regular expression to this parser */
+  //-------------------------------------------------------------
+  // Adds a regular expression to this parser
   protected void add_regex( string re, TextMatchCallback func ) {
     try {
       _res.append_val( { new Regex( re, RegexCompileFlags.MULTILINE ), func } );
@@ -60,19 +62,23 @@ public class TextParser {
     }
   }
 
-  /* Helper function that adds the tag for the given parenthesis match */
+  //-------------------------------------------------------------
+  // Helper function that adds the tag for the given parenthesis
+  // match
   protected void add_tag( FormattedText text, MatchInfo matches, int paren, FormatTag tag, string? extra = null ) {
     int start, end;
     matches.fetch_pos( paren, out start, out end );
     text.add_tag( tag, start, end, extra, _id );
   }
 
-  /* Helper function that returns the matched string */
+  //-------------------------------------------------------------
+  // Helper function that returns the matched string
   protected string get_text( MatchInfo matches, int paren ) {
     return( matches.fetch( paren ) );
   }
 
-  /* Called to parse the text within the given FormattedText element */
+  //-------------------------------------------------------------
+  // Called to parse the text within the given FormattedText element
   public void parse( FormattedText text, int cursor ) {
     for( int i=0; i<_res.length; i++ ) {
       MatchInfo matches;
@@ -88,17 +94,21 @@ public class TextParser {
     }
   }
 
-  /* Returns true if the associated tag should enable the associated FormatBar button */
+  //-------------------------------------------------------------
+  // Returns true if the associated tag should enable the associated
+  // FormatBar button
   public virtual bool tag_handled( FormatTag tag ) {
     return( false );
   }
 
-  /* This is called when the associated FormatBar button is clicked */
+  //-------------------------------------------------------------
+  // This is called when the associated FormatBar button is clicked
   public virtual void insert_tag( CanvasText ct, FormatTag tag, int start_pos, int end_pos, UndoTextBuffer undo_buffer, string? extra = null ) {
     ct.text.add_tag( tag, start_pos, end_pos, extra, _id );
   }
 
-  /* This is called when the associated FormatBar button is unclicked */
+  //-------------------------------------------------------------
+  // This is called when the associated FormatBar button is unclicked
   public virtual void remove_all_tags( CanvasText ct, int start_pos, int end_pos, UndoTextBuffer undo_buffer ) {
     ct.text.remove_all_tags( start_pos, end_pos, _id );
   }

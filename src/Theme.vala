@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -53,10 +53,12 @@ public class Theme : Object {
   public    RGBA   match_background   { protected set; get; }
   public    RGBA   markdown_listitem  { protected set; get; }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public Theme() {}
 
-  /* Returns the RGBA color for the given color value */
+  //-------------------------------------------------------------
+  // Returns the RGBA color for the given color value
   protected RGBA get_color( string value ) {
 
     RGBA c = {(float)1.0, (float)1.0, (float)1.0, (float)1.0};
@@ -66,7 +68,8 @@ public class Theme : Object {
 
   }
 
-  /* Returns the CSS provider for this theme */
+  //-------------------------------------------------------------
+  // Returns the CSS provider for this theme
   public CssProvider get_css_provider() {
 
     var provider = new CssProvider();

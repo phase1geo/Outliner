@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020-2025 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -367,7 +367,7 @@ public class ExportMinder : Export {
     extractor.set_options( flags );
     extractor.set_standard_lookup();
 
-    /* Open the Minder file for reading */
+    // Open the Minder file for reading
     if( archive.open_filename( fname, 16384 ) != Archive.Result.OK ) {
       return( import_xml( fname, table ) );
     }
@@ -603,7 +603,7 @@ public class ExportMinder : Export {
       node.task = bool.parse( t ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
     }
 
-    /* Parse any children nodes */
+    // Parse any children nodes
     for( Xml.Node* it=n->children; it!=null; it=it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {
