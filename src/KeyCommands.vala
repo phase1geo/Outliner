@@ -157,6 +157,11 @@ public enum KeyCommand {
       EDIT_CUT,
       EDIT_PASTE,
     EDIT_CLIPBOARD_END,
+    EDIT_URL_START,
+      EDIT_URL_OPEN,
+      EDIT_URL_ADD_EDIT,
+      EDIT_URL_REMOVE,
+    EDIT_URL_END,
     EDIT_CURSOR_START,
       EDIT_CURSOR_CHAR_NEXT,
       EDIT_CURSOR_CHAR_PREV,
@@ -300,6 +305,9 @@ public enum KeyCommand {
       case EDIT_COPY                 :  return( "edit-copy" );
       case EDIT_CUT                  :  return( "edit-cut" );
       case EDIT_PASTE                :  return( "edit-paste" );
+      case EDIT_URL_OPEN             :  return( "edit-url-open" );
+      case EDIT_URL_ADD_EDIT         :  return( "edit-url-add-edit" );
+      case EDIT_URL_REMOVE           :  return( "edit-url-remove" );
       case EDIT_CURSOR_CHAR_NEXT     :  return( "edit-cursor-char-next" );
       case EDIT_CURSOR_CHAR_PREV     :  return( "edit-cursor-char-prev" );
       case EDIT_CURSOR_UP            :  return( "edit-cursor-up" );
@@ -442,6 +450,9 @@ public enum KeyCommand {
       case "edit-copy"                 :  return( EDIT_COPY );
       case "edit-cut"                  :  return( EDIT_CUT );
       case "edit-paste"                :  return( EDIT_PASTE );
+      case "edit-url-open"             :  return( EDIT_URL_OPEN );
+      case "edit-url-add-edit"         :  return( EDIT_URL_ADD_EDIT );
+      case "edit-url-remove"           :  return( EDIT_URL_REMOVE );
       case "edit-cursor-char-next"     :  return( EDIT_CURSOR_CHAR_NEXT );
       case "edit-cursor-char-prev"     :  return( EDIT_CURSOR_CHAR_PREV );
       case "edit-cursor-up"            :  return( EDIT_CURSOR_UP );
@@ -589,6 +600,10 @@ public enum KeyCommand {
       case EDIT_COPY                 :  return( _( "Copy selected nodes or text" ) );
       case EDIT_CUT                  :  return( _( "Cut selected nodes or text" ) );
       case EDIT_PASTE                :  return( _( "Paste nodes or text from clipboard" ) );
+      case EDIT_URL_START            :  return( _( "URL Link Commands" ) );
+      case EDIT_URL_OPEN             :  return( _( "Open the URL link under the current cursor" ) );
+      case EDIT_URL_ADD_EDIT         :  return( _( "Add URL link to selected text or edit URL link at the current cursor" ) );
+      case EDIT_URL_REMOVE           :  return( _( "Remove the URL link under the current cursor" ) );
       case EDIT_CURSOR_START         :  return( _( "Cursor Commands" ) );
       case EDIT_CURSOR_CHAR_NEXT     :  return( _( "Move cursor to next character" ) );
       case EDIT_CURSOR_CHAR_PREV     :  return( _( "Move cursor to previous character" ) );
@@ -722,6 +737,9 @@ public enum KeyCommand {
       case EDIT_COPY                 :  return( edit_copy );
       case EDIT_CUT                  :  return( edit_cut );
       case EDIT_PASTE                :  return( edit_paste );
+      case EDIT_URL_OPEN             :  return( edit_url_open );
+      case EDIT_URL_ADD_EDIT         :  return( edit_url_add_edit );
+      case EDIT_URL_REMOVE           :  return( edit_url_remove );
       case EDIT_CURSOR_CHAR_NEXT     :  return( edit_cursor_char_next );
       case EDIT_CURSOR_CHAR_PREV     :  return( edit_cursor_char_previous );
       case EDIT_CURSOR_UP            :  return( edit_cursor_up );
@@ -900,6 +918,7 @@ public enum KeyCommand {
       case NODE_LABEL_START     :
       case EDIT_TEXT_START      :
       case EDIT_CLIPBOARD_START :
+      case EDIT_URL_START       :
       case EDIT_CURSOR_START    :
       case EDIT_SELECT_START    :
       case EDIT_MISC_START      :
@@ -928,6 +947,7 @@ public enum KeyCommand {
       case NODE_LABEL_END     :
       case EDIT_TEXT_END      :
       case EDIT_CLIPBOARD_END :
+      case EDIT_URL_END       :
       case EDIT_CURSOR_END    :
       case EDIT_SELECT_END    :
       case EDIT_MISC_END      :
@@ -1595,6 +1615,41 @@ public enum KeyCommand {
 
   public static void edit_paste( OutlineTable ot ) {
     ot.do_paste( false );
+  }
+
+  private static string? get_current_url( OutlineTable ot ) {
+    var text = ot.get_current_text( false );
+    if( text != null ) {
+      int cursor, selstart, selend;
+      text.get_cursor_info( out cursor, out selstart, out selend );
+      var links = text.text.get_full_tags_in_range( FormatTag.URL, cursor, cursor );
+      if( links.length > 0 ) {
+        return( links.index( 0 ).extra );
+      }
+    }
+    return( null );
+  }
+
+  public static void edit_url_open( OutlineTable ot ) {
+    var url = get_current_url( ot );
+    if( url != null ) {
+      Utils.open_url( url );
+    }
+  }
+
+  public static void edit_url_add_edit( OutlineTable ot ) {
+    var editor = new LinkEditor( ot );
+    editor.point_to_text();
+    editor.add_edit_url();
+  }
+
+  public static void edit_url_remove( OutlineTable ot ) {
+    var text = ot.get_current_text( false );
+    if( text != null ) {
+      text.remove_tag( FormatTag.URL, ot.undo_text );
+      text.clear_selection();
+      ot.queue_draw();
+    }
   }
 
   private static void edit_return_helper( OutlineTable ot, bool shift ) {

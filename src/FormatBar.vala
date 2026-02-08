@@ -239,10 +239,8 @@ public class FormatBar : Box {
   // Returns the font that the outline table is currently using.
   private RGBA get_font_color() {
     if( _table.font_color == null ) {
-      stdout.printf( "In get_font_color, use foreground\n" );
       return( _table.get_theme().foreground );
     } else {
-      stdout.printf( "In get_font_color, use table font_color\n" );
       RGBA color = {(float)1.0, (float)1.0, (float)1.0, (float)1.0};
       color.parse( _table.font_color );
       return( color );
@@ -252,7 +250,6 @@ public class FormatBar : Box {
   //-------------------------------------------------------------
   // Closes this popover.
   public void close() {
-    stdout.printf( "Closing\n" );
     destroy();
   }
 
@@ -431,11 +428,7 @@ public class FormatBar : Box {
       if( _link.active ) {
         // _link_editor.pointing_to = {0, 0, 1, 1};
         _link_editor.set_parent( _link );
-        if( _table.selected.mode == NodeMode.EDITABLE ) {
-          _link_editor.add_url( _table.selected.name );
-        } else {
-          _link_editor.add_url( _table.selected.note );
-        }
+        _link_editor.add_edit_url();
         _table.queue_draw();
         _table.changed();
       } else {

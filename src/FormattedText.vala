@@ -361,14 +361,30 @@ public class FormattedText {
     //-------------------------------------------------------------
     // Returns the tag extra value at the given index, if it exists;
     // otherwise, returns null.
-    public string? get_extra_at_index( int index ) {
+    private FormattedRange? get_tag_at_index( int index ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
         if( (info.start <= index) && (index < info.end) ) {
-          return( info.extra );
+          return( info );
         }
       }
       return( null );
+    }
+
+    //-------------------------------------------------------------
+    // Get the extra information at the given index.
+    public string? get_extra_at_index( int index ) {
+      var tag = get_tag_at_index( index );
+      return( (tag == null) ? null : tag.extra );
+    }
+
+    //-------------------------------------------------------------
+    // Gets the tag position information that contains the given index.
+    public bool get_pos_at_index( int index, out int start, out int end ) {
+      var tag = get_tag_at_index( index );
+      start = (tag == null) ? 0 : tag.start;
+      end   = (tag == null) ? 0 : tag.end;
+      return( tag != null );
     }
 
     //-------------------------------------------------------------
@@ -968,6 +984,13 @@ public class FormattedText {
   }
 
   //-------------------------------------------------------------
+  // Returns the tag position at the given index, if one exists;
+  // otherwise, returns false.
+  public bool get_tag_pos_at_index( FormatTag tag, int index, out int start, out int end ) {
+    return( _formats[tag].get_pos_at_index( index, out start, out end ) );
+  }
+
+  //-------------------------------------------------------------
   // Returns true if at least one tag is applied to the text
   public bool tags_exist() {
     foreach( TagInfo f in _formats ) {
@@ -1071,13 +1094,6 @@ public class FormattedText {
       buf.get_iter_at_offset( out ti_end,   tag.end );
       buf.apply_tag_by_name( ttag.name, ti_start, ti_end );
     }
-  }
-
-  //-------------------------------------------------------------
-  // Returns the extra data stored at the given index location,
-  // if one exists.  If nothing is found, returns null.
-  public string? get_extra( FormatTag tag, int index ) {
-    return( _formats[tag].get_extra( index ) );
   }
 
   //-------------------------------------------------------------

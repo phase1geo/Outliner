@@ -571,6 +571,9 @@ public class Shortcuts {
     add_default( Key.i,            true,  false, false, KeyCommand.EDIT_ITALICS );
     add_default( Key.u,            true,  false, false, KeyCommand.EDIT_UNDERLINE );
     add_default( Key.t,            true,  false, false, KeyCommand.EDIT_STRIKETHRU );
+    add_default( Key.l,            true,  false, false, KeyCommand.EDIT_URL_OPEN );
+    add_default( Key.k,            true,  false, false, KeyCommand.EDIT_URL_ADD_EDIT );
+    add_default( Key.k,            true,  true,  false, KeyCommand.EDIT_URL_REMOVE );
 
     add_default( Key.F10,          false, true,  false, KeyCommand.SHOW_CONTEXTUAL_MENU );
 

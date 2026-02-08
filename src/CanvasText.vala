@@ -256,7 +256,7 @@ public class CanvasText : Object {
       var cindex = text.text.char_count( cursor + trailing );
       FormatTag[] tags = { FormatTag.URL, FormatTag.TAG };
       foreach( FormatTag t in tags ) {
-        var e = text.get_extra( t, cindex );
+        var e = text.get_tag_extra_at_index( t, cindex );
         if( e != null ) {
           tag   = t;
           extra = e;
@@ -1014,13 +1014,38 @@ public class CanvasText : Object {
   }
 
   //-------------------------------------------------------------
+  // This should only be called when we don't have a selection.
+  public void replace_tag( FormatTag tag, string? extra, UndoTextBuffer undo_buffer ) {
+    int spos = 0;
+    int epos = 0; 
+    if( !is_selected() && text.get_tag_pos_at_index( tag, cursor, out spos, out epos ) ) {
+      var info = text.get_full_tags_in_range( tag, spos, epos );
+      text.replace_tag_in_range( tag, spos, epos, extra );
+      undo_buffer.add_tag_replace( spos, epos, tag, extra, info, _cursor );
+    } 
+  }
+
+  //-------------------------------------------------------------
   // Removes the specified tag for the selected range
   public void remove_tag( FormatTag tag, UndoTextBuffer undo_buffer ) {
-    var spos  = text.text.index_of_nth_char( _selstart );
-    var epos  = text.text.index_of_nth_char( _selend );
-    var extra = text.get_extra( tag, spos );
-    text.remove_tag( tag, spos, epos );
-    undo_buffer.add_tag_remove( spos, epos, tag, extra, _cursor );
+    if( is_selected() ) {
+      var spos  = text.text.index_of_nth_char( _selstart );
+      var epos  = text.text.index_of_nth_char( _selend );
+      var extra = text.get_tag_extra_at_index( tag, spos );
+      if( extra != null ) {
+        text.remove_tag( tag, spos, epos );
+        undo_buffer.add_tag_remove( spos, epos, tag, extra, _cursor );
+      }
+    } else {
+      int spos = 0;
+      int epos = 0;
+      var cursor = text.text.index_of_nth_char( _cursor );
+      if( text.get_tag_pos_at_index( tag, cursor, out spos, out epos ) ) {
+        var extra = text.get_tag_extra_at_index( tag, cursor );
+        text.remove_tag( tag, spos, epos );
+        undo_buffer.add_tag_remove( spos, epos, tag, extra, _cursor );
+      }
+    }
   }
 
   //-------------------------------------------------------------

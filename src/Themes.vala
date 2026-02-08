@@ -76,7 +76,7 @@ public class Themes : Object {
     var provider = new Gtk.CssProvider ();
     var css      = "";
     for( int i=0; i<(_themes.length - 2); i++ ) {
-      css += "." + _themes.index( i ).name + " radio { background: " + _themes.index( i ).background.to_string() + "; color: " + _themes.index( i ).foreground.to_string() + "; } ";
+      css += "." + _themes.index( i ).name + " radio { background: " + _themes.index( i ).background.to_string() + "; color: " + _themes.index( i ).foreground.to_string() + "; padding: 10px; } ";
     }
     try {
       provider.load_from_data( css.data );

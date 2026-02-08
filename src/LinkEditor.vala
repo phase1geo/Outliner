@@ -24,11 +24,11 @@ using Gtk;
 public class LinkEditor : Popover {
 
   private OutlineTable _ot;
-  private bool         _add = true;
   private Entry        _entry;
   private Button       _apply;
   private string       _url_re = "^(mailto:.+@[a-z0-9-]+\\.[a-z0-9.-]+|[a-zA-Z0-9]+://[a-z0-9-]+\\.[a-z0-9.-]+(?:/|(?:/[][a-zA-Z0-9!#$%&'*+,.:;=?@_~-]+)*))$";
   private CanvasText   _text;
+  private bool         _add;
 
   public signal void edit_cancelled();
 
@@ -40,10 +40,9 @@ public class LinkEditor : Popover {
 
     _ot = ot;
 
-    var ebox  = new Box( Orientation.HORIZONTAL, 5 );
     var lbl   = new Label( _( "URL:" ) );
     _entry = new Entry() {
-      halign = Align.FILL,
+      halign = Align.START,
       width_chars = 50,
       input_purpose = InputPurpose.URL
     };
@@ -52,43 +51,39 @@ public class LinkEditor : Popover {
     });
     _entry.changed.connect( check_entry );
 
-    ebox.append( lbl );
-    ebox.append( _entry );
-
-    _apply = new Button.with_label( _( "Apply" ) ) {
-      halign = Align.END
+    _apply = new Button.from_icon_name( "object-select-symbolic" ) {
+      halign       = Align.START,
+      tooltip_text = _( "Apply" )
     };
+    _apply.add_css_class( Granite.STYLE_CLASS_CIRCULAR );
     _apply.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
     _apply.clicked.connect(() => {
       set_url();
       show_popover( false );
     });
 
-    var cancel = new Button.with_label( _( "Cancel" ) ) {
-      halign = Align.END,
-      hexpand = true
+    var cancel = new Button.from_icon_name( "window-close-symbolic" ) {
+      halign       = Align.START,
+      tooltip_text = _( "Cancel" )
     };
+    cancel.add_css_class( Granite.STYLE_CLASS_CIRCULAR );
     cancel.clicked.connect(() => {
       _text.clear_selection();
       show_popover( false );
       edit_cancelled();
     });
 
-    var bbox = new Box( Orientation.HORIZONTAL, 5 ) {
-      halign = Align.FILL
-    };
-    bbox.append( cancel );
-    bbox.append( _apply );
-
-    var box = new Box( Orientation.VERTICAL, 5 ) {
+    var box = new Box( Orientation.HORIZONTAL, 5 ) {
+      halign = Align.FILL,
       margin_start  = 5,
       margin_end    = 5,
       margin_top    = 5,
       margin_bottom = 5
     };
-
-    box.append( ebox );
-    box.append( bbox );
+    box.append( lbl );
+    box.append( _entry );
+    box.append( _apply );
+    box.append( cancel );
 
     child = box;
 
@@ -99,10 +94,35 @@ public class LinkEditor : Popover {
   private void show_popover( bool show ) {
     if( show ) {
       Utils.show_popover( this );
+      _entry.grab_focus();
     } else {
       unparent();
       Utils.hide_popover( this );
+      _ot.grab_focus();
     }
+  }
+
+  //-------------------------------------------------------------
+  // Sets this popover to point to the start of the text selection. 
+  public void point_to_text() {
+
+    var ct = _ot.get_current_text();
+
+    int selstart, selend, cursor;
+    ct.get_cursor_info( out cursor, out selstart, out selend );
+
+    double left, top, bottom;
+    int line;
+    ct.get_char_pos( selstart, out left, out top, out bottom, out line );
+    var int_left = (int)left;
+    var int_top  = (int)top;
+    Gdk.Rectangle rect = {int_left, int_top, 1, 1};
+
+    // Setup popover to be displayable
+    set_parent( _ot );
+    position    = PositionType.TOP;
+    pointing_to = rect;
+
   }
 
   //-------------------------------------------------------------
@@ -117,10 +137,14 @@ public class LinkEditor : Popover {
   // Sets the URL of the current node's selected text to the value
   // stored in the popover entry.
   private void set_url() {
-    if( _ot.markdown ) {
-      _ot.markdown_parser.insert_tag( _text, FormatTag.URL, _text.selstart, _text.selend, _ot.undo_text, _entry.text );
+    if( _add ) {
+      if( _ot.markdown ) {
+        _ot.markdown_parser.insert_tag( _text, FormatTag.URL, _text.selstart, _text.selend, _ot.undo_text, _entry.text );
+      } else {
+        _text.add_tag( FormatTag.URL, _entry.text, _ot.undo_text );
+      }
     } else {
-      _text.add_tag( FormatTag.URL, _entry.text, _ot.undo_text );
+      _text.replace_tag( FormatTag.URL, _entry.text, _ot.undo_text );
     }
     _ot.changed();
   }
@@ -128,24 +152,70 @@ public class LinkEditor : Popover {
   //-------------------------------------------------------------
   // Called when we want to add a URL to the currently selected
   // text of the given node.
-  public void add_url( CanvasText text ) {
+  public void add_edit_url() {
+
+    var text = _ot.get_current_text();
+    if( text == null ) return;
 
     _text = text;
 
     int selstart, selend, cursor;
     text.get_cursor_info( out cursor, out selstart, out selend );
 
-    // Check to see if the selected text is already a valid URL
-    var selected_text = text.get_selected_text();
-    var selected_link = text.text.get_tag_extra_at_index( FormatTag.URL, selstart );
-    var use_selected  = (selected_text != null) && Regex.match_simple( _url_re, selected_text );
+    // If nothing is selected, we can only edit an existing URL, if one exists.
+    if( selstart == selend ) {
+      var link = text.text.get_tag_extra_at_index( FormatTag.URL, text.cursor );
+      if( link != null ) {
+        _add = false;
+        _entry.text = link;
+        check_entry();
+        show_popover( true );
+      }
 
-    _add        = true;
-    _entry.text = (selected_link != null) ? selected_link :
-                  use_selected            ? selected_text : "";
-    _apply.set_sensitive( (selected_link != null) || use_selected );
+      return;
 
-    show_popover( true );
+    } else {
+
+      int start = 0;
+      int end   = 0;
+
+      // If an existing URL is fully selected, edit it
+      if( text.text.get_tag_pos_at_index( FormatTag.URL, text.selstart, out start, out end ) && (text.selstart == start) && (text.selend == end) ) {
+        var link = text.text.get_tag_extra_at_index( FormatTag.URL, text.selstart );
+        assert( link != null );
+        _add = false;
+        _entry.text = link;
+
+      } else {
+
+        _add = true;
+
+        var selected_text = text.get_selected_text();
+
+        if( Regex.match_simple( _url_re, selected_text ) ) {
+          _entry.text = text.get_selected_text();
+
+        } else if( OutlinerClipboard.text_pasteable() ) {
+          stdout.printf( "Checking clipboard\n" );
+          var clipboard = Gdk.Display.get_default().get_clipboard();
+          try {
+            clipboard.read_text_async.begin( null, (obj, res) => {
+              var clip_text = clipboard.read_text_async.end( res );
+              if( (clip_text != null) && Regex.match_simple( _url_re, clip_text ) ) {
+                _entry.text = clip_text;
+                check_entry();
+              }
+            });
+          } catch( Error e ) {} 
+        }
+
+      }
+
+      check_entry();
+      _ot.hide_format_bar();
+      show_popover( true );
+
+    }
 
   }
 

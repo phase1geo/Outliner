@@ -1210,7 +1210,6 @@ public class OutlineTable : DrawingArea {
     switch( keyval ) {
       case Gdk.Key.Control_L :
       case Gdk.Key.Control_R :
-        _control_set = true;
         handle_control( true );
         break;
       case Gdk.Key.Shift_L :
@@ -1225,6 +1224,9 @@ public class OutlineTable : DrawingArea {
 
     // Attempt to execute a keyboard shortcut
     if( _win.shortcuts.execute( this, keyval, keycode, state ) ) {
+      handle_control( false );
+      _shift_set = false;
+      _alt_set = false;
       update_format_bar( "on_keypress" );
       return( true );
 
@@ -1423,12 +1425,21 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Handles a copy operation on a node or selected text
   public void do_copy() {
+
     if( selected == null ) return;
+
     switch( selected.mode ) {
       case NodeMode.SELECTED :  copy_selected_node();   break;
       case NodeMode.EDITABLE :  copy_selected_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  copy_selected_text( selected.note );  break;
     }
+
+    // Get rid of the format bar
+    var text = get_current_text();
+    if( text != null ) {
+      text.clear_selection();
+    }
+
   }
 
   //-------------------------------------------------------------
@@ -1466,12 +1477,21 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Handles a cut operation on a node or selected text
   public void do_cut() {
+
     if( selected == null ) return;
+
     switch( selected.mode ) {
       case NodeMode.SELECTED :  cut_selected_node();  break;
       case NodeMode.EDITABLE :  cut_selected_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  cut_selected_text( selected.note );  break;
     }
+
+    // Get rid of the format bar
+    var text = get_current_text();
+    if( text != null ) {
+      text.clear_selection();
+    }
+
   }
 
   //-------------------------------------------------------------
@@ -2376,7 +2396,7 @@ public class OutlineTable : DrawingArea {
 
   //-------------------------------------------------------------
   // Hides the format bar if it is currently visible and destroys it
-  private void hide_format_bar() {
+  public void hide_format_bar() {
     if( _format_bar != null ) {
       /*
       var ol = (Overlay)this.parent;
