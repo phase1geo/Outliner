@@ -39,7 +39,6 @@ public class FormatBar : Box {
   private ColorPicker  _color;
   private ToggleButton _link;
   private bool         _ignore_active = false;
-  private LinkEditor   _link_editor;
   private Button       _clear;
   private SimpleAction _header_action;
 
@@ -52,13 +51,6 @@ public class FormatBar : Box {
     Object( orientation: Orientation.HORIZONTAL, spacing: 0, margin_start: 5, margin_end: 5, margin_top: 5, margin_bottom: 5 );
 
     _table = table;
-
-    _link_editor = new LinkEditor( table );
-    _link_editor.edit_cancelled.connect(() => {
-      _ignore_active = true;
-      _link.active   = false;
-      _ignore_active = false;
-    });
 
     _copy = new Button.from_icon_name( "edit-copy-symbolic" ) {
       has_frame = false,
@@ -433,14 +425,11 @@ public class FormatBar : Box {
   private void handle_link() {
     if( !_ignore_active ) {
       if( _link.active ) {
-        // _link_editor.pointing_to = {0, 0, 1, 1};
-        _link_editor.set_parent( _link );
-        _link_editor.add_edit_url();
-        _table.queue_draw();
-        _table.changed();
+        KeyCommand.edit_url_add_edit( _table );
       } else {
         unformat_text( FormatTag.URL );
       }
+      update_link_tooltip();
     }
   }
 
@@ -460,6 +449,7 @@ public class FormatBar : Box {
     _hilite.set_active( false );
     _color.set_active( false );
     _link.set_active( false );
+    update_link_tooltip();
     activate_header( 0 );
     _ignore_active = false;
     _table.queue_draw();
@@ -505,6 +495,13 @@ public class FormatBar : Box {
   }
 
   //-------------------------------------------------------------
+  // Updates the link button tooltip based on the button active state.
+  private void update_link_tooltip() {
+    var command = _link.active ? KeyCommand.EDIT_URL_REMOVE : KeyCommand.EDIT_URL_ADD_EDIT;
+    _link.tooltip_markup = get_tooltip_markup( _( "Link" ), command );
+  }
+
+  //-------------------------------------------------------------
   // Updates the state of the format bar based on the state of the
   // current text.
   private void update_from_text( CanvasText? text ) {
@@ -519,6 +516,7 @@ public class FormatBar : Box {
     set_color_picker(  text, FormatTag.HILITE,     _hilite );
     set_color_picker(  text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );
+    update_link_tooltip();
     set_header( text );
     _ignore_active = false;
   }

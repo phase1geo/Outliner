@@ -196,7 +196,6 @@ public class LinkEditor : Popover {
           _entry.text = text.get_selected_text();
 
         } else if( OutlinerClipboard.text_pasteable() ) {
-          stdout.printf( "Checking clipboard\n" );
           var clipboard = Gdk.Display.get_default().get_clipboard();
           try {
             clipboard.read_text_async.begin( null, (obj, res) => {
