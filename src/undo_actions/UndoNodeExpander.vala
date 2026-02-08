@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,7 +24,8 @@ public class UndoNodeExpander : UndoItem {
   private Node        _parent;
   private Array<Node> _nodes;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoNodeExpander( Node parent, Array<Node> nodes ) {
     base( _( "expander change" ) );
     _parent = parent;
@@ -40,12 +41,14 @@ public class UndoNodeExpander : UndoItem {
     table.changed();
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo( OutlineTable table ) {
     toggle( table );
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo( OutlineTable table ) {
     toggle( table );
   }
