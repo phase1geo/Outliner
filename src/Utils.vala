@@ -25,9 +25,10 @@ using Cairo;
 
 public class Utils {
 
-  /* Returns true if the specified version is older than this version */
-  public static bool is_version_older( string other_version ) {
-    var my_parts    = Outliner.version.split( "." );
+  //-------------------------------------------------------------
+  // Returns true if the specified version is older than this version
+  public static bool is_version_older( string our_version, string other_version ) {
+    var my_parts    = our_version.split( "." );
     var other_parts = other_version.split( "." );
     for( int i=0; i<my_parts.length; i++ ) {
       if( int.parse( other_parts[i] ) < int.parse( my_parts[i] ) ) {
@@ -37,31 +38,30 @@ public class Utils {
     return( false );
   }
 
-  /*
-   Helper function for converting an RGBA color value to a stringified color
-   that can be used by a markup parser.
-  */
+  //-------------------------------------------------------------
+  // Helper function for converting an RGBA color value to a
+  // stringified color that can be used by a markup parser.
   public static string color_from_rgba( RGBA rgba ) {
     return( "#%02x%02x%02x".printf( (int)(rgba.red * 255), (int)(rgba.green * 255), (int)(rgba.blue * 255) ) );
   }
 
-  /* Sets the context source color to the given color value */
+  //-------------------------------------------------------------
+  // Sets the context source color to the given color value
   public static void set_context_color( Context ctx, RGBA color ) {
     ctx.set_source_rgba( color.red, color.green, color.blue, color.alpha );
   }
 
-  /*
-   Sets the context source color to the given color value overriding the
-   alpha value with the given value.
-  */
+  //-------------------------------------------------------------
+  // Sets the context source color to the given color value
+  // overriding the alpha value with the given value.
   public static void set_context_color_with_alpha( Context ctx, RGBA color, double alpha ) {
     ctx.set_source_rgba( color.red, color.green, color.blue, alpha );
   }
 
-  /*
-   Checks the given string to see if it is a match to the given pattern.  If
-   it is, the matching portion of the string appended to the list of matches.
-  */
+  //-------------------------------------------------------------
+  // Checks the given string to see if it is a match to the given
+  // pattern.  If it is, the matching portion of the string
+  // appended to the list of matches.
   /*
   public static void match_string( string pattern, string value, string type, Node? node, ref Gtk.ListStore matches ) {
     int index = value.casefold().index_of( pattern );
@@ -79,30 +79,37 @@ public class Utils {
   }
   */
 
-  /* Returns true if the given coordinates are within the specified bounds */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates are within the specified
+  // bounds
   public static bool is_within_bounds( double x, double y, double bx, double by, double bw, double bh ) {
     return( (bx <= x) && (x < (bx + bw)) && (by <= y) && (y < (by + bh)) );
   }
 
-  /* Returns a string that is suitable to use as an inspector title */
+  //-------------------------------------------------------------
+  // Returns a string that is suitable to use as an inspector title
   public static string make_title( string str ) {
     return( "<b>" + str + "</b>" );
   }
 
-  /* Returns a string that is used to display a tooltip with displayed accelerator */
+  //-------------------------------------------------------------
+  // Returns a string that is used to display a tooltip with
+  // displayed accelerator
   public static string tooltip_with_accel( string tooltip, string accel ) {
     string[] accels = {accel};
     return( Granite.markup_accel_tooltip( accels, tooltip ) );
   }
 
-  /* Opens the given URL in the proper external default application */
+  //-------------------------------------------------------------
+  // Opens the given URL in the proper external default application
   public static void open_url( string url ) {
     try {
       AppInfo.launch_default_for_uri( url, null );
     } catch( GLib.Error e ) {}
   }
 
-  /* Converts the given Markdown into HTML */
+  //-------------------------------------------------------------
+  // Converts the given Markdown into HTML
   public static string markdown_to_html( string md, string tag ) {
     string html;
     var    flags = 0x47607004;
@@ -112,7 +119,9 @@ public class Utils {
     return( "<" + tag + ">" + html + "</" + tag + ">" );
   }
 
-  /* Returns the line height of the first line of the given pango layout */
+  //-------------------------------------------------------------
+  // Returns the line height of the first line of the given pango
+  // layout
   public static double get_line_height( Pango.Layout layout ) {
     int height;
     var line = layout.get_line_readonly( 0 );
@@ -127,7 +136,8 @@ public class Utils {
     return( height / Pango.SCALE );
   }
 
-  /* Searches for the beginning or ending word */
+  //-------------------------------------------------------------
+  // Searches for the beginning or ending word
   public static int find_word( string str, int cursor, bool wordstart ) {
     try {
       MatchInfo match_info;
@@ -142,7 +152,8 @@ public class Utils {
     return( -1 );
   }
 
-  /* Returns the rootname of the given filename */
+  //-------------------------------------------------------------
+  // Returns the rootname of the given filename
   public static string rootname( string filename ) {
     var basename = GLib.Path.get_basename( filename );
     var parts    = basename.split( "." );
@@ -153,7 +164,8 @@ public class Utils {
     }
   }
 
-  /* Show the specified popover */
+  //-------------------------------------------------------------
+  // Show the specified popover
   public static void show_popover( Popover popover ) {
 #if GTK322
     popover.popup();
@@ -162,7 +174,8 @@ public class Utils {
 #endif
   }
 
-  /* Hide the specified popover */
+  //-------------------------------------------------------------
+  // Hide the specified popover
   public static void hide_popover( Popover popover ) {
 #if GTK322
     popover.popdown();
@@ -186,7 +199,9 @@ public class Utils {
     Outliner.settings.set_string( "last-directory", dir );
   }
 
-  /* Returns the child widget at the given index of the parent widget (or null if one does not exist) */
+  //-------------------------------------------------------------
+  // Returns the child widget at the given index of the parent
+  // widget (or null if one does not exist)
   public static Widget? get_child_at_index( Widget parent, int index ) {
     var child = parent.get_first_child();
     while( (child != null) && (index-- > 0) ) {
@@ -195,7 +210,8 @@ public class Utils {
     return( child );
   }
 
-  /* Reads the string from the input stream */
+  //-------------------------------------------------------------
+  // Reads the string from the input stream
   public static string read_stream( InputStream stream ) {
     var str = "";
     var dis = new DataInputStream( stream );
@@ -212,7 +228,8 @@ public class Utils {
     return( str );
   }
 
-  /* Draws a rounded rectangle on the given context */
+  //-------------------------------------------------------------
+  // Draws a rounded rectangle on the given context
   public static void draw_rounded_rectangle( Cairo.Context ctx, double x, double y, double w, double h, double radius ) {
 
     var deg = Math.PI / 180.0;

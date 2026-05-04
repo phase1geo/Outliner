@@ -27,14 +27,17 @@ public class Outliner : Gtk.Application {
   private static bool          show_version = false;
   private static bool          new_file     = false;
   private static bool          testing      = false;
-  public  static string        version      = "1.7.0";
   public  static GLib.Settings settings;
   private        bool          loaded       = false;
   private        MainWindow    appwin;
 
   public Outliner () {
 
-    Object( application_id: "com.github.phase1geo.outliner", flags: ApplicationFlags.HANDLES_OPEN );
+    Object(
+      application_id: "com.github.phase1geo.outliner",
+      flags: ApplicationFlags.HANDLES_OPEN,
+      version: "2.0.0"
+    );
 
     Intl.setlocale( LocaleCategory.ALL, "" );
     Intl.bindtextdomain( GETTEXT_PACKAGE, LOCALEDIR );

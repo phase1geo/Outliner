@@ -24,16 +24,15 @@ using Gdk;
 using Cairo;
 using Gee;
 
-/*
- Returns true if the given node meets a condition that should cause it to be
- displayed; otherwise, the node will be hidden.
-*/
+//-------------------------------------------------------------
+// Returns true if the given node meets a condition that should
+// cause it to be displayed; otherwise, the node will be hidden.
 public delegate bool NodeFilterFunc( Node node );
 
 public enum FontTarget {
-  NAME,  /* Specifies that the font changes target all node names */
-  NOTE,  /* Specifies that the font changes target all node notes */
-  TITLE  /* Specifies that the font changes the document title */
+  NAME,  // Specifies that the font changes target all node names
+  NOTE,  // Specifies that the font changes target all node notes
+  TITLE  // Specifies that the font changes the document title
 }
 
 public class OutlineTable : DrawingArea {
@@ -321,13 +320,13 @@ public class OutlineTable : DrawingArea {
   public int top_margin      { get; private set; default = 45; }
   public bool tasks_on_right { get; private set; default = true; }
 
-  /* Allocate static parsers */
+  // Allocate static parsers
   public MarkdownParser markdown_parser { get; private set; }
   public TaggerParser   tagger_parser   { get; private set; }
   public UnicodeParser  unicode_parser  { get; private set; }
   public UrlParser      url_parser      { get; private set; }
 
-  /* Called by this class when a change is made to the table */
+  // Called by this class when a change is made to the table
   public signal void changed();
   public signal void zoom_changed();
   public signal void theme_changed();
@@ -341,42 +340,43 @@ public class OutlineTable : DrawingArea {
   public signal void nodes_filtered( string? msg );
   public signal void width_changed();
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public OutlineTable( MainWindow win, GLib.Settings settings ) {
 
     _win = win;
 
-    /* Create the document for this table */
+    // Create the document for this table
     _doc = new Document( this, settings );
 
-    /* Create the root node */
+    // Create the root node
     root = new Node.root( this );
 
-    /* Create contextual menu(s) */
+    // Create contextual menu(s)
     _node_menu = new NodeMenu( win.application, this );
 
-    /* Create the node draw options */
+    // Create the node draw options
     _draw_options = new NodeDrawOptions();
 
-    /* Create the labels */
+    // Create the labels
     _labels = new NodeLabels();
 
-    /* Create the tags */
+    // Create the tags
     _tagger = new Tagger( this );
 
-    /* Create the parsers */
+    // Create the parsers
     tagger_parser   = new TaggerParser( this );
     markdown_parser = new MarkdownParser( this );
     unicode_parser  = new UnicodeParser( this );
     url_parser      = new UrlParser();
 
-    /* Create text completion */
+    // Create text completion
     _completion = new TextCompletion( this );
 
-    /* Set the style context */
+    // Set the style context
     get_style_context().add_class( "canvas" );
 
-    /* Initialize font and other property information from gsettings */
+    // Initialize font and other property information from gsettings
     _title_family    = settings.get_string( "default-title-font-family" );
     _name_family     = settings.get_string( "default-row-font-family" );
     _note_family     = settings.get_string( "default-note-font-family" );
@@ -393,7 +393,7 @@ public class OutlineTable : DrawingArea {
     _min_depth       = settings.get_boolean( "minimum-depth-line-display" );
     _parse_urls      = settings.get_boolean( "auto-parse-embedded-urls" );
 
-    /* Handle any changes made to the settings that we don't want to poll on */
+    // Handle any changes made to the settings that we don't want to poll on
     settings.changed.connect(() => {
       tasks_on_right = settings.get_boolean( "checkboxes-on-right" );
       _min_depth     = settings.get_boolean( "minimum-depth-line-display" );
@@ -406,20 +406,20 @@ public class OutlineTable : DrawingArea {
       queue_draw();
     });
 
-    /* Set the default theme */
+    // Set the default theme
     var init_theme = MainWindow.themes.get_theme( settings.get_string( "default-theme" ) );
     _hilite_color = Utils.color_from_rgba( init_theme.hilite );
     set_theme( init_theme );
 
-    /* Allocate memory for the canvas text prior to editing for undo purposes */
+    // Allocate memory for the canvas text prior to editing for undo purposes
     _orig_text = new CanvasText( this, 0 );
     _orig_title = new CanvasText( this, 0 );
 
-    /* Allocate memory for the undo buffer */
+    // Allocate memory for the undo buffer
     undo_buffer = new UndoBuffer( this );
     undo_text   = new UndoTextBuffer( this );
 
-    /* Add event listeners */
+    // Add event listeners
     _key_controller = new EventControllerKey();
     var pri_click_controller = new GestureClick() {
       button = Gdk.BUTTON_PRIMARY
@@ -444,11 +444,11 @@ public class OutlineTable : DrawingArea {
 
     this.set_draw_func( on_draw );
 
-    /* Make sure the drawing area can receive keyboard focus */
+    // Make sure the drawing area can receive keyboard focus
     this.can_focus = true;
     this.focusable = true;
 
-    /* Make sure that we us the IMMulticontext input method when editing text only */
+    // Make sure that we us the IMMulticontext input method when editing text only
     _im_context = new IMMulticontext();
     _im_context.set_client_widget( this );
     _im_context.set_use_preedit( false );
@@ -458,7 +458,8 @@ public class OutlineTable : DrawingArea {
 
   }
 
-  /* Attempts to get the size of the outline table */
+  //-------------------------------------------------------------
+  // Attempts to get the size of the outline table
   public override void size_allocate( int width, int height, int baseline ) {
     _width = width;
     window_size_changed();
@@ -466,17 +467,21 @@ public class OutlineTable : DrawingArea {
     width_changed();
   }
 
-  /* Called whenever the selection mode changed of the current node */
+  //-------------------------------------------------------------
+  // Called whenever the selection mode changed of the current node
   private void select_mode_changed( bool name, bool mode ) {
     _show_format = mode;
   }
 
-  /* Called whenever the cursor changes position in the current node */
+  //-------------------------------------------------------------
+  // Called whenever the cursor changes position in the current node
   private void selected_cursor_changed( bool name ) {
     cursor_changed();
   }
 
-  /* Called whenever we want to change the current selected node's mode */
+  //-------------------------------------------------------------
+  // Called whenever we want to change the current selected node's
+  // mode
   public void set_node_mode( Node? node, NodeMode mode ) {
     if( node == null ) return;
     if( node.mode != mode ) {
@@ -519,7 +524,9 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  /* Called whenever we want to change the editable nature of the document title */
+  //-------------------------------------------------------------
+  // Called whenever we want to change the editable nature of the
+  // document title
   public void set_title_editable( bool edit ) {
     if( _title == null )  return;
     if( _title.edit != edit ) {
@@ -545,7 +552,9 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  /* Returns the y position of the first row in the table (excluding the title) */
+  //-------------------------------------------------------------
+  // Returns the y position of the first row in the table (excluding
+  // the title)
   public double get_top_row_y() {
     return( (_title != null) ? (_title.posy + _title.height + 10) : top_margin );
   }
@@ -558,7 +567,9 @@ public class OutlineTable : DrawingArea {
     bottom = top + vh;
   }
 
-  /* Updates the IM context cursor location based on the canvas text position */
+  //-------------------------------------------------------------
+  // Updates the IM context cursor location based on the canvas
+  // text position
   private void update_im_cursor( CanvasText ct ) {
     int top, bottom;
     get_window_ys( out top, out bottom );
@@ -566,7 +577,8 @@ public class OutlineTable : DrawingArea {
     _im_context.set_cursor_location( rect );
   }
 
-  /* Make sure that the given node is fully in view */
+  //-------------------------------------------------------------
+  // Make sure that the given node is fully in view
   public void see( Node node ) {
     if( root.children.length == 0 ) return;
     int y1, y2;
@@ -597,10 +609,9 @@ public class OutlineTable : DrawingArea {
     }
   }
 
-  /*
-   Resizes this table such that the last row can be positioned at the top
-   of the window.
-  */
+  //-------------------------------------------------------------
+  // Resizes this table such that the last row can be positioned
+  // at the top of the window.
   public bool resize_table() {
 
     var last_node = root.get_last_node();
@@ -1275,7 +1286,8 @@ public class OutlineTable : DrawingArea {
     changed();
   }
 
-  /* Creates a serialized version of the node for copy */
+  //-------------------------------------------------------------
+  // Creates a serialized version of the node for copy
   public string serialize_node_for_copy( Node node ) {
     string    str;
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
@@ -3140,10 +3152,11 @@ public class OutlineTable : DrawingArea {
 
   }
 
-  /* Saves the table information to the given XML node */
+  //-------------------------------------------------------------
+  // Saves the table information to the given XML node
   public void save( Xml.Node* n ) {
 
-    n->set_prop( "version",     Outliner.version );
+    n->set_prop( "version",     _win.application.version );
     n->set_prop( "condensed",   _condensed.to_string() );
     n->set_prop( "listtype",    list_type.to_string() );
     n->set_prop( "show-tasks",  _show_tasks.to_string() );

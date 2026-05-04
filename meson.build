@@ -1,5 +1,5 @@
  project('com.github.phase1geo.outliner', ['vala', 'c'],
-    version : '1.7.0',
+    version : '2.0.0',
     license: 'GPL-3.0'
 )
 
@@ -41,8 +41,8 @@ math_dep    = cc.find_library('m', required: false)
 libmarkdown = cc.find_library('markdown', required: true)
 
 add_project_arguments([
-        '--vapidir', join_paths(meson.current_source_dir(), 'vapi'),
-        '--disable-warnings'
+        '--vapidir', join_paths(meson.current_source_dir(), 'vapi')
+        #        '--disable-warnings'
     ],
     language: 'vala',
 )
