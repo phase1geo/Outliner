@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -25,12 +25,14 @@ public class ExportMinder : Export {
 
   private static int id = 0;
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public ExportMinder() {
     base( "minder", _( "Minder" ), {".minder"}, true, true, false );
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     id = 0;
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
@@ -53,10 +55,10 @@ public class ExportMinder : Export {
   private Xml.Node* export_nodes( OutlineTable table ) {
     Xml.Node* nodes = new Xml.Node( null, "nodes" );
     Xml.Node* root  = export_root_node( table );
-    if( table.root.children.length > 0 ) {
+    if( table.root_node.children.length > 0 ) {
       Xml.Node* root_nodes = new Xml.Node( null, "nodes" );
-      for( int i=0; i<table.root.children.length; i++ ) {
-        var node = table.root.children.index( i );
+      for( int i=0; i<table.root_node.children.length; i++ ) {
+        var node = table.root_node.children.index( i );
         if( !node.draw_as_blank() ) {
           root_nodes->add_child( export_node( node ) );
         }
@@ -157,53 +159,56 @@ public class ExportMinder : Export {
     return( note );
   }
 
-  /**********************************************************************/
+  //-------------------------------------------------------------
+  // IMPORT
+  //-------------------------------------------------------------
 
-  /*
-   Reads the contents of an OPML file and creates a new document based on
-   the stored information.
-  */
+  //-------------------------------------------------------------
+  // Reads the contents of an OPML file and creates a new document
+  // based on the stored information.
   public override bool import( string fname, OutlineTable table ) {
 
-    /* Read in the contents of the Minder file */
+    // Read in the contents of the Minder file
     var doc = Xml.Parser.read_file( fname, null, Xml.ParserOption.HUGE );
     if( doc == null ) {
       return( false );
     }
 
-    /* Load the contents of the file */
+    // Load the contents of the file
     for( Xml.Node* it = doc->get_root_element()->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "nodes") ) {
         import_nodes( it, table );
       }
     }
 
-    /* Delete the XML document */
+    // Delete the XML document
     delete doc;
 
     return( true );
 
   }
 
-  /* Parses the given top-level nodes */
+  //-------------------------------------------------------------
+  // Parses the given top-level nodes
   private void import_nodes( Xml.Node* nodes, OutlineTable table ) {
     for( Xml.Node* it=nodes->children; it!=null; it=it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
-        table.root.add_child( import_node( it, table ) );
+        table.root_node.add_child( import_node( it, table ) );
       }
     }
   }
 
-  /* Parses the given text node and stores it to the CanvasText item */
+  //-------------------------------------------------------------
+  // Parses the given text node and stores it to the CanvasText item
   private void import_node_text( Xml.Node* n, CanvasText ct, Array<UndoTagInfo>? tags ) {
 
-    /* Let's convert the text from Markdown */
+    // Let's convert the text from Markdown
     var html = Utils.markdown_to_html( n->get_content(), "div" );
 
-    /* Convert HTML to FormattedText */
+    // Convert HTML to FormattedText
     if( ExportHTML.to_text( html, ct.text ) ) {
 
-      /* Add the tags if there are any */
+      // Add the tags if there are any
       if( tags != null ) {
         ct.text.apply_tags( tags );
       }
@@ -212,7 +217,8 @@ public class ExportMinder : Export {
 
   }
 
-  /* Parses the given urllink tag and saves the information as a URL */
+  //-------------------------------------------------------------
+  // Parses the given urllink tag and saves the information as a URL
   private void import_text_link( Xml.Node* ul, CanvasText ct, Array<UndoTagInfo> formatting ) {
 
     var url   = "";
@@ -240,7 +246,8 @@ public class ExportMinder : Export {
 
   }
 
-  /* Parses the node formatting tag */
+  //-------------------------------------------------------------
+  // Parses the node formatting tag
   private void import_node_formatting( Xml.Node* f, CanvasText ct, Array<UndoTagInfo> formatting ) {
 
     for( Xml.Node* it=f->children; it!= null; it=it->next ) {
@@ -253,7 +260,8 @@ public class ExportMinder : Export {
 
   }
 
-  /* Imports all Minder information useful for the node */
+  //-------------------------------------------------------------
+  // Imports all Minder information useful for the node
   private Node import_node( Xml.Node* n, OutlineTable table ) {
 
     var node       = new Node( table );
@@ -269,7 +277,7 @@ public class ExportMinder : Export {
       node.task = bool.parse( t ) ? NodeTaskMode.DONE : NodeTaskMode.OPEN;
     }
 
-    /* Parse any children nodes */
+    // Parse any children nodes
     for( Xml.Node* it=n->children; it!=null; it=it->next ) {
       if( it->type == Xml.ElementType.ELEMENT_NODE ) {
         switch( it->name ) {

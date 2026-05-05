@@ -169,7 +169,8 @@ public class Preferences : Gtk.Dialog {
     return( w );
   }
 
-  /* Creates switch */
+  //-------------------------------------------------------------
+  // Creates switch
   private Switch make_switch( string setting ) {
     var w = new Switch() {
       halign = Align.START,
@@ -179,14 +180,16 @@ public class Preferences : Gtk.Dialog {
     return( w );
   }
 
-  /* Creates spinner */
+  //-------------------------------------------------------------
+  // Creates spinner
   private SpinButton make_spinner( string setting, int min_value, int max_value, int step ) {
     var w = new SpinButton.with_range( min_value, max_value, step );
     _settings.bind( setting, w, "value", SettingsBindFlags.DEFAULT );
     return( w );
   }
 
-  /* Creates an information image */
+  //-------------------------------------------------------------
+  // Creates an information image
   private Image make_info( string detail ) {
     var w = new Image.from_icon_name( "dialog-information-symbolic" ) {
       halign       = Align.START,
@@ -195,23 +198,30 @@ public class Preferences : Gtk.Dialog {
     return( w );
   }
 
-  /* Creates a font button */
-  private FontButton make_font( FontTarget target, string family_setting, string size_setting ) {
-    var btn = new FontButton();
-    btn.set_filter_func( (family, face) => {
-      var fd     = face.describe();
-      var weight = fd.get_weight();
-      var style  = fd.get_style();
-      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+  //-------------------------------------------------------------
+  // Creates a font button
+  private FontDialogButton make_font( FontTarget target, string family_setting, string size_setting ) {
+
+    var dialog = new FontDialog();
+    var btn = new FontDialogButton( dialog );
+
+    var fd  = btn.get_font_desc();
+    fd.set_family( _settings.get_string( family_setting ) );
+    fd.set_size( _settings.get_int( size_setting ) * Pango.SCALE );
+    btn.set_font_desc( fd );
+
+    btn.notify["font-desc"].connect(() => {
+      var table  = _win.get_current_table();
+      var family = btn.font_desc.get_family();
+      var size   = btn.font_desc.get_size() / Pango.SCALE;
+      table.change_font( target, family, size );
+      _settings.set_string( family_setting, family );
+      _settings.set_int( size_setting, size );
+
     });
-    btn.set_font( _settings.get_string( family_setting ) + " " + _settings.get_int( size_setting ).to_string() );
-    btn.font_set.connect(() => {
-      var table = _win.get_current_table();
-      table.change_font( target, btn.get_font_family().get_name(), (btn.get_font_size() / Pango.SCALE) );
-      _settings.set_string( family_setting, btn.get_font_family().get_name() );
-      _settings.set_int( size_setting, (btn.get_font_size() / Pango.SCALE) );
-    });
+
     return( btn );
+
   }
 
   /* Creates the theme menu button */

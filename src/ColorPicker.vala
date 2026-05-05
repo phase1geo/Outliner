@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -38,15 +38,15 @@ public enum ColorPickerType {
     switch( this ) {
       case HCOLOR :
         btn.icon_name = "format-text-highlight";
+        btn.child     = null;
         break;
-      case FCOLOR :  {
-        var lbl = new Label( "<span size=\"large\">A</span>" ) {
-          use_markup = true
-        };
-        btn.child = lbl;
+      case FCOLOR : {
+        var lbl = new Label( "<span size=\"large\">A</span>" );
+        lbl.use_markup = true;
+        btn.child      = lbl;
         break;
       }
-      default     :  assert_not_reached();
+      default :  assert_not_reached();
     }
   }
 
@@ -54,70 +54,66 @@ public enum ColorPickerType {
 
 public class ColorPicker : Box {
 
-  private ColorPickerType    _type;
-  private ToggleButton       _toggle;
-  private ColorChooserWidget _chooser;
-  private MenuButton         _select;
-  private bool               _ignore_active;
-
-  public string toggle_tooltip {
-    get {
-      return( _toggle.get_tooltip_text() );
-    }
-    set {
-      _toggle.set_tooltip_text( value );
-    }
-  }
-
-  public string select_tooltip {
-    get {
-      return( _select.get_tooltip_text() );
-    }
-    set {
-      _select.set_tooltip_text( value );
-    }
-  }
+  private ColorPickerType _type;
+  private ToggleButton    _toggle;
+  private Button          _select;
+  private bool            _ignore_active;
+  private RGBA            _color;
 
   public signal void color_changed( RGBA? color );
 
-  public ColorPicker( RGBA init_color, ColorPickerType type ) {
+  public ColorPicker( MainWindow win, RGBA init_color, ColorPickerType type ) {
 
-    _type = type;
+    _type  = type;
+    _color = init_color.copy();
+
+    homogeneous = true;
 
     _toggle = new ToggleButton() {
       has_frame = false
     };
+    _toggle.add_css_class( type.get_css_class() );
     _toggle.toggled.connect( handle_toggle );
-    _toggle.get_style_context().add_class( type.get_css_class() );
-
     type.set_image( _toggle );
 
-    _chooser = new ColorChooserWidget() {
-      rgba = init_color
+    var chooser = new ColorDialog() {
+      modal = true,
+      with_alpha = true
     };
 
-    var click_controller = new GestureClick();
-    var overlay = new Overlay() {
-      child = _chooser
-    };
-    overlay.add_controller( click_controller );
-
-    click_controller.pressed.connect( handle_chooser );
-
-    _select = new MenuButton() {
+    _select = new Button.from_icon_name( "view-more-symbolic" ) {
       has_frame = false
     };
-    _select.get_style_context().add_class( "color_chooser" );
-
-    _select.popover = new Popover() {
-      child = overlay
-    };
+    _select.clicked.connect(() => {
+      chooser.choose_rgba.begin( win, _color, null, (obj, res) => {
+        try {
+          var rgba = chooser.choose_rgba.end( res );
+          if( rgba != null ) {
+            _color.free();
+            _color = rgba.copy();
+            update_css( rgba );
+            set_active( true );
+            color_changed( rgba );
+          }
+        } catch( Error e ) {}
+      });
+    });
 
     append( _toggle );
     append( _select );
 
-    update_css( init_color );
+    update_css( _color );
 
+    add_css_class( Granite.STYLE_CLASS_LINKED );
+
+  }
+
+  public void set_toggle_tooltip( string tooltip ) {
+    _toggle.set_tooltip_text( tooltip );
+  }
+
+  public void set_select_tooltip( string tooltip ) {
+    _select.set_tooltip_text( tooltip );
   }
 
   public void set_active( bool active ) {
@@ -128,35 +124,23 @@ public class ColorPicker : Box {
 
   private void update_css( RGBA rgba ) {
     var provider = new CssProvider();
-    try {
-      var color    = Utils.color_from_rgba( rgba );
-      var css_data = ".%s { background: %s; }".printf( _type.get_css_class(), color );
-      provider.load_from_data( css_data.data );
-      StyleContext.add_provider_for_display(
-        Display.get_default(),
-        provider,
-        STYLE_PROVIDER_PRIORITY_APPLICATION
-      );
-    } catch( GLib.Error e ) {
-      stdout.printf( "Unable to update css: %s\n", e.message );
-    }
+    var css_data = ".%s { background: %s; }".printf( _type.get_css_class(), rgba.to_string() );
+    provider.load_from_string( css_data );
+    StyleContext.add_provider_for_display(
+      Display.get_default(),
+      provider,
+      STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
   }
 
   private void handle_toggle() {
     if( !_ignore_active ) {
       if( _toggle.active ) {
-        color_changed( _chooser.rgba );
+        color_changed( _color );
       } else {
         color_changed( null );
       }
     }
-  }
-
-  private void handle_chooser( int n_press, double x, double y ) {
-    update_css( _chooser.rgba );
-    set_active( true );
-    color_changed( _chooser.rgba );
-    _select.popover.popup();
   }
 
 }

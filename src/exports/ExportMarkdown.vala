@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,12 +23,14 @@ using GLib;
 
 public class ExportMarkdown : Export {
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public ExportMarkdown() {
     base( "markdown", _( "Markdown" ), {".md", ".markdown"}, true, false, false );
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     var  file   = File.new_for_path( fname );
     bool retval = true;
@@ -41,9 +43,10 @@ public class ExportMarkdown : Export {
     return( retval );
   }
 
-  /* Draws each of the top-level nodes */
+  //-------------------------------------------------------------
+  // Draws each of the top-level nodes
   private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
-    var nodes = table.root.children;
+    var nodes = table.root_node.children;
     for( int i=0; i<nodes.length; i++ ) {
       export_node( os, nodes.index( i ), table, "" );
     }
@@ -92,7 +95,8 @@ public class ExportMarkdown : Export {
     return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
-  /* Draws the given node and its children to the output stream */
+  //-------------------------------------------------------------
+  // Draws the given node and its children to the output stream
   private void export_node( FileOutputStream os, Node node, OutlineTable table, string prefix = "  " ) {
 
     try {
@@ -103,6 +107,7 @@ public class ExportMarkdown : Export {
         case NodeTaskMode.DONE  :  title += "[x] ";  break;
         case NodeTaskMode.OPEN  :
         case NodeTaskMode.DOING :  title += "[ ] ";  break;
+        default                 :  break;
       }
 
       if( table.markdown ) {

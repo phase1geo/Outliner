@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -58,8 +58,9 @@ public enum FormatTag {
       case TAG        :  return( "tag" );
       case SYNTAX     :  return( "syntax" );
       case MATCH      :  return( "match" );
+      case SELECT     :  return( "select" );
+      default         :  assert_not_reached();
     }
-    return( "bold" );
   }
 
   public static FormatTag from_string( string str ) {
@@ -78,13 +79,14 @@ public enum FormatTag {
       case "tag"         :  return( TAG );
       case "syntax"      :  return( SYNTAX );
       case "match"       :  return( MATCH );
+      default            :  return( LENGTH );
     }
-    return( LENGTH );
   }
 
 }
 
-/* Stores information for undo/redo operation on tags */
+//-------------------------------------------------------------
+// Stores information for undo/redo operation on tags
 public class UndoTagInfo {
   public int     start { private set; get; }
   public int     end   { private set; get; }
@@ -172,12 +174,14 @@ public class FormattedText {
       }
     }
 
-    /* Default constructor */
+    //-------------------------------------------------------------
+    // Default constructor
     public TagInfo() {
       _info = new Array<FormattedRange>();
     }
 
-    /* Copies the given TagInfo structure to this one */
+    //-------------------------------------------------------------
+    // Copies the given TagInfo structure to this one
     public void copy( TagInfo other ) {
       _info.remove_range( 0, _info.length );
       for( int i=0; i<other._info.length; i++ ) {
@@ -186,7 +190,8 @@ public class FormattedText {
       }
     }
 
-    /* Returns true if this info array is empty */
+    //-------------------------------------------------------------
+    // Returns true if this info array is empty
     public bool is_empty() {
       return( _info.length == 0 );
     }
@@ -206,7 +211,8 @@ public class FormattedText {
       }
     }
 
-    /* Adds the given range from this format type */
+    //-------------------------------------------------------------
+    // Adds the given range from this format type
     public void add_tag( int start, int end, string? extra, int pid=0 ) {
       for( int i=0; i<_info.length; i++ ) {
         if( _info.index( i ).combine( start, end, extra, pid ) ) {
@@ -217,7 +223,8 @@ public class FormattedText {
       _info.sort( (CompareFunc)FormattedRange.compare );
     }
 
-    /* Adds the given TagInfo contents to the existing list */
+    //-------------------------------------------------------------
+    // Adds the given TagInfo contents to the existing list
     public void add_tags_at_offset( TagInfo other, int offset ) {
       for( int i=0; i<other._info.length; i++ ) {
         var other_info = other._info.index( i );
@@ -225,14 +232,16 @@ public class FormattedText {
       }
     }
 
-    /* Replaces the given range(s) with the given range */
+    //-------------------------------------------------------------
+    // Replaces the given range(s) with the given range
     public void replace_tag( int start, int end, string? extra, int pid=0 ) {
       _info.remove_range( 0, _info.length );
       _info.append_val( new FormattedRange( start, end, extra, pid ) );
       _info.sort( (CompareFunc)FormattedRange.compare );
     }
 
-    /* Removes the given range from this format type */
+    //-------------------------------------------------------------
+    // Removes the given range from this format type
     public void remove_tag( int start, int end, int pid ) {
       for( int i=((int)_info.length - 1); i>=0; i-- ) {
         var info = _info.index( i );
@@ -254,7 +263,8 @@ public class FormattedText {
       _info.sort( (CompareFunc)FormattedRange.compare );
     }
 
-    /* Removes all of the tags associated with the given parser ID */
+    //-------------------------------------------------------------
+    // Removes all of the tags associated with the given parser ID
     public void remove_all_parser_tags( int pid ) {
       for( int i=((int)_info.length - 1); i>=0; i-- ) {
         if( _info.index( i ).pid == pid ) {
@@ -264,16 +274,16 @@ public class FormattedText {
       _info.sort( (CompareFunc)FormattedRange.compare );
     }
 
-    /* Removes all ranges for this tag */
+    //-------------------------------------------------------------
+    // Removes all ranges for this tag
     public void remove_tag_all() {
       _info.remove_range( 0, _info.length );
     }
 
-    /*
-     Returns true if the text contains a tag that matches the given extra information.
-     If extra is set to the empty string, returns true if there are any tags of this
-     type.
-    */
+    //-------------------------------------------------------------
+    // Returns true if the text contains a tag that matches the
+    // given extra information.  If extra is set to the empty string,
+    // returns true if there are any tags of this type.
     public bool contains_tag( string extra ) {
       if( extra == "" ) {
         return( _info.length > 0 );
@@ -287,7 +297,8 @@ public class FormattedText {
       }
     }
 
-    /* Returns all of the extra values for this tag */
+    //-------------------------------------------------------------
+    // Returns all of the extra values for this tag
     public void get_extras_for_tag( ref HashMap<string,bool> extras ) {
       for( int i=0; i<_info.length; i++ ) {
         var extra = _info.index( i ).extra;
@@ -297,7 +308,8 @@ public class FormattedText {
       }
     }
 
-    /* Returns the full tag ranges which overlap with the given range */
+    //-------------------------------------------------------------
+    // Returns the full tag ranges which overlap with the given range
     public void get_full_tags_in_range( int tag, int start, int end, ref Array<UndoTagInfo> tags ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
@@ -307,7 +319,8 @@ public class FormattedText {
       }
     }
 
-    /* Returns all tags found within the given range */
+    //-------------------------------------------------------------
+    // Returns all tags found within the given range
     public void get_tags_in_range( int tag, int start, int end, ref Array<UndoTagInfo> tags ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
@@ -319,7 +332,8 @@ public class FormattedText {
       }
     }
 
-    /* Returns true if the given index contains this tag */
+    //-------------------------------------------------------------
+    // Returns true if the given index contains this tag
     public bool is_applied_at_index( int index ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
@@ -330,10 +344,9 @@ public class FormattedText {
       return( false );
     }
 
-    /*
-     Returns true if the given range overlaps with any tag; otherwise,
-     returns false.
-    */
+    //-------------------------------------------------------------
+    // Returns true if the given range overlaps with any tag; otherwise,
+    // returns false.
     public bool is_applied_in_range( int start, int end ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
@@ -344,7 +357,8 @@ public class FormattedText {
       return( false );
     }
 
-    /* Inserts all of the attributes for this tag */
+    //-------------------------------------------------------------
+    // Inserts all of the attributes for this tag
     public void get_attributes( TagAttr tag_attr, ref AttrList attrs ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
@@ -352,7 +366,8 @@ public class FormattedText {
       }
     }
 
-    /* Returns the extra data associated with the given cursor position */
+    //-------------------------------------------------------------
+    // Returns the extra data associated with the given cursor position
     public string? get_extra( int index ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
@@ -363,7 +378,8 @@ public class FormattedText {
       return( null );
     }
 
-    /* Returns the first extra value found within the given range */
+    //-------------------------------------------------------------
+    // Returns the first extra value found within the given range
     public string? get_first_extra_in_range( int start, int end ) {
       for( int i=0; i<_info.length; i++ ) {
         var info = _info.index( i );
@@ -374,7 +390,8 @@ public class FormattedText {
       return( null );
     }
 
-    /* Returns the list of ranges this tag is associated with */
+    //-------------------------------------------------------------
+    // Returns the list of ranges this tag is associated with
     public Xml.Node* save( string tag ) {
       Xml.Node* n = new Xml.Node( null, tag );
       for( int i=0; i<_info.length; i++ ) {
@@ -386,7 +403,8 @@ public class FormattedText {
       return( n );
     }
 
-    /* Loads the data from XML */
+    //-------------------------------------------------------------
+    // Loads the data from XML
     public void load( Xml.Node* n ) {
       for( Xml.Node* it = n->children; it != null; it = it->next ) {
         if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "range") ) {
@@ -685,18 +703,22 @@ public class FormattedText {
   }
 	public int header_depth { set; get; default = 0; }
 
-  /* Default copy constructor */
+  //-------------------------------------------------------------
+  // Default copy constructor
   public FormattedText( OutlineTable table ) {
     initialize( table );
   }
 
-  /* Copy contructor with a string */
+  //-------------------------------------------------------------
+  // Copy contructor with a string
   public FormattedText.with_text( OutlineTable table, string txt ) {
     initialize( table );
     _text = txt;
   }
 
-  /* Copies the selected portion of the given FormattedText instance to this instance */
+  //-------------------------------------------------------------
+  // Copies the selected portion of the given FormattedText
+  // instance to this instance
   public FormattedText.copy_range( OutlineTable table, FormattedText text, int start, int end ) {
     initialize( table );
     _text = text.text.slice( start, end );
@@ -707,7 +729,9 @@ public class FormattedText {
     }
   }
 
-  /* Creates a copy of the given text and removes all of the syntax characters */
+  //-------------------------------------------------------------
+  // Creates a copy of the given text and removes all of the
+  // syntax characters
   public FormattedText.copy_clean( OutlineTable table, FormattedText other ) {
     initialize( table );
     _text = other._text;
@@ -721,7 +745,8 @@ public class FormattedText {
     }
   }
 
-  /* Initializes this instance */
+  //-------------------------------------------------------------
+  // Initializes this instance
   private void initialize( OutlineTable table ) {
     if( _attr_tags == null ) {
       var theme = table.get_theme();
@@ -747,7 +772,8 @@ public class FormattedText {
     }
   }
 
-  /* Called whenever the theme changes */
+  //-------------------------------------------------------------
+  // Called whenever the theme changes
   public static void set_theme( Theme theme ) {
     if( _attr_tags == null ) return;
     var url = _attr_tags[FormatTag.URL] as UrlInfo;
@@ -772,14 +798,16 @@ public class FormattedText {
     }
   }
 
-  /* Adds the given parser */
+  //-------------------------------------------------------------
+  // Adds the given parser
   public void add_parser( TextParser parser ) {
     _parsers.append_val( parser );
     parse( 0 );
     changed();
   }
 
-  /* Removes the specified parser */
+  //-------------------------------------------------------------
+  // Removes the specified parser
   public void remove_parser( TextParser parser ) {
     for( int i=0; i<_parsers.length; i++ ) {
       if( _parsers.index( i ) == parser ) {
@@ -792,7 +820,8 @@ public class FormattedText {
     }
   }
 
-  /* Copies the specified FormattedText instance to this one */
+  //-------------------------------------------------------------
+  // Copies the specified FormattedText instance to this one
   public void copy( FormattedText other ) {
     _text = other._text;
     for( int i=0; i<FormatTag.LENGTH; i++ ) {
@@ -801,12 +830,14 @@ public class FormattedText {
     changed();
   }
 
-  /* Initializes the text to the given value */
+  //-------------------------------------------------------------
+  // Initializes the text to the given value
   public void set_text( string str ) {
     _text = str;
   }
 
-  /* Inserts a string into the given text */
+  //-------------------------------------------------------------
+  // Inserts a string into the given text
   public void insert_text( int index, string str ) {
     _text = _text.splice( index, index, str );
     foreach( TagInfo f in _formats) {
@@ -816,7 +847,8 @@ public class FormattedText {
     changed();
   }
 
-  /* Inserts the formatted text at the given position */
+  //-------------------------------------------------------------
+  // Inserts the formatted text at the given position
   public void insert_formatted_text( int index, FormattedText text ) {
     insert_text( index, text.text );
     for( int i=0; i<FormatTag.LENGTH-2; i++ ) {
@@ -824,7 +856,8 @@ public class FormattedText {
     }
   }
 
-  /* Replaces the given text range with the given string */
+  //-------------------------------------------------------------
+  // Replaces the given text range with the given string
   public void replace_text( int index, int chars, string str, int pid=0 ) {
     _text = _text.splice( index, (index + chars), str );
     foreach( TagInfo f in _formats ) {
@@ -835,7 +868,9 @@ public class FormattedText {
     changed();
   }
 
-  /* Removes characters from the current text, starting at the given index */
+  //-------------------------------------------------------------
+  // Removes characters from the current text, starting at the
+  // given index
   public void remove_text( int index, int chars, int pid=0 ) {
     _text = _text.splice( index, (index + chars) );
     foreach( TagInfo f in _formats ) {
@@ -846,38 +881,44 @@ public class FormattedText {
     changed();
   }
 
-  /* Adds the given tag */
+  //-------------------------------------------------------------
+  // Adds the given tag
   public void add_tag( FormatTag tag, int start, int end, string? extra=null, int pid=0 ) {
     _formats[tag].add_tag( start, end, extra, pid );
     changed();
   }
 
-  /* Replaces the given tag with the given range */
+  //-------------------------------------------------------------
+  // Replaces the given tag with the given range
   public void replace_tag( FormatTag tag, int start, int end, string? extra=null, int pid=0 ) {
     _formats[tag].replace_tag( start, end, extra, pid );
     changed();
   }
 
-  /* Removes the given tag */
+  //-------------------------------------------------------------
+  // Removes the given tag
   public void remove_tag( FormatTag tag, int start, int end, int pid=0 ) {
     _formats[tag].remove_tag( start, end, pid );
     changed();
   }
 
-  /* Removes all ranges for the given tag */
+  //-------------------------------------------------------------
+  // Removes all ranges for the given tag
   public void remove_tag_all( FormatTag tag ) {
     _formats[tag].remove_tag_all();
     changed();
   }
 
-  /* Removes all ranges for the given parser ID */
+  //-------------------------------------------------------------
+  // Removes all ranges for the given parser ID
   public void remove_all_parser_tags( int pid ) {
     for( int i=0; i<FormatTag.LENGTH-3; i++ ) {
       _formats[i].remove_all_parser_tags( pid );
     }
   }
 
-  /* Removes all formatting from the text */
+  //-------------------------------------------------------------
+  // Removes all formatting from the text
   public void remove_all_tags( int start, int end, int pid=0 ) {
     for( int i=0; i<FormatTag.LENGTH-3; i++ ) {
       _formats[i].remove_tag( start, end, pid );
@@ -885,17 +926,20 @@ public class FormattedText {
     changed();
   }
 
-  /* Returns true if the given tag is applied at the given index */
+  //-------------------------------------------------------------
+  // Returns true if the given tag is applied at the given index
   public bool is_tag_applied_at_index( FormatTag tag, int index ) {
     return( _formats[tag].is_applied_at_index( index ) );
   }
 
-  /* Returns true if the given tag is applied within the given range */
+  //-------------------------------------------------------------
+  // Returns true if the given tag is applied within the given range
   public bool is_tag_applied_in_range( FormatTag tag, int start, int end ) {
     return( _formats[tag].is_applied_in_range( start, end ) );
   }
 
-  /* Returns true if at least one tag is applied to the text */
+  //-------------------------------------------------------------
+  // Returns true if at least one tag is applied to the text
   public bool tags_exist() {
     foreach( TagInfo f in _formats ) {
       if( !f.is_empty() ) {
@@ -905,22 +949,24 @@ public class FormattedText {
     return( false );
   }
 
-  /*
-   Returns true if the given tag and extra information is found within this
-   text.
-  */
+  //-------------------------------------------------------------
+  // Returns true if the given tag and extra information is found
+  // within this text.
   public bool contains_tag( FormatTag tag, string extra = "" ) {
     return( _formats[tag].contains_tag( extra ) );
   }
 
-  /* Retrieves the extra values for all items marked with tag */
+  //-------------------------------------------------------------
+  // Retrieves the extra values for all items marked with tag
   public HashMap<string,bool> get_extras_for_tag( FormatTag tag ) {
     var extras = new HashMap<string,bool>();
     _formats[tag].get_extras_for_tag( ref extras );
     return( extras );
   }
 
-  /* Returns the tag information of the given tag in the specified range */
+  //-------------------------------------------------------------
+  // Returns the tag information of the given tag in the specified
+  // range
   public Array<UndoTagInfo> get_full_tags_in_range( FormatTag tag, int start, int end ) {
     var tags = new Array<UndoTagInfo>();
     for( int i=0; i<FormatTag.LENGTH-4; i++ ) {
@@ -929,7 +975,9 @@ public class FormattedText {
     return( tags );
   }
 
-  /* Returns an array containing all tags that are within the specified range */
+  //-------------------------------------------------------------
+  // Returns an array containing all tags that are within the
+  // specified range
   public Array<UndoTagInfo> get_tags_in_range( int start, int end ) {
     var tags = new Array<UndoTagInfo>();
     for( int i=0; i<FormatTag.LENGTH-4; i++ ) {
@@ -938,7 +986,8 @@ public class FormattedText {
     return( tags );
   }
 
-  /* Reapplies tags that were previously removed */
+  //-------------------------------------------------------------
+  // Reapplies tags that were previously removed
   public void apply_tags( Array<UndoTagInfo> tags, int start = 0 ) {
     for( int i=((int)tags.length - 1); i>=0; i-- ) {
       var info = tags.index( i );
@@ -947,10 +996,9 @@ public class FormattedText {
     changed();
   }
 
-  /*
-   Returns the Pango attribute list to apply to the Pango layout.  This
-   method should only be called if tags_exist returns true.
-  */
+  //-------------------------------------------------------------
+  // Returns the Pango attribute list to apply to the Pango layout.
+  // This method should only be called if tags_exist returns true.
   public AttrList get_attributes( int add_header_depth = -1 ) {
     var attrs = new AttrList();
     for( int i=0; i<FormatTag.LENGTH; i++ ) {
@@ -963,11 +1011,11 @@ public class FormattedText {
     return( attrs );
   }
 
-  /*
-   Same as the above method; however, it applies the given theme colors to the
-   returns tags immediately without updating the main components.  This is useful
-   for changing the theme for a temporary context.
-  */
+  //-------------------------------------------------------------
+  // Same as the above method; however, it applies the given theme
+  // colors to the returns tags immediately without updating the
+  // main components.  This is useful for changing the theme for
+  // a temporary context.
   public AttrList get_attributes_from_theme( Theme theme ) {
     var attrs = new AttrList();
     for( int i=0; i<(FormatTag.LENGTH-4); i++ ) {
@@ -977,7 +1025,9 @@ public class FormattedText {
     return( attrs );
   }
 
-  /* Populate the given text buffer with the text and formatting tags */
+  //-------------------------------------------------------------
+  // Populate the given text buffer with the text and formatting
+  // tags
   public void to_buffer( TextBuffer buf, int start, int end ) {
     buf.text = text;
     var tags = get_tags_in_range( start, end );
@@ -994,26 +1044,23 @@ public class FormattedText {
     }
   }
 
-  /*
-   Returns the extra data stored at the given index location, if one exists.
-   If nothing is found, returns null.
-  */
+  //-------------------------------------------------------------
+  // Returns the extra data stored at the given index location,
+  // if one exists. If nothing is found, returns null.
   public string? get_extra( FormatTag tag, int index ) {
     return( _formats[tag].get_extra( index ) );
   }
 
-  /*
-   Returns the first extra data stored in the given range, if any exist.  If nothing
-   is found, returns null.
-  */
+  //-------------------------------------------------------------
+  // Returns the first extra data stored in the given range, if
+  // any exist.  If nothing is found, returns null.
   public string? get_first_extra_in_range( FormatTag tag, int start, int end ) {
     return( _formats[tag].get_first_extra_in_range( start, end ) );
   }
 
-  /*
-   Performs search of the given string within the text.  If any occurrences
-   are found, highlight them with the match color.
-  */
+  //-------------------------------------------------------------
+  // Performs search of the given string within the text.  If any
+  // occurrences are found, highlight them with the match color.
   public bool do_search( string pattern ) {
     remove_tag_all( FormatTag.MATCH );
     if( (pattern != "") && text.contains( pattern ) ) {
@@ -1029,10 +1076,9 @@ public class FormattedText {
     return( false );
   }
 
-  /*
-   Sets the start value of match to the next/previous match if a search match
-   exists in the text.
-  */
+  //-------------------------------------------------------------
+  // Sets the start value of match to the next/previous match if
+  // a search match exists in the text.
   public void get_search_match( int start, bool get_next, ref SearchMatch match ) {
     var tags = new Array<UndoTagInfo>();
     var spos = get_next ? start : 0;
@@ -1045,7 +1091,8 @@ public class FormattedText {
     }
   }
 
-  /* Replaces all matched search text with the given string */
+  //-------------------------------------------------------------
+  // Replaces all matched search text with the given string
   public void replace_all( string str, ref UndoTextReplaceAll undo ) {
     var matches = new Array<UndoTagInfo>();
     _formats[FormatTag.MATCH].get_tags_in_range( FormatTag.MATCH, 0, _text.length, ref matches );
@@ -1061,7 +1108,8 @@ public class FormattedText {
     changed();
   }
 
-  /* If there are text parsers associated with this text, run them */
+  //-------------------------------------------------------------
+  // If there are text parsers associated with this text, run them
   private void parse( int cursor ) {
     for( int i=0; i<_parsers.length; i++ ) {
       remove_all_parser_tags( _parsers.index( i ).id );
@@ -1069,7 +1117,8 @@ public class FormattedText {
     }
   }
 
-  /* Saves the text as the given XML node */
+  //-------------------------------------------------------------
+  // Saves the text as the given XML node
   public Xml.Node* save() {
     Xml.Node* n = new Xml.Node( null, "text" );
     n->new_prop( "data", text );
@@ -1082,7 +1131,8 @@ public class FormattedText {
     return( n );
   }
 
-  /* Loads the given XML information */
+  //-------------------------------------------------------------
+  // Loads the given XML information
   public void load( Xml.Node* n ) {
     string? t = n->get_prop( "data" );
     if( t != null ) {

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -55,10 +55,13 @@ public class NodeMenu {
     { "action_select_first_node",        action_select_first_node },
     { "action_select_last_node",         action_select_last_node },
     { "action_select_label",             action_select_label, "s" },
+    { "action_toggle_label",             action_toggle_label },
+    { "action_clear_all_labels",         action_clear_all_labels },
     { "action_move_to_label",            action_move_to_label, "s" },
   };
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public NodeMenu( Gtk.Application app, OutlineTable ot ) {
 
     _ot = ot;
@@ -144,7 +147,7 @@ public class NodeMenu {
     target_menu.append_submenu( _( "Select Row" ), select_menu );
     target_menu.append_submenu( _( "Labels" ),     label_menu );
 
-    /* Add all of the submenus to ourself */
+    // Add all of the submenus to ourself
     var menu = new GLib.Menu();
     menu.append_section( null, edit_menu );
     menu.append_section( null, node_menu );
@@ -152,7 +155,7 @@ public class NodeMenu {
     menu.append_section( null, add_menu );
     menu.append_section( null, target_menu );
 
-    /* Populate the select and move label submenus */
+    // Populate the select and move label submenus
     for( int i=0; i<9; i++ ) {
 
       var name = _( "Label-%d" ).printf( i + 1 );
@@ -162,16 +165,16 @@ public class NodeMenu {
 
     }
 
-    /* Create the popover */
+    // Create the popover
     _popover = new PopoverMenu.from_model( menu );
     _popover.set_parent( _ot );
 
-    /* Add the menu actions */
+    // Add the menu actions
     var actions = new SimpleActionGroup();
     actions.add_action_entries( action_entries, this );
     _ot.insert_action_group( "node", actions );
 
-    /* Add keyboard shortcuts */
+    // Add keyboard shortcuts
     app.set_accels_for_action( "node.action_copy",                     { "<Control>c" } );
     app.set_accels_for_action( "node.action_cut",                      { "<Control>x" } );
     app.set_accels_for_action( "node.action_paste",                    { "<Control>v" } );
@@ -202,13 +205,14 @@ public class NodeMenu {
 
   }
 
-  /* Called when the menu is popped up */
+  //-------------------------------------------------------------
+  // Called when the menu is popped up
   public void show( double x, double y ) {
 
     var pasteable  = OutlinerClipboard.node_pasteable();
-    var first_node = _ot.root.get_first_node();
+    var first_node = _ot.root_node.get_first_node();
 
-    /* Set the menu sensitivity */
+    // Set the menu sensitivity
     _ot.action_set_enabled( "node.action_paste",                    pasteable );
     _ot.action_set_enabled( "node.action_paste_replace",            pasteable );
     _ot.action_set_enabled( "node.action_unclone",                  _ot.selected.is_clone() );
@@ -222,7 +226,7 @@ public class NodeMenu {
     _ot.action_set_enabled( "node.action_select_parent_node",       !_ot.selected.parent.is_root() );
     _ot.action_set_enabled( "node.action_select_last_child_node",   !_ot.selected.is_leaf() );
     _ot.action_set_enabled( "node.action_select_first_node",        ((first_node != _ot.selected) && !first_node.is_root()) );
-    _ot.action_set_enabled( "node.action_select_last_node",         ((_ot.root.get_last_node() != _ot.selected) && !first_node.is_root()) );
+    _ot.action_set_enabled( "node.action_select_last_node",         ((_ot.root_node.get_last_node() != _ot.selected) && !first_node.is_root()) );
     _ot.action_set_enabled( "node.action_join_row",                 _ot.is_node_joinable() );
     _ot.action_set_enabled( "node.action_toggle_expand",            (_ot.selected.children.length > 0) );
 
@@ -244,59 +248,69 @@ public class NodeMenu {
       _ot.action_set_enabled( "node.action_toggle_note", true );
     }
 
-    /* Display the popover at the given location */
+    // Display the popover at the given location
     Gdk.Rectangle rect = {(int)x, (int)y, 1, 1};
     _popover.pointing_to = rect;
     _popover.popup();
 
   }
 
-  /* Copies the currently selected node */
+  //-------------------------------------------------------------
+  // Copies the currently selected node
   private void action_copy() {
     _ot.copy_selected_node();
   }
 
-  /* Cuts the currently selected node */
+  //-------------------------------------------------------------
+  // Cuts the currently selected node
   private void action_cut() {
     _ot.cut_selected_node();
   }
 
-  /* Pastes the given node as a sibling of the selected node */
+  //-------------------------------------------------------------
+  // Pastes the given node as a sibling of the selected node
   private void action_paste() {
     OutlinerClipboard.paste( _ot, false );
   }
 
-  /* Pastes the given node as a sibling of the selected node */
+  //-------------------------------------------------------------
+  // Pastes the given node as a sibling of the selected node
   private void action_paste_replace() {
     OutlinerClipboard.paste( _ot, true );
   }
 
-  /* Clones the currently selected node */
+  //-------------------------------------------------------------
+  // Clones the currently selected node
   private void action_clone_copy() {
     _ot.clone_node( _ot.selected );
   }
 
-  /* Pastes the given clone within the currently selected node */
+  //-------------------------------------------------------------
+  // Pastes the given clone within the currently selected node
   private void action_clone_paste() {
     _ot.paste_clone( true );
   }
 
-  /* Unclones the currently selected node */
+  //-------------------------------------------------------------
+  // Unclones the currently selected node
   private void action_unclone() {
     _ot.unclone_node( _ot.selected );
   }
 
-  /* Deletes the currently selected node */
+  //-------------------------------------------------------------
+  // Deletes the currently selected node
   private void action_delete_node() {
     _ot.delete_current_node();
   }
 
-  /* Edit the current node's name field */
+  //-------------------------------------------------------------
+  // Edit the current node's name field
   private void action_edit_text() {
     _ot.edit_selected( true );
   }
 
-  /* Edit the current node's note field */
+  //-------------------------------------------------------------
+  // Edit the current node's note field
   private void action_edit_note() {
     _ot.edit_selected( false );
   }
@@ -305,104 +319,124 @@ public class NodeMenu {
     _ot.tagger.show_add_ui();
   }
 
-  /* Toggles the note display status of the currently selected node */
+  //-------------------------------------------------------------
+  // Toggles the note display status of the currently selected node
   private void action_toggle_note() {
     _ot.toggle_note( _ot.selected, false );
   }
 
-  /* Adds a new row above the currently selected row */
+  //-------------------------------------------------------------
+  // Adds a new row above the currently selected row
   private void action_add_row_above() {
     _ot.add_sibling_node( false );
   }
 
-  /* Adds a new row below the currently selected row */
+  //-------------------------------------------------------------
+  // Adds a new row below the currently selected row
   private void action_add_row_below() {
     _ot.add_sibling_node( true );
   }
 
-  /* Joins the current row to the one above it */
+  //-------------------------------------------------------------
+  // Joins the current row to the one above it
   private void action_join_row() {
     _ot.join_row();
   }
 
-  /* Indents the currently selected row by one level */
+  //-------------------------------------------------------------
+  // Indents the currently selected row by one level
   private void action_indent() {
     _ot.indent();
   }
 
-  /* Unindents the currently selected row by one level */
+  //-------------------------------------------------------------
+  // Unindents the currently selected row by one level
   private void action_unindent() {
     _ot.unindent();
   }
 
-  /* Toggles the expand/collapse property of the node */
+  //-------------------------------------------------------------
+  // Toggles the expand/collapse property of the node
   private void action_toggle_expand() {
     _ot.toggle_expand( _ot.selected );
   }
 
-  /* Enters focus mode */
+  //-------------------------------------------------------------
+  // Enters focus mode
   private void action_focus() {
     _ot.focus_on_selected();
   }
 
-  /* Selects the node just above the selected node */
+  //-------------------------------------------------------------
+  // Selects the node just above the selected node
   private void action_select_node_above() {
     _ot.change_selected( _ot.selected.get_previous_node() );
   }
 
-  /* Selects the node just below the selected node */
+  //-------------------------------------------------------------
+  // Selects the node just below the selected node
   private void action_select_node_below() {
     _ot.change_selected( _ot.selected.get_next_node() );
   }
 
-  /* Selects the previous sibling node relative to the selected node */
+  //-------------------------------------------------------------
+  // Selects the previous sibling node relative to the selected node
   private void action_select_prev_sibling_node() {
     _ot.change_selected( _ot.selected.get_previous_sibling() );
   }
 
-  /* Selects the next sibling node relative to the selected node */
+  //-------------------------------------------------------------
+  // Selects the next sibling node relative to the selected node
   private void action_select_next_sibling_node() {
     _ot.change_selected( _ot.selected.get_next_sibling() );
   }
 
-  /* Selects the parent node of the selected node */
+  //-------------------------------------------------------------
+  // Selects the parent node of the selected node
   private void action_select_parent_node() {
     _ot.change_selected( _ot.selected.parent );
   }
 
-  /* Selects the last child node of the selected node */
+  //-------------------------------------------------------------
+  // Selects the last child node of the selected node
   private void action_select_last_child_node() {
     _ot.change_selected( _ot.selected.get_last_child() );
   }
 
-  /* Selects the top-most node of the document */
+  //-------------------------------------------------------------
+  // Selects the top-most node of the document
   private void action_select_first_node() {
-    _ot.change_selected( _ot.root.get_first_node() );
+    _ot.change_selected( _ot.root_node.get_first_node() );
   }
 
-  /* Selects the bottom-most node of the document */
+  //-------------------------------------------------------------
+  // Selects the bottom-most node of the document
   private void action_select_last_node() {
-    _ot.change_selected( _ot.root.get_last_node() );
+    _ot.change_selected( _ot.root_node.get_last_node() );
   }
 
-  /* Adds a label to the currently selected node */
+  //-------------------------------------------------------------
+  // Adds a label to the currently selected node
   private void action_toggle_label() {
     _ot.toggle_label();
   }
 
-  /* Selects the given label index */
+  //-------------------------------------------------------------
+  // Selects the given label index
   private void action_select_label( SimpleAction action, Variant? variant ) {
     var index = int.parse( variant.get_string() );
     _ot.goto_label( index );
   }
   
-  /* Moves the current row to the given label */
+  //-------------------------------------------------------------
+  // Moves the current row to the given label
   private void action_move_to_label( SimpleAction action, Variant? variant ) {
     var index = int.parse( variant.get_string() );
     _ot.handle_control_number( index );
   }
 
-  /* Clears all of the set labels */
+  //-------------------------------------------------------------
+  // Clears all of the set labels
   private void action_clear_all_labels() {
     _ot.clear_all_labels();
   }

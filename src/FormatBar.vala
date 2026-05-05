@@ -41,8 +41,13 @@ public class FormatBar : Gtk.Popover {
   private bool         _ignore_active = false;
   private LinkEditor   _link_editor;
   private Button       _clear;
+ 
+  private const GLib.ActionEntry[] action_entries = {
+    { "action_header", action_header, "i" },
+  };
 
-  /* Construct the formatting bar */
+  //-------------------------------------------------------------
+  // Construct the formatting bar
   public FormatBar( OutlineTable table ) {
 
     _table = table;
@@ -119,7 +124,7 @@ public class FormatBar : Gtk.Popover {
 
     var header_menu = new GLib.Menu();
     for( int i=0; i<7; i++ ) {
-      header_menu.append( ((i == 0) ? _( "None" ) : "<H%d>".printf( i )), "format.handle_header('%d')".printf( i ) );
+      header_menu.append( ((i == 0) ? _( "None" ) : "<H%d>".printf( i )), "formatbar.action_header(%d)".printf( i ) );
     }
 
     _header = new MenuButton() {
@@ -129,16 +134,14 @@ public class FormatBar : Gtk.Popover {
     };
     add_markup( _header, false, "H<i>x</i>" );
 
-    _hilite = new ColorPicker( get_hilite_color(), ColorPickerType.HCOLOR ) {
-      toggle_tooltip = _( "Apply Highlight Color" ),
-      select_tooltip = _( "Change Highlight Color" )
-    };
+    _hilite = new ColorPicker( _table.win, get_hilite_color(), ColorPickerType.HCOLOR );
+    _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
+    _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
     _hilite.color_changed.connect( handle_hilite );
 
-    _color = new ColorPicker( get_font_color(), ColorPickerType.FCOLOR ) {
-      toggle_tooltip = _( "Apply Font Color" ),
-      select_tooltip = _( "Change Font Color" )
-    };
+    _color = new ColorPicker( _table.win, get_font_color(), ColorPickerType.FCOLOR );
+    _color.set_toggle_tooltip( _( "Apply Font Color" ) );
+    _color.set_select_tooltip( _( "Change Font Color" ) );
     _color.color_changed.connect( handle_color );
 
     _link = new ToggleButton() {
@@ -185,6 +188,11 @@ public class FormatBar : Gtk.Popover {
     set_parent( table );
 
     initialize();
+
+    // Set the stage for menu actions
+    var actions = new SimpleActionGroup ();
+    actions.add_action_entries( action_entries, this );
+    insert_action_group( "formatbar", actions );
 
   }
 
@@ -333,13 +341,17 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the header status of the currently selected text */
-  private void handle_header( int level ) {
-    if( !_ignore_active ) {
-      if( level > 0 ) {
-        format_text( FormatTag.HEADER, level.to_string() );
-      } else {
-        unformat_text( FormatTag.HEADER );
+  //-------------------------------------------------------------
+  // Toggles the header status of the currently selected text
+  private void action_header( SimpleAction action, Variant? variant ) {
+    if( variant != null ) {
+      var level = variant.get_int32();
+      if( !_ignore_active ) {
+        if( level > 0 ) {
+          format_text( FormatTag.HEADER, level.to_string() );
+        } else {
+          unformat_text( FormatTag.HEADER );
+        }
       }
     }
   }

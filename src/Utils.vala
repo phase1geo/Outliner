@@ -184,16 +184,19 @@ public class Utils {
 #endif
   }
 
-  public static void set_chooser_folder( FileChooser chooser ) {
+  //-------------------------------------------------------------
+  // Sets the given dialog initial folder to the last accessed
+  // directory location.
+  public static void set_chooser_folder( FileDialog dialog ) {
     var dir = Outliner.settings.get_string( "last-directory" );
     if( dir != "" ) {
       var file = File.new_for_path( dir );
-      try {
-        chooser.set_current_folder( file );
-      } catch( Error e ) {}
+      dialog.initial_folder = file;
     }
   }
 
+  //-------------------------------------------------------------
+  // Saves the given folder path to the last-directory.
   public static void store_chooser_folder( string file, bool is_dir ) {
     var dir = is_dir ? file : GLib.Path.get_dirname( file );
     Outliner.settings.set_string( "last-directory", dir );

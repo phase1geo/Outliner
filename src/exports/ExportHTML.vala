@@ -24,23 +24,27 @@ using Gtk;
 
 public class ExportHTML : Export {
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public ExportHTML() {
     base( "html", _( "HTML" ), {".htm", ".html"}, true, false, false );
   }
 
-  /* Add settings for Org Mode */
+  //-------------------------------------------------------------
+  // Add settings for Org Mode
   public override void add_settings( Grid grid ) {
     add_setting_bool( "use-ul", grid, _( "Use unordered lists" ), _( "Export using unordered lists" ), true );
   }
 
-  /* Save the settings */
+  //-------------------------------------------------------------
+  // Save the settings
   public override void save_settings( Xml.Node* node ) {
     var value = get_bool( "use-ul" );
     node->set_prop( "use-ul", value.to_string() );
   }
 
-  /* Load the settings */
+  //-------------------------------------------------------------
+  // Load the settings
   public override void load_settings( Xml.Node* node ) {
     var q = node->get_prop( "use-ul" );
     if( q != null ) {
@@ -49,7 +53,8 @@ public class ExportHTML : Export {
     }
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* html = new Xml.Node( null, "html" );
@@ -61,14 +66,16 @@ public class ExportHTML : Export {
     return( true );
   }
 
-  /* Generates the header for the document */
+  //-------------------------------------------------------------
+  // Generates the header for the document
   private Xml.Node* export_head( string? title ) {
     Xml.Node* head = new Xml.Node( null, "head" );
     head->new_text_child( null, "title", (title ?? "Outline") );
     return( head );
   }
 
-  /* Generates the body for the document */
+  //-------------------------------------------------------------
+  // Generates the body for the document
   private Xml.Node* export_body( OutlineTable table ) {
     var use_ul     = get_bool( "use-ul" );
     Xml.Node* body = new Xml.Node( null, "body" );
@@ -78,8 +85,8 @@ public class ExportHTML : Export {
     } else {
       list->set_prop( "type", "I" );
     }
-    for( int i=0; i<table.root.children.length; i++ ) {
-      list->add_child( export_node( table, table.root.children.index( i ) ) );
+    for( int i=0; i<table.root_node.children.length; i++ ) {
+      list->add_child( export_node( table, table.root_node.children.index( i ) ) );
     }
     body->add_child( list );
     return( body );
@@ -132,7 +139,8 @@ public class ExportHTML : Export {
     return( node );
   }
 
-  /* Traverses the node tree exporting XML nodes in OPML format */
+  //-------------------------------------------------------------
+  // Traverses the node tree exporting XML nodes in OPML format
   private Xml.Node* export_node( OutlineTable table, Node node ) {
     string    ul_syms[3] = {"disc", "circle", "square"};
     string    ol_syms[5] = {"I", "A", "1", "a", "i"};
@@ -161,9 +169,12 @@ public class ExportHTML : Export {
     return( li );
   }
 
-  /****************************************************************************/
+  //-------------------------------------------------------------
+  // IMPORT
+  //-------------------------------------------------------------
 
-  /* Parses the given style string for tag information */
+  //-------------------------------------------------------------
+  // Parses the given style string for tag information
   private static void parse_style( string style, int start, int end, FormattedText text ) {
     var opts = style.split( ";" );
     foreach( unowned string opt in opts ) {
@@ -214,7 +225,8 @@ public class ExportHTML : Export {
     }
   }
 
-  /* Parses the given element for tag information */
+  //-------------------------------------------------------------
+  // Parses the given element for tag information
   private static void parse_element( Xml.Node* node, string str, FormattedText text ) {
     var end   = text.text.char_count();
     var start = end - str.char_count();
@@ -265,6 +277,7 @@ public class ExportHTML : Export {
         str += node->get_content();
         text.insert_text( text.text.char_count(), node->get_content() );
         break;
+      default :  break;
     }
     return( str );
   }

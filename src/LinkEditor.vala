@@ -53,7 +53,7 @@ public class LinkEditor : Popover {
     _apply = new Button.with_label( _( "Apply" ) ) {
       halign = Align.END
     };
-    _apply.get_style_context().add_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
+    _apply.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
     _apply.clicked.connect(() => {
       set_url();
       show_popover( false );

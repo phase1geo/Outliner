@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -26,7 +26,8 @@ public class UndoNodeDelete : UndoItem {
   private int   _index;
   private Node? _insert_node;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoNodeDelete( Node node, Node? insert_node ) {
     base( _( "delete item" ) );
     _node        = node;
@@ -35,7 +36,8 @@ public class UndoNodeDelete : UndoItem {
     _insert_node = insert_node;
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo( OutlineTable table ) {
     if( _insert_node != null ) {
       table.delete_node( _insert_node );
@@ -43,11 +45,12 @@ public class UndoNodeDelete : UndoItem {
     table.insert_node( _parent, _node, _index );
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo( OutlineTable table ) {
     table.delete_node( _node );
     if( _insert_node != null ) {
-      table.insert_node( table.root, _insert_node, 0 );
+      table.insert_node( table.root_node, _insert_node, 0 );
     }
   }
 

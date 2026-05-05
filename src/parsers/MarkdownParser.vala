@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,36 +23,37 @@ public class MarkdownParser : TextParser {
 
   private OutlineTable _ot;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public MarkdownParser( OutlineTable ot ) {
     base( "Markdown", 1 );
 
     _ot = ot;
 
-    /* Header */
+    // Header
     add_regex( "^(#{1,6})[^#].*$", highlight_header );
 
-    /* Lists */
+    // Lists
     add_regex( "^\\s*(\\*|\\+|\\-|[0-9]+\\.)\\s", (text, match, cursor) => {
       add_tag( text, match, 1, FormatTag.COLOR, _ot.get_theme().markdown_listitem.to_string() );
     });
 
-    /* Code */
+    // Code
     add_regex( "(`)([^`]+)(`)", (text, match, cursor) => {
       make_grey( text, match, 1 );
       add_tag( text, match, 2, FormatTag.CODE );
       make_grey( text, match, 3 );
     });
 
-    /* Bold */
+    // Bold
     add_regex( "(\\*\\*)([^* \\t].*?)(?<!\\\\|\\*| |\\t)(\\*\\*)", highlight_bold );
     add_regex( "(__)([^_ \\t].*?(?<!\\\\|_| |\\t))(__)", highlight_bold );
 
-    /* Italics */
+    // Italics
     add_regex( "(?<!_)(_)([^_ \t].*?(?<!\\\\|_| |\\t))(_)(?!_)", highlight_italics );
     add_regex( "(?<!\\*)(\\*)([^* \t].*?(?<!\\\\|\\*| |\\t))(\\*)(?!\\*)", highlight_italics );
 
-    /* Links */
+    // Links
     add_regex( "(\\[)(.+?)(\\]\\s*\\((\\S+).*\\))", highlight_url1 );
     add_regex( "(<)((mailto:)?[a-z0-9.-]+@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)(>)", highlight_url2 );
     add_regex( "(<)((https?|ftp):[^'\">\\s]+)(>)", highlight_url3 );
@@ -98,7 +99,8 @@ public class MarkdownParser : TextParser {
     make_grey( text, match, 4 );
   }
 
-  /* Returns true if the associated tag should enable the associated FormatBar button */
+  //-------------------------------------------------------------
+  // Returns true if the associated tag should enable the associated FormatBar button
   public override bool tag_handled( FormatTag tag ) {
     switch( tag ) {
       case FormatTag.HEADER  :
@@ -110,7 +112,8 @@ public class MarkdownParser : TextParser {
     }
   }
 
-  /* This is called when the associated FormatBar button is clicked */
+  //-------------------------------------------------------------
+  // This is called when the associated FormatBar button is clicked
   public override void insert_tag( CanvasText ct, FormatTag tag, int start_pos, int end_pos, UndoTextBuffer undo_buffer, string? extra ) {
     switch( tag ) {
       case FormatTag.HEADER  :  insert_header( ct, start_pos, extra, undo_buffer );  break;

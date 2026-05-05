@@ -1,5 +1,5 @@
  /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -26,7 +26,6 @@ public class Outliner : Gtk.Application {
 
   private static bool          show_version = false;
   private static bool          new_file     = false;
-  private static bool          testing      = false;
   public  static GLib.Settings settings;
   private        bool          loaded       = false;
   private        MainWindow    appwin;

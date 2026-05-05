@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,23 +24,27 @@ using Gtk;
 
 public class ExportRTF : Export {
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public ExportRTF() {
     base( "rtf", _( "RTF" ), {".rtf"}, true, false, false );
   }
 
-  /* Add settings for Org Mode */
+  //-------------------------------------------------------------
+  // Add settings for Org Mode
   public override void add_settings( Grid grid ) {
     add_setting_bool( "use-ul", grid, _( "Use unordered lists" ), _( "Export using unordered lists" ), true );
   }
 
-  /* Save the settings */
+  //-------------------------------------------------------------
+  // Save the settings
   public override void save_settings( Xml.Node* node ) {
     var value = get_bool( "use-ul" );
     node->set_prop( "use-ul", value.to_string() );
   }
 
-  /* Load the settings */
+  //-------------------------------------------------------------
+  // Load the settings
   public override void load_settings( Xml.Node* node ) {
     var q = node->get_prop( "use-ul" );
     if( q != null ) {
@@ -49,7 +53,8 @@ public class ExportRTF : Export {
     }
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     var file = File.new_for_path( fname );
     try {
@@ -64,8 +69,8 @@ public class ExportRTF : Export {
   private void export_main( FileOutputStream os, OutlineTable table ) {
     try {
       os.write( "{\\rtf1\\ansi{\\fonttbl\\f0\\fswiss Helvetica;}\\f0\\pard ".data );
-      for( int i=0; i<table.root.children.length; i++ ) {
-        export_node( os, table.root.children.index( i ) );
+      for( int i=0; i<table.root_node.children.length; i++ ) {
+        export_node( os, table.root_node.children.index( i ) );
       }
       os.write( "}".data );
     } catch( Error e ) {}
@@ -120,7 +125,8 @@ public class ExportRTF : Export {
     return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
-  /* Traverses the node tree exporting XML nodes in OPML format */
+  //-------------------------------------------------------------
+  // Traverses the node tree exporting XML nodes in OPML format
   private void export_node( FileOutputStream os, Node node ) {
     if( node.children.length > 0 ) {
       for( int i=0; i<node.children.length; i++ ) {

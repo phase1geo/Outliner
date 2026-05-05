@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,23 +24,27 @@ using Gtk;
 
 public class ExportOrgMode : Export {
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public ExportOrgMode() {
     base( "org-mode", _( "Org-Mode" ), {".org"}, true, false, false );
   }
 
-  /* Add settings for Org Mode */
+  //-------------------------------------------------------------
+  // Add settings for Org Mode
   public override void add_settings( Grid grid ) {
     add_setting_bool( "indent-mode", grid, _( "Indent Mode" ), _( "Export using indentation spaces" ), true );
   }
 
-  /* Save the settings */
+  //-------------------------------------------------------------
+  // Save the settings
   public override void save_settings( Xml.Node* node ) {
     var value = get_bool( "indent-mode" );
     node->set_prop( "indent-mode", value.to_string() );
   }
 
-  /* Load the settings */
+  //-------------------------------------------------------------
+  // Load the settings
   public override void load_settings( Xml.Node* node ) {
     var q = node->get_prop( "indent-mode" );
     if( q != null ) {
@@ -61,7 +65,8 @@ public class ExportOrgMode : Export {
     return( get_bool( "indent-mode" ) ? (prefix + "  ") : "" );
   }
 
-  /* Exports the given drawing area to the file of the given name */
+  //-------------------------------------------------------------
+  // Exports the given drawing area to the file of the given name
   public override bool export( string fname, OutlineTable table ) {
     var  file   = File.new_for_path( fname );
     bool retval = true;
@@ -74,16 +79,19 @@ public class ExportOrgMode : Export {
     return( retval );
   }
 
-  /* Draws each of the top-level nodes */
+  //-------------------------------------------------------------
+  // Draws each of the top-level nodes
   private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
-    if( table.title != null ) {
-      var title = "* " + table.title.text.text + "\n\n";
-      os.write( title.data );
-    }
-    var nodes = table.root.children;
-    for( int i=0; i<nodes.length; i++ ) {
-      export_node( os, table, nodes.index( i ), sprefix() );
-    }
+    try {
+      if( table.title != null ) {
+        var title = "* " + table.title.text.text + "\n\n";
+        os.write( title.data );
+      }
+      var nodes = table.root_node.children;
+      for( int i=0; i<nodes.length; i++ ) {
+        export_node( os, table, nodes.index( i ), sprefix() );
+      }
+    } catch( IOError e ) {}
   }
 
   public static string from_text( FormattedText text ) {
@@ -115,7 +123,8 @@ public class ExportOrgMode : Export {
     return( ExportUtils.export( text, start_func, end_func, encode_func ) );
   }
 
-  /* Draws the given node and its children to the output stream */
+  //-------------------------------------------------------------
+  // Draws the given node and its children to the output stream
   private void export_node( FileOutputStream os, OutlineTable table, Node node, string prefix = "  " ) {
 
     try {
@@ -126,6 +135,7 @@ public class ExportOrgMode : Export {
         case NodeTaskMode.DONE  :  title += "[x] ";  break;
         case NodeTaskMode.OPEN  :  title += "[ ] ";  break;
         case NodeTaskMode.DOING :  title += "[-] ";  break;
+        default :  break;
       }
 
       var name = new FormattedText.copy_clean( table, node.name.text );
@@ -154,7 +164,9 @@ public class ExportOrgMode : Export {
 
   //----------------------------------------------------------------------------
 
-  /* Imports an Org-Mode file and display it in the given outline table */
+  //-------------------------------------------------------------
+  // Imports an Org-Mode file and display it in the given outline
+  // table
   public override bool import( string fname, OutlineTable table ) {
 
     return( false );

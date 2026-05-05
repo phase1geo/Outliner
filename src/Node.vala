@@ -304,7 +304,7 @@ public class Node {
 
     _lt_layout = ot.create_pango_layout( null );
 
-    _name = new CanvasText( ot, ot.get_allocated_width() );
+    _name = new CanvasText( ot, ot.get_width() );
     _name.text.add_parser( ot.tagger_parser );
     _name.text.add_parser( ot.unicode_parser );
     _name.text.add_parser( ot.url_parser );
@@ -312,7 +312,7 @@ public class Node {
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
 
-    _note = new CanvasText( ot, ot.get_allocated_width() );
+    _note = new CanvasText( ot, ot.get_width() );
     _note.text.add_parser( ot.unicode_parser );
     _note.text.add_parser( ot.url_parser );
     _note.resized.connect( update_height_from_resize );
@@ -362,13 +362,13 @@ public class Node {
 
     _lt_layout = ot.create_pango_layout( null );
 
-    _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
+    _name = new CanvasText.clone_from( ot, ot.get_width(), node.name );
     _name.text.add_parser( ot.tagger_parser );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
 
-    _note = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.note );
+    _note = new CanvasText.clone_from( ot, ot.get_width(), node.note );
     _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
@@ -1440,6 +1440,7 @@ public class Node {
       case NodeMode.ATTACHTO :  background = theme.attachable_color;    break;
       case NodeMode.HOVER    :  background = theme.nodesel_background;  alpha = 0.1;  break;
       case NodeMode.MOVETO   :  alpha      = 0.3;                       break;
+      default                :  break;
     }
 
     Utils.set_context_color_with_alpha( ctx, background, alpha );
@@ -1458,6 +1459,7 @@ public class Node {
         ctx.rectangle( _x, (last_y - 4), _w, 4 );
         ctx.fill();
         break;
+      default :  break;
     }
 
   }
@@ -1562,6 +1564,7 @@ public class Node {
         ctx.line_to( ((tx + tw) - 3), (ty + 3) );
         ctx.stroke();
         break;
+      default :  break;
     }
 
   }
