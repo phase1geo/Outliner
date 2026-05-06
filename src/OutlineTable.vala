@@ -543,9 +543,8 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Called whenever we want to change the editable nature of the
   // document title
-  public void set_title_editable( bool edit ) {
-    if( _title == null )  return;
-    if( _title.edit != edit ) {
+  public bool set_title_editable( bool edit ) {
+    if( (_title != null) && (_title.edit != edit) ) {
       if( _title.edit && undo_text.undoable() ) {
         undo_buffer.add_item( new UndoTitleChange( this, _orig_title ) );
         undo_text.clear();
@@ -565,7 +564,9 @@ public class OutlineTable : DrawingArea {
         _im_context.focus_out();
       }
       _title.edit = edit;
+      return( true );
     }
+    return( false );
   }
 
   //-------------------------------------------------------------
@@ -667,6 +668,12 @@ public class OutlineTable : DrawingArea {
     var sw = parent.parent.parent as ScrolledWindow;
     sw.vadjustment.value = _scroll_adjust;
     _scroll_adjust = -1;
+  }
+
+  //-------------------------------------------------------------
+  // Returns true if this document has a title.
+  public bool has_title() {
+    return( _title != null );
   }
 
   //-------------------------------------------------------------

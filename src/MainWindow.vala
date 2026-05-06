@@ -1420,6 +1420,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     _auto_sizing.state   = table.auto_sizing;
     _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
+    menu_set_enabled( KeyCommand.EDIT_TITLE, table.has_title() );
   }
 
   //-------------------------------------------------------------
@@ -1540,6 +1541,15 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
     if( _shortcut_widgets.has_key( command ) ) {
       _shortcut_widgets.get( command ).set_tooltip( shortcut );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Sets the action enable for the given command to the given value.
+  private void menu_set_enabled( KeyCommand command, bool enable ) {
+    var action = (SimpleAction)_actions.lookup_action( command.to_string() );
+    if( action != null ) {
+      action.set_enabled( enable );
     }
   }
 

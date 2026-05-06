@@ -1081,8 +1081,9 @@ public enum KeyCommand {
   }
 
   public static void edit_title( OutlineTable ot ) {
-    ot.set_title_editable( true );
-    ot.title.set_cursor_all( false );
+    if( ot.set_title_editable( true ) ) {
+      ot.title.set_cursor_all( false );
+    }
     ot.see_title();
     ot.grab_focus();
   }
