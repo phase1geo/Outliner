@@ -164,42 +164,41 @@ public class Exporter : Box {
 
     var name   = _stack.visible_child_name;
     var export = _win.exports.get_by_name( name );
-
-    var dialog = new FileChooserDialog( _( "Export As %s" ).printf( export.label ), _win, FileChooserAction.SAVE,
-      _( "Cancel" ), ResponseType.CANCEL, _( "Export" ), ResponseType.ACCEPT );
-    Utils.set_chooser_folder( dialog );
-
-    // Set the default filename
     var default_fname = Utils.rootname( _win.get_current_table().document.filename );
-    dialog.set_current_name( _win.repair_filename( default_fname, export.extensions ) );
+    var initial_file  = File.new_for_path( _win.repair_filename( default_fname, export.extensions ) );
 
     // Set the filter
-    FileFilter filter = new FileFilter();
+    var filter = new FileFilter();
     filter.set_filter_name( export.label );
     foreach( string extension in export.extensions ) {
       filter.add_pattern( "*" + extension );
     }
-    dialog.set_filter( filter );
 
-    dialog.response.connect((id) => {
-      if( id == ResponseType.ACCEPT ) {
+    var filters = new GLib.ListStore( typeof( FileFilter ) );
+    filters.append( filter );
 
-        // Close the dialog and parent window
-        dialog.hide();
+    var dialog = new FileDialog() {
+      modal = true,
+      title = _( "Export As %s" ).printf( export.label ),
+      accept_label = _( "Export" ),
+      filters = filters,
+      initial_file = initial_file
+    };
+
+    dialog.save.begin( _win, null, (obj, res) => {
+      try {
+        var file = dialog.save.end( res );
 
         // Perform the export
-        var fname = dialog.get_file().get_path();
+        var fname = file.get_path();
         export.export( fname = _win.repair_filename( fname, export.extensions ), _win.get_current_table() );
         Utils.store_chooser_folder( fname, false );
 
         // Generate notification to indicate that the export completed
-        _win.notification( _( "Outliner Export Completed" ), fname );
+        _win.notification( _( "Minder Export Completed" ), fname );
 
-      }
-      dialog.destroy();
+      } catch( Error e ) {}
     });
-
-    dialog.show();
 
   }
 

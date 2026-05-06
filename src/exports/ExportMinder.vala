@@ -190,10 +190,10 @@ public class ExportMinder : Export {
   private Xml.Node* export_nodes( OutlineTable table, Array<string> tags ) {
     Xml.Node* nodes = new Xml.Node( null, "nodes" );
     Xml.Node* root  = export_root_node( table );
-    if( table.root.children.length > 0 ) {
+    if( table.root_node.children.length > 0 ) {
       Xml.Node* root_nodes = new Xml.Node( null, "nodes" );
-      for( int i=0; i<table.root.children.length; i++ ) {
-        var node = table.root.children.index( i );
+      for( int i=0; i<table.root_node.children.length; i++ ) {
+        var node = table.root_node.children.index( i );
         if( !node.draw_as_blank() ) {
           root_nodes->add_child( export_node( node, tags ) );
         }
@@ -480,11 +480,11 @@ public class ExportMinder : Export {
       for( int i=(int)(root.children.length - 1); i>=0; i-- ) {
         var child = root.children.index( i );
         root.remove_child( child );
-        table.root.add_child( child, 0 );
+        table.root_node.add_child( child, 0 );
       }
     } else {
       for( int i=0; i<top_nodes.length; i++ ) {
-        table.root.add_child( top_nodes.index( i ) );
+        table.root_node.add_child( top_nodes.index( i ) );
       }
     }
   }

@@ -21,12 +21,14 @@
 
 public class Exports {
 
+  private MainWindow    _win;
   private Array<Export> _exports;
 
   //-------------------------------------------------------------
   // Constructor
-  public Exports( bool save_settings = true ) {
+  public Exports( MainWindow win, bool save_settings = true ) {
 
+    _win = win;
     _exports = new Array<Export>();
 
     // Add the exports
@@ -97,7 +99,7 @@ public class Exports {
     }
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* root = new Xml.Node( null, "exports" );
-    root->set_prop( "version", Outliner.version );
+    root->set_prop( "version", _win.application.version );
     doc->set_root_element( root );
     for( int i=0; i<_exports.length; i++ ) {
       root->add_child( _exports.index( i ).save() );

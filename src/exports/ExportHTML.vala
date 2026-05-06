@@ -85,8 +85,8 @@ public class ExportHTML : Export {
     } else {
       list->set_prop( "type", "I" );
     }
-    for( int i=0; i<table.root.children.length; i++ ) {
-      list->add_child( export_node( table, table.root.children.index( i ) ) );
+    for( int i=0; i<table.root_node.children.length; i++ ) {
+      list->add_child( export_node( table, table.root_node.children.index( i ) ) );
     }
     body->add_child( list );
     return( body );
@@ -280,6 +280,7 @@ public class ExportHTML : Export {
         str += node->get_content();
         text.insert_text( text.text.char_count(), node->get_content() );
         break;
+      default :  break;
     }
     return( str );
   }

@@ -38,7 +38,7 @@ public class OutlinerClipboard {
     var bytes = new Bytes( ftxt.data );
     var ftext_provider = new ContentProvider.for_bytes( FTEXT_TARGET_NAME, bytes );
 
-    var text_value = new Value( Type.STRING );
+    var text_value = Value( Type.STRING );
     text_value.set_string( txt );
     var text_provider = new ContentProvider.for_value( text_value );
 
@@ -92,28 +92,32 @@ public class OutlinerClipboard {
 
     var clipboard = Display.get_default().get_clipboard();
 
-    try {
-      if( clipboard.get_formats().contain_mime_type( NODES_TARGET_NAME ) ) {
-        clipboard.read_async.begin( { NODES_TARGET_NAME }, 0, null, (obj, res) => {
+    if( clipboard.get_formats().contain_mime_type( NODES_TARGET_NAME ) ) {
+      clipboard.read_async.begin( { NODES_TARGET_NAME }, 0, null, (obj, res) => {
+        try {
           string str;
           var stream = clipboard.read_async.end( res, out str );
           var contents = Utils.read_stream( stream );
           table.paste_node( contents, shift );
-        });
-      } else if( clipboard.get_formats().contain_mime_type( FTEXT_TARGET_NAME ) ) {
-        clipboard.read_async.begin( { FTEXT_TARGET_NAME }, 0, null, (obj, res) => {
+        } catch( Error e ) {}
+      });
+    } else if( clipboard.get_formats().contain_mime_type( FTEXT_TARGET_NAME ) ) {
+      clipboard.read_async.begin( { FTEXT_TARGET_NAME }, 0, null, (obj, res) => {
+        try {
           string str;
           var stream = clipboard.read_async.end( res, out str );
           var contents = Utils.read_stream( stream );
           table.paste_formatted_text( contents, shift );
-        });
-      } else if( clipboard.get_formats().contain_gtype( Type.STRING ) ) {
-        clipboard.read_text_async.begin( null, (obj, res) => {
+        } catch( Error e ) {}
+      });
+    } else if( clipboard.get_formats().contain_gtype( Type.STRING ) ) {
+      clipboard.read_text_async.begin( null, (obj, res) => {
+        try {
           var text = clipboard.read_text_async.end( res );
           table.paste_text( text, shift );
-        });
-      }
-    } catch( Error e ) {}
+        } catch( Error e ) {}
+      });
+    }
 
   }
 

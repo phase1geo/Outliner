@@ -152,7 +152,7 @@ public class NodeMenu : BaseMenu {
   protected override void on_popup() {
 
     var pasteable  = OutlinerClipboard.node_pasteable();
-    var first_node = ot.root.get_first_node();
+    var first_node = ot.root_node.get_first_node();
 
     // Set the menu sensitivity
     set_enabled( KeyCommand.EDIT_PASTE,               pasteable );
@@ -168,7 +168,7 @@ public class NodeMenu : BaseMenu {
     set_enabled( KeyCommand.NODE_SELECT_PARENT,       !ot.selected.parent.is_root() );
     set_enabled( KeyCommand.NODE_SELECT_LAST_CHILD,   !ot.selected.is_leaf() );
     set_enabled( KeyCommand.NODE_SELECT_TOP,          ((first_node != ot.selected) && !first_node.is_root()) );
-    set_enabled( KeyCommand.NODE_SELECT_BOTTOM,       ((ot.root.get_last_node() != ot.selected) && !first_node.is_root()) );
+    set_enabled( KeyCommand.NODE_SELECT_BOTTOM,       ((ot.root_node.get_last_node() != ot.selected) && !first_node.is_root()) );
     ot.action_set_enabled( "node.action_join_row",                 ot.is_node_joinable() );
     ot.action_set_enabled( "node.action_toggle_expand",            (ot.selected.children.length > 0) );
 
@@ -198,24 +198,6 @@ public class NodeMenu : BaseMenu {
   // Toggles the note display status of the currently selected node
   private void action_toggle_note() {
     ot.toggle_note( ot.selected, false );
-  }
-
-  //-------------------------------------------------------------
-  // Adds a new row above the currently selected row
-  private void action_add_row_above() {
-    ot.add_sibling_node( false );
-  }
-
-  //-------------------------------------------------------------
-  // Adds a new row below the currently selected row
-  private void action_add_row_below() {
-    ot.add_sibling_node( true );
-  }
-
-  //-------------------------------------------------------------
-  // Joins the current row to the one above it
-  private void action_join_row() {
-    ot.join_row();
   }
 
   //-------------------------------------------------------------

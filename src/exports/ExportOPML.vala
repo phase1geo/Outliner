@@ -63,8 +63,8 @@ public class ExportOPML : Export {
   private Xml.Node* export_body( OutlineTable table, out string expand_state ) {
     Xml.Node*  body    = new Xml.Node( null, "body" );
     Array<int> estate  = new Array<int>();
-    for( int i=0; i<table.root.children.length; i++ ) {
-      body->add_child( export_node( table, table.root.children.index( i ), ref estate ) );
+    for( int i=0; i<table.root_node.children.length; i++ ) {
+      body->add_child( export_node( table, table.root_node.children.index( i ), ref estate ) );
     }
     expand_state = "";
     for( int i=0; i<estate.length; i++ ) {
@@ -170,13 +170,13 @@ public class ExportOPML : Export {
   public void import_body( OutlineTable table, Xml.Node* n, ref Array<int>? expand_state) {
 
     // Clear the existing nodes
-    table.root.children.remove_range( 0, table.root.children.length );
+    table.root_node.children.remove_range( 0, table.root_node.children.length );
 
     // Load the contents of the file
     var i = 0;
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "outline") ) {
-        table.root.add_child( import_node( table, it, ref expand_state ), i++ );
+        table.root_node.add_child( import_node( table, it, ref expand_state ), i++ );
       }
     }
 

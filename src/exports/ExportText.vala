@@ -49,7 +49,7 @@ public class ExportText : Export {
 
     try {
 
-      var nodes = table.root.children;
+      var nodes = table.root_node.children;
       for( int i=0; i<nodes.length; i++ ) {
         var name  = new FormattedText.copy_clean( table, nodes.index( i ).name.text );
         var title = "- " + name.text.replace( "\n", "\n  " ) + "\n";

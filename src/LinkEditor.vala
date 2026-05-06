@@ -197,15 +197,15 @@ public class LinkEditor : Popover {
 
         } else if( OutlinerClipboard.text_pasteable() ) {
           var clipboard = Gdk.Display.get_default().get_clipboard();
-          try {
-            clipboard.read_text_async.begin( null, (obj, res) => {
+          clipboard.read_text_async.begin( null, (obj, res) => {
+            try {
               var clip_text = clipboard.read_text_async.end( res );
               if( (clip_text != null) && Regex.match_simple( _url_re, clip_text ) ) {
                 _entry.text = clip_text;
                 check_entry();
               }
-            });
-          } catch( Error e ) {} 
+            } catch( Error e ) {} 
+          });
         }
 
       }

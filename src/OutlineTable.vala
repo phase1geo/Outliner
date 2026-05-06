@@ -149,7 +149,7 @@ public class OutlineTable : DrawingArea {
       }
     }
   }
-  public Node root { private set; get; }
+  public Node root_node { private set; get; }
   public string? hilite_color {
     get {
       return( _hilite_color );
@@ -175,7 +175,7 @@ public class OutlineTable : DrawingArea {
     set {
       if( _condensed != value ) {
         _condensed = value;
-        root.set_condensed( value );
+        root_node.set_condensed( value );
         queue_draw();
       }
     }
@@ -187,7 +187,7 @@ public class OutlineTable : DrawingArea {
     set {
       if( _list_type != value ) {
         _list_type = value;
-        root.set_list_types();
+        root_node.set_list_types();
         queue_draw();
         changed();
       }
@@ -363,7 +363,7 @@ public class OutlineTable : DrawingArea {
     _doc = new Document( this );
 
     // Create the root node
-    root = new Node.root( this );
+    root_node = new Node.root( this );
 
     // Create contextual menu(s)
     _node_menu = new NodeMenu( win.application, this );
@@ -387,7 +387,7 @@ public class OutlineTable : DrawingArea {
     _completion = new TextCompletion( this );
 
     // Set the style context
-    get_style_context().add_class( "canvas" );
+    add_css_class( "canvas" );
 
     // Initialize font and other property information from gsettings
     _title_family    = Outliner.settings.get_string( "default-title-font-family" );
@@ -411,9 +411,9 @@ public class OutlineTable : DrawingArea {
       tasks_on_right = Outliner.settings.get_boolean( "checkboxes-on-right" );
       _min_depth     = Outliner.settings.get_boolean( "minimum-depth-line-display" );
       parse_urls     = Outliner.settings.get_boolean( "auto-parse-embedded-urls" );
-      if( root.children.length > 0 ) {
-        root.children.index( 0 ).y = get_top_row_y();
-        root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
+      if( root_node.children.length > 0 ) {
+        root_node.children.index( 0 ).y = get_top_row_y();
+        root_node.children.index( 0 ).adjust_nodes( root_node.children.index( 0 ).last_y, false, "gsettings changed" );
       }
       show_tasks_changed();
       queue_draw();
@@ -580,7 +580,7 @@ public class OutlineTable : DrawingArea {
   // are currently displayed.
   public void get_window_ys( out int top, out int bottom ) {
     var vp = parent.parent as Viewport;
-    var vh = vp.get_allocated_height();
+    var vh = vp.get_height();
     var sw = parent.parent.parent as ScrolledWindow;
     top    = (int)sw.vadjustment.value;
     bottom = top + vh;
@@ -599,11 +599,11 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Make sure that the given node is fully in view
   public void see( Node node ) {
-    if( root.children.length == 0 ) return;
+    if( root_node.children.length == 0 ) return;
     int y1, y2;
     int x, ytop, ybot;
     var vp = parent.parent as Viewport;
-    var vh = vp.get_allocated_height();
+    var vh = vp.get_height();
     get_window_ys( out y1, out y2 );
     if( (y2 - y1) <= 1 ) return;
     switch( node.mode ) {
@@ -623,7 +623,7 @@ public class OutlineTable : DrawingArea {
     } else if( ybot > y2 ) {
       _scroll_adjust = (double)ybot - vh;
     }
-    if( ybot <= get_allocated_height() ) {
+    if( ybot <= get_height() ) {
       see_internal();
     }
   }
@@ -640,10 +640,10 @@ public class OutlineTable : DrawingArea {
   // at the top of the window.
   public bool resize_table() {
 
-    var last_node = root.get_last_node();
+    var last_node = root_node.get_last_node();
     var last_y    = (int)last_node.last_y;
     var vp        = parent.parent as Viewport;
-    var vh        = vp.get_allocated_height();
+    var vh        = vp.get_height();
     var end_y     = (last_y > ((int)last_node.y + vh)) ? last_y : ((int)last_node.y + vh);
 
     set_size_request( -1, end_y );
@@ -709,7 +709,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Returns the node at the given coordinates
   private Node? node_at_coordinates( double x, double y ) {
-    return( root.get_containing_node( x, y ) );
+    return( root_node.get_containing_node( x, y ) );
   }
 
   //-------------------------------------------------------------
@@ -817,7 +817,7 @@ public class OutlineTable : DrawingArea {
     if( size != null ) {
       _name_size = size;
     }
-    root.change_name_font( family, size );
+    root_node.change_name_font( family, size );
     queue_draw();
     changed();
   }
@@ -831,7 +831,7 @@ public class OutlineTable : DrawingArea {
     if( size != null ) {
       _note_size = size;
     }
-    root.change_note_font( family, size );
+    root_node.change_note_font( family, size );
     queue_draw();
     changed();
   }
@@ -1135,6 +1135,7 @@ public class OutlineTable : DrawingArea {
               _active.parent.add_child( selected, (_active.index() + 1) );
               undo_buffer.add_item( new UndoNodeMove( selected, _move_parent, _move_index ) );
               break;
+            default :  break;
           }
           set_node_mode( selected, NodeMode.SELECTED );
           set_node_mode( _active, NodeMode.NONE );
@@ -1187,16 +1188,6 @@ public class OutlineTable : DrawingArea {
   // Hides the format bar if we lose keyboard focus.
   private void on_focus_leave() {
     // hide_format_bar();
-  }
-
-  //-------------------------------------------------------------
-  // Returns true if the following key was found to be pressed
-  // (regardless of keyboard layout).
-  private bool has_key( uint[] kvs, uint key ) {
-    foreach( uint kv in kvs ) {
-      if( kv == key ) return( true );
-    }
-    return( false );
   }
 
   //-------------------------------------------------------------
@@ -1432,6 +1423,7 @@ public class OutlineTable : DrawingArea {
       case NodeMode.SELECTED :  copy_selected_node();   break;
       case NodeMode.EDITABLE :  copy_selected_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  copy_selected_text( selected.note );  break;
+      default :  break;
     }
 
     // Get rid of the format bar
@@ -1484,6 +1476,7 @@ public class OutlineTable : DrawingArea {
       case NodeMode.SELECTED :  cut_selected_node();  break;
       case NodeMode.EDITABLE :  cut_selected_text( selected.name );  break;
       case NodeMode.NOTEEDIT :  cut_selected_text( selected.note );  break;
+      default :  break;
     }
 
     // Get rid of the format bar
@@ -1666,7 +1659,7 @@ public class OutlineTable : DrawingArea {
       }
     } else if( is_title_editable() ) {
       set_title_editable( false );
-    } else if( root.alpha < 1.0 ) {
+    } else if( root_node.alpha < 1.0 ) {
       focus_leave();
     } else if( _filtered ) {
       filter_nodes( "", true, null );
@@ -1806,11 +1799,11 @@ public class OutlineTable : DrawingArea {
   // Moves the selected node to the top of the document.  Returns
   // true if successful.
   public bool move_node_to_top( Node node ) {
-    if( node != root.children.index( 0 ) ) {
+    if( node != root_node.children.index( 0 ) ) {
       var orig_parent = node.parent;
       var orig_index  = node.index();
       node.parent.remove_child( node );
-      root.add_child( node, 0 );
+      root_node.add_child( node, 0 );
       undo_buffer.add_item( new UndoNodeMove( node, orig_parent, orig_index ) );
       queue_draw();
       changed();
@@ -1824,7 +1817,7 @@ public class OutlineTable : DrawingArea {
   // Moves the selected node to the bottom of the document.  Returns
   // true if successful.
   public bool move_node_to_bottom( Node node ) {
-    var last = root.get_last_node();
+    var last = root_node.get_last_node();
     if( node.get_last_node() != last ) {
       var orig_parent = node.parent;
       var orig_index  = node.index();
@@ -1882,15 +1875,7 @@ public class OutlineTable : DrawingArea {
   // Toggles the show all notes status given the state of the
   // currently selected node
   public void toggle_show_notes() {
-    set_notes_display( !root.any_notes_shown() );
-  }
-
-  //-------------------------------------------------------------
-  // Causes selected text to be stricken.
-  private void handle_control_t( bool shift ) {
-    if( shift && is_node_selected() ) {
-      move_node_to_top( selected );
-    }
+    set_notes_display( !root_node.any_notes_shown() );
   }
 
   //-------------------------------------------------------------
@@ -1898,7 +1883,7 @@ public class OutlineTable : DrawingArea {
   public void pageup() {
     if( is_node_selected() ) {
       var vp   = parent.parent as Viewport;
-      var vh   = vp.get_allocated_height();
+      var vh   = vp.get_height();
       var sw   = parent.parent.parent as ScrolledWindow;
       var y1   = sw.vadjustment.value;
       sw.vadjustment.value = y1 - vh;
@@ -1919,7 +1904,7 @@ public class OutlineTable : DrawingArea {
   public void pagedn() {
     if( is_node_selected() ) {
       var vp = parent.parent as Viewport;
-      var vh = vp.get_allocated_height();
+      var vh = vp.get_height();
       var sw = parent.parent.parent as ScrolledWindow;
       var y1 = sw.vadjustment.value;
       sw.vadjustment.value = y1 + vh;
@@ -1967,7 +1952,7 @@ public class OutlineTable : DrawingArea {
   // Helper class for the handle_im_retrieve_surrounding method
   private void retrieve_surrounding_in_text( CanvasText ct ) {
     var text = ct.text.text;
-    _im_context.set_surrounding( text, text.length, ct.cursor );
+    _im_context.set_surrounding_with_selection( text, text.length, ct.cursor, ct.selstart );
   }
 
   //-------------------------------------------------------------
@@ -2059,7 +2044,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Returns the top-most visible node.
   public Node? node_top() {
-    var node = root.get_first_node();
+    var node = root_node.get_first_node();
     while( (node != null) && node.hidden ) {
       node = node.get_next_node();
     }
@@ -2069,7 +2054,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Returns the bottom-most visible node.
   public Node? node_bottom() {
-    var node = root.get_last_node();
+    var node = root_node.get_last_node();
     while( (node != null) && node.hidden ) {
       node = node.get_previous_node();
     }
@@ -2259,9 +2244,9 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Updates the title on window resize
   private void title_resized() {
-    if( root.children.length > 0 ) {
-      root.children.index( 0 ).y = get_top_row_y();
-      root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "gsettings changed" );
+    if( root_node.children.length > 0 ) {
+      root_node.children.index( 0 ).y = get_top_row_y();
+      root_node.children.index( 0 ).adjust_nodes( root_node.children.index( 0 ).last_y, false, "gsettings changed" );
       queue_draw();
     }
   }
@@ -2270,7 +2255,7 @@ public class OutlineTable : DrawingArea {
   // Creates a title and makes it editable, if specified.
   public void create_title( bool edit, string text = _( "Title" ) ) {
 
-    _title = new CanvasText.with_text( this, get_allocated_width(), text );
+    _title = new CanvasText.with_text( this, get_width(), text );
     _title.posy = top_margin;
     _title.set_font( _title_family, _title_size );
     _title.set_alignment( Pango.Alignment.CENTER );
@@ -2310,7 +2295,7 @@ public class OutlineTable : DrawingArea {
 
       // Create the main idea node
       var node = new Node( this );
-      insert_node( root, node, 0 );
+      insert_node( root_node, node, 0 );
       selected = null;
 
       // Create the title
@@ -2329,7 +2314,7 @@ public class OutlineTable : DrawingArea {
   public void initialize_for_open() {
 
     // Create a new root node
-    root = new Node( this );
+    root_node = new Node( this );
 
     // Clear the undo buffer
     undo_buffer.clear();
@@ -2373,11 +2358,11 @@ public class OutlineTable : DrawingArea {
       int    line;
       text.get_char_pos( cursor, out left, out top, out bottom, out line );
 
-      var width  = (_format_bar.get_allocated_width() / 2);
-      var height = _format_bar.get_allocated_height();
+      var width  = (_format_bar.get_width() / 2);
+      var height = _format_bar.get_height();
 
       // If this is the first line of the first row, change the popover point to the bottom of the text
-      if( (selected == root.children.index( 0 )) && (line == 0) ) {
+      if( (selected == root_node.children.index( 0 )) && (line == 0) ) {
         _format_bar.margin_start = (int)((left < width) ? 0 : (left - width));
         _format_bar.margin_top   = (int)(bottom + 10);
       } else {
@@ -2443,6 +2428,7 @@ public class OutlineTable : DrawingArea {
       case NodeTaskMode.OPEN  :  tasks_open++;  break;
       case NodeTaskMode.DOING :  tasks_doing++;  break;
       case NodeTaskMode.DONE  :  tasks_done++;   break;
+      default                 :  break;
     }
     for( int i=0; i<node.children.length; i++ ) {
       update_node_statistics( node.children.index( i ),
@@ -2463,8 +2449,8 @@ public class OutlineTable : DrawingArea {
     tasks_open  = 0;
     tasks_doing = 0;
     tasks_done  = 0;
-    for( int i=0; i<root.children.length; i++ ) {
-      update_node_statistics( root.children.index( i ),
+    for( int i=0; i<root_node.children.length; i++ ) {
+      update_node_statistics( root_node.children.index( i ),
         ref char_count, ref word_count, ref row_count,
         ref tasks_open, ref tasks_doing, ref tasks_done );
     }
@@ -2562,7 +2548,7 @@ public class OutlineTable : DrawingArea {
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "node") ) {
         var node = new Node( this );
-        root.add_child( node, i++ );
+        root_node.add_child( node, i++ );
         node.load( this, it, ref clone_ids );
       }
     }
@@ -2573,7 +2559,7 @@ public class OutlineTable : DrawingArea {
   // Saves the table information to the given XML node
   public void save( Xml.Node* n ) {
 
-    n->set_prop( "version",     Outliner.version );
+    n->set_prop( "version",     _win.application.version );
     n->set_prop( "condensed",   _condensed.to_string() );
     n->set_prop( "listtype",    list_type.to_string() );
     n->set_prop( "show-tasks",  _show_tasks.to_string() );
@@ -2613,8 +2599,8 @@ public class OutlineTable : DrawingArea {
 
     var clone_ids = new HashMap<int,bool>();
 
-    for( int i=0; i<root.children.length; i++ ) {
-      n->add_child( root.children.index( i ).save( ref clone_ids ) );
+    for( int i=0; i<root_node.children.length; i++ ) {
+      n->add_child( root_node.children.index( i ).save( ref clone_ids ) );
     }
 
     return( n );
@@ -2628,7 +2614,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Perform a depth-first search for the given search pattern
   public void do_search( string pattern ) {
-    root.do_search( pattern );
+    root_node.do_search( pattern );
     queue_draw();
   }
 
@@ -2655,7 +2641,7 @@ public class OutlineTable : DrawingArea {
   // string
   public void replace_all( string search, string replace ) {
     var undo = new UndoReplaceAll( search, replace );
-    root.replace_all( replace, ref undo );
+    root_node.replace_all( replace, ref undo );
     undo_buffer.add_item( undo );
     queue_draw();
     changed();
@@ -2664,7 +2650,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Enters focus mode for the selected mode
   public void focus_on_selected() {
-    root.set_tree_alpha( dim_unselected );
+    root_node.set_tree_alpha( dim_unselected );
     selected.set_tree_alpha( 1.0 );
     _focus_node = selected;
     place_at_top( selected );
@@ -2675,7 +2661,7 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Return to unfocused mode
   public void focus_leave() {
-    root.set_tree_alpha( 1.0 );
+    root_node.set_tree_alpha( 1.0 );
     focus_mode( null );
     _focus_node = null;
     queue_draw();
@@ -2685,13 +2671,13 @@ public class OutlineTable : DrawingArea {
   // Filters the rows that match the given NodeFilterFunc
   public void filter_nodes( string msg, bool show_parent, NodeFilterFunc? func ) {
     _filtered = false;
-    for( int i=0; i<root.children.length; i++ ) {
+    for( int i=0; i<root_node.children.length; i++ ) {
       var shown = false;
-      root.children.index( i ).filter( func, ref _filtered, ref shown );
-      root.children.index( i ).hidden &= !show_parent || !shown;
+      root_node.children.index( i ).filter( func, ref _filtered, ref shown );
+      root_node.children.index( i ).hidden &= !show_parent || !shown;
     }
     if( _filtered || (func == null) ) {
-      root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "filter_nodes" );
+      root_node.children.index( 0 ).adjust_nodes( root_node.children.index( 0 ).last_y, false, "filter_nodes" );
       queue_draw();
       if( selected != null ) {
         see( selected );
@@ -2836,11 +2822,11 @@ public class OutlineTable : DrawingArea {
   // Removes the selected node from the table
   public void delete_current_node() {
     if( selected == null ) return;
-    if( (root.children.length == 1) && (selected == root.children.index( 0 )) ) {
+    if( (root_node.children.length == 1) && (selected == root_node.children.index( 0 )) ) {
       var node = new Node( this );
       undo_buffer.add_item( new UndoNodeDelete( selected, node ) );
       delete_node( selected );
-      insert_node( root, node, 0 );
+      insert_node( root_node, node, 0 );
       set_node_mode( selected, NodeMode.EDITABLE );
     } else {
       undo_buffer.add_item( new UndoNodeDelete( selected, null ) );
@@ -2924,8 +2910,8 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Set the notes display for all nodes to the given value
   public void set_notes_display( bool show ) {
-    root.set_notes_display( show );
-    root.children.index( 0 ).adjust_nodes( root.children.index( 0 ).last_y, false, "set_notes_display" );
+    root_node.set_notes_display( show );
+    root_node.children.index( 0 ).adjust_nodes( root_node.children.index( 0 ).last_y, false, "set_notes_display" );
     if( selected != null ) {
       see( selected );
     }
@@ -2948,14 +2934,14 @@ public class OutlineTable : DrawingArea {
   //-------------------------------------------------------------
   // Draw the background from the stylesheet
   private void draw_background( Context ctx ) {
-    get_style_context().render_background( ctx, 0, 0, get_allocated_width(), get_allocated_height() );
+    get_style_context().render_background( ctx, 0, 0, get_width(), get_height() );
   }
 
   //-------------------------------------------------------------
   // Returns true if the coordinates are within the focus exit
   private bool is_within_focus_exit( double x, double y ) {
     if( Outliner.settings.get_boolean( "focus-mode" ) ) {
-      var width = get_allocated_width();
+      var width = get_width();
       return( Utils.is_within_bounds( x, y, (width - 45), 15, 30, 30 ) );
     }
     return( false );
@@ -2965,7 +2951,7 @@ public class OutlineTable : DrawingArea {
   // Draws the focus mode exit icon
   private void draw_exit_focus_mode( Context ctx ) {
     if( Outliner.settings.get_boolean( "focus-mode" ) ) {
-      var width = get_allocated_width();
+      var width = get_width();
       Utils.set_context_color_with_alpha( ctx, _theme.symbol_color, (_in_focus_exit ? 1.0 : 0.5) );
       ctx.set_line_width( 4 );
       ctx.arc( (width - 30), 30, 15, 0, (2 * Math.PI) );
@@ -2983,7 +2969,7 @@ public class OutlineTable : DrawingArea {
     if( include_title && (_title != null) ) {
       _title.draw( ctx, theme, theme.title_foreground, 1.0, draw_options.use_theme );
     }
-    root.draw_tree( ctx, theme, draw_options );
+    root_node.draw_tree( ctx, theme, draw_options );
   }
 
   //-------------------------------------------------------------
@@ -2992,7 +2978,7 @@ public class OutlineTable : DrawingArea {
     if( _title != null ) {
       _title.draw( ctx, _theme, _theme.title_foreground, 1.0, _draw_options.use_theme );
     }
-    root.draw_tree( ctx, _theme, _draw_options );
+    root_node.draw_tree( ctx, _theme, _draw_options );
     if( (selected != null) && !selected.hidden ) {
       selected.draw( ctx, _theme, _draw_options );
     }

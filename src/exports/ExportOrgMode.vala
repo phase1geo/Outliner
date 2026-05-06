@@ -82,14 +82,16 @@ public class ExportOrgMode : Export {
   //-------------------------------------------------------------
   // Draws each of the top-level nodes
   private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
-    if( table.title != null ) {
-      var title = "* " + table.title.text.text + "\n\n";
-      os.write( title.data );
-    }
-    var nodes = table.root.children;
-    for( int i=0; i<nodes.length; i++ ) {
-      export_node( os, table, nodes.index( i ), sprefix() );
-    }
+    try {
+      if( table.title != null ) {
+        var title = "* " + table.title.text.text + "\n\n";
+        os.write( title.data );
+      }
+      var nodes = table.root_node.children;
+      for( int i=0; i<nodes.length; i++ ) {
+        export_node( os, table, nodes.index( i ), sprefix() );
+      }
+    } catch( IOError e ) {}
   }
 
   public static string from_text( FormattedText text ) {
@@ -133,6 +135,7 @@ public class ExportOrgMode : Export {
         case NodeTaskMode.DONE  :  title += "[x] ";  break;
         case NodeTaskMode.OPEN  :  title += "[ ] ";  break;
         case NodeTaskMode.DOING :  title += "[-] ";  break;
+        default :  break;
       }
 
       var name = new FormattedText.copy_clean( table, node.name.text );

@@ -118,7 +118,7 @@ public class NodeLabels {
     }
     var n = lbl->get_prop( "node" );
     if( n != null ) {
-      set_label( ot.root.get_node_by_lookup_id( n ), index );
+      set_label( ot.root_node.get_node_by_lookup_id( n ), index );
     }
   }
 

@@ -54,40 +54,40 @@ public class FormatBar : Box {
 
     _copy = new Button.from_icon_name( "edit-copy-symbolic" ) {
       has_frame = false,
-      tooltip_markup = get_tooltip_markup( _( "Copy" ), KeyCommand.EDIT_COPY )
+      tooltip_markup = make_tooltip_markup( _( "Copy" ), KeyCommand.EDIT_COPY )
     };
     _copy.clicked.connect( handle_copy );
 
     _cut = new Button.from_icon_name( "edit-cut-symbolic" ) {
       has_frame = false,
-      tooltip_markup = get_tooltip_markup( _( "Cut" ), KeyCommand.EDIT_CUT )
+      tooltip_markup = make_tooltip_markup( _( "Cut" ), KeyCommand.EDIT_CUT )
     };
     _cut.clicked.connect( handle_cut );
 
     _bold = new ToggleButton() {
       has_frame = false,
-      tooltip_markup = get_tooltip_markup( _( "Bold" ), KeyCommand.EDIT_BOLD )
+      tooltip_markup = make_tooltip_markup( _( "Bold" ), KeyCommand.EDIT_BOLD )
     };
     add_markup( _bold, true, "<b>B</b>" );
     _bold.toggled.connect( handle_bold );
 
     _italics = new ToggleButton() {
       has_frame = false,
-      tooltip_markup = get_tooltip_markup( _( "Italic" ), KeyCommand.EDIT_ITALICS )
+      tooltip_markup = make_tooltip_markup( _( "Italic" ), KeyCommand.EDIT_ITALICS )
     };
     add_markup( _italics, true, "<i>I</i>" );
     _italics.toggled.connect( handle_italics );
 
     _underline = new ToggleButton() {
       has_frame = false,
-      tooltip_text = get_tooltip_markup( _( "Underline" ), KeyCommand.EDIT_UNDERLINE )
+      tooltip_text = make_tooltip_markup( _( "Underline" ), KeyCommand.EDIT_UNDERLINE )
     };
     add_markup( _underline, true, "<u>U</u>" );
     _underline.toggled.connect( handle_underline );
 
     _strike = new ToggleButton() {
       has_frame = false,
-      tooltip_text = get_tooltip_markup( _( "Strikethrough" ), KeyCommand.EDIT_STRIKETHRU )
+      tooltip_text = make_tooltip_markup( _( "Strikethrough" ), KeyCommand.EDIT_STRIKETHRU )
     };
     add_markup( _strike, true, "<s>S</s>" );
     _strike.toggled.connect( handle_strikethru );
@@ -129,16 +129,14 @@ public class FormatBar : Box {
     }
     add_markup( _header, false, "H<i>x</i>" );
 
-    _hilite = new ColorPicker( get_hilite_color(), table.get_theme().background, table.get_theme().foreground, ColorPickerType.HCOLOR ) {
-      toggle_tooltip = _( "Apply Highlight Color" ),
-      select_tooltip = _( "Change Highlight Color" )
-    };
+    _hilite = new ColorPicker( table.win, get_hilite_color(), ColorPickerType.HCOLOR );
+    _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
+    _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
     _hilite.color_changed.connect( handle_hilite );
 
-    _color = new ColorPicker( get_font_color(), table.get_theme().background, table.get_theme().foreground, ColorPickerType.FCOLOR ) {
-      toggle_tooltip = _( "Apply Font Color" ),
-      select_tooltip = _( "Change Font Color" )
-    };
+    _color = new ColorPicker( table.win, get_font_color(), ColorPickerType.FCOLOR );
+    _color.set_toggle_tooltip( _( "Apply Font Color" ) );
+    _color.set_select_tooltip( _( "Change Font Color" ) );
     _color.color_changed.connect( handle_color );
 
     _link = new ToggleButton() {
@@ -153,8 +151,6 @@ public class FormatBar : Box {
       tooltip_text = _( "Clear all formatting" )
     };
     _clear.clicked.connect( handle_clear );
-
-    var spacer = "    ";
 
     append( _copy );
     append( _cut );
@@ -201,7 +197,7 @@ public class FormatBar : Box {
 
   //-------------------------------------------------------------
   // Returns the tooltip to show for the given command.
-  private string get_tooltip_markup( string lbl, KeyCommand command ) {
+  private string make_tooltip_markup( string lbl, KeyCommand command ) {
     var shortcut = _table.win.shortcuts.get_shortcut( command );
     return( (shortcut == null) ? lbl : Utils.tooltip_with_accel( lbl, shortcut.get_accelerator() ) );
   }
@@ -374,15 +370,6 @@ public class FormatBar : Box {
   }
 
   //-------------------------------------------------------------
-  // Handles the header menu items.
-  private void action_header( SimpleAction action, Variant? variant ) {
-    if( variant != null ) {
-      var level = variant.get_int32();
-      handle_header( level );
-    }
-  }
-
-  //-------------------------------------------------------------
   // Toggles the header status of the currently selected text
   private void handle_header( int level ) {
     if( !_ignore_active ) {
@@ -498,7 +485,7 @@ public class FormatBar : Box {
   // Updates the link button tooltip based on the button active state.
   private void update_link_tooltip() {
     var command = _link.active ? KeyCommand.EDIT_URL_REMOVE : KeyCommand.EDIT_URL_ADD_EDIT;
-    _link.tooltip_markup = get_tooltip_markup( _( "Link" ), command );
+    _link.tooltip_markup = make_tooltip_markup( _( "Link" ), command );
   }
 
   //-------------------------------------------------------------

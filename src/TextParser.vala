@@ -23,14 +23,8 @@ public class TextParser {
 
   public delegate void TextMatchCallback( FormattedText text, MatchInfo match_info, int cursor );
 
-  private struct ReCallback {
-    Regex             re;
-    TextMatchCallback func;
-  }
-
-  private string             _name;
-  private int                _id;
-  private Array<ReCallback?> _res;
+  private string _name;
+  private int    _id; 
 
   public string name {
     get {
@@ -43,24 +37,36 @@ public class TextParser {
     }
   }
 
+  public signal void parse( FormattedText text, int cursor );
+
   //-------------------------------------------------------------
   // Default constructor
   public TextParser( string name, int id ) {
     _name = name;
     _id   = id;
-    _res  = new Array<ReCallback?>();
   }
 
   //-------------------------------------------------------------
   // Adds a regular expression to this parser
-  protected void add_regex( string re, TextMatchCallback func ) {
+  protected void add_regex( string pattern, TextMatchCallback func ) {
     try {
-      _res.append_val( { new Regex( re, RegexCompileFlags.MULTILINE ), func } );
+      var re = new Regex( pattern, RegexCompileFlags.MULTILINE );
+      parse.connect((text, cursor) => {
+        MatchInfo matches;
+        var       start = 0;
+        try {
+          while( re.match_full( text.text, -1, start, 0, out matches ) ) {
+            int start_pos, end_pos;
+            matches.fetch_pos( 0, out start_pos, out end_pos );
+            start = end_pos;
+            func( text, matches, cursor );
+          }
+        } catch( RegexError e ) {}
+      });
     } catch( RegexError e ) {
-      stdout.printf( "Parser regex error (re: %s, error: %s)\n", re, e.message );
-      return;
+      stdout.printf( "Parser regex error (re: %s, error: %s)\n", pattern, e.message );
     }
-  }
+  } 
 
   //-------------------------------------------------------------
   // Helper function that adds the tag for the given parenthesis
@@ -75,23 +81,6 @@ public class TextParser {
   // Helper function that returns the matched string
   protected string get_text( MatchInfo matches, int paren ) {
     return( matches.fetch( paren ) );
-  }
-
-  //-------------------------------------------------------------
-  // Called to parse the text within the given FormattedText element
-  public void parse( FormattedText text, int cursor ) {
-    for( int i=0; i<_res.length; i++ ) {
-      MatchInfo matches;
-      var       start = 0;
-      try {
-        while( _res.index( i ).re.match_full( text.text, -1, start, 0, out matches ) ) {
-          int start_pos, end_pos;
-          matches.fetch_pos( 0, out start_pos, out end_pos );
-          start = end_pos;
-          _res.index( i ).func( text, matches, cursor );
-        }
-      } catch( RegexError e ) {}
-    }
   }
 
   //-------------------------------------------------------------

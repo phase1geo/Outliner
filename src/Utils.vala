@@ -47,8 +47,8 @@ public class Utils {
   //-------------------------------------------------------------
   // Returns true if the specified version is older than this
   // version
-  public static bool is_version_older( string other_version ) {
-    var my_parts    = Outliner.version.split( "." );
+  public static bool is_version_older( string our_version, string other_version ) {
+    var my_parts    = our_version.split( "." );
     var other_parts = other_version.split( "." );
     for( int i=0; i<my_parts.length; i++ ) {
       if( int.parse( other_parts[i] ) < int.parse( my_parts[i] ) ) {
@@ -215,13 +215,11 @@ public class Utils {
 
   //-------------------------------------------------------------
   // Sets the initial folder for the given file chooser.
-  public static void set_chooser_folder( FileChooser chooser ) {
+  public static void set_chooser_folder( FileDialog dialog ) {
     var dir = Outliner.settings.get_string( "last-directory" );
     if( dir != "" ) {
       var file = File.new_for_path( dir );
-      try {
-        chooser.set_current_folder( file );
-      } catch( Error e ) {}
+      dialog.initial_folder = file;
     }
   }
 
@@ -315,18 +313,18 @@ public class Utils {
   private static void delete_recursively( File file ) throws Error {
 
     try {
-      var enumerator = file.enumerate_children ( FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NOFOLLOW_SYMLINKS );
+      var enumerator = file.enumerate_children( FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NOFOLLOW_SYMLINKS );
       FileInfo? info;
-      while( (info = enumerator.next_file ()) != null ) {
-        var child = file.get_child (info.get_name ());
+      while( (info = enumerator.next_file()) != null ) {
+        var child = file.get_child( info.get_name() );
         delete_recursively( child );
       }
-    } catch (Error e) {
+    } catch( Error e ) {
       // ignore if not a directory
     }
 
     // Finally delete the file or directory itself
-    file.delete ();
+    file.delete();
 
   }
 
@@ -334,7 +332,9 @@ public class Utils {
   // Deletes the given directory.
   public static void delete_directory( string dirpath ) {
     var dir = File.new_for_path( dirpath );
-    delete_recursively( dir );
+    try {
+      delete_recursively( dir );
+    } catch( Error e ) {}
   }
 
 }

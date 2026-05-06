@@ -410,22 +410,28 @@ public class Preferences : Granite.Dialog {
 
   //-------------------------------------------------------------
   // Creates a font button
-  private FontButton make_font( FontTarget target, string family_setting, string size_setting ) {
-    var btn = new FontButton();
-    btn.set_filter_func( (family, face) => {
-      var fd     = face.describe();
-      var weight = fd.get_weight();
-      var style  = fd.get_style();
-      return( (weight == Pango.Weight.NORMAL) && (style == Pango.Style.NORMAL) );
+  private FontDialogButton make_font( FontTarget target, string family_setting, string size_setting ) {
+
+    var dialog = new FontDialog();
+    var btn = new FontDialogButton( dialog );
+
+    var fd  = btn.get_font_desc();
+    fd.set_family( Outliner.settings.get_string( family_setting ) );
+    fd.set_size( Outliner.settings.get_int( size_setting ) * Pango.SCALE );
+    btn.set_font_desc( fd );
+
+    btn.notify["font-desc"].connect(() => {
+      var table  = _win.get_current_table();
+      var family = btn.font_desc.get_family();
+      var size   = btn.font_desc.get_size() / Pango.SCALE;
+      table.change_font( target, family, size );
+      Outliner.settings.set_string( family_setting, family );
+      Outliner.settings.set_int( size_setting, size );
+
     });
-    btn.set_font( Outliner.settings.get_string( family_setting ) + " " + Outliner.settings.get_int( size_setting ).to_string() );
-    btn.font_set.connect(() => {
-      var table = _win.get_current_table();
-      table.change_font( target, btn.get_font_family().get_name(), (btn.get_font_size() / Pango.SCALE) );
-      Outliner.settings.set_string( family_setting, btn.get_font_family().get_name() );
-      Outliner.settings.set_int( size_setting, (btn.get_font_size() / Pango.SCALE) );
-    });
+
     return( btn );
+
   }
 
   //-------------------------------------------------------------
@@ -634,7 +640,7 @@ public class Preferences : Granite.Dialog {
 
     // Get the available theme names
     var names = new Array<string>();
-    _win.themes.names( ref names );
+    MainWindow.themes.names( ref names );
 
     var theme   = Outliner.settings.get_string( "default-theme" );
     var current = 0;
@@ -642,7 +648,7 @@ public class Preferences : Granite.Dialog {
 
     for( int i=0; i<names.length; i++ ) {
       var name = names.index( i );
-      themes[i] = _win.themes.get_theme( name ).label;
+      themes[i] = MainWindow.themes.get_theme( name ).label;
       if( name == theme ) {
         current = i;
       }

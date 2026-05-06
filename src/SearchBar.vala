@@ -200,9 +200,10 @@ public class SearchBar : Box {
           _next.name = false;
           start = _next.node.note.is_selected() ? _next.node.note.selend : _next.node.note.cursor + 1;
           break;
+        default :  break;
       }
-    } else if( _ot.root.children.length > 0 ) {
-      _next.node = _ot.root.children.index( 0 );
+    } else if( _ot.root_node.children.length > 0 ) {
+      _next.node = _ot.root_node.children.index( 0 );
     } else {
       return;
     }
@@ -249,6 +250,7 @@ public class SearchBar : Box {
           _prev.name = false;
           start = _prev.node.note.is_selected() ? _prev.node.name.selstart : _prev.node.note.cursor;
           break;
+        default :  break;
       }
     } else {
       return;
@@ -350,6 +352,7 @@ public class SearchBar : Box {
       switch( _ot.selected.mode ) {
         case NodeMode.EDITABLE :  seltext = _ot.selected.name.get_selected_text();  break;
         case NodeMode.NOTEEDIT :  seltext = _ot.selected.note.get_selected_text();  break;
+        default :  break;
       }
       return( (seltext != null) && (seltext == pattern) );
     }

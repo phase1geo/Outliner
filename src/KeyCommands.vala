@@ -108,6 +108,8 @@ public enum KeyCommand {
     NODE_MOVE_START,
       NODE_INDENT,
       NODE_UNINDENT,
+      NODE_MOVE_TO_TOP,
+      NODE_MOVE_TO_BOTTOM,
       NODE_MOVE_UP,
       NODE_MOVE_DOWN,
       NODE_MOVE_PARENT_ABOVE,
@@ -264,6 +266,8 @@ public enum KeyCommand {
       case NODE_SELECT_PREV_SIBLING  :  return( "node-select-prev-sibling" );
       case NODE_INDENT               :  return( "node-indent" );
       case NODE_UNINDENT             :  return( "node-unindent" );
+      case NODE_MOVE_TO_TOP          :  return( "node-move-to-top" );
+      case NODE_MOVE_TO_BOTTOM       :  return( "node-move-to-bottom" );
       case NODE_MOVE_UP              :  return( "node-move-up" );
       case NODE_MOVE_DOWN            :  return( "node-move-down" );
       case NODE_MOVE_PARENT_ABOVE    :  return( "node-move-parent-above" );
@@ -403,6 +407,8 @@ public enum KeyCommand {
       case "node-select-prev-sibling"  :  return( NODE_SELECT_PREV_SIBLING );
       case "node-indent"               :  return( NODE_INDENT );
       case "node-unindent"             :  return( NODE_UNINDENT );
+      case "node-move-to-top"          :  return( NODE_MOVE_TO_TOP );
+      case "node-move-to-bottom"       :  return( NODE_MOVE_TO_BOTTOM );
       case "node-move-down"            :  return( NODE_MOVE_DOWN );
       case "node-move-up"              :  return( NODE_MOVE_UP );
       case "node-move-parent-above"    :  return( NODE_MOVE_PARENT_ABOVE );
@@ -552,6 +558,8 @@ public enum KeyCommand {
       case NODE_MOVE_START           :  return( _( "Move Commands" ) );
       case NODE_INDENT               :  return( _( "Indent currently selected row" ) );
       case NODE_UNINDENT             :  return( _( "Unindent currently selected row" ) );
+      case NODE_MOVE_TO_TOP          :  return( _( "Move current row to top of document" ) );
+      case NODE_MOVE_TO_BOTTOM       :  return( _( "Move current row to bottom of document" ) );
       case NODE_MOVE_DOWN            :  return( _( "Move current row down" ) );
       case NODE_MOVE_UP              :  return( _( "Move current row up" ) );
       case NODE_MOVE_PARENT_ABOVE    :  return( _( "Move current row above parent" ) );
@@ -690,6 +698,8 @@ public enum KeyCommand {
       case NODE_SELECT_PREV_SIBLING  :  return( node_select_prev_sibling );
       case NODE_INDENT               :  return( node_indent );
       case NODE_UNINDENT             :  return( node_unindent );
+      case NODE_MOVE_TO_TOP          :  return( node_move_to_top );
+      case NODE_MOVE_TO_BOTTOM       :  return( node_move_to_bottom );
       case NODE_MOVE_DOWN            :  return( node_move_down );
       case NODE_MOVE_UP              :  return( node_move_up );
       case NODE_MOVE_PARENT_ABOVE    :  return( node_move_parent_above );
@@ -1181,6 +1191,14 @@ public enum KeyCommand {
     ot.unindent();
   }
 
+  public static void node_move_to_top( OutlineTable ot ) {
+    ot.move_node_to_top( ot.selected );
+  }
+
+  public static void node_move_to_bottom( OutlineTable ot ) {
+    ot.move_node_to_bottom( ot.selected );
+  }
+
   public static void node_move_down( OutlineTable ot ) {
     ot.move_node_down( ot.selected );
   }
@@ -1476,10 +1494,8 @@ public enum KeyCommand {
   }
 
   private static void edit_format( OutlineTable ot, FormatTag tag ) {
-    stdout.printf( "In edit_format, tag: %s\n", tag.to_string() );
     var text = ot.get_current_text( false );
     if( (text != null) && text.is_selected() ) {
-      stdout.printf( "  text is selected\n" );
       text.add_tag( tag, null, ot.undo_text );
       ot.see( ot.selected );
       ot.queue_draw();
@@ -1660,7 +1676,7 @@ public enum KeyCommand {
       ot.queue_draw();
     } else if( ot.is_title_editable() ) {
       ot.set_title_editable( false );
-      ot.selected = ot.root.get_last_node();
+      ot.selected = ot.root_node.get_last_node();
       ot.set_node_mode( ot.selected, NodeMode.EDITABLE );
       ot.queue_draw();
     } else if( ot.selected != null ) {
@@ -1693,7 +1709,7 @@ public enum KeyCommand {
         ot.title.insert( "\t", ot.undo_text );
       } else {
         ot.set_title_editable( false );
-        ot.selected = ot.root.get_last_node();
+        ot.selected = ot.root_node.get_last_node();
         ot.set_node_mode( ot.selected, NodeMode.EDITABLE );
       }
       ot.queue_draw();

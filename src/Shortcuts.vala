@@ -183,7 +183,6 @@ public class Shortcut {
   public string get_label() {
     string[] lbl = {};
     unichar  uc  = keyval_to_unicode( _keycode );
-    string   str = "";
     if( _control ) {
       lbl += "Ctrl";
     }
@@ -579,6 +578,8 @@ public class Shortcuts {
 
     add_default( Key.Tab,          false, false, false, KeyCommand.NODE_INDENT );
     add_default( Key.Tab,          false, true,  false, KeyCommand.NODE_UNINDENT );
+    add_default( Key.t,            true,  true,  false, KeyCommand.NODE_MOVE_TO_TOP );
+    add_default( Key.b,            true,  true,  false, KeyCommand.NODE_MOVE_TO_BOTTOM );
     add_default( Key.Down,         true,  false, false, KeyCommand.NODE_MOVE_DOWN );
     add_default( Key.Up,           true,  false, false, KeyCommand.NODE_MOVE_UP );
     add_default( Key.a,            true,  false, false, KeyCommand.NODE_MOVE_PARENT_BELOW );

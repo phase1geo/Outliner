@@ -51,9 +51,6 @@ public class MainWindow : Gtk.ApplicationWindow {
   private Button?                     _redo_btn    = null;
   private ZoomWidget                  _zoom;
   private ModeGroup                   _list_types;
-  private FontButton                  _fonts_title;
-  private FontButton                  _fonts_name;
-  private FontButton                  _fonts_note;
   private Switch                      _condensed;
   private Switch                      _show_tasks;
   private Switch                      _show_depth;
@@ -73,7 +70,6 @@ public class MainWindow : Gtk.ApplicationWindow {
   private Exports                     _exports;
   private Exporter                    _exporter;
   private UnicodeInsert               _unicoder;
-  private Label                       _info_label;
   private SimpleActionGroup           _actions;
   private Shortcuts                   _shortcuts;
   private Gee.HashMap<KeyCommand, ShortcutTooltip> _shortcut_widgets;
@@ -117,12 +113,10 @@ public class MainWindow : Gtk.ApplicationWindow {
     var window_h = Outliner.settings.get_int( "window-h" );
 
     // Create the exports and load it
-    _exports = new Exports();
+    _exports = new Exports( this );
 
     // Unicoder
     _unicoder = new UnicodeInsert();
-
-    var focus_mode = Outliner.settings.get_boolean( "focus-mode" );
 
     enable_tag_completion = Outliner.settings.get_boolean( "enable-tag-auto-completion" );
 
@@ -134,8 +128,8 @@ public class MainWindow : Gtk.ApplicationWindow {
       show_title_buttons = true,
       title_widget = new Label( _( "Outliner" ) )
     };
-    _header.get_style_context().add_class( "outliner-toolbar" );
-    _header.get_style_context().add_class( "titlebar" );
+    _header.add_css_class( "outliner-toolbar" );
+    _header.add_css_class( "titlebar" );
 
     set_titlebar( _header );
 
@@ -151,9 +145,6 @@ public class MainWindow : Gtk.ApplicationWindow {
     // Set the stage for menu actions
     _actions = new SimpleActionGroup();
     insert_action_group( "win", _actions );
-
-    // Add keyboard shortcuts
-    add_keyboard_shortcuts( app );
 
     _nb = new Notebook() {
       scrollable = true,
@@ -172,29 +163,29 @@ public class MainWindow : Gtk.ApplicationWindow {
     set_action_for_command( KeyCommand.TAB_CLOSE_CURRENT );
 
     // Create title toolbar
-    var new_btn = new Button.from_icon_name( get_icon_name( "document-new" ) );
+    var new_btn = new Button.from_icon_name( get_header_icon_name( "document-new" ) );
     register_widget_for_shortcut( new_btn, KeyCommand.FILE_NEW, _( "New File" ) );
     new_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_NEW ); });
     _header.pack_start( new_btn );
 
-    var open_btn = new Button.from_icon_name( get_icon_name( "document-open" ) );
+    var open_btn = new Button.from_icon_name( get_header_icon_name( "document-open" ) );
     register_widget_for_shortcut( open_btn, KeyCommand.FILE_OPEN, _( "Open File" ) );
     open_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_OPEN ); });
     _header.pack_start( open_btn );
 
-    var save_btn = new Button.from_icon_name( get_icon_name( "document-save-as" ) );
+    var save_btn = new Button.from_icon_name( get_header_icon_name( "document-save-as" ) );
     register_widget_for_shortcut( save_btn, KeyCommand.FILE_SAVE_AS, _( "Save File As" ) );
     save_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_SAVE_AS ); });
     _header.pack_start( save_btn );
 
-    _undo_btn = new Button.from_icon_name( get_icon_name( "edit-undo" ) ) {
+    _undo_btn = new Button.from_icon_name( get_header_icon_name( "edit-undo" ) ) {
       sensitive = false
     };
     register_widget_for_shortcut( _undo_btn, KeyCommand.UNDO_ACTION, _( "Undo" ) );
     _undo_btn.clicked.connect(() => { execute_command( KeyCommand.UNDO_ACTION ); });
     _header.pack_start( _undo_btn );
 
-    _redo_btn = new Button.from_icon_name( get_icon_name( "edit-redo" ) ) {
+    _redo_btn = new Button.from_icon_name( get_header_icon_name( "edit-redo" ) ) {
       sensitive = false
     };
     register_widget_for_shortcut( _redo_btn, KeyCommand.REDO_ACTION, _( "Redo" ) );
@@ -207,7 +198,13 @@ public class MainWindow : Gtk.ApplicationWindow {
     add_stats_button();
     add_search_button();
 
+    // Apply the focus mode
+    if( Outliner.settings.get_boolean( "focus-mode" ) ) {
+      set_focus_mode( true );
+    } 
+
     child = _nb;
+
     show();
 
     // Listen for changes to the system dark mode
@@ -256,7 +253,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   //-------------------------------------------------------------
   // Returns the name of the icon to use for a headerbar icon
-  private string get_icon_name( string icon_name ) {
+  private string get_header_icon_name( string icon_name ) {
     return( "%s%s".printf( icon_name, (on_elementary ? "" : "-symbolic") ) );
   }
 
@@ -298,13 +295,12 @@ public class MainWindow : Gtk.ApplicationWindow {
   // Shows or hides the information bar, setting the message to
   // the given value
   private void show_info_bar( string? msg ) {
-    var info = Utils.get_child_at_index( _nb.get_nth_page( _nb.page ), 2 ) as InfoBar;
+    var info = Utils.get_child_at_index( _nb.get_nth_page( _nb.page ), 2 ) as InfoBox;
     if( info != null ) {
       if( msg != null ) {
-        _info_label.label = msg;
-        info.set_revealed( true );
+        info.show_info( msg );
       } else {
-        info.set_revealed( false );
+        info.visible = false;
       }
     }
   }
@@ -481,6 +477,7 @@ public class MainWindow : Gtk.ApplicationWindow {
         break;
       case TabAddReason.IMPORT :
       case TabAddReason.OPEN :
+      case TabAddReason.LOAD :
         ot.initialize_for_open();
         _nb.page = tab_index;
         break;
@@ -514,19 +511,20 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   //-------------------------------------------------------------
   // Creates the info bar UI
-  private InfoBar create_info_bar() {
+  private InfoBox create_info_bar() {
 
-    _info_label = new Label( "" );
-
-    var info_bar = new InfoBar() {
+    var info_bar = new InfoBox() {
       halign = Align.FILL
     };
-    info_bar.add_child( _info_label );
-    info_bar.set_revealed( false );
-    info_bar.message_type = MessageType.INFO;
 
     return( info_bar );
 
+  }
+
+  //-------------------------------------------------------------
+  // Returns the path of the tab_state.xml file.
+  private string get_tab_state_path() {
+    return( GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner", "tab_state.xml" ) );
   }
 
   //-------------------------------------------------------------
@@ -535,7 +533,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     if( !_tabs_loaded ) return;
 
-    var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
+    var dir = get_tab_state_path();
 
     if( DirUtils.create_with_parents( dir, 0775 ) != 0 ) {
       return;
@@ -565,16 +563,10 @@ public class MainWindow : Gtk.ApplicationWindow {
   }
 
   //-------------------------------------------------------------
-  // Returns the path of the tab_state.xml file.
-  private string get_tab_state_path() {
-    return( GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner", "tab_state.xml" ) );
-  }
-
-  //-------------------------------------------------------------
   // Loads the tab state
   public void load_tab_state() {
 
-    var tab_state = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner", "tab_state.xml" );
+    var tab_state = get_tab_state_path();
     var tabs      = 0;
 
     // If the file does not exist, skip the rest and return false
@@ -630,34 +622,11 @@ public class MainWindow : Gtk.ApplicationWindow {
   }
 
   //-------------------------------------------------------------
-  // Adds keyboard shortcuts for the menu actions
-  private void add_keyboard_shortcuts( Gtk.Application app ) {
-
-    app.set_accels_for_action( "win.action_new",         { "<Control>n" } );
-    app.set_accels_for_action( "win.action_open",        { "<Control>o" } );
-    app.set_accels_for_action( "win.action_save",        { "<Control>s" } );
-    app.set_accels_for_action( "win.action_save_as",     { "<Control><Shift>s" } );
-    app.set_accels_for_action( "win.action_undo",        { "<Control>z" } );
-    app.set_accels_for_action( "win.action_redo",        { "<Control><Shift>z" } );
-    app.set_accels_for_action( "win.action_search",      { "<Control>f" } );
-    app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
-    // app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
-    app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
-    app.set_accels_for_action( "win.action_preferences", { "<Control>comma" } );
-    app.set_accels_for_action( "win.action_shortcuts",   { "<Control>question" } );
-    app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
-    app.set_accels_for_action( "win.action_zoom_in",     { "<Control>plus", "<Control>equal" } );
-    app.set_accels_for_action( "win.action_zoom_out",    { "<Control>minus" } );
-    app.set_accels_for_action( "win.action_zoom_actual", { "<Control>0" } );
-
-  }
-
-  //-------------------------------------------------------------
   // Adds the search functionality
   private void add_search_button() {
 
     // Create the menu button
-    _search_btn = new Button.from_icon_name( get_icon_name( "edit-find" ) );
+    _search_btn = new Button.from_icon_name( get_header_icon_name( "edit-find" ) );
     register_widget_for_shortcut( _search_btn, KeyCommand.SEARCH, _( "Search" ) );
     _search_btn.clicked.connect(() => { execute_command( KeyCommand.SEARCH ); });
     _header.pack_end( _search_btn );
@@ -696,8 +665,6 @@ public class MainWindow : Gtk.ApplicationWindow {
       row_spacing    = 10,
       column_spacing = 10
     };
-
-    var lmargin = "    ";
 
     var group_text = new Label( _( "<b>Text Statistics</b>" ) ) {
       xalign     = 0,
@@ -782,7 +749,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     export_menu.append_item( export_menu_item );
 
     var print_menu = new GLib.Menu();
-    print_menu.append( _( "Print…" ), "win.action_print" );
+    append_menu_item( print_menu, KeyCommand.FILE_PRINT, _( "Print…" ) );
 
     var menu = new GLib.Menu();
     menu.append_section( null, export_menu );
@@ -832,8 +799,8 @@ public class MainWindow : Gtk.ApplicationWindow {
         tooltip_text = theme.label,
         group        = rb
       };
-      button.get_style_context().add_class( theme.name );
-      button.get_style_context().add_class( "color-button" );
+      button.add_css_class( theme.name );
+      button.add_css_class( "color-button" );
       button.toggled.connect(() => {
         var table = get_current_table();
         table.set_theme( theme );
@@ -1095,7 +1062,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     // Add the button
     var prop_btn = new MenuButton() {
-      icon_name    = get_icon_name( "open-menu" ),
+      icon_name    = get_header_icon_name( "open-menu" ),
       tooltip_text = _( "Properties" ),
       popover      = prop_popover
     };
@@ -1179,7 +1146,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     dialog.add_action_widget( cancel, ResponseType.CANCEL );
 
     var save = new Button.with_label( _( "Save" ) );
-    save.get_style_context().add_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
+    save.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
     dialog.add_action_widget( save, ResponseType.ACCEPT );
 
     dialog.set_transient_for( this );
@@ -1219,14 +1186,13 @@ public class MainWindow : Gtk.ApplicationWindow {
   // Allow the user to open a Outliner file
   public void do_open_file() {
 
-    // Get the file to open from the user
-    FileChooserNative dialog = new FileChooserNative( _( "Open File" ), this, FileChooserAction.OPEN, _( "Open" ), _( "Cancel" ) );
-
     // Create file filters
     var filter = new FileFilter();
     filter.set_filter_name( "Outliner" );
     filter.add_pattern( "*.outliner" );
-    dialog.add_filter( filter );
+
+    var filters = new GLib.ListStore( typeof( FileFilter ) );
+    filters.append( filter );
 
     for( int i=0; i<exports.length(); i++ ) {
       if( exports.index( i ).importable ) {
@@ -1235,19 +1201,28 @@ public class MainWindow : Gtk.ApplicationWindow {
         foreach( string extension in exports.index( i ).extensions ) {
           filter.add_pattern( "*" + extension );
         }
-        dialog.add_filter( filter );
+        filters.append( filter );
       }
     }
 
-    dialog.response.connect((id) => {
-      if( id == ResponseType.ACCEPT ) {
-        open_file( dialog.get_file().get_path() );
-        get_current_table( "do_open_file" ).grab_focus();
-      }
-      dialog.destroy();
-    });
+    // Get the file to open from the user
+    var dialog = new FileDialog() {
+      modal = true,
+      title = _( "Open File" ),
+      accept_label = _( "Open" ),
+      filters = filters
+    };
 
-    dialog.show();
+    Utils.set_chooser_folder( dialog );
+
+    dialog.open.begin( this, null, (obj, res) => {
+      try {
+        var file = dialog.open.end( res );
+        open_file( file.get_path() );
+        get_current_table( "do_open_file" ).grab_focus();
+        Utils.store_chooser_folder( file.get_path(), false );
+      } catch( Error e ) {}
+    });
 
   }
 
@@ -1335,22 +1310,32 @@ public class MainWindow : Gtk.ApplicationWindow {
   // Allow the user to select a filename to save the document as
   public void save_file( OutlineTable ot, bool close_tab = false ) {
 
-    FileChooserDialog dialog = new FileChooserDialog( _( "Save File" ), this, FileChooserAction.SAVE,
-      _( "Cancel" ), ResponseType.CANCEL, _( "Save" ), ResponseType.ACCEPT );
-    FileFilter        filter = new FileFilter();
-
+    var filter = new FileFilter();
     filter.set_filter_name( _( "Outliner" ) );
     filter.add_pattern( "*.outliner" );
-    dialog.add_filter( filter );
 
-    dialog.response.connect((id) => {
-      if( id == ResponseType.ACCEPT ) {
-        var fname = dialog.get_file().get_path();
+    var filters = new GLib.ListStore( typeof( Filter ) );
+    filters.append( filter );
+
+    var dialog = new FileDialog() {
+      modal = true,
+      title = _( "Save File" ),
+      accept_label = _( "Save" ),
+      filters = filters
+    };
+
+    Utils.set_chooser_folder( dialog );
+
+    dialog.save.begin( this, null, (obj, res) => {
+      try {
+        var file  = dialog.save.end( res );
+        var fname = file.get_path();
         if( fname.substring( -9, -1 ) != ".outliner" ) {
           fname += ".outliner";
         }
         ot.document.filename = fname;
         ot.document.save();
+        Utils.store_chooser_folder( fname, false );
         var page = _nb.get_nth_page( _nb.page );
         var tab_box = (Box)_nb.get_tab_label( page );
         var tab_label = (Label)Utils.get_child_at_index( tab_box, 0 );
@@ -1363,11 +1348,8 @@ public class MainWindow : Gtk.ApplicationWindow {
         } else {
           ot.grab_focus();
         }
-      }
-      dialog.destroy();
+      } catch( Error e ) {}
     });
-
-    dialog.show();
 
   }
 
@@ -1375,29 +1357,6 @@ public class MainWindow : Gtk.ApplicationWindow {
   // Called when the save as button is clicked
   public void do_save_as_file() {
     save_file( get_current_table( "do_save_as_file" ) );
-  }
-
-  //-------------------------------------------------------------
-  // Called when the user uses the Control-n keyboard shortcut
-  private void action_new() {
-    do_new_file();
-  }
-
-  //-------------------------------------------------------------
-  // Called when the user uses the Control-o keyboard shortcut
-  private void action_open() {
-    do_open_file();
-  }
-
-  //-------------------------------------------------------------
-  // Called when the user uses the Control-s keyboard shortcut
-  private void action_save() {
-    var table = get_current_table( "action_save" );
-    if( table.document.is_saved() ) {
-      table.document.save();
-    } else {
-      save_file( table );
-    }
   }
 
   //-------------------------------------------------------------
@@ -1422,14 +1381,6 @@ public class MainWindow : Gtk.ApplicationWindow {
   // Called when the user uses the Control-0 shortcut
   public void do_zoom_actual() {
     _zoom.zoom_actual();
-  }
-
-  //-------------------------------------------------------------
-  // Called when the user uses the Control-q keyboard shortcut
-  private void action_quit() {
-    save_window_size();
-    save_tabs();
-    destroy();
   }
 
   //-------------------------------------------------------------
@@ -1472,22 +1423,32 @@ public class MainWindow : Gtk.ApplicationWindow {
   }
 
   //-------------------------------------------------------------
-  // Hides the header bar
-  public void toggle_focus_mode() {
-
-    var enable = _header.visible;
+  // Sets the focus mode to the given value.
+  private void set_focus_mode( bool enable ) {
 
     // Hide the header bar
     if( enable ) {
-      get_titlebar().hide();
+      get_titlebar().visible = false;
       fullscreen();
     } else {
-      get_titlebar().show();
+      get_titlebar().visible = true;
       unfullscreen();
     }
 
     _nb.show_tabs = !enable;
-    Outliner.settings.set_boolean( "focus-mode", enable );
+
+  }
+
+  //-------------------------------------------------------------
+  // Hides the header bar
+  public void toggle_focus_mode() {
+
+    var enable = Outliner.settings.get_boolean( "focus-mode" );
+
+    // Toggle the focus mode
+    set_focus_mode( !enable );
+
+    Outliner.settings.set_boolean( "focus-mode", !enable ); 
 
   }
 
@@ -1580,17 +1541,6 @@ public class MainWindow : Gtk.ApplicationWindow {
     if( _shortcut_widgets.has_key( command ) ) {
       _shortcut_widgets.get( command ).set_tooltip( shortcut );
     }
-  }
-
-  //-------------------------------------------------------------
-  // Returns the shortcut accelerator associated with the given
-  // key command.
-  private string get_accelerator( KeyCommand command ) {
-    var shortcut = shortcuts.get_shortcut( command );
-    if( shortcut != null ) {
-      return( shortcut.get_accelerator() );
-    }
-    return( "" );
   }
 
   //-------------------------------------------------------------

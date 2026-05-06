@@ -71,6 +71,8 @@ public class ExportPrint : Object {
         case PrintOperationResult.IN_PROGRESS :
           // TBD
           break;
+        default :
+          break;
       }
     } catch( GLib.Error e ) {
       // TBD
@@ -83,9 +85,9 @@ public class ExportPrint : Object {
   public void begin_print( PrintContext context ) {
 
     var include_size = 1.0;
-    var sf           = ((7.5 / 8.5) * context.get_width()) / _table.get_allocated_width();
+    var sf           = ((7.5 / 8.5) * context.get_width()) / _table.get_width();
     var page_size    = (int)(((10.0 / 11.0) * context.get_height()) / sf);
-    var node         = _table.root.get_next_node();
+    var node         = _table.root_node.get_next_node();
     var last_node    = node;
 
     _boundaries.append_val( include_size );
@@ -110,7 +112,7 @@ public class ExportPrint : Object {
 
     var settings    = op.get_print_settings();
     var use_color   = settings.get( "cups-ColorModel" ) == "RGB";
-    var alloc_width = _table.get_allocated_width();
+    var alloc_width = _table.get_width();
     var ctx         = context.get_cairo_context();
     var sf          = ((7.5 / 8.5) * context.get_width()) / alloc_width;
     var margin      = (0.5 / 8.5) * context.get_width();

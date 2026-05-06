@@ -12,6 +12,7 @@ sources += files(
   'ExportUtils.vala',
   'FormatBar.vala',
   'FormattedText.vala',
+  'InfoBox.vala',
   'KeyCommands.vala',
   'LinkEditor.vala',
   'MainWindow.vala',

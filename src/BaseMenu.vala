@@ -140,9 +140,9 @@ public class BaseMenu {
   //-------------------------------------------------------------
   // Sets the action enable for the given command to the given value.
   protected void set_enabled( KeyCommand command, bool enable ) {
-    var action = _group.lookup_action( command.to_string() );
+    var action = (SimpleAction)_group.lookup_action( command.to_string() );
     if( action != null ) {
-      (action as SimpleAction).set_enabled( enable );
+      action.set_enabled( enable );
     }
   }
 

@@ -1,4 +1,4 @@
- /*
+/*
 * Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@ using GLib;
 
 public class Outliner : Gtk.Application {
 
-  public  static string        version = "2.0.0";
   public  static GLib.Settings settings;
   private        MainWindow    appwin;
 
@@ -32,7 +31,11 @@ public class Outliner : Gtk.Application {
   // Constructor
   public Outliner () {
 
-    Object( application_id: "com.github.phase1geo.outliner", flags: ApplicationFlags.HANDLES_COMMAND_LINE );
+    Object(
+      application_id: "com.github.phase1geo.outliner",
+      flags: ApplicationFlags.HANDLES_COMMAND_LINE,
+      version: "2.0.0"
+    );
 
     Intl.setlocale( LocaleCategory.ALL, "" );
     Intl.bindtextdomain( GETTEXT_PACKAGE, LOCALEDIR );

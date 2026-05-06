@@ -50,7 +50,7 @@ public class UndoNodeDelete : UndoItem {
   public override void redo( OutlineTable table ) {
     table.delete_node( _node );
     if( _insert_node != null ) {
-      table.insert_node( table.root, _insert_node, 0 );
+      table.insert_node( table.root_node, _insert_node, 0 );
     }
   }
 

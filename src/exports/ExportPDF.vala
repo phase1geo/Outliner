@@ -43,8 +43,8 @@ public class ExportPDF : Export {
     var context = new Context( surface );
 
     // Calculate the required scaling factor to get the document to fit
-    double width  = (page_width  - (2 * margin)) / table.get_allocated_width();
-    double height = (page_height - (2 * margin)) / table.get_allocated_height();
+    double width  = (page_width  - (2 * margin)) / table.get_width();
+    double height = (page_height - (2 * margin)) / table.get_height();
     double sf     = (width < height) ? width : height;
 
     // Scale and translate the image

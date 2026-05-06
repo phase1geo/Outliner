@@ -58,8 +58,9 @@ public enum FormatTag {
       case TAG        :  return( "tag" );
       case SYNTAX     :  return( "syntax" );
       case MATCH      :  return( "match" );
+      case SELECT     :  return( "select" );
+      default         :  assert_not_reached();
     }
-    return( "bold" );
   }
 
   public static FormatTag from_string( string str ) {
@@ -78,8 +79,9 @@ public enum FormatTag {
       case "tag"         :  return( TAG );
       case "syntax"      :  return( SYNTAX );
       case "match"       :  return( MATCH );
+      case "select"      :  return( SELECT );
+      default            :  return( LENGTH );
     }
-    return( LENGTH );
   }
 
 }

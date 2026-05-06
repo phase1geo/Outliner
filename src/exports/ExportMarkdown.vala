@@ -46,14 +46,16 @@ public class ExportMarkdown : Export {
   //-------------------------------------------------------------
   // Draws each of the top-level nodes
   private void export_top_nodes( FileOutputStream os, OutlineTable table ) {
-    if( table.title != null ) {
-      var title = "# " + from_text( table.title.text ) + "\n\n";
-      os.write( title.data );
-    }
-    var nodes = table.root.children;
-    for( int i=0; i<nodes.length; i++ ) {
-      export_node( os, nodes.index( i ), table, "" );
-    }
+    try {
+      if( table.title != null ) {
+        var title = "# " + from_text( table.title.text ) + "\n\n";
+        os.write( title.data );
+      }
+      var nodes = table.root_node.children;
+      for( int i=0; i<nodes.length; i++ ) {
+        export_node( os, nodes.index( i ), table, "" );
+      }
+    } catch( IOError e ) {}
   }
 
   //-------------------------------------------------------------
@@ -113,6 +115,7 @@ public class ExportMarkdown : Export {
         case NodeTaskMode.DONE  :  title += "[x] ";  break;
         case NodeTaskMode.OPEN  :
         case NodeTaskMode.DOING :  title += "[ ] ";  break;
+        default :  break;
       }
 
       if( table.markdown ) {
