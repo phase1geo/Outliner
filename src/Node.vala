@@ -420,7 +420,7 @@ public class Node {
   private void initialize_note_icon() {
     if( _note_icon == null ) {
       try {
-        _note_icon = new Pixbuf.from_resource( "/com/github/phase1geo/outliner/images/accessories-text-editor-symbolic" );
+        _note_icon = new Pixbuf.from_resource( "/io/github/phase1geo/outliner/images/accessories-text-editor-symbolic" );
       } catch( GLib.Error e ) {}
     }
   }

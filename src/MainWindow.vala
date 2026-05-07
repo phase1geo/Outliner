@@ -533,15 +533,14 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     if( !_tabs_loaded ) return;
 
-    var dir = get_tab_state_path();
+    var fname = get_tab_state_path();
 
-    if( DirUtils.create_with_parents( dir, 0775 ) != 0 ) {
+    if( DirUtils.create_with_parents( GLib.Path.get_dirname( fname ), 0775 ) != 0 ) {
       return;
     }
 
-    var       fname = GLib.Path.build_filename( dir, "tab_state.xml" );
-    Xml.Doc*  doc   = new Xml.Doc( "1.0" );
-    Xml.Node* root  = new Xml.Node( null, "tabs" );
+    Xml.Doc*  doc  = new Xml.Doc( "1.0" );
+    Xml.Node* root = new Xml.Node( null, "tabs" );
 
     doc->set_root_element( root );
 
@@ -1472,7 +1471,7 @@ public class MainWindow : Gtk.ApplicationWindow {
       var notification = new Notification( title );
       notification.set_body( msg );
       notification.set_priority( priority );
-      app.send_notification( "com.github.phase1geo.outliner", notification );
+      app.send_notification( "io.github.phase1geo.outliner", notification );
     }
 
   }

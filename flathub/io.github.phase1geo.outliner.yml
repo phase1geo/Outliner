@@ -1,8 +1,8 @@
-app-id: com.github.phase1geo.outliner
+app-id: io.github.phase1geo.outliner
 runtime: org.gnome.Platform
 runtime-version: '49'
 sdk: org.gnome.Sdk
-command: com.github.phase1geo.outliner
+command: io.github.phase1geo.outliner
 finish-args:
   - '--share=ipc'
   - '--socket=fallback-x11'
@@ -86,4 +86,4 @@ modules:
      - '--libdir=lib'
     sources:
       - type: dir
-        path: .
+        path: ..

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2020 Trevor Williams <phase1geo@gmail.com> -->
 <component type="desktop-application">
-    <id>com.github.phase1geo.outliner</id>
+    <id>io.github.phase1geo.outliner</id>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0+</project_license>
     <name>Outliner</name>
@@ -33,9 +33,9 @@
         <li>Printer support.</li>
       </ul>
     </description>
-    <launchable type="desktop-id">com.github.phase1geo.outliner.desktop</launchable>
+    <launchable type="desktop-id">io.github.phase1geo.outliner.desktop</launchable>
     <provides>
-      <binary>com.github.phase1geo.outliner</binary>
+      <binary>io.github.phase1geo.outliner</binary>
     </provides>
     <screenshots>
       <screenshot type="default">
@@ -51,7 +51,7 @@
         <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-dark.png</image>
       </screenshot>
     </screenshots>
-    <developer id="com.github.phase1geo">
+    <developer id="io.github.phase1geo">
       <name>Trevor Williams</name>
     </developer>
     <url type="homepage">https://github.com/phase1geo/Outliner</url>

@@ -1050,7 +1050,7 @@ public enum KeyCommand {
 
   public static void show_shortcuts( OutlineTable ot ) {
 
-    var builder = new Builder.from_resource( "/com/github/phase1geo/outliner/shortcuts/shortcuts.ui" );
+    var builder = new Builder.from_resource( "/io/github/phase1geo/outliner/shortcuts/shortcuts.ui" );
     var win     = builder.get_object( "shortcuts" ) as Gtk.ShortcutsWindow;
 
     win.transient_for = ot.win;

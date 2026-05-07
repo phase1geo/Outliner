@@ -1,4 +1,4 @@
- project('com.github.phase1geo.outliner', ['vala', 'c'],
+ project('io.github.phase1geo.outliner', ['vala', 'c'],
     version : '2.0.0',
     license: 'GPL-3.0'
 )
@@ -66,7 +66,7 @@ dependencies = [
     math_dep
 ]
 
-e = executable('com.github.phase1geo.outliner',
+e = executable('io.github.phase1geo.outliner',
     sources,
     config_file,
     gresource,
