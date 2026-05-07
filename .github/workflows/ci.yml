@@ -37,8 +37,8 @@ jobs:
       - name: Build
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6.5
         with:
-          bundle: minder.flatpak
-          manifest-path: com.github.phase1geo.outliner.elementary.yml
+          bundle: outliner.flatpak
+          manifest-path: elementary/io.github.phase1geo.outliner.yml
           repository-name: appcenter
           repository-url: https://flatpak.elementary.io/repo.flatpakrepo
           cache-key: "flatpak-builder-${{ github.sha }}"
