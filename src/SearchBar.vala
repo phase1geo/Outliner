@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -29,8 +29,21 @@ public class SearchMatch {
   public int   start { set; get; default = -1; }
   public int   end   { set; get; default = -1; }
 
+  //-------------------------------------------------------------
+  // Constructor
   public SearchMatch() {}
 
+  //-------------------------------------------------------------
+  // Copy constructor
+  public SearchMatch.copy( SearchMatch other ) {
+    node  = other.node;
+    name  = other.name;
+    start = other.start;
+    end   = other.end;
+  }
+
+  //-------------------------------------------------------------
+  // Outputs the contents as a printable string.
   public string to_string() {
     return( (node == null) ? "none" : "name: %s, str: %s, start: %d, end: %d".printf( name.to_string(), (name ? node.name.text.text : node.note.text.text), start, end ) );
   }
@@ -45,12 +58,14 @@ public class SearchBar : Box {
   private Button       _search_prev;
   private SearchEntry  _replace_entry;
   private Button       _replace_current;
+  private Button       _skip_current;
   private Button       _replace_all;
   private SearchMatch  _next;
   private SearchMatch  _prev;
-  private int          _ignore_update;
+  private bool         _ignore_update;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public SearchBar( OutlineTable ot ) {
 
     Object(
@@ -65,7 +80,7 @@ public class SearchBar : Box {
 
     _next = new SearchMatch();
     _prev = new SearchMatch();
-    _ignore_update = 0;
+    _ignore_update = false;
 
     add_search_entry();
     add_search_next();
@@ -73,6 +88,7 @@ public class SearchBar : Box {
     add_spacer();
     add_replace_entry();
     add_replace_current();
+    add_skip_current();
     add_replace_all();
 
     _ot.selected_changed.connect( update_next_previous );
@@ -80,20 +96,20 @@ public class SearchBar : Box {
 
   }
 
-  /* Called whenever the search bar is displayed or hidden */
+  //-------------------------------------------------------------
+  // Called whenever the search bar is displayed or hidden
   public void change_display( bool show ) {
     if( !show ) {
       _search_entry.text = "";
       search();
-      _ignore_update = 2;
     } else {
       _search_entry.grab_focus();
       update_state();
-      _ignore_update = 0;
     }
   }
 
-  /* Creates the search entry field and adds it to this box */
+  //-------------------------------------------------------------
+  // Creates the search entry field and adds it to this box
   private void add_search_entry() {
 
     _search_entry = new Gtk.SearchEntry() {
@@ -109,37 +125,36 @@ public class SearchBar : Box {
 
   }
 
-  /* Performs the text search */
+  //-------------------------------------------------------------
+  // Performs the text search
   private void search() {
 
-    /* Perform search */
+    // Perform search
     _ot.do_search( _search_entry.text );
-
-    /* Update the UI state */
+    
+    // Update the UI state
     update_next_previous();
 
   }
 
-  /* Called whenever the cursor changes position or the selected node changes */
+  //-------------------------------------------------------------
+  // Called whenever the cursor changes position or the selected
+  // node changes
   private void update_next_previous() {
 
-    if( _ignore_update > 0 ) {
-      if( _ignore_update == 1 ) {
-        _ignore_update = 0;
-      }
-      return;
-    }
+    if( _ignore_update ) return;
 
-    /* Get the next and previous matches */
+    // Get the next and previous matches
     find_next_match();
     find_prev_match();
 
-    /* Update the UI state */
+    // Update the UI state
     update_state();
 
   }
 
-  /* Updates the UI state */
+  //-------------------------------------------------------------
+  // Updates the UI state
   private void update_state() {
 
     var found = (_next.node != null) || (_prev.node != null) || is_match_selected();
@@ -149,11 +164,13 @@ public class SearchBar : Box {
     _replace_entry.editable  = found;
     _replace_entry.can_focus = found;
     _replace_current.set_sensitive( (_replace_entry.text != "") && is_match_selected() );
+    _skip_current.set_sensitive( (_replace_entry.text != "") && is_match_selected() );
     _replace_all.set_sensitive( (_replace_entry.text != "") && found );
 
   }
 
-  /* Creates the search next field and adds it to this box */
+  //-------------------------------------------------------------
+  // Creates the search next field and adds it to this box
   private void add_search_next() {
 
     _search_next = new Gtk.Button.from_icon_name( "go-down-symbolic" );
@@ -163,7 +180,8 @@ public class SearchBar : Box {
 
   }
 
-  /* Finds the match after the currently selected node */
+  //-------------------------------------------------------------
+  // Finds the match after the currently selected node
   private void find_next_match() {
 
     _next.node  = _ot.selected;
@@ -182,9 +200,10 @@ public class SearchBar : Box {
           _next.name = false;
           start = _next.node.note.is_selected() ? _next.node.note.selend : _next.node.note.cursor + 1;
           break;
+        default :  break;
       }
-    } else if( _ot.root.children.length > 0 ) {
-      _next.node = _ot.root.children.index( 0 );
+    } else if( _ot.root_node.children.length > 0 ) {
+      _next.node = _ot.root_node.children.index( 0 );
     } else {
       return;
     }
@@ -211,7 +230,8 @@ public class SearchBar : Box {
 
   }
 
-  /* Finds the match after the currently selected node */
+  //-------------------------------------------------------------
+  // Finds the match after the currently selected node
   private void find_prev_match() {
 
     _prev.node  = _ot.selected;
@@ -230,6 +250,7 @@ public class SearchBar : Box {
           _prev.name = false;
           start = _prev.node.note.is_selected() ? _prev.node.name.selstart : _prev.node.note.cursor;
           break;
+        default :  break;
       }
     } else {
       return;
@@ -257,40 +278,46 @@ public class SearchBar : Box {
 
   }
 
-  /* Perform the search for the next text match */
+  //-------------------------------------------------------------
+  // Perform the search for the next text match
   private void search_next() {
     select_matched_text( _next );
   }
 
-  /* Selects the matched text */
+  //-------------------------------------------------------------
+  // Selects the matched text
   private void select_matched_text( SearchMatch match ) {
 
     if( match.node == null ) return;
 
-    var selchange = (match.node != _ot.selected);
-    var curchange = (match.name ? match.node.name.cursor : match.node.note.cursor) != match.end;
+    var goto = new SearchMatch.copy( match );
+    var ct   = goto.name ? goto.node.name : goto.node.note;
 
-    /* Set the matched node to edit mode and select the matched text */
-    _ignore_update = selchange ? 1 : 0;
-    _ot.selected   = match.node;
-    _ot.edit_selected( match.name );
+    var selchange = (goto.node != _ot.selected);
+    var curchange = (ct.cursor != goto.end);
+    var edit_selected = goto.name ? KeyCommand.NODE_CHANGE_TEXT : KeyCommand.NODE_CHANGE_NOTE;
+    var edit_selected_func = edit_selected.get_func();
 
-    if( match.name ) {
-      _ot.selected.name.change_selection( match.start, match.end );
-      _ot.selected.name.set_cursor_only( match.end );
-    } else {
-      _ot.selected.note.change_selection( match.start, match.end );
-      _ot.selected.note.set_cursor_only( match.end );
-    }
+    _ignore_update = true;
 
-    /* Make sure that we update the search bar */
-    if( !curchange ) {
-      _ot.cursor_changed();
+    // Set the matched node to edit mode and select the matched text
+    _ot.selected   = goto.node;
+    edit_selected_func( _ot );
+
+    ct.change_selection( goto.start, goto.end );
+    ct.set_cursor_only( goto.end );
+
+    _ignore_update = false;
+
+    // Make sure that we update next/previous if we are changing position
+    if( selchange || curchange ) {
+      update_next_previous();
     }
 
   }
 
-  /* Creates the search previous field and adds it to this box */
+  //-------------------------------------------------------------
+  // Creates the search previous field and adds it to this box
   private void add_search_previous() {
 
     _search_prev = new Gtk.Button.from_icon_name( "go-up-symbolic" );
@@ -300,21 +327,22 @@ public class SearchBar : Box {
 
   }
 
-  /* Perform the search for the previous text match */
+  //-------------------------------------------------------------
+  // Perform the search for the previous text match
   private void search_previous() {
-
-    /* Select the matched text */
     select_matched_text( _prev );
-
   }
 
-  /* Adds a spacer between the search and replace portions of the search bar */
+  //-------------------------------------------------------------
+  // Adds a spacer between the search and replace portions of the
+  // search bar
   private void add_spacer() {
     var lbl = new Label( " " );
     append( lbl );
   }
 
-  /* Returns true if the selected text is a matched pattern */
+  //-------------------------------------------------------------
+  // Returns true if the selected text is a matched pattern
   private bool is_match_selected() {
 
     var pattern = _search_entry.text;
@@ -324,6 +352,7 @@ public class SearchBar : Box {
       switch( _ot.selected.mode ) {
         case NodeMode.EDITABLE :  seltext = _ot.selected.name.get_selected_text();  break;
         case NodeMode.NOTEEDIT :  seltext = _ot.selected.note.get_selected_text();  break;
+        default :  break;
       }
       return( (seltext != null) && (seltext == pattern) );
     }
@@ -332,18 +361,20 @@ public class SearchBar : Box {
 
   }
 
-  /* Adds the replace text entry field and adds it to this box */
+  //-------------------------------------------------------------
+  // Adds the replace text entry field and adds it to this box
   private void add_replace_entry() {
 
-    var focus_controller = new EventControllerFocus();
     _replace_entry = new Gtk.SearchEntry() {
       halign            = Align.FILL,
       hexpand           = true,
       placeholder_text  = _( "Replace with…")
     };
-    _replace_entry.add_controller( focus_controller );
 
     _replace_entry.search_changed.connect( replace_text_changed );
+
+    var focus_controller = new EventControllerFocus();
+    _replace_entry.add_controller( focus_controller );
 
     focus_controller.enter.connect( replace_focus_in );
 
@@ -351,19 +382,22 @@ public class SearchBar : Box {
 
   }
 
-  /* Called when the search box loses focus */
+  //-------------------------------------------------------------
+  // Called when the search box loses focus
   private void replace_focus_in() {
     if( !is_match_selected() ) {
       select_matched_text( _next );
     }
   }
 
-  /* Called whenever the replacement text is changed */
+  //-------------------------------------------------------------
+  // Called whenever the replacement text is changed
   private void replace_text_changed() {
     update_state();
   }
 
-  /* Adds the replace current button and adds it to this box */
+  //-------------------------------------------------------------
+  // Adds the replace current button and adds it to this box
   private void add_replace_current() {
 
     _replace_current = new Gtk.Button.with_label( _( "Replace" ) );
@@ -373,18 +407,31 @@ public class SearchBar : Box {
 
   }
 
-  /* Performs the replacement for the currently matched text */
+  //-------------------------------------------------------------
+  // Performs the replacement for the currently matched text
   private void replace_current() {
 
-    /* Replace the current match */
+    // Replace the current match
     _ot.replace_current( _replace_entry.text );
 
-    /* Jump to the next match */
+    // Jump to the next match
     select_matched_text( _next );
 
   }
 
-  /* Adds the replace all button and adds it to this box */
+  //-------------------------------------------------------------
+  // Adds the skip current button and adds it to this box
+  private void add_skip_current() {
+
+    _skip_current = new Gtk.Button.with_label( _( "Skip" ) );
+    _skip_current.clicked.connect( search_next );
+
+    append( _skip_current );
+
+  }
+
+  //-------------------------------------------------------------
+  // Adds the replace all button and adds it to this box
   private void add_replace_all() {
 
     _replace_all = new Gtk.Button.with_label( _( "Replace All" ) );
@@ -394,7 +441,9 @@ public class SearchBar : Box {
 
   }
 
-  /* Performs the replacement for all text that matches the search text */
+  //-------------------------------------------------------------
+  // Performs the replacement for all text that matches the search
+  // text
   private void replace_all() {
 
     _ot.replace_all( _search_entry.text, _replace_entry.text );

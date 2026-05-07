@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -21,25 +21,31 @@
 
 public class Exports {
 
+  private MainWindow    _win;
   private Array<Export> _exports;
 
-  /* Constructor */
-  public Exports( bool save_settings = true ) {
+  //-------------------------------------------------------------
+  // Constructor
+  public Exports( MainWindow win, bool save_settings = true ) {
 
+    _win = win;
     _exports = new Array<Export>();
 
-    /* Add the exports */
+    // Add the exports
     add( new ExportHTML(), save_settings );
     add( new ExportMarkdown(), save_settings );
     add( new ExportMinder(), save_settings );
+    add( new ExportODT(), save_settings );
     add( new ExportOPML(), save_settings );
     add( new ExportOrgMode(), save_settings );
     add( new ExportPDF(), save_settings );
-    // add( new ExportRTF(), save_settings );
+    add( new ExportRTF(), save_settings );
     add( new ExportText(), save_settings );
 
   }
 
+  //-------------------------------------------------------------
+  // Adds an export to the list of exports.
   private void add( Export export, bool save_settings ) {
     if( save_settings ) {
       export.settings_changed.connect(() => {
@@ -49,20 +55,21 @@ public class Exports {
     _exports.append_val( export );
   }
 
-  /* Returns the number of stored exports */
+  //-------------------------------------------------------------
+  // Returns the number of stored exports
   public int length() {
     return( (int)_exports.length );
   }
 
-  /* Returns the export at the given index */
+  //-------------------------------------------------------------
+  // Returns the export at the given index
   public Export index( int idx ) {
     return( _exports.index( idx ) );
   }
 
-  /*
-   Returns the export as determined by the given name; otherwise, returns null
-   if name does not refer to a valid export type.
-  */
+  //-------------------------------------------------------------
+  // Returns the export as determined by the given name; otherwise,
+  // returns null if name does not refer to a valid export type.
   public Export? get_by_name( string name ) {
     for( int i=0; i<_exports.length; i++ ) {
       if( _exports.index( i ).name == name ) {
@@ -72,7 +79,9 @@ public class Exports {
     return( null );
   }
 
-  /* Gets the save filename and creates the parent directory if it doesn't exist */
+  //-------------------------------------------------------------
+  // Gets the save filename and creates the parent directory if
+  // it doesn't exist
   private string? settings_file( bool make_dir ) {
     var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
     if( make_dir && DirUtils.create_with_parents( dir, 0775 ) != 0 ) {
@@ -81,7 +90,8 @@ public class Exports {
     return( GLib.Path.build_filename( dir, "exports.xml" ) );
   }
 
-  /* Saves the settings to the save file */
+  //-------------------------------------------------------------
+  // Saves the settings to the save file
   public void save() {
     var sfile = settings_file( true );
     if( sfile == null ) {
@@ -89,7 +99,7 @@ public class Exports {
     }
     Xml.Doc*  doc  = new Xml.Doc( "1.0" );
     Xml.Node* root = new Xml.Node( null, "exports" );
-    root->set_prop( "version", Outliner.version );
+    root->set_prop( "version", _win.application.version );
     doc->set_root_element( root );
     for( int i=0; i<_exports.length; i++ ) {
       root->add_child( _exports.index( i ).save() );
@@ -98,7 +108,8 @@ public class Exports {
     delete doc;
   }
 
-  /* Loads the settings from the save file */
+  //-------------------------------------------------------------
+  // Loads the settings from the save file
   public void load() {
     var sfile = settings_file( false );
     if( (sfile == null) || !FileUtils.test( sfile, FileTest.EXISTS ) ) return;

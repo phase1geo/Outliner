@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,36 +23,38 @@ using Cairo;
 
 public class ExportPDF : Export {
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public ExportPDF() {
     base( "pdf", _( "PDF" ), {".pdf"}, true, false, false );
   }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Exports the outline to PDF format
   public override bool export( string fname, OutlineTable table ) {
 
-    /* Get the width and height of the page */
+    // Get the width and height of the page
     double page_width  = 8.5 * 72;
     double page_height = 11  * 72;
     double margin      = 0.5 * 72;
 
-    /* Create the drawing surface */
+    // Create the drawing surface
     var surface = new PdfSurface( fname, page_width, page_height );
     var context = new Context( surface );
 
-    /* Calculate the required scaling factor to get the document to fit */
-    double width  = (page_width  - (2 * margin)) / table.get_allocated_width();
-    double height = (page_height - (2 * margin)) / table.get_allocated_height();
+    // Calculate the required scaling factor to get the document to fit
+    double width  = (page_width  - (2 * margin)) / table.get_width();
+    double height = (page_height - (2 * margin)) / table.get_height();
     double sf     = (width < height) ? width : height;
 
-    /* Scale and translate the image */
+    // Scale and translate the image
     context.scale( sf, sf );
     context.translate( margin, margin );
 
-    /* Recreate the image */
+    // Recreate the image
     table.draw_all( context );
 
-    /* Draw the page to the PDF file */
+    // Draw the page to the PDF file
     context.show_page();
 
     return( true );

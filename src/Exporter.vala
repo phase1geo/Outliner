@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -34,14 +34,15 @@ public class Exporter : Box {
 
   public signal void export_done();
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public Exporter( MainWindow win ) {
 
     Object( orientation: Orientation.VERTICAL, spacing: 0 );
 
     _win = win;
 
-    /* Create the exporter dropdown menu */
+    // Create the exporter dropdown menu
     var menu = new GLib.Menu();
     for( int i=0; i<win.exports.length(); i++ ) {
       var export = win.exports.index( i );
@@ -85,17 +86,18 @@ public class Exporter : Box {
     append( bbox );
     append( _stack_reveal );
 
-    /* Initialize the UI */
-    select_export( win.settings.get_string( "last-export" ) );
+    // Initialize the UI
+    select_export( Outliner.settings.get_string( "last-export" ) );
 
-    /* Add the menu actions */
+    // Add the menu actions
     var actions = new SimpleActionGroup();
     actions.add_action_entries( action_entries, this );
     insert_action_group( "exporter", actions );
 
   }
 
-  /* Populates the exporter widget with the available export types */
+  //-------------------------------------------------------------
+  // Populates the exporter widget with the available export types
   private void populate() {
     for( int i=0; i<_win.exports.length(); i++ ) {
       var export = _win.exports.index( i );
@@ -105,26 +107,29 @@ public class Exporter : Box {
     }
   }
 
-  /* Selecting the export */
+  //-------------------------------------------------------------
+  // Selecting the export
   private void select_export( string name ) {
     var export = _win.exports.get_by_name( name );
     if( export != null ) {
       _mb.label = export.label;
       _stack.visible_child_name = export.name;
       _stack_reveal.reveal_child = export.settings_available();
-      _win.settings.set_string( "last-export", export.name );
+      Outliner.settings.set_string( "last-export", export.name );
     }
   }
 
-  /* Menu action to select an export */
+  //-------------------------------------------------------------
+  // Menu action to select an export
   private void action_select_export( SimpleAction action, Variant? variant ) {
     select_export( variant.get_string() );
   }
 
-  /* Add the given export */
+  //-------------------------------------------------------------
+  // Add the given export
   private void add_export_options( Export export ) {
 
-    /* Add the page */
+    // Add the page
     var opts = new Grid() {
       margin_start   = 5,
       margin_end     = 5,
@@ -148,52 +153,52 @@ public class Exporter : Box {
       child = opts
     };
 
-    /* Add the options to the options stack */
+    // Add the options to the options stack
     _stack.add_named( frame, export.name );
 
   }
 
-  /* Perform the export */
+  //-------------------------------------------------------------
+  // Perform the export
   public void do_export() {
 
     var name   = _stack.visible_child_name;
     var export = _win.exports.get_by_name( name );
-
-    var dialog = new FileChooserDialog( _( "Export As %s" ).printf( export.label ), _win, FileChooserAction.SAVE,
-      _( "Cancel" ), ResponseType.CANCEL, _( "Export" ), ResponseType.ACCEPT );
-    Utils.set_chooser_folder( dialog );
-
-    /* Set the default filename */
     var default_fname = Utils.rootname( _win.get_current_table().document.filename );
-    dialog.set_current_name( _win.repair_filename( default_fname, export.extensions ) );
+    var initial_file  = File.new_for_path( _win.repair_filename( default_fname, export.extensions ) );
 
-    /* Set the filter */
-    FileFilter filter = new FileFilter();
+    // Set the filter
+    var filter = new FileFilter();
     filter.set_filter_name( export.label );
     foreach( string extension in export.extensions ) {
       filter.add_pattern( "*" + extension );
     }
-    dialog.set_filter( filter );
 
-    dialog.response.connect((id) => {
-      if( id == ResponseType.ACCEPT ) {
+    var filters = new GLib.ListStore( typeof( FileFilter ) );
+    filters.append( filter );
 
-        /* Close the dialog and parent window */
-        dialog.hide();
+    var dialog = new FileDialog() {
+      modal = true,
+      title = _( "Export As %s" ).printf( export.label ),
+      accept_label = _( "Export" ),
+      filters = filters,
+      initial_file = initial_file
+    };
 
-        /* Perform the export */
-        var fname = dialog.get_file().get_path();
+    dialog.save.begin( _win, null, (obj, res) => {
+      try {
+        var file = dialog.save.end( res );
+
+        // Perform the export
+        var fname = file.get_path();
         export.export( fname = _win.repair_filename( fname, export.extensions ), _win.get_current_table() );
         Utils.store_chooser_folder( fname, false );
 
-        /* Generate notification to indicate that the export completed */
+        // Generate notification to indicate that the export completed
         _win.notification( _( "Minder Export Completed" ), fname );
 
-      }
-      dialog.destroy();
+      } catch( Error e ) {}
     });
-
-    dialog.show();
 
   }
 

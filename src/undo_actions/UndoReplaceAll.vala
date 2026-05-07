@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -42,7 +42,8 @@ public class UndoReplaceAll : UndoItem {
   public string                    replace_text { private set; get; }
   public Array<UndoTextReplaceAll> texts        { private set; get; }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoReplaceAll( string search_text, string replace_text ) {
     base( _( "replace all" ) );
     this.search_text  = search_text;
@@ -50,12 +51,14 @@ public class UndoReplaceAll : UndoItem {
     this.texts        = new Array<UndoTextReplaceAll>();
   }
 
-  /* Adds a given text */
+  //-------------------------------------------------------------
+  // Adds a given text
   public void add_text( UndoTextReplaceAll text ) {
     texts.append_val( text );
   }
 
-  /* Performs replacement */
+  //-------------------------------------------------------------
+  // Performs replacement
   private void replace( UndoTextReplaceAll utra, string remove_text, string add_text ) {
     var remove_chars = remove_text.char_count();
     for( int i=0; i<utra.starts.length; i++ ) {
@@ -66,7 +69,8 @@ public class UndoReplaceAll : UndoItem {
     }
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo( OutlineTable table ) {
     for( int i=0; i<texts.length; i++ ) {
       var ti = texts.index( i );
@@ -76,7 +80,8 @@ public class UndoReplaceAll : UndoItem {
     table.changed();
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo( OutlineTable table ) {
     for( int i=0; i<texts.length; i++ ) {
       var ti = texts.index( i );

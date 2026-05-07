@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,11 +23,32 @@ using Gtk;
 using Gdk;
 using Cairo;
 
+public delegate void ConfirmationDialogFunc();
+
 public class Utils {
 
-  /* Returns true if the specified version is older than this version */
-  public static bool is_version_older( string other_version ) {
-    var my_parts    = Outliner.version.split( "." );
+  //-------------------------------------------------------------
+  // Determines if we are executing this within the Pantheon desktop.
+  // If we are, we need to use icons in the header bar that contain
+  // color.
+  public static bool on_elementary() {
+    var desktop = Environment.get_variable( "XDG_CURRENT_DESKTOP" );
+    return( desktop == "Pantheon" );
+  }
+
+  //-------------------------------------------------------------
+  // Determines if we are using the adwaita theme.
+  public static bool using_adwaita() {
+    var settings = Gtk.Settings.get_default();
+    var theme    = settings.gtk_theme_name;
+    return( (theme != null) && theme.contains( "Adwaita" ) );
+  }
+
+  //-------------------------------------------------------------
+  // Returns true if the specified version is older than this
+  // version
+  public static bool is_version_older( string our_version, string other_version ) {
+    var my_parts    = our_version.split( "." );
     var other_parts = other_version.split( "." );
     for( int i=0; i<my_parts.length; i++ ) {
       if( int.parse( other_parts[i] ) < int.parse( my_parts[i] ) ) {
@@ -37,72 +58,87 @@ public class Utils {
     return( false );
   }
 
-  /*
-   Helper function for converting an RGBA color value to a stringified color
-   that can be used by a markup parser.
-  */
+  //-------------------------------------------------------------
+  // Helper function for converting an RGBA color value to a
+  // stringified color that can be used by a markup parser.
   public static string color_from_rgba( RGBA rgba ) {
     return( "#%02x%02x%02x".printf( (int)(rgba.red * 255), (int)(rgba.green * 255), (int)(rgba.blue * 255) ) );
   }
 
-  /* Sets the context source color to the given color value */
+  //-------------------------------------------------------------
+  // Sets the context source color to the given color value
   public static void set_context_color( Context ctx, RGBA color ) {
     ctx.set_source_rgba( color.red, color.green, color.blue, color.alpha );
   }
 
-  /*
-   Sets the context source color to the given color value overriding the
-   alpha value with the given value.
-  */
+  //-------------------------------------------------------------
+  // Sets the context source color to the given color value
+  // overriding the alpha value with the given value.
   public static void set_context_color_with_alpha( Context ctx, RGBA color, double alpha ) {
     ctx.set_source_rgba( color.red, color.green, color.blue, alpha );
   }
 
-  /*
-   Checks the given string to see if it is a match to the given pattern.  If
-   it is, the matching portion of the string appended to the list of matches.
-  */
-  /*
-  public static void match_string( string pattern, string value, string type, Node? node, ref Gtk.ListStore matches ) {
-    int index = value.casefold().index_of( pattern );
-    if( index != -1 ) {
-      TreeIter it;
-      int    start_index = (index > 20) ? (index - 20) : 0;
-      string prefix      = (index > 20) ? "…"        : "";
-      string str         = prefix +
-                           value.substring( start_index, (index - start_index) ) + "<u>" +
-                           value.substring( index, pattern.length ) + "</u>" +
-                           value.substring( (index + pattern.length), -1 );
-      matches.append( out it );
-      matches.set( it, 0, type, 1, str, 2, node, 3, conn, -1 );
-    }
-  }
-  */
-
-  /* Returns true if the given coordinates are within the specified bounds */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates are within the
+  // specified bounds.
   public static bool is_within_bounds( double x, double y, double bx, double by, double bw, double bh ) {
     return( (bx <= x) && (x < (bx + bw)) && (by <= y) && (y < (by + bh)) );
   }
 
-  /* Returns a string that is suitable to use as an inspector title */
+  //-------------------------------------------------------------
+  // Returns a string that is suitable to use as an inspector title
   public static string make_title( string str ) {
     return( "<b>" + str + "</b>" );
   }
 
-  /* Returns a string that is used to display a tooltip with displayed accelerator */
+  //-------------------------------------------------------------
+  // Transforms a filename into a document title.
+  public static string make_title_from_filename( string fname ) {
+
+    var root = rootname( fname );
+    root = root.replace( "_", " " );
+    root = root.replace( "-", " " );
+    root = root.replace( ".", " - " );
+
+    var title = "";
+    var capitalize = true;
+    for( int i=0; i<root.length; i++ ) {
+      if( root.valid_char( i ) ) {
+        var c = root.@get( i );
+        if( capitalize && c.isalpha() ) {
+          title += c.toupper().to_string();
+          capitalize = false;
+        } else {
+          title += c.to_string();
+        }
+        if( c == ' ' ) {
+          capitalize = true;
+        }
+      }
+    }
+
+    return( title );
+
+  }
+
+  //-------------------------------------------------------------
+  // Returns a string that is used to display a tooltip with
+  // displayed accelerator
   public static string tooltip_with_accel( string tooltip, string accel ) {
     string[] accels = {accel};
     return( Granite.markup_accel_tooltip( accels, tooltip ) );
   }
 
-  /* Opens the given URL in the proper external default application */
+  //-------------------------------------------------------------
+  // Opens the given URL in the proper external default application
   public static void open_url( string url ) {
     try {
       AppInfo.launch_default_for_uri( url, null );
     } catch( GLib.Error e ) {}
   }
 
-  /* Converts the given Markdown into HTML */
+  //-------------------------------------------------------------
+  // Converts the given Markdown into HTML
   public static string markdown_to_html( string md, string tag ) {
     string html;
     var    flags = 0x47607004;
@@ -112,7 +148,9 @@ public class Utils {
     return( "<" + tag + ">" + html + "</" + tag + ">" );
   }
 
-  /* Returns the line height of the first line of the given pango layout */
+  //-------------------------------------------------------------
+  // Returns the line height of the first line of the given pango
+  // layout
   public static double get_line_height( Pango.Layout layout ) {
     int height;
     var line = layout.get_line_readonly( 0 );
@@ -127,7 +165,8 @@ public class Utils {
     return( height / Pango.SCALE );
   }
 
-  /* Searches for the beginning or ending word */
+  //-------------------------------------------------------------
+  // Searches for the beginning or ending word
   public static int find_word( string str, int cursor, bool wordstart ) {
     try {
       MatchInfo match_info;
@@ -142,7 +181,8 @@ public class Utils {
     return( -1 );
   }
 
-  /* Returns the rootname of the given filename */
+  //-------------------------------------------------------------
+  // Returns the rootname of the given filename
   public static string rootname( string filename ) {
     var basename = GLib.Path.get_basename( filename );
     var parts    = basename.split( "." );
@@ -153,7 +193,8 @@ public class Utils {
     }
   }
 
-  /* Show the specified popover */
+  //-------------------------------------------------------------
+  // Show the specified popover
   public static void show_popover( Popover popover ) {
 #if GTK322
     popover.popup();
@@ -162,7 +203,8 @@ public class Utils {
 #endif
   }
 
-  /* Hide the specified popover */
+  //-------------------------------------------------------------
+  // Hide the specified popover
   public static void hide_popover( Popover popover ) {
 #if GTK322
     popover.popdown();
@@ -171,22 +213,26 @@ public class Utils {
 #endif
   }
 
-  public static void set_chooser_folder( FileChooser chooser ) {
+  //-------------------------------------------------------------
+  // Sets the initial folder for the given file chooser.
+  public static void set_chooser_folder( FileDialog dialog ) {
     var dir = Outliner.settings.get_string( "last-directory" );
     if( dir != "" ) {
       var file = File.new_for_path( dir );
-      try {
-        chooser.set_current_folder( file );
-      } catch( Error e ) {}
+      dialog.initial_folder = file;
     }
   }
 
+  //-------------------------------------------------------------
+  // Stores the last used directory from the file chooser.
   public static void store_chooser_folder( string file, bool is_dir ) {
     var dir = is_dir ? file : GLib.Path.get_dirname( file );
     Outliner.settings.set_string( "last-directory", dir );
   }
 
-  /* Returns the child widget at the given index of the parent widget (or null if one does not exist) */
+  //-------------------------------------------------------------
+  // Returns the child widget at the given index of the parent
+  // widget (or null if one does not exist)
   public static Widget? get_child_at_index( Widget parent, int index ) {
     var child = parent.get_first_child();
     while( (child != null) && (index-- > 0) ) {
@@ -195,7 +241,8 @@ public class Utils {
     return( child );
   }
 
-  /* Reads the string from the input stream */
+  //-------------------------------------------------------------
+  // Reads the string from the input stream
   public static string read_stream( InputStream stream ) {
     var str = "";
     var dis = new DataInputStream( stream );
@@ -212,7 +259,8 @@ public class Utils {
     return( str );
   }
 
-  /* Draws a rounded rectangle on the given context */
+  //-------------------------------------------------------------
+  // Draws a rounded rectangle on the given context
   public static void draw_rounded_rectangle( Cairo.Context ctx, double x, double y, double w, double h, double radius ) {
 
     var deg = Math.PI / 180.0;
@@ -224,6 +272,69 @@ public class Utils {
     ctx.arc( (x + radius),     (y + radius),     radius, (180 * deg), (270 * deg) );
     ctx.close_path();
 
+  }
+
+  //-------------------------------------------------------------
+  // Creates a confirmation dialog window.  If the user accepts
+  // message, executes function.
+  public static void create_confirmation_dialog( Gtk.Window win, string message, string detail, ConfirmationDialogFunc confirm_func ) {
+
+    var dialog = new Granite.MessageDialog.with_image_from_icon_name(
+      message,
+      detail,
+      "dialog-warning",
+      ButtonsType.NONE
+    );
+
+    var no = new Button.with_label( _( "No" ) );
+    dialog.add_action_widget( no, ResponseType.CANCEL );
+
+    var yes = new Button.with_label( _( "Yes" ) );
+    yes.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
+    dialog.add_action_widget( yes, ResponseType.ACCEPT );
+
+    dialog.set_transient_for( win );
+    dialog.set_default_response( ResponseType.CANCEL );
+    dialog.set_title( "" );
+
+    dialog.response.connect((id) => {
+      if( id == ResponseType.ACCEPT ) {
+        confirm_func();
+      }
+      dialog.close();
+    });
+
+    dialog.present();
+
+  }
+
+  //-------------------------------------------------------------
+  // Recursively deletes a given directory.
+  private static void delete_recursively( File file ) throws Error {
+
+    try {
+      var enumerator = file.enumerate_children( FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NOFOLLOW_SYMLINKS );
+      FileInfo? info;
+      while( (info = enumerator.next_file()) != null ) {
+        var child = file.get_child( info.get_name() );
+        delete_recursively( child );
+      }
+    } catch( Error e ) {
+      // ignore if not a directory
+    }
+
+    // Finally delete the file or directory itself
+    file.delete();
+
+  }
+
+  //-------------------------------------------------------------
+  // Deletes the given directory.
+  public static void delete_directory( string dirpath ) {
+    var dir = File.new_for_path( dirpath );
+    try {
+      delete_recursively( dir );
+    } catch( Error e ) {}
   }
 
 }

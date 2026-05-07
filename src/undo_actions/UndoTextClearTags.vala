@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -25,7 +25,8 @@ public class UndoTextClearTags : UndoTextItem {
   public int                end   { private set; get; }
   public Array<UndoTagInfo> tags  { private set; get; }
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoTextClearTags( int start, int end, Array<UndoTagInfo> tags, int cursor ) {
     base( _( "clear formatting" ), UndoTextOp.TAGCLEAR, cursor, cursor );
     this.start = start;
@@ -33,19 +34,22 @@ public class UndoTextClearTags : UndoTextItem {
     this.tags  = tags;
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo_text( OutlineTable table, CanvasText ct ) {
     ct.text.apply_tags( tags, start );
     table.queue_draw();
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo_text( OutlineTable table, CanvasText ct ) {
     ct.text.remove_all_tags( start, end );
     table.queue_draw();
   }
 
-  /* Merges the given item with the current one */
+  //-------------------------------------------------------------
+  // Merges the given item with the current one
   public override bool merge( CanvasText ct, UndoTextItem item ) {
     return( false );
   }

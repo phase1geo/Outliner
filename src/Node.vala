@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -41,7 +41,8 @@ public enum NodeListType {
   SECTION,    // Indicates that lists should show section annotations (ex. "1.0", "1.1.2", etc.)
   LENGTH;     // Not a value but can be used for for() loops
 
-  /* Displays the string value of this NodeSide */
+  //-------------------------------------------------------------
+  // Displays the string value of this NodeSide
   public string to_string() {
     switch( this ) {
       case NONE    :  return( "none" );
@@ -60,7 +61,8 @@ public enum NodeListType {
     }
   }
 
-  /* Translates a string from to_string() to a NodeSide value */
+  //-------------------------------------------------------------
+  // Translates a string from to_string() to a NodeSide value
   public static NodeListType parse( string val ) {
     switch( val ) {
       case "none"    :  return( NONE );
@@ -70,7 +72,8 @@ public enum NodeListType {
     }
   }
 
-  /* Outputs the tooltip to be displayed for each type */
+  //-------------------------------------------------------------
+  // Outputs the tooltip to be displayed for each type
   public string tooltip() {
     switch( this ) {
       case NONE    :  return( _( "No enumeration will be displayed" ) );
@@ -154,11 +157,13 @@ public class Node {
 
   private static Pixbuf? _note_icon = null;
 
-  /* Signals */
+  //-------------------------------------------------------------
+  // Signals
   public signal void select_mode( bool name, bool mode );
   public signal void cursor_changed( bool name );
 
-  /* Properties */
+  //-------------------------------------------------------------
+  // Properties
   public int id {
     get {
       return( _id );
@@ -297,14 +302,15 @@ public class Node {
   public double      last_y    { get { return( _y + (hidden ? 0 : _h) ); } }
   public bool        over_note_icon { get; set; default = false; }
 
-  /* Constructor */
+  //-------------------------------------------------------------
+  // Constructor
   public Node( OutlineTable ot ) {
 
     _ot = ot;
 
     _lt_layout = ot.create_pango_layout( null );
 
-    _name = new CanvasText( ot, ot.get_allocated_width() );
+    _name = new CanvasText( ot, ot.get_width() );
     _name.text.add_parser( ot.tagger_parser );
     _name.text.add_parser( ot.unicode_parser );
     _name.text.add_parser( ot.url_parser );
@@ -312,7 +318,7 @@ public class Node {
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
 
-    _note = new CanvasText( ot, ot.get_allocated_width() );
+    _note = new CanvasText( ot, ot.get_width() );
     _note.text.add_parser( ot.unicode_parser );
     _note.text.add_parser( ot.url_parser );
     _note.resized.connect( update_height_from_resize );
@@ -330,7 +336,7 @@ public class Node {
     table_markdown_changed();
     table_parse_urls_changed();
 
-    /* Detect any size changes by the drawing area */
+    // Detect any size changes by the drawing area
     ot.width_changed.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
@@ -341,17 +347,19 @@ public class Node {
 
   }
 
-  /* Constructor of root node */
+  //-------------------------------------------------------------
+  // Constructor of root node
   public Node.root( OutlineTable ot ) {
     _ot = ot;
   }
 
-  /* Copy constructor */
+  //-------------------------------------------------------------
+  // Copy constructor
   public Node.clone_from_node( OutlineTable ot, Node node ) {
 
     _ot = ot;
 
-    /* Handle the clone ID */
+    // Handle the clone ID
     if( node._clone_id == -1 ) {
       int cid        = clone_id++;
       node._clone_id = cid;
@@ -362,13 +370,13 @@ public class Node {
 
     _lt_layout = ot.create_pango_layout( null );
 
-    _name = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.name );
+    _name = new CanvasText.clone_from( ot, ot.get_width(), node.name );
     _name.text.add_parser( ot.tagger_parser );
     _name.resized.connect( update_height_from_resize );
     _name.select_mode.connect( name_select_mode );
     _name.cursor_changed.connect( name_cursor_changed );
 
-    _note = new CanvasText.clone_from( ot, ot.get_allocated_width(), node.note );
+    _note = new CanvasText.clone_from( ot, ot.get_width(), node.note );
     _note.resized.connect( update_height_from_resize );
     _note.select_mode.connect( note_select_mode );
     _note.cursor_changed.connect( note_cursor_changed );
@@ -384,7 +392,7 @@ public class Node {
     table_markdown_changed();
     table_parse_urls_changed();
 
-    /* Detect any size changes by the drawing area */
+    // Detect any size changes by the drawing area
     ot.width_changed.connect( window_size_changed );
     ot.zoom_changed.connect( table_zoom_changed );
     ot.theme_changed.connect( table_theme_changed );
@@ -395,7 +403,8 @@ public class Node {
 
   }
 
-  /* Destructor */
+  //-------------------------------------------------------------
+  // Destructor
   ~Node() {
     _ot.width_changed.disconnect( window_size_changed );
     _ot.zoom_changed.disconnect( table_zoom_changed );
@@ -406,21 +415,24 @@ public class Node {
     _ot.auto_size_changed.disconnect( table_auto_size_changed );
   }
 
-  /* Create the note icon pixbuf if we need to */
+  //-------------------------------------------------------------
+  // Create the note icon pixbuf if we need to
   private void initialize_note_icon() {
     if( _note_icon == null ) {
       try {
-        _note_icon = new Pixbuf.from_resource( "/com/github/phase1geo/outliner/images/accessories-text-editor-symbolic" );
+        _note_icon = new Pixbuf.from_resource( "/io/github/phase1geo/outliner/images/accessories-text-editor-symbolic" );
       } catch( GLib.Error e ) {}
     }
   }
 
-  /* If the window size changes, adjust our width */
+  //-------------------------------------------------------------
+  // If the window size changes, adjust our width
   private void window_size_changed() {
     update_width();
   }
 
-  /* Updates the size of the name and note information */
+  //-------------------------------------------------------------
+  // Updates the size of the name and note information
   private void table_zoom_changed() {
     int width, height;
     var zoom_factor = _ot.win.get_zoom_factor();
@@ -431,16 +443,16 @@ public class Node {
     _lt_width = width / Pango.SCALE;
   }
 
-  /*
-   If the theme has changed, all we need to do is alert the CanvasText to
-   rerender the text.
-  */
+  //-------------------------------------------------------------
+  // If the theme has changed, all we need to do is alert the
+  // CanvasText to rerender the text.
   private void table_theme_changed() {
     _name.update_size( false );
     _note.update_size( false );
   }
 
-  /* Handle any changes to the markdown parser */
+  //-------------------------------------------------------------
+  // Handle any changes to the markdown parser
   private void table_markdown_changed() {
     if( _ot.markdown ) {
       _name.text.add_parser( _ot.markdown_parser );
@@ -451,7 +463,8 @@ public class Node {
     }
   }
 
-  /* Handle any changes to the URL parser */
+  //-------------------------------------------------------------
+  // Handle any changes to the URL parser
   private void table_parse_urls_changed() {
     if( _ot.parse_urls ) {
       _name.text.add_parser( _ot.url_parser );
@@ -462,12 +475,15 @@ public class Node {
     }
   }
 
-  /* Handle any changes to the auto-size setting */
+  //-------------------------------------------------------------
+  // Handle any changes to the auto-size setting
   private void table_auto_size_changed() {
     auto_size();
   }
 
-  /* Update the header_depth of the name text to match our depth if auto-sizing is enabled */
+  //-------------------------------------------------------------
+  // Update the header_depth of the name text to match our depth
+  // if auto-sizing is enabled
   private void auto_size() {
     var orig_depth = name.text.header_depth;
     if( _ot.auto_sizing && (_depth <= _ot.auto_size_depth) ) {
@@ -480,12 +496,14 @@ public class Node {
     }
   }
 
-  /* Generates the select mode signal for the name field */
+  //-------------------------------------------------------------
+  // Generates the select mode signal for the name field
   private void name_select_mode( bool mode ) {
     select_mode( true, mode );
   }
 
-  /* Generates the select mode signal for the note field */
+  //-------------------------------------------------------------
+  // Generates the select mode signal for the note field
   private void note_select_mode( bool mode ) {
     select_mode( false, mode );
   }
@@ -498,15 +516,15 @@ public class Node {
     cursor_changed( false );
   }
 
-  /* Returns true if this node is a cloned node */
+  //-------------------------------------------------------------
+  // Returns true if this node is a cloned node
   public bool is_clone() {
     return( _clone_id != -1 );
   }
 
-  /*
-   If this node is cloned, we will unclone the node by making a copy of the name/note from
-   the cloned value.
-  */
+  //-------------------------------------------------------------
+  // If this node is cloned, we will unclone the node by making a
+  // copy of the name/note from the cloned value.
   public void unclone() {
     if( !is_clone() ) return;
     _clone_id = -1;
@@ -514,7 +532,8 @@ public class Node {
     note.unclone( _ot );
   }
 
-  /* Returns clone data which is used for undoing/redoing uncloning */
+  //-------------------------------------------------------------
+  // Returns clone data which is used for undoing/redoing uncloning
   public NodeCloneData get_clone_data() {
     var clone_data = new NodeCloneData();
     clone_data.id   = _clone_id;
@@ -523,26 +542,29 @@ public class Node {
     return( clone_data );
   }
 
-  /* Re-clones a node that was previously cloned */
+  //-------------------------------------------------------------
+  // Re-clones a node that was previously cloned
   public void reclone( NodeCloneData clone_data ) {
     _clone_id = clone_data.id;
     name.clone( clone_data.name );
     note.clone( clone_data.note );
   }
 
-  /* Called whenever the canvas width changes */
+  //-------------------------------------------------------------
+  // Called whenever the canvas width changes
   private void update_width() {
 
     var rmargin = (padx * 5) + 20;
 
-    /* Update our width information */
+    // Update our width information
     _w = _ot.width;
     _name.max_width = _w - (_name.posx + rmargin);
     _note.max_width = _w - (_note.posx + rmargin);
 
   }
 
-  /* Updates the size of this node */
+  //-------------------------------------------------------------
+  // Updates the size of this node
   private void update_height( bool adjust ) {
 
     var orig_height = _h;
@@ -560,20 +582,18 @@ public class Node {
 
   }
 
-  /*
-   Updates the height information due to either the name or the note being
-   resized.
-  */
+  //-------------------------------------------------------------
+  // Updates the height information due to either the name or the
+  // note being resized.
   private void update_height_from_resize() {
     position_text();
     update_width();
     update_height( true );
   }
 
-  /*
-   Returns true if this node is on the border of a page and we will return the
-   number of pixels to draw on the first page.
-  */
+  //-------------------------------------------------------------
+  // Returns true if this node is on the border of a page and we
+  // will return the number of pixels to draw on the first page.
   public bool on_page_boundary( int page_size, out double inc_size ) {
 
     var int_y     = (int)_y;
@@ -581,23 +601,19 @@ public class Node {
     var int_nameh = (int)_name.height;
     var int_noteh = (int)_note.height;
 
-    /* If the node starts at the top of the next page, return true */
+    // If the node starts at the top of the next page, return true
     if( ((int)_y % page_size) == 0 ) {
       inc_size = 0;
       return( true );
 
-    /*
-     If the node name straddles the page boundary, make sure that we set inc_size
-     such that we don't cut off a line.
-    */
+    // If the node name straddles the page boundary, make sure that we set inc_size
+    // such that we don't cut off a line.
     } else if( (int_y / page_size) != ((int_y + int_pady + int_nameh) / page_size) ) {
       inc_size = name.get_page_include_size( page_size ) + int_y + int_pady;
       return( true );
 
-    /*
-     If the node note straddles the page boundary, make sure that we set inc_size
-     such that we don't cut off a line.
-    */
+    // If the node note straddles the page boundary, make sure that we set inc_size
+    // such that we don't cut off a line.
     } else if( !hide_note && ((int_y / page_size) != ((int_y + (int_pady * 2) + int_nameh + int_noteh) / page_size)) ) {
       inc_size = note.get_page_include_size( page_size ) + int_y + (int_pady * 2) + int_nameh;
       return( true );
@@ -609,17 +625,19 @@ public class Node {
 
   }
 
-  /*
-   Checks to see if the current node is the last node and, if it is, sets the
-   height of the OutlineTable to the calculated last_y of this node.
-  */
+  //-------------------------------------------------------------
+  // Checks to see if the current node is the last node and, if
+  // it is, sets the height of the OutlineTable to the calculated
+  // last_y of this node.
   private void set_ot_height() {
     if( this == get_root_node().get_last_node() ) {
       _ot.resize_table();
     }
   }
 
-  /* Adjusts the posy value of all of the nodes displayed below this node */
+  //-------------------------------------------------------------
+  // Adjusts the posy value of all of the nodes displayed below
+  // this node.
   public double adjust_nodes( double last_y, bool deleted, string msg, int child_start = 0 ) {
 
     if( _debug ) {
@@ -634,14 +652,16 @@ public class Node {
       last_y = parent.adjust_nodes( last_y, false, "adjust_nodes", (index() + 1) );
     }
 
-    /* If the current node is the last node, update the widget size to match the current height */
+    // If the current node is the last node, update the widget size to match the current height
     set_ot_height();
 
     return( last_y );
 
   }
 
-  /* Adjusts the posy value of all nodes that are descendants of the give node */
+  //-------------------------------------------------------------
+  // Adjusts the posy value of all nodes that are descendants of
+  // the give node
   private double adjust_descendants( double last_y, int child_start ) {
     if( expanded ) {
       Node? child = null;
@@ -657,6 +677,9 @@ public class Node {
     return( last_y );
   }
 
+  //-------------------------------------------------------------
+  // Sets the alpha value of every row in this tree to the given
+  // value.
   public void set_tree_alpha( double value ) {
     alpha = value;
     for( int i=0; i<children.length; i++ ) {
@@ -664,7 +687,8 @@ public class Node {
     }
   }
 
-  /* Adjusts the position of the text object */
+  //-------------------------------------------------------------
+  // Adjusts the position of the text object
   private void position_text() {
     var zoom = _ot.win.get_zoom_factor();
     var tx   = ((task == NodeTaskMode.NONE) || _ot.tasks_on_right) ? 0 : (task_size + padx);
@@ -674,7 +698,8 @@ public class Node {
     note.posy = y + (pady * 2) + name.height;
   }
 
-  /* Searches the node tree for a node that matches the given ID */
+  //-------------------------------------------------------------
+  // Searches the node tree for a node that matches the given ID
   public string lookup_id() {
     var str  = index().to_string();
     var node = parent;
@@ -692,7 +717,8 @@ public class Node {
     return( this );
   }
 
-  /* Returns the node associated with the given lookup ID */
+  //-------------------------------------------------------------
+  // Returns the node associated with the given lookup ID.
   public Node? get_node_by_lookup_id( string str ) {
     if( is_root() ) {
       string[] indices = str.split( "," );
@@ -701,7 +727,8 @@ public class Node {
     return( null );
   }
 
-  /* Propagates the current task information to the children */
+  //-------------------------------------------------------------
+  // Propagates the current task information to the children
   private void propagate_task_down() {
     if( task != NodeTaskMode.DOING ) {
       for( int i=0; i<children.length; i++ ) {
@@ -711,7 +738,9 @@ public class Node {
     }
   }
 
-  /* Updates the task of this parent row based on the status of the children */
+  //-------------------------------------------------------------
+  // Updates the task of this parent row based on the status of
+  // the children
   private void update_task_from_children() {
     var value = NodeTaskMode.NONE;
     for( int i=0; i<children.length; i++ ) {
@@ -728,14 +757,17 @@ public class Node {
     update_task( value, false, true );
   }
 
-  /* Propagates the current task information upwards in the tree until we reach the root node */
+  //-------------------------------------------------------------
+  // Propagates the current task information upwards in the tree
+  // until we reach the root node
   private void propagate_task_up() {
     if( !parent.is_root() ) {
       parent.update_task_from_children();
     }
   }
 
-  /* Propagates the task information both up and down the node tree */
+  //-------------------------------------------------------------
+  // Propagates the task information both up and down the node tree
   private void update_task( NodeTaskMode value, bool prop_down, bool prop_up ) {
     if( _task == value ) return;
     var resize = (task == NodeTaskMode.NONE) || (value == NodeTaskMode.NONE);
@@ -745,7 +777,8 @@ public class Node {
     if( prop_up )   propagate_task_up();
   }
 
-  /* Returns the root node of this node */
+  //-------------------------------------------------------------
+  // Returns the root node of this node
   public Node get_root_node() {
     var parent = _parent;
     var root   = this;
@@ -756,7 +789,8 @@ public class Node {
     return( root );
   }
 
-  /* Returns the main node of this node */
+  //-------------------------------------------------------------
+  // Returns the main node of this node
   public Node? get_main_node() {
     if( is_root() ) return( null );
     var parent = _parent;
@@ -768,7 +802,8 @@ public class Node {
     return( root );
   }
 
-  /* Returns the first node in the current node tree */
+  //-------------------------------------------------------------
+  // Returns the first node in the current node tree
   public Node? get_first_node() {
     if( is_leaf() || !expanded ) {
       return( this );
@@ -777,7 +812,8 @@ public class Node {
     }
   }
 
-  /* Returns the last node in the current node tree */
+  //-------------------------------------------------------------
+  // Returns the last node in the current node tree
   public Node? get_last_node() {
     if( is_leaf() || !expanded ) {
       return( this );
@@ -786,7 +822,8 @@ public class Node {
     }
   }
 
-  /* Returns the node displayed before this node */
+  //-------------------------------------------------------------
+  // Returns the node displayed before this node
   public Node? get_previous_node() {
     var index = index();
     if( index <= 0 ) {
@@ -796,7 +833,8 @@ public class Node {
     }
   }
 
-  /* Returns the node displayed after this node */
+  //-------------------------------------------------------------
+  // Returns the node displayed after this node
   public Node? get_next_node() {
     if( !is_leaf() && expanded ) {
       return( children.index( 0 ) );
@@ -813,7 +851,8 @@ public class Node {
     }
   }
 
-  /* Returns the sibling node relative to this node */
+  //-------------------------------------------------------------
+  // Returns the sibling node relative to this node
   private Node? get_sibling( int dir ) {
     var index = index() + dir;
     if( (index < 0) || (index >= parent.children.length) ) {
@@ -823,27 +862,35 @@ public class Node {
     }
   }
 
-  /* Returns the previous sibling node relative to this node */
+  //-------------------------------------------------------------
+  // Returns the previous sibling node relative to this node
   public Node? get_previous_sibling() {
     return( get_sibling( -1 ) );
   }
 
-  /* Returns the previous sibling node relative to this node */
+  //-------------------------------------------------------------
+  // Returns the previous sibling node relative to this node
   public Node? get_next_sibling() {
     return( get_sibling( 1 ) );
   }
 
-  /* Returns the first child node, if one exists; otherwise, returns null */
+  //-------------------------------------------------------------
+  // Returns the first child node, if one exists; otherwise,
+  // returns null
   public Node? get_first_child() {
     return( is_leaf() ? null : children.index( 0 ) );
   }
 
-  /* Returns the last child node, if one exists; otherwise, returns null */
+  //-------------------------------------------------------------
+  // Returns the last child node, if one exists; otherwise,
+  // returns null
   public Node? get_last_child() {
     return( is_leaf() ? null : children.index( children.length - 1 ) );
   }
 
-  /* Returns the node within this tree that contains the given coordinates */
+  //-------------------------------------------------------------
+  // Returns the node within this tree that contains the given
+  // coordinates
   public Node? get_containing_node( double x, double y ) {
     if( !is_root() && is_within( x, y ) ) {
       return( this );
@@ -858,7 +905,8 @@ public class Node {
     return( null );
   }
 
-  /* Returns the area where we will draw the note icon */
+  //-------------------------------------------------------------
+  // Returns the area where we will draw the note icon
   public void note_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 2) + 10;
     y = this.y + pady + ((name.get_line_height() / 2) - (note_size / 2));
@@ -866,7 +914,8 @@ public class Node {
     h = note_size;
   }
 
-  /* Returns the area where we will draw the task icon */
+  //-------------------------------------------------------------
+  // Returns the area where we will draw the task icon
   private void task_bbox( out double x, out double y, out double w, out double h ) {
     if( _ot.tasks_on_right ) {
       x = _ot.width - ((padx * 4) + 20);
@@ -878,7 +927,9 @@ public class Node {
     h = task_size;
   }
 
-  /* Returns the area where the expander will draw the expander icon */
+  //-------------------------------------------------------------
+  // Returns the area where the expander will draw the expander
+  // icon
   private void expander_bbox( out double x, out double y, out double w, out double h ) {
     x = this.x + (padx * 4) + 10 + (depth * indent);
     y = this.y + pady + ((name.get_line_height() / 2) - (expander_size / 2));
@@ -886,12 +937,14 @@ public class Node {
     h = expander_size;
   }
 
-  /* Returns true if the given coordinates are within this node */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates are within this node
   public bool is_within( double x, double y ) {
     return( !hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, _h ) );
   }
 
-  /* Returns true if the given coordinates lie within the expander */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates lie within the expander
   public bool is_within_expander( double x, double y ) {
     if( is_leaf() || hidden ) return( false );
     double ex, ey, ew, eh;
@@ -899,7 +952,9 @@ public class Node {
     return( Utils.is_within_bounds( x, y, ex, ey, ew, eh ) );
   }
 
-  /* Returns true if the given coordinates reside within the note icon boundaries */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates reside within the note
+  // icon boundaries
   public bool is_within_note_icon( double x, double y ) {
     if( hidden ) return( false );
     double nx, ny, nw, nh;
@@ -907,6 +962,9 @@ public class Node {
     return( Utils.is_within_bounds( x, y, nx, ny, nw, nh ) );
   }
 
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates are within this nodes' task
+  // indicator.
   public bool is_within_task( double x, double y ) {
     if( hidden ) return( false );
     double tx, ty, tw, th;
@@ -914,27 +972,36 @@ public class Node {
     return( (task != NodeTaskMode.NONE) && Utils.is_within_bounds( x, y, tx, ty, tw, th ) );
   }
 
-  /* Returns true if the given coordinates reside within the name text area */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates reside within the name
+  // text area
   public bool is_within_name( double x, double y ) {
     return( !hidden && Utils.is_within_bounds( x, y, name.posx, name.posy, _w, name.height ) );
   }
 
-  /* Returns true if the given coordinates reside within the note text area */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates reside within the note
+  // text area
   public bool is_within_note( double x, double y ) {
     return( !hidden && Utils.is_within_bounds( x, y, note.posx, note.posy, _w, note.height ) );
   }
 
-  /* Returns true if the given coordinates lie within the attachto area */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates lie within the attachto
+  // area
   public bool is_within_attachto( double x, double y ) {
     return( !hidden && Utils.is_within_bounds( x, y, this.x, (this.y + 4), width, (_h - 8) ) );
   }
 
-  /* Returns true if the given coordinates lie within the attachabove area */
+  //-------------------------------------------------------------
+  // Returns true if the given coordinates lie within the
+  // attachabove area
   public bool is_within_attachabove( double x, double y ) {
     return( !hidden && Utils.is_within_bounds( x, y, this.x, this.y, width, 4 ) );
   }
 
-  /* Change the name font to the given value */
+  //-------------------------------------------------------------
+  // Change the name font to the given value
   public void change_name_font( string family, int size, bool recursive = true ) {
     if( !is_root() ) {
       int width, height;
@@ -951,7 +1018,8 @@ public class Node {
     }
   }
 
-  /* Change the note font to the given value */
+  //-------------------------------------------------------------
+  // Change the note font to the given value
   public void change_note_font( string family, int size, bool recursive = true ) {
     if( !is_root() ) {
       var zoom_factor = _ot.win.get_zoom_factor();
@@ -964,11 +1032,12 @@ public class Node {
     }
   }
 
-  /*************************/
-  /* FILE HANDLING METHODS */
-  /*************************/
+  //-------------------------------------------------------------
+  // FILE HANDLING METHODS
+  //-------------------------------------------------------------
 
-  /* Saves the current node and its children in XML Outliner format */
+  //-------------------------------------------------------------
+  // Saves the current node and its children in XML Outliner format
   public Xml.Node* save( ref HashMap<int,bool> clone_ids ) {
 
     Xml.Node* n = new Xml.Node( null, "node" );
@@ -977,7 +1046,8 @@ public class Node {
     n->new_prop( "hidenote", hide_note.to_string() );
     n->new_prop( "task",     _task.to_string() );
 
-    /* Only save out the name/note if we are not a clone or if our clone has not been output yet */
+    // Only save out the name/note if we are not a clone or if our
+    // clone has not been output yet
     if( (_clone_id == -1) || !clone_ids.has_key( _clone_id ) ) {
       n->add_child( name.save( "name" ) );
       if( note.text.text != "" ) {
@@ -1001,7 +1071,9 @@ public class Node {
 
   }
 
-  /* Loads the current node and its children from XML Outliner format */
+  //-------------------------------------------------------------
+  // Loads the current node and its children from XML Outliner
+  // format
   public void load( OutlineTable ot, Xml.Node* n, ref HashMap<int,Node> clone_ids ) {
 
     string? e = n->get_prop( "expanded" );
@@ -1048,7 +1120,8 @@ public class Node {
 
   }
 
-  /* Loads the given child node information */
+  //-------------------------------------------------------------
+  // Loads the given child node information
   private void load_nodes( OutlineTable ot, Xml.Node* n, ref HashMap<int,Node> clone_ids ) {
 
     for( Xml.Node* it = n->children; it != null; it = it->next ) {
@@ -1061,11 +1134,12 @@ public class Node {
 
   }
 
-  /*************************/
-  /* TREE HANDLING METHODS */
-  /*************************/
+  //-------------------------------------------------------------
+  // TREE HANDLING METHODS
+  //-------------------------------------------------------------
 
-  /* Returns the index of this node within its parent */
+  //-------------------------------------------------------------
+  // Returns the index of this node within its parent
   public int index() {
 
     if( _parent != null ) {
@@ -1080,7 +1154,8 @@ public class Node {
 
   }
 
-  /* Adds a child to this node */
+  //-------------------------------------------------------------
+  // Adds a child to this node
   public void add_child( Node child, int index = -1 ) {
 
     if( index < 0 ) {
@@ -1089,7 +1164,7 @@ public class Node {
       children.insert_val( index, child );
     }
 
-    /* Make sure that this node is expanded */
+    // Make sure that this node is expanded
     expanded = true;
 
     child.parent = this;
@@ -1100,15 +1175,16 @@ public class Node {
     child.x      = 0;
     child.y      = (prev == null) ? _ot.get_top_row_y() : prev.last_y;
 
-    /* Re-draw all nodes */
+    // Re-draw all nodes
     child.adjust_nodes( child.last_y, false, "add_child" );
 
-    /* Update the list type values */
+    // Update the list type values
     set_list_types();
 
   }
 
-  /* Removes the child at the given index from this node */
+  //-------------------------------------------------------------
+  // Removes the child at the given index from this node
   public void remove_child( Node node ) {
 
     var prev  = node.get_previous_node();
@@ -1118,12 +1194,13 @@ public class Node {
     children.remove_index( index );
     node.parent = null;
 
-    /* Update the list type values */
+    // Update the list type values
     set_list_types();
 
   }
 
-  /* Expands the next unexpanded level of hierachy */
+  //-------------------------------------------------------------
+  // Expands the next unexpanded level of hierachy
   public void expand_next( Array<Node> nodes ) {
     if( !is_leaf() ) {
       if( !expanded ) {
@@ -1137,7 +1214,8 @@ public class Node {
     }
   }
 
-  /* Expand all of the nodes within this node tree */
+  //-------------------------------------------------------------
+  // Expand all of the nodes within this node tree
   public void expand_all( Array<Node> nodes ) {
     if( !expanded ) {
       _expanded = true;
@@ -1148,7 +1226,8 @@ public class Node {
     }
   }
 
-  /* Calculate the maximum depth that is not collapsedd */
+  //-------------------------------------------------------------
+  // Calculate the maximum depth that is not collapsed
   private void get_collapse_next_depth( ref int max_depth ) {
     if( !is_leaf() ) {
       if( expanded ) {
@@ -1162,7 +1241,8 @@ public class Node {
     }
   }
 
-  /* Collapse all nodes that match the maximum depth */
+  //-------------------------------------------------------------
+  // Collapse all nodes that match the maximum depth
   private void collapse_at_depth( int max_depth, Array<Node> nodes ) {
     if( !is_leaf() ) {
       if( depth == max_depth ) {
@@ -1176,14 +1256,16 @@ public class Node {
     }
   }
 
-  /* Collapses the next level of hierarchy */
+  //-------------------------------------------------------------
+  // Collapses the next level of hierarchy
   public void collapse_next( Array<Node> nodes ) {
     int max_depth = depth;
     get_collapse_next_depth( ref max_depth );
     collapse_at_depth( max_depth, nodes );
   }
 
-  /* Collapses all nodes within this node tree */
+  //-------------------------------------------------------------
+  // Collapses all nodes within this node tree
   public void collapse_all( Array<Node> nodes ) {
     if( expanded ) {
       _expanded = false;
@@ -1194,22 +1276,27 @@ public class Node {
     }
   }
 
-  /* Returns true if the node is a root node (has no parent) */
+  //-------------------------------------------------------------
+  // Returns true if the node is a root node (has no parent)
   public bool is_root() {
     return( parent == null );
   }
 
-  /* Returns true if the node is a main node (its parent is the root node) */
+  //-------------------------------------------------------------
+  // Returns true if the node is a main node (its parent is the
+  // root node)
   public bool is_main() {
     return( (parent != null) && parent.is_root() );
   }
 
-  /* Returns true if the node is a leaf node (has no children) */
+  //-------------------------------------------------------------
+  // Returns true if the node is a leaf node (has no children)
   public bool is_leaf() {
     return( children.length == 0 );
   }
 
-  /* Returns true if we are a descendant of the given node */
+  //-------------------------------------------------------------
+  // Returns true if we are a descendant of the given node
   public bool is_descendant_of( Node node ) {
     var current = parent;
     while( !current.is_root() && (current != node) ) {
@@ -1218,7 +1305,8 @@ public class Node {
     return( current == node );
   }
 
-  /* Set the notes display for this node and all descendant nodes */
+  //-------------------------------------------------------------
+  // Set the notes display for this node and all descendant nodes
   public void set_notes_display( bool show ) {
     if( !is_root() && (note.text.text != "") ) {
       _hide_note = !show;
@@ -1229,7 +1317,9 @@ public class Node {
     }
   }
 
-  /* Returns true if any notes are shown in this note or any descendants */
+  //-------------------------------------------------------------
+  // Returns true if any notes are shown in this note or any
+  // descendants
   public bool any_notes_shown() {
     if( !_hide_note ) return( true );
     for( int i=0; i<children.length; i++ ) {
@@ -1240,7 +1330,8 @@ public class Node {
     return( false );
   }
 
-  /* Set the node to display in normal or condensed mode */
+  //-------------------------------------------------------------
+  // Set the node to display in normal or condensed mode
   public void set_condensed( bool condensed ) {
     if( !is_root() ) {
       pady = condensed ? 2 : 10;
@@ -1255,11 +1346,12 @@ public class Node {
     }
   }
 
-  /**************************/
-  /* SEARCH/REPLACE METHODS */
-  /**************************/
+  //-------------------------------------------------------------
+  // SEARCH/REPLACE METHODS
+  //-------------------------------------------------------------
 
-  /* Performs depth first search */
+  //-------------------------------------------------------------
+  // Performs depth first search
   public void do_search( string pattern ) {
 
     if( !is_root() ) {
@@ -1273,7 +1365,9 @@ public class Node {
 
   }
 
-  /* Replaces all matched text with the given string in the specified CanvasText */
+  //-------------------------------------------------------------
+  // Replaces all matched text with the given string in the
+  // specified CanvasText
   private void replace_all_text( string str, CanvasText ct, ref UndoReplaceAll undo ) {
     var undo_text = new UndoTextReplaceAll( ct );
     ct.text.replace_all( str, ref undo_text );
@@ -1282,10 +1376,9 @@ public class Node {
     }
   }
 
-  /*
-   Replaces all matched text within this node and its descendants with the
-   given string.
-  */
+  //-------------------------------------------------------------
+  // Replaces all matched text within this node and its descendants
+  // with the given string.
   public void replace_all( string str, ref UndoReplaceAll undo ) {
     if( !is_root() ) {
       replace_all_text( str, name, ref undo );
@@ -1296,7 +1389,8 @@ public class Node {
     }
   }
 
-  /* Changes the filter based on the given filter function */
+  //-------------------------------------------------------------
+  // Changes the filter based on the given filter function
   public void filter( NodeFilterFunc? func, ref bool one_hidden, ref bool one_shown ) {
     hidden      = (func != null) && !func( this );
     one_hidden |= _hidden;
@@ -1307,11 +1401,12 @@ public class Node {
     }
   }
 
-  /*********************/
-  /* NUMBERING METHODS */
-  /*********************/
+  //-------------------------------------------------------------
+  // NUMBERING METHODS
+  //-------------------------------------------------------------
 
-  /* Returns the section ID for this node */
+  //-------------------------------------------------------------
+  // Returns the section ID for this node
   private int section() {
     if( _parent != null ) {
       var index = 0;
@@ -1325,7 +1420,8 @@ public class Node {
     return( -1 );
   }
 
-  /* Sets the line type value */
+  //-------------------------------------------------------------
+  // Sets the line type value
   private void set_list_type() {
     int width, height;
     switch( _ot.list_type ) {
@@ -1339,7 +1435,9 @@ public class Node {
     update_width();
   }
 
-  /* Used when the associated outline table needs to change the list type of all nodes */
+  //-------------------------------------------------------------
+  // Used when the associated outline table needs to change the
+  // list type of all nodes
   public void set_list_types() {
     for( int i=0; i<children.length; i++ ) {
       var child = children.index( i );
@@ -1349,6 +1447,8 @@ public class Node {
     }
   }
 
+  //-------------------------------------------------------------
+  // Returns the ordered value to display for this node.
   public string ordered_item() {
     switch( depth ) {
       case 1  :  return( roman_number( section() ).up() );
@@ -1363,7 +1463,8 @@ public class Node {
     }
   }
 
-  /* Returns the Roman number to represent the given index */
+  //-------------------------------------------------------------
+  // Returns the Roman number to represent the given index
   private string roman_number( int index ) {
 
     var      value = "";
@@ -1384,7 +1485,8 @@ public class Node {
 
   }
 
-  /* Returns the letter to represent the given index */
+  //-------------------------------------------------------------
+  // Returns the letter to represent the given index
   private string letter( int index ) {
 
     var      value   = "";
@@ -1403,7 +1505,8 @@ public class Node {
 
   }
 
-  /* Returns a section number */
+  //-------------------------------------------------------------
+  // Returns a section number
   public string ordered_section() {
 
     if( is_root() ) return( "" );
@@ -1420,15 +1523,18 @@ public class Node {
 
   }
 
-  /*******************/
-  /* DRAWING METHODS */
-  /*******************/
+  //-------------------------------------------------------------
+  // DRAWING METHODS
+  //-------------------------------------------------------------
 
+  //-------------------------------------------------------------
+  // Returns true if this node should be drawn as a blank line.
   public bool draw_as_blank() {
     return( (mode != NodeMode.EDITABLE) && is_main() && (name.text.text == "") && (children.length == 0) && _ot.blank_rows );
   }
 
-  /* Draws the background for the given row */
+  //-------------------------------------------------------------
+  // Draws the background for the given row
   public void draw_background( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     var background = theme.background;
@@ -1440,13 +1546,14 @@ public class Node {
       case NodeMode.ATTACHTO :  background = theme.attachable_color;    break;
       case NodeMode.HOVER    :  background = theme.nodesel_background;  alpha = 0.1;  break;
       case NodeMode.MOVETO   :  alpha      = 0.3;                       break;
+      default :  break;
     }
 
     Utils.set_context_color_with_alpha( ctx, background, alpha );
     ctx.rectangle( _x, _y, _w, _h );
     ctx.fill();
 
-    /* If we are attaching above or below this node, draw the below indicator */
+    // If we are attaching above or below this node, draw the below indicator
     switch( tmode ) {
       case NodeMode.ATTACHABOVE :
         Utils.set_context_color( ctx, theme.attachable_color );
@@ -1458,11 +1565,13 @@ public class Node {
         ctx.rectangle( _x, (last_y - 4), _w, 4 );
         ctx.fill();
         break;
+      default :  break;
     }
 
   }
 
-  /* Draw the expander icon */
+  //-------------------------------------------------------------
+  // Draw the expander icon
   public void draw_expander( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     if( !opts.show_expander ) return;
@@ -1500,6 +1609,8 @@ public class Node {
 
   }
 
+  //-------------------------------------------------------------
+  // Draw the depth lines.
   public void draw_depth( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     if( !opts.show_depth || !_ot.show_depth || _parent.is_root() ) return;
@@ -1529,7 +1640,8 @@ public class Node {
 
   }
 
-  /* Draw the task indicator */
+  //-------------------------------------------------------------
+  // Draw the task indicator
   public void draw_task( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     if( (task == NodeTaskMode.NONE) ) return;
@@ -1562,11 +1674,13 @@ public class Node {
         ctx.line_to( ((tx + tw) - 3), (ty + 3) );
         ctx.stroke();
         break;
+      default :  break;
     }
 
   }
 
-  /* Draw the list type to the right of the expander */
+  //-------------------------------------------------------------
+  // Draw the list type to the right of the expander
   public void draw_list_type( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     if( _ot.list_type == NodeListType.NONE ) return;
@@ -1583,7 +1697,8 @@ public class Node {
 
   }
 
-  /* Draw the node title */
+  //-------------------------------------------------------------
+  // Draw the node title
   public void draw_name( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     var color = theme.foreground;
@@ -1600,7 +1715,8 @@ public class Node {
 
   }
 
-  /* Draw the note icon */
+  //-------------------------------------------------------------
+  // Draw the note icon
   private void draw_note_icon( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     var tmode = opts.show_modes ? mode : NodeMode.NONE;
@@ -1623,7 +1739,8 @@ public class Node {
 
   }
 
-  /* Draw the note */
+  //-------------------------------------------------------------
+  // Draw the note
   public void draw_note( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     var tmode = opts.show_modes ? mode : NodeMode.NONE;
@@ -1634,7 +1751,7 @@ public class Node {
     var bg_color         = use_select_color ? theme.nodesel_background : theme.note_background;
     var fg_color         = use_select_color ? theme.nodesel_foreground : theme.note_foreground;
 
-    /* Draw the background color */
+    // Draw the background color
     if( opts.show_note_bg ) {
       Utils.set_context_color_with_alpha( ctx, bg_color, alpha );
       Utils.draw_rounded_rectangle( ctx, (note.posx - (padx / 2)), note.posy, note.max_width, note.height, 4 );
@@ -1652,7 +1769,8 @@ public class Node {
 
   }
 
-  /* Draw the node to the screen */
+  //-------------------------------------------------------------
+  // Draw the node to the screen
   public void draw( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     var tmode = opts.show_modes ? mode : NodeMode.NONE;
@@ -1673,7 +1791,8 @@ public class Node {
 
   }
 
-  /* Draws the entire node tree */
+  //-------------------------------------------------------------
+  // Draws the entire node tree
   public void draw_tree( Cairo.Context ctx, Theme theme, NodeDrawOptions opts ) {
 
     draw( ctx, theme, opts );

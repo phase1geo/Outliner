@@ -1,5 +1,5 @@
- project('com.github.phase1geo.outliner', ['vala', 'c'],
-    version : '1.7.0',
+ project('io.github.phase1geo.outliner', ['vala', 'c'],
+    version : '2.0.0',
     license: 'GPL-3.0'
 )
 
@@ -40,12 +40,17 @@ cc = meson.get_compiler('c')
 math_dep    = cc.find_library('m', required: false)
 libmarkdown = cc.find_library('markdown', required: true)
 
+# Check externally used programs
+pandoc = find_program('pandoc', required: true)
+
 add_project_arguments([
-        '--vapidir', join_paths(meson.current_source_dir(), 'vapi'),
-        '--disable-warnings'
+        '--vapidir', join_paths(meson.current_source_dir(), 'vapi')
+        #        '--disable-warnings'
     ],
     language: 'vala',
 )
+
+add_project_arguments(['-w'], language: 'c')
 
 dependencies = [
     dependency('gobject-2.0'),
@@ -55,22 +60,29 @@ dependencies = [
     dependency('granite-7'),
     dependency('gtk4'),
     dependency('libxml-2.0'),
+    dependency('libarchive'),
     dependency('webkitgtk-6.0'),
     libmarkdown,
     math_dep
 ]
 
-e = executable('com.github.phase1geo.outliner',
+e = executable('io.github.phase1geo.outliner',
     sources,
     config_file,
     gresource,
     dependencies: dependencies,
     vala_args: [
-        meson.source_root() + '/vapi/libmarkdown.vapi'
+        meson.project_source_root() + '/vapi/libmarkdown.vapi'
     ],
     install : true
 )
 
 #test('tests', e, args : ['--run-tests'])
 
-meson.add_install_script('meson/post_install.py')
+gnome.post_install(
+  glib_compile_schemas: true,
+  gtk_update_icon_cache: true,
+  update_mime_database: true,
+  update_desktop_database: true
+)
+

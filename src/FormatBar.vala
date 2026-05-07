@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -22,7 +22,7 @@
 using Gtk;
 using Gdk;
 
-public class FormatBar : Gtk.Popover {
+public class FormatBar : Box {
 
   private OutlineTable _table;
   private Button       _copy;
@@ -39,59 +39,55 @@ public class FormatBar : Gtk.Popover {
   private ColorPicker  _color;
   private ToggleButton _link;
   private bool         _ignore_active = false;
-  private LinkEditor   _link_editor;
   private Button       _clear;
+  private SimpleAction _header_action;
 
-  /* Construct the formatting bar */
+  public signal void close_requested();
+
+  //-------------------------------------------------------------
+  // Construct the formatting bar
   public FormatBar( OutlineTable table ) {
+
+    Object( orientation: Orientation.HORIZONTAL, spacing: 0, margin_start: 5, margin_end: 5, margin_top: 5, margin_bottom: 5 );
 
     _table = table;
 
-    _link_editor = new LinkEditor( table );
-
-    var box = new Box( Orientation.HORIZONTAL, 0 ) {
-      margin_start  = 5,
-      margin_end    = 5,
-      margin_top    = 5,
-      margin_bottom = 5
-    };
-
     _copy = new Button.from_icon_name( "edit-copy-symbolic" ) {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Copy" ), "<Control>c" )
+      tooltip_markup = make_tooltip_markup( _( "Copy" ), KeyCommand.EDIT_COPY )
     };
     _copy.clicked.connect( handle_copy );
 
     _cut = new Button.from_icon_name( "edit-cut-symbolic" ) {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Cut" ), "<Control>x" )
+      tooltip_markup = make_tooltip_markup( _( "Cut" ), KeyCommand.EDIT_CUT )
     };
     _cut.clicked.connect( handle_cut );
 
     _bold = new ToggleButton() {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Bold" ), "<Control>b" )
+      tooltip_markup = make_tooltip_markup( _( "Bold" ), KeyCommand.EDIT_BOLD )
     };
     add_markup( _bold, true, "<b>B</b>" );
     _bold.toggled.connect( handle_bold );
 
     _italics = new ToggleButton() {
       has_frame = false,
-      tooltip_markup = Utils.tooltip_with_accel( _( "Italic" ), "<Control>i" )
+      tooltip_markup = make_tooltip_markup( _( "Italic" ), KeyCommand.EDIT_ITALICS )
     };
     add_markup( _italics, true, "<i>I</i>" );
     _italics.toggled.connect( handle_italics );
 
     _underline = new ToggleButton() {
       has_frame = false,
-      tooltip_text = _( "Underline" )
+      tooltip_text = make_tooltip_markup( _( "Underline" ), KeyCommand.EDIT_UNDERLINE )
     };
     add_markup( _underline, true, "<u>U</u>" );
     _underline.toggled.connect( handle_underline );
 
     _strike = new ToggleButton() {
       has_frame = false,
-      tooltip_text = _( "Strikethrough" )
+      tooltip_text = make_tooltip_markup( _( "Strikethrough" ), KeyCommand.EDIT_STRIKETHRU )
     };
     add_markup( _strike, true, "<s>S</s>" );
     _strike.toggled.connect( handle_strikethru );
@@ -119,7 +115,7 @@ public class FormatBar : Gtk.Popover {
 
     var header_menu = new GLib.Menu();
     for( int i=0; i<7; i++ ) {
-      header_menu.append( ((i == 0) ? _( "None" ) : "<H%d>".printf( i )), "format.handle_header('%d')".printf( i ) );
+      header_menu.append_item( new GLib.MenuItem( ((i == 0) ? _( "None" ) : "<H%d>".printf( i )), "format.action_header('%d')".printf( i ) ) );
     }
 
     _header = new MenuButton() {
@@ -127,18 +123,20 @@ public class FormatBar : Gtk.Popover {
       tooltip_text = _( "Header" ),
       menu_model   = header_menu
     };
+    var menu_popover = (_header.popover as Gtk.PopoverMenu);
+    if( menu_popover != null ) {
+      menu_popover.cascade_popdown = false;
+    }
     add_markup( _header, false, "H<i>x</i>" );
 
-    _hilite = new ColorPicker( get_hilite_color(), ColorPickerType.HCOLOR ) {
-      toggle_tooltip = _( "Apply Highlight Color" ),
-      select_tooltip = _( "Change Highlight Color" )
-    };
+    _hilite = new ColorPicker( table.win, get_hilite_color(), ColorPickerType.HCOLOR );
+    _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
+    _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
     _hilite.color_changed.connect( handle_hilite );
 
-    _color = new ColorPicker( get_font_color(), ColorPickerType.FCOLOR ) {
-      toggle_tooltip = _( "Apply Font Color" ),
-      select_tooltip = _( "Change Font Color" )
-    };
+    _color = new ColorPicker( table.win, get_font_color(), ColorPickerType.FCOLOR );
+    _color.set_toggle_tooltip( _( "Apply Font Color" ) );
+    _color.set_select_tooltip( _( "Change Font Color" ) );
     _color.color_changed.connect( handle_color );
 
     _link = new ToggleButton() {
@@ -154,40 +152,58 @@ public class FormatBar : Gtk.Popover {
     };
     _clear.clicked.connect( handle_clear );
 
-    var spacer = "    ";
-
-    box.append( _copy );
-    box.append( _cut );
+    append( _copy );
+    append( _cut );
     if( !table.markdown ) {
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _bold );
-      box.append( _italics );
-      box.append( _underline );
-      box.append( _strike );
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _code );
-      box.append( _header );
-      box.append( _link );
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _super );
-      box.append( _sub );
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( new Label( spacer ) );
-      box.append( _hilite );
-      box.append( new Label( spacer ) );
-      box.append( _color );
-      box.append( new Separator( Orientation.VERTICAL ) );
-      box.append( _clear );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _bold );
+      append( _italics );
+      append( _underline );
+      append( _strike );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _code );
+      append( _header );
+      append( _link );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _super );
+      append( _sub );
+      append( new Separator( Orientation.VERTICAL ) );
+      // box.append( new Label( spacer ) );
+      append( _hilite );
+      // box.append( new Label( spacer ) );
+      append( _color );
+      append( new Separator( Orientation.VERTICAL ) );
+      append( _clear );
     }
 
-    child = box;
-    position = PositionType.TOP;
-    set_parent( table );
+    // Create the action group
+    var group = new SimpleActionGroup();
+    insert_action_group( "format", group );
 
+    _header_action = new SimpleAction.stateful( "action_header", VariantType.STRING, new Variant.string( "0" ) );
+    _header_action.activate.connect((p) => {
+      if( p != null ) {
+        _header_action.set_state( p );
+        handle_header( int.parse( p.get_string() ) );
+      }
+    });
+
+    group.add_action( _header_action );
+
+    // Initialize the format bar
     initialize();
 
   }
 
+  //-------------------------------------------------------------
+  // Returns the tooltip to show for the given command.
+  private string make_tooltip_markup( string lbl, KeyCommand command ) {
+    var shortcut = _table.win.shortcuts.get_shortcut( command );
+    return( (shortcut == null) ? lbl : Utils.tooltip_with_accel( lbl, shortcut.get_accelerator() ) );
+  }
+
+  //-------------------------------------------------------------
+  // Adds the given markup to the specified widget for display purposes.
   private void add_markup( Widget w, bool is_button, string markup ) {
     var lbl = new Label( "<span size=\"large\">" + markup + "</span>" ) {
       use_markup = true
@@ -201,6 +217,9 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  //-------------------------------------------------------------
+  // Returns the highlight color that the outline table is currently
+  // using.
   private RGBA get_hilite_color() {
     if( _table.hilite_color == null ) {
       return( _table.get_theme().hilite );
@@ -211,6 +230,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
+  //-------------------------------------------------------------
+  // Returns the font that the outline table is currently using.
   private RGBA get_font_color() {
     if( _table.font_color == null ) {
       return( _table.get_theme().foreground );
@@ -221,10 +242,14 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  private void close() {
-    Utils.hide_popover( this );
+  //-------------------------------------------------------------
+  // Closes this popover.
+  public void close() {
+    destroy();
   }
 
+  //-------------------------------------------------------------
+  // Formats the selected text with the given tag and extra information.
   private void format_text( FormatTag tag, string? extra=null ) {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
     ct.add_tag( tag, extra, _table.undo_text );
@@ -233,6 +258,8 @@ public class FormatBar : Gtk.Popover {
     _table.grab_focus();
   }
 
+  //-------------------------------------------------------------
+  // Removes formatting for the given tag from the selected text.
   private void unformat_text( FormatTag tag ) {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
       _table.selected.name.remove_tag( tag, _table.undo_text );
@@ -244,19 +271,22 @@ public class FormatBar : Gtk.Popover {
     _table.grab_focus();
   }
 
-  /* Copies the selected text to the clipboard */
+  //-------------------------------------------------------------
+  // Copies the selected text to the clipboard
   private void handle_copy() {
     _table.do_copy();
-    close();
+    close_requested();
   }
 
-  /* Cuts the selected text to the clipboard */
+  //-------------------------------------------------------------
+  // Cuts the selected text to the clipboard
   private void handle_cut() {
     _table.do_cut();
-    close();
+    close_requested();
   }
 
-  /* Toggles the bold status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the bold status of the currently selected text
   private void handle_bold() {
     if( !_ignore_active ) {
       if( _bold.active ) {
@@ -267,7 +297,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the italics status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the italics status of the currently selected text
   private void handle_italics() {
     if( !_ignore_active ) {
       if( _italics.active ) {
@@ -278,7 +309,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the underline status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the underline status of the currently selected text
   private void handle_underline() {
     if( !_ignore_active ) {
       if( _underline.active ) {
@@ -289,7 +321,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the strikethru status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the strikethru status of the currently selected text
   private void handle_strikethru() {
     if( !_ignore_active ) {
       if( _strike.active ) {
@@ -300,7 +333,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the code status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the code status of the currently selected text
   private void handle_code() {
     if( !_ignore_active ) {
       if( _code.active ) {
@@ -311,7 +345,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the superscript status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the superscript status of the currently selected text
   private void handle_superscript() {
     if( !_ignore_active ) {
       if( _super.active ) {
@@ -322,7 +357,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the superscript status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the superscript status of the currently selected text
   private void handle_subscript() {
     if( !_ignore_active ) {
       if( _sub.active ) {
@@ -333,7 +369,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the header status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the header status of the currently selected text
   private void handle_header( int level ) {
     if( !_ignore_active ) {
       if( level > 0 ) {
@@ -344,7 +381,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the highlight status of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the highlight status of the currently selected text
   private void handle_hilite( RGBA? rgba ) {
     if( !_ignore_active ) {
       if( rgba != null ) {
@@ -356,7 +394,8 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Toggles the foreground color of the currently selected text */
+  //-------------------------------------------------------------
+  // Toggles the foreground color of the currently selected text
   private void handle_color( RGBA? rgba ) {
     if( !_ignore_active ) {
       if( rgba != null ) {
@@ -368,24 +407,21 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /* Creates a link out of the currently selected text */
+  //-------------------------------------------------------------
+  // Creates a link out of the currently selected text
   private void handle_link() {
     if( !_ignore_active ) {
       if( _link.active ) {
-        if( _table.selected.mode == NodeMode.EDITABLE ) {
-          _link_editor.add_url( _table.selected.name );
-        } else {
-          _link_editor.add_url( _table.selected.note );
-        }
-        _table.queue_draw();
-        _table.changed();
+        KeyCommand.edit_url_add_edit( _table );
       } else {
         unformat_text( FormatTag.URL );
       }
+      update_link_tooltip();
     }
   }
 
-  /* Clears all tags from selected text */
+  //-------------------------------------------------------------
+  // Clears all tags from selected text
   private void handle_clear() {
     var ct = (_table.selected.mode == NodeMode.EDITABLE) ? _table.selected.name : _table.selected.note;
     ct.remove_all_tags( _table.undo_text );
@@ -400,6 +436,7 @@ public class FormatBar : Gtk.Popover {
     _hilite.set_active( false );
     _color.set_active( false );
     _link.set_active( false );
+    update_link_tooltip();
     activate_header( 0 );
     _ignore_active = false;
     _table.queue_draw();
@@ -407,26 +444,27 @@ public class FormatBar : Gtk.Popover {
     _table.grab_focus();
   }
 
-  /* Sets the active status of the given toggle button */
+  //-------------------------------------------------------------
+  // Sets the active status of the given toggle button
   private void set_toggle_button( CanvasText text, FormatTag tag, ToggleButton btn ) {
     btn.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
   }
 
-  /* Sets the active status of the given color picker */
+  //-------------------------------------------------------------
+  // Sets the active status of the given color picker
   private void set_color_picker( CanvasText text, FormatTag tag, ColorPicker cp ) {
     cp.set_active( text.text.is_tag_applied_in_range( tag, text.selstart, text.selend ) );
   }
 
-  /* Sets the active status of the header menubutton */
+  //-------------------------------------------------------------
+  // Sets the active status of the header menubutton
   private void activate_header( int index ) {
-    /* TODO
-    var buttons = _header.popup.get_children();
-    var button  = (CheckMenuItem)buttons.nth_data( index );
-    button.set_active( true );
-    */
+    var variant = new Variant.string( "%d".printf( index ) );
+    _header_action.set_state( variant );
   }
 
-  /* Sets the active status of the correct header radio menu item */
+  //-------------------------------------------------------------
+  // Sets the active status of the correct header radio menu item
   private void set_header( CanvasText text ) {
     var header  = text.text.get_first_extra_in_range( FormatTag.HEADER, text.selstart, text.selend );
     if( header == null ) {
@@ -443,10 +481,16 @@ public class FormatBar : Gtk.Popover {
     }
   }
 
-  /*
-   Updates the state of the format bar based on the state of the current
-   text.
-  */
+  //-------------------------------------------------------------
+  // Updates the link button tooltip based on the button active state.
+  private void update_link_tooltip() {
+    var command = _link.active ? KeyCommand.EDIT_URL_REMOVE : KeyCommand.EDIT_URL_ADD_EDIT;
+    _link.tooltip_markup = make_tooltip_markup( _( "Link" ), command );
+  }
+
+  //-------------------------------------------------------------
+  // Updates the state of the format bar based on the state of the
+  // current text.
   private void update_from_text( CanvasText? text ) {
     _ignore_active = true;
     set_toggle_button( text, FormatTag.BOLD,       _bold );
@@ -459,14 +503,14 @@ public class FormatBar : Gtk.Popover {
     set_color_picker(  text, FormatTag.HILITE,     _hilite );
     set_color_picker(  text, FormatTag.COLOR,      _color );
     set_toggle_button( text, FormatTag.URL,        _link );
+    update_link_tooltip();
     set_header( text );
     _ignore_active = false;
   }
 
-  /*
-   Updates the state of the format bar based on which tags are applied at the
-   current cursor position.
-  */
+  //-------------------------------------------------------------
+  // Updates the state of the format bar based on which tags are
+  // applied at the current cursor position.
   public void initialize() {
     if( _table.selected.mode == NodeMode.EDITABLE ) {
       update_from_text( _table.selected.name );

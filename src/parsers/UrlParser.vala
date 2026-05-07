@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -21,17 +21,19 @@
 
 public class UrlParser : TextParser {
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UrlParser() {
     base( "URL", 4 );
 
-    /* Links */
+    // Links
     add_regex( "((mailto:)?[a-z0-9.-]+@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)", highlight_url );
     add_regex( "((https?|ftp):[^'\">\\s]+)", highlight_url );
 
   }
 
-  /* Add the URL link */
+  //-------------------------------------------------------------
+  // Add the URL link
   private void highlight_url( FormattedText text, MatchInfo match, int cursor ) {
     add_tag( text, match, 0, FormatTag.URL, get_text( match, 0 ) );
   }

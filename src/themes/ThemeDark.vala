@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Minder)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,13 +24,14 @@ using Gtk;
 
 public class ThemeDark : Theme {
 
-  /* Create the theme colors */
+  //-------------------------------------------------------------
+  // Create the theme colors
   public ThemeDark() {
 
     name  = "dark";
     label = _( "Dark" );
 
-    /* Generate the non-link colors */
+    // Generate the non-link colors
     even               = get_color( "#333333" );
     odd                = get_color( "#444444" );
     background         = get_color( "#333333" );

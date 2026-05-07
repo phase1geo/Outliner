@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -27,7 +27,8 @@ public class UndoNodeSplit : UndoItem {
   private int                _cursor;
   private Array<UndoTagInfo> _tags;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoNodeSplit( Node node ) {
     base( _( "split item" ) );
     _node   = node;
@@ -37,7 +38,8 @@ public class UndoNodeSplit : UndoItem {
     _tags   = node.name.text.get_tags_in_range( 0, node.name.text.text.length );
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo( OutlineTable table ) {
     var prev_node    = _parent.children.index( _index - 1 );
     var name         = prev_node.name;
@@ -56,7 +58,8 @@ public class UndoNodeSplit : UndoItem {
     table.changed();
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo( OutlineTable table ) {
     var prev_node    = _parent.children.index( _index - 1 );
     var endpos       = prev_node.name.text.text.char_count( prev_node.name.text.text.length );

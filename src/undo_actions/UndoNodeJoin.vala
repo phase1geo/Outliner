@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -28,7 +28,8 @@ public class UndoNodeJoin : UndoItem {
   private int  _to_text_len;
   private Node _to;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoNodeJoin( Node from, Node to ) {
     base( _( "join rows" ) );
     _from        = from;
@@ -39,7 +40,8 @@ public class UndoNodeJoin : UndoItem {
     _to_children = (int)_to.children.length;
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo( OutlineTable table ) {
     var chars       = _to.name.text.text.length - _to_text_len;
     var to_children = _to.children.length;
@@ -55,7 +57,8 @@ public class UndoNodeJoin : UndoItem {
     table.changed();
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo( OutlineTable table ) {
     var from_children = _from.children.length;
     _to.name.text.set_text( _to.name.text.text + " " );

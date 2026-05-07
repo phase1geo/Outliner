@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -29,9 +29,20 @@ public enum TabAddReason {
   LOAD
 }
 
+public class ShortcutTooltip {
+  private Widget _widget;
+  private string _label;
+  public ShortcutTooltip( Widget w, string l ) {
+    _widget = w;
+    _label  = l;
+  }
+  public void set_tooltip( Shortcut? shortcut ) {
+    _widget.tooltip_markup = (shortcut == null) ? _label : Utils.tooltip_with_accel( _label, shortcut.get_accelerator() );
+  }
+}
+
 public class MainWindow : Gtk.ApplicationWindow {
 
-  private GLib.Settings               _settings;
   private HeaderBar                   _header;
   private Notebook                    _nb;
   private Button                      _search_btn;
@@ -40,9 +51,6 @@ public class MainWindow : Gtk.ApplicationWindow {
   private Button?                     _redo_btn    = null;
   private ZoomWidget                  _zoom;
   private ModeGroup                   _list_types;
-  private FontButton                  _fonts_title;
-  private FontButton                  _fonts_name;
-  private FontButton                  _fonts_note;
   private Switch                      _condensed;
   private Switch                      _show_tasks;
   private Switch                      _show_depth;
@@ -57,20 +65,18 @@ public class MainWindow : Gtk.ApplicationWindow {
   private Label                       _stats_tip;
   private Label                       _stats_tdone;
   private bool                        _debug       = false;
-  private Box                         _themes;
+  private Box?                        _themes = null;
   private HashMap<string,CheckButton> _theme_buttons;
   private Exports                     _exports;
   private Exporter                    _exporter;
   private UnicodeInsert               _unicoder;
-  private Label                       _info_label;
+  private SimpleActionGroup           _actions;
+  private Shortcuts                   _shortcuts;
+  private Gee.HashMap<KeyCommand, ShortcutTooltip> _shortcut_widgets;
+  private bool                        _tabs_loaded = false;
 
-  private bool on_elementary = Gtk.Settings.get_default().gtk_icon_theme_name == "elementary";
+  private bool on_elementary = Utils.on_elementary();
 
-  public GLib.Settings settings {
-    get {
-      return( _settings );
-    }
-  }
   public Exports exports {
     get {
       return( _exports );
@@ -81,87 +87,64 @@ public class MainWindow : Gtk.ApplicationWindow {
       return( _unicoder );
     }
   }
+  public Shortcuts shortcuts {
+    get {
+      return( _shortcuts );
+    }
+  }
 
   public static Themes themes = new Themes();
   public static bool   enable_tag_completion = true;
-
-  private const GLib.ActionEntry[] action_entries = {
-    { "action_new",           action_new },
-    { "action_open",          action_open },
-    { "action_save",          action_save },
-    { "action_save_as",       action_save_as },
-    { "action_undo",          action_undo },
-    { "action_redo",          action_redo },
-    { "action_search",        action_search },
-    { "action_quit",          action_quit },
-    // { "action_export",        action_export },
-    { "action_print",         action_print },
-    { "action_preferences",   action_preferences },
-    { "action_shortcuts",     action_shortcuts },
-    { "action_focus_mode",    action_focus_mode },
-    { "action_zoom_in",       action_zoom_in },
-    { "action_zoom_out",      action_zoom_out },
-    { "action_zoom_actual",   action_zoom_actual }
-  };
 
   private delegate void ChangedFunc();
 
   public signal void canvas_changed( OutlineTable? ot );
 
-  /* Create the main window UI */
-  public MainWindow( Gtk.Application app, GLib.Settings settings ) {
+  //-------------------------------------------------------------
+  // Create the main window UI
+  public MainWindow( Gtk.Application app ) {
 
     Object( application: app );
 
-    _settings = settings;
-
-    /* Initialize variables */
+    // Initialize variables
     _theme_buttons = new HashMap<string,CheckButton>();
 
-    var window_w = settings.get_int( "window-w" );
-    var window_h = settings.get_int( "window-h" );
+    var window_w = Outliner.settings.get_int( "window-w" );
+    var window_h = Outliner.settings.get_int( "window-h" );
 
-    /* Create the exports and load it */
-    _exports = new Exports();
+    // Create the exports and load it
+    _exports = new Exports( this );
 
-    /* Unicoder */
+    // Unicoder
     _unicoder = new UnicodeInsert();
 
-    var focus_mode = settings.get_boolean( "focus-mode" );
+    enable_tag_completion = Outliner.settings.get_boolean( "enable-tag-auto-completion" );
 
-    enable_tag_completion = settings.get_boolean( "enable-tag-auto-completion" );
-
-    /* Add the theme CSS */
+    // Add the theme CSS
     themes.add_css();
 
-    /* Listen for changes to the system dark mode */
-#if GRANITE_6_OR_NEWER
-    var granite_settings = Granite.Settings.get_default();
-    granite_settings.notify["prefers-color-scheme"].connect( () => {
-      update_themes();
-    });
-#endif
-
-    /* Create the header bar */
+    // Create the header bar
     _header = new HeaderBar() {
       show_title_buttons = true,
       title_widget = new Label( _( "Outliner" ) )
     };
-    _header.get_style_context().add_class( "outliner-toolbar" );
-    _header.get_style_context().add_class( "titlebar" );
+    _header.add_css_class( "outliner-toolbar" );
+    _header.add_css_class( "titlebar" );
 
     set_titlebar( _header );
 
-    /* Set the main window data */
+    // Set the main window data
     set_default_size( window_w, window_h );
 
-    /* Set the stage for menu actions */
-    var actions = new SimpleActionGroup ();
-    actions.add_action_entries( action_entries, this );
-    insert_action_group( "win", actions );
+    // Load the user shortcuts
+    _shortcuts = new Shortcuts();
+    _shortcuts.shortcut_changed.connect( shortcut_changed );
 
-    /* Add keyboard shortcuts */
-    add_keyboard_shortcuts( app );
+    _shortcut_widgets = new Gee.HashMap<KeyCommand, ShortcutTooltip>();
+
+    // Set the stage for menu actions
+    _actions = new SimpleActionGroup();
+    insert_action_group( "win", _actions );
 
     _nb = new Notebook() {
       scrollable = true,
@@ -174,56 +157,109 @@ public class MainWindow : Gtk.ApplicationWindow {
     _nb.page_reordered.connect( tab_reordered );
     _nb.page_removed.connect( tab_removed );
 
-    /* Create title toolbar */
-    var new_btn = new Button.from_icon_name( get_icon_name( "document-new" ) ) {
-      tooltip_markup = Utils.tooltip_with_accel( _( "New File" ), "<Control>n" )
-    };
-    new_btn.clicked.connect( do_new_file );
+    // Set shortcuts until we have a tab menu
+    set_action_for_command( KeyCommand.TAB_GOTO_NEXT );
+    set_action_for_command( KeyCommand.TAB_GOTO_PREV );
+    set_action_for_command( KeyCommand.TAB_CLOSE_CURRENT );
+
+    // Create title toolbar
+    var new_btn = new Button.from_icon_name( get_header_icon_name( "document-new" ) );
+    register_widget_for_shortcut( new_btn, KeyCommand.FILE_NEW, _( "New File" ) );
+    new_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_NEW ); });
     _header.pack_start( new_btn );
 
-    var open_btn = new Button.from_icon_name( get_icon_name( "document-open" ) ) {
-      tooltip_markup = Utils.tooltip_with_accel( _( "Open File" ), "<Control>o" )
-    };
-    open_btn.clicked.connect( do_open_file );
+    var open_btn = new Button.from_icon_name( get_header_icon_name( "document-open" ) );
+    register_widget_for_shortcut( open_btn, KeyCommand.FILE_OPEN, _( "Open File" ) );
+    open_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_OPEN ); });
     _header.pack_start( open_btn );
 
-    var save_btn = new Button.from_icon_name( get_icon_name( "document-save-as" ) ) {
-      tooltip_markup = Utils.tooltip_with_accel( _( "Save File As" ), "<Control><Shift>s" )
-    };
-    save_btn.clicked.connect( do_save_as_file );
+    var save_btn = new Button.from_icon_name( get_header_icon_name( "document-save-as" ) );
+    register_widget_for_shortcut( save_btn, KeyCommand.FILE_SAVE_AS, _( "Save File As" ) );
+    save_btn.clicked.connect(() => { execute_command( KeyCommand.FILE_SAVE_AS ); });
     _header.pack_start( save_btn );
 
-    _undo_btn = new Button.from_icon_name( get_icon_name( "edit-undo" ) ) {
-      tooltip_markup = Utils.tooltip_with_accel( _( "Undo" ), "<Control>z" ),
+    _undo_btn = new Button.from_icon_name( get_header_icon_name( "edit-undo" ) ) {
       sensitive = false
     };
-    _undo_btn.clicked.connect( do_undo );
+    register_widget_for_shortcut( _undo_btn, KeyCommand.UNDO_ACTION, _( "Undo" ) );
+    _undo_btn.clicked.connect(() => { execute_command( KeyCommand.UNDO_ACTION ); });
     _header.pack_start( _undo_btn );
 
-    _redo_btn = new Button.from_icon_name( get_icon_name( "edit-redo" ) ) {
-      tooltip_markup = Utils.tooltip_with_accel( _( "Redo" ), "<Control><Shift>z" ),
+    _redo_btn = new Button.from_icon_name( get_header_icon_name( "edit-redo" ) ) {
       sensitive = false
     };
-    _redo_btn.clicked.connect( do_redo );
+    register_widget_for_shortcut( _redo_btn, KeyCommand.REDO_ACTION, _( "Redo" ) );
+    _redo_btn.clicked.connect(() => { execute_command( KeyCommand.REDO_ACTION ); });
     _header.pack_start( _redo_btn );
 
-    /* Add the buttons on the right side in the reverse order */
+    // Add the buttons on the right side in the reverse order
     add_properties_button();
     add_export_button();
     add_stats_button();
     add_search_button();
 
+    // Apply the focus mode
+    if( Outliner.settings.get_boolean( "focus-mode" ) ) {
+      set_focus_mode( true );
+    } 
+
     child = _nb;
+
     show();
+
+    // Listen for changes to the system dark mode
+    var granite_settings = Granite.Settings.get_default();
+    granite_settings.notify["prefers-color-scheme"].connect( () => {
+      update_themes( "prefers-color-scheme" );
+    });
+
+    close_request.connect(() => {
+      save_window_size();
+      save_tabs();
+      return( false );
+    });
+
+    // Setup shortcuts not associated with UI elements
+    set_action_for_command( KeyCommand.QUIT );
+
+    set_window_size();
 
   }
 
-  /* Returns the name of the icon to use for a headerbar icon */
-  private string get_icon_name( string icon_name ) {
+  //-------------------------------------------------------------
+  // Saves the current application window size to gsettings.
+  private void save_window_size() {
+    Outliner.settings.set_int( "window-w", get_width() );
+    Outliner.settings.set_int( "window-h", get_height() );
+  }
+
+  //-------------------------------------------------------------
+  // Set the window size to the values in gsettings
+  private void set_window_size() {
+    set_default_size( Outliner.settings.get_int( "window-w" ), Outliner.settings.get_int( "window-h" ) );
+  }
+
+  //-------------------------------------------------------------
+  // Returns the next tab in the tabbar.
+  public void next_tab() {
+    _nb.next_page();
+  }
+
+  //-------------------------------------------------------------
+  // Returns the previous tab in the tabbar.
+  public void previous_tab() {
+    _nb.prev_page();
+  }
+
+  //-------------------------------------------------------------
+  // Returns the name of the icon to use for a headerbar icon
+  private string get_header_icon_name( string icon_name ) {
     return( "%s%s".printf( icon_name, (on_elementary ? "" : "-symbolic") ) );
   }
 
-  /* Returns the OutlineTable associated with the given notebook page */
+  //-------------------------------------------------------------
+  // Returns the OutlineTable associated with the given notebook
+  // page
   public OutlineTable get_table( int page ) {
     var pg = _nb.get_nth_page( page );
     var sw = (ScrolledWindow)Utils.get_child_at_index( pg, 1 );
@@ -233,7 +269,8 @@ public class MainWindow : Gtk.ApplicationWindow {
     return( ot );
   }
 
-  /* Returns the current drawing area */
+  //-------------------------------------------------------------
+  // Returns the current drawing area
   public OutlineTable? get_current_table( string? caller = null ) {
     if( _debug && (caller != null) ) {
       stdout.printf( "get_current_table called from %s\n", caller );
@@ -242,7 +279,8 @@ public class MainWindow : Gtk.ApplicationWindow {
     return( get_table( _nb.page ) );
   }
 
-  /* Shows or hides the search bar for the current tab */
+  //-------------------------------------------------------------
+  // Shows or hides the search bar for the current tab
   private void toggle_search_bar() {
     var revealer = Utils.get_child_at_index( _nb.get_nth_page( _nb.page ), 0 ) as Revealer;
     if( revealer != null ) {
@@ -253,20 +291,22 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
   }
 
-  /* Shows or hides the information bar, setting the message to the given value */
+  //-------------------------------------------------------------
+  // Shows or hides the information bar, setting the message to
+  // the given value
   private void show_info_bar( string? msg ) {
-    var info = Utils.get_child_at_index( _nb.get_nth_page( _nb.page ), 2 ) as InfoBar;
+    var info = Utils.get_child_at_index( _nb.get_nth_page( _nb.page ), 2 ) as InfoBox;
     if( info != null ) {
       if( msg != null ) {
-        _info_label.label = msg;
-        info.set_revealed( true );
+        info.show_info( msg );
       } else {
-        info.set_revealed( false );
+        info.visible = false;
       }
     }
   }
 
-  /* Updates the title */
+  //-------------------------------------------------------------
+  // Updates the title
   private void update_title( OutlineTable? ot ) {
     var suffix = " \u2014 Outliner";
     var title  = (Label)_header.title_widget;
@@ -277,37 +317,44 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
   }
 
-  /* This needs to be called whenever the tab is changed */
-  private void tab_changed( OutlineTable ot ) {
+  //-------------------------------------------------------------
+  // This needs to be called whenever the tab is changed
+  private void tab_changed( int page_num ) {
+    var ot = get_table( page_num );
     do_buffer_changed( ot.undo_buffer );
     update_title( ot );
     canvas_changed( ot );
     ot.update_theme();
     ot.grab_focus();
-    save_tab_state();
+    save_tab_state( page_num );
   }
 
-  /* Called whenever the current tab is switched in the notebook */
+  //-------------------------------------------------------------
+  // Called whenever the current tab is switched in the notebook
   private void tab_switched( Widget page, uint page_num ) {
-    tab_changed( get_table( (int)page_num ) );
+    tab_changed( (int)page_num );
   }
 
-  /* Called whenever the current tab is moved to a new position */
+  //-------------------------------------------------------------
+  // Called whenever the current tab is moved to a new position
   private void tab_reordered( Widget page, uint page_num ) {
-    save_tab_state();
+    save_tab_state( (int)page_num );
   }
 
-  /* Called whenever the current tab is moved to a new position */
+  //-------------------------------------------------------------
+  // Called whenever the current tab is moved to a new position
   private void tab_removed( Widget page, uint page_num ) {
-    save_tab_state();
+    save_tab_state( _nb.page );
   }
 
-  /* Closes the current tab */
+  //-------------------------------------------------------------
+  // Closes the current tab
   public void close_current_tab() {
     close_tab( _nb.page );
   }
 
-  /* Closes the tab at the given location */
+  //-------------------------------------------------------------
+  // Closes the tab at the given location
   public void close_tab( int page ) {
     if( _nb.get_n_pages() == 1 ) return;
     var ot = get_table( _nb.page );
@@ -318,11 +365,12 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
   }
 
-   /* Adds a new tab to the notebook */
+  //-------------------------------------------------------------
+  // Adds a new tab to the notebook
   public OutlineTable add_tab( string? fname, TabAddReason reason ) {
 
-    /* Create and pack the canvas */
-    var ot = new OutlineTable( this, _settings );
+    // Create and pack the canvas
+    var ot = new OutlineTable( this );
     ot.map.connect( on_table_mapped );
     ot.undo_buffer.buffer_changed.connect( do_buffer_changed );
     ot.undo_text.buffer_changed.connect( do_buffer_changed );
@@ -334,12 +382,12 @@ public class MainWindow : Gtk.ApplicationWindow {
       ot.document.filename = fname;
     }
 
-    /* Create the overlay that will hold the canvas so that we can put an entry box for emoji support */
+    // Create the overlay that will hold the canvas so that we can put an entry box for emoji support
     var overlay = new Overlay() {
       child = ot
     };
 
-    /* Create the scrolled window for the treeview */
+    // Create the scrolled window for the treeview
     var scroll = new ScrolledWindow() {
       halign = Align.FILL,
       valign = Align.FILL,
@@ -350,14 +398,14 @@ public class MainWindow : Gtk.ApplicationWindow {
       child = overlay
     };
 
-    /* Create the search bar */
+    // Create the search bar
     var search = new SearchBar( ot );
     var search_reveal = new Revealer() {
       halign = Align.FILL,
       child = search
     };
 
-    /* Create the info bar */
+    // Create the info bar
     var info_bar = create_info_bar();
 
     var box = new Box( Orientation.VERTICAL, 0 );
@@ -392,7 +440,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     tab_box.append( tab_label );
     tab_box.append( tab_revealer );
 
-    /* We need to unreveal the close button */
+    // We need to unreveal the close button
     var other_page = _nb.get_nth_page( _nb.page );
     if( other_page != null ) {
       var label    = _nb.get_tab_label( other_page );
@@ -400,7 +448,7 @@ public class MainWindow : Gtk.ApplicationWindow {
       revealer.reveal_child = false;
     }
 
-    /* Add the page to the notebook */
+    // Add the page to the notebook
     var tab_index = _nb.append_page( box, tab_box );
 
     tab_focus.enter.connect((x, y) => {
@@ -418,10 +466,10 @@ public class MainWindow : Gtk.ApplicationWindow {
       close_tab( tab_index );
     });
 
-    /* Update the titlebar */
+    // Update the titlebar
     update_title( ot );
 
-    /* Make the drawing area new */
+    // Make the drawing area new
     switch( reason ) {
       case TabAddReason.NEW    :
         ot.initialize_for_new();
@@ -429,6 +477,7 @@ public class MainWindow : Gtk.ApplicationWindow {
         break;
       case TabAddReason.IMPORT :
       case TabAddReason.OPEN :
+      case TabAddReason.LOAD :
         ot.initialize_for_open();
         _nb.page = tab_index;
         break;
@@ -440,11 +489,11 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
-  /*
-   Checks to see if any other tab contains the given filename.  If the filename
-   is already found, refresh the tab with the file contents and make it the current
-   tab; otherwise, add the new tab and populate it.
-  */
+  //-------------------------------------------------------------
+  // Checks to see if any other tab contains the given filename.
+  // If the filename is already found, refresh the tab with the
+  // file contents and make it the current tab; otherwise, add
+  // the new tab and populate it.
   private OutlineTable add_tab_conditionally( string fname, TabAddReason reason ) {
 
     for( int i=0; i<_nb.get_n_pages(); i++ ) {
@@ -460,35 +509,38 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
+  //-------------------------------------------------------------
+  // Creates the info bar UI
+  private InfoBox create_info_bar() {
 
-  /* Creates the info bar UI */
-  private InfoBar create_info_bar() {
-
-    _info_label = new Label( "" );
-
-    var info_bar = new InfoBar() {
+    var info_bar = new InfoBox() {
       halign = Align.FILL
     };
-    info_bar.add_child( _info_label );
-    info_bar.set_revealed( false );
-    info_bar.message_type = MessageType.INFO;
 
     return( info_bar );
 
   }
 
-  /* Save the current tab state */
-  private void save_tab_state() {
+  //-------------------------------------------------------------
+  // Returns the path of the tab_state.xml file.
+  private string get_tab_state_path() {
+    return( GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner", "tab_state.xml" ) );
+  }
 
-    var dir = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner" );
+  //-------------------------------------------------------------
+  // Save the current tab state
+  private void save_tab_state( int current_page ) {
 
-    if( DirUtils.create_with_parents( dir, 0775 ) != 0 ) {
+    if( !_tabs_loaded ) return;
+
+    var fname = get_tab_state_path();
+
+    if( DirUtils.create_with_parents( GLib.Path.get_dirname( fname ), 0775 ) != 0 ) {
       return;
     }
 
-    var       fname = GLib.Path.build_filename( dir, "tab_state.xml" );
-    Xml.Doc*  doc   = new Xml.Doc( "1.0" );
-    Xml.Node* root  = new Xml.Node( null, "tabs" );
+    Xml.Doc*  doc  = new Xml.Doc( "1.0" );
+    Xml.Node* root = new Xml.Node( null, "tabs" );
 
     doc->set_root_element( root );
 
@@ -500,85 +552,89 @@ public class MainWindow : Gtk.ApplicationWindow {
       root->add_child( node );
     }
 
-    root->new_prop( "selected", _nb.page.to_string() );
+    root->new_prop( "selected", current_page.to_string() );
 
-    /* Save the file */
+    // Save the file
     doc->save_format_file( fname, 1 );
 
     delete doc;
 
   }
 
-  /* Loads the tab state */
-  public bool load_tab_state() {
+  //-------------------------------------------------------------
+  // Loads the tab state
+  public void load_tab_state() {
 
-    var tab_state = GLib.Path.build_filename( Environment.get_user_data_dir(), "outliner", "tab_state.xml" );
+    var tab_state = get_tab_state_path();
+    var tabs      = 0;
 
-    /* If the file does not exist, skip the rest and return false */
-    if( !FileUtils.test( tab_state, FileTest.EXISTS ) ) return( false );
+    // If the file does not exist, skip the rest and return false
+    if( !FileUtils.test( tab_state, FileTest.EXISTS ) ) {
+      do_new_file();
+      _tabs_loaded = true;
+      return;
+    }
 
     Xml.Doc* doc = Xml.Parser.parse_file( tab_state );
 
-    if( doc == null ) { return( false ); }
+    if( doc == null ) {
+      do_new_file();
+      _tabs_loaded = true;
+      return;
+    }
 
     var root = doc->get_root_element();
+    var tab_skipped = false;
+
     for( Xml.Node* it = root->children; it != null; it = it->next ) {
       if( (it->type == Xml.ElementType.ELEMENT_NODE) && (it->name == "tab") ) {
         var fname = it->get_prop( "path" );
-        var saved = it->get_prop( "saved" );
-        var table = add_tab( fname, TabAddReason.LOAD );
-        table.document.load_filename( fname, bool.parse( saved ) );
-        table.document.load();
+        if( FileUtils.test( fname, FileTest.EXISTS ) ) {
+          var saved = it->get_prop( "saved" );
+          var table = add_tab( fname, TabAddReason.LOAD );
+          table.document.load_filename( fname, bool.parse( saved ) );
+          table.document.load();
+          tabs++;
+        } else {
+          tab_skipped = true;
+        }
       }
     }
 
-    var s = root->get_prop( "selected" );
-    if( s != null ) {
-      _nb.page = int.parse( s );
-      // tab_changed( _nb.get_nth_page( _nb.current );
+    if( tabs == 0 ) {
+      do_new_file();
+    } else {
+      var s = root->get_prop( "selected" );
+      if( s != null ) {
+        _nb.page = int.parse( s );
+      }
+    }
+
+    _tabs_loaded = true;
+
+    if( (tabs == 0) || tab_skipped ) {
+      save_tab_state( _nb.page );
     }
 
     delete doc;
 
-    return( _nb.get_n_pages() > 0 );
-
   }
 
-  /* Adds keyboard shortcuts for the menu actions */
-  private void add_keyboard_shortcuts( Gtk.Application app ) {
-
-    app.set_accels_for_action( "win.action_new",         { "<Control>n" } );
-    app.set_accels_for_action( "win.action_open",        { "<Control>o" } );
-    app.set_accels_for_action( "win.action_save",        { "<Control>s" } );
-    app.set_accels_for_action( "win.action_save_as",     { "<Control><Shift>s" } );
-    app.set_accels_for_action( "win.action_undo",        { "<Control>z" } );
-    app.set_accels_for_action( "win.action_redo",        { "<Control><Shift>z" } );
-    app.set_accels_for_action( "win.action_search",      { "<Control>f" } );
-    app.set_accels_for_action( "win.action_quit",        { "<Control>q" } );
-    // app.set_accels_for_action( "win.action_export",      { "<Control>e" } );
-    app.set_accels_for_action( "win.action_print",       { "<Control>p" } );
-    app.set_accels_for_action( "win.action_preferences", { "<Control>comma" } );
-    app.set_accels_for_action( "win.action_shortcuts",   { "<Control>question" } );
-    app.set_accels_for_action( "win.action_focus_mode",  { "F2" } );
-    app.set_accels_for_action( "win.action_zoom_in",     { "<Control>plus", "<Control>equal" } );
-    app.set_accels_for_action( "win.action_zoom_out",    { "<Control>minus" } );
-    app.set_accels_for_action( "win.action_zoom_actual", { "<Control>0" } );
-
-  }
-
-  /* Adds the search functionality */
+  //-------------------------------------------------------------
+  // Adds the search functionality
   private void add_search_button() {
 
-    /* Create the menu button */
-    _search_btn = new Button.from_icon_name( get_icon_name( "edit-find" ) ) {
-      tooltip_markup = Utils.tooltip_with_accel( _( "Search" ), "<Control>f" )
-    };
-    _search_btn.clicked.connect( toggle_search_bar );
+    // Create the menu button
+    _search_btn = new Button.from_icon_name( get_header_icon_name( "edit-find" ) );
+    register_widget_for_shortcut( _search_btn, KeyCommand.SEARCH, _( "Search" ) );
+    _search_btn.clicked.connect(() => { execute_command( KeyCommand.SEARCH ); });
     _header.pack_end( _search_btn );
 
   }
 
-  /* Adds a statistic row to the given grid, returning the created value label */
+  //-------------------------------------------------------------
+  // Adds a statistic row to the given grid, returning the created
+  // value label
   private Label add_stats_row( Grid grid, int row, string text ) {
 
     var lbl = new Label( text ) {
@@ -596,7 +652,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
-  /* Adds the statistics functionality */
+  //-------------------------------------------------------------
+  // Adds the statistics functionality
   private void add_stats_button() {
 
     var grid = new Grid() {
@@ -607,8 +664,6 @@ public class MainWindow : Gtk.ApplicationWindow {
       row_spacing    = 10,
       column_spacing = 10
     };
-
-    var lmargin = "    ";
 
     var group_text = new Label( _( "<b>Text Statistics</b>" ) ) {
       xalign     = 0,
@@ -647,12 +702,13 @@ public class MainWindow : Gtk.ApplicationWindow {
     };
     popover.map.connect( stats_clicked );
 
-    /* Add the button to the header bar */
+    // Add the button to the header bar
     _header.pack_end( stats_btn );
 
   }
 
-  /* Toggle the statistics bar */
+  //-------------------------------------------------------------
+  // Toggle the statistics bar
   private void stats_clicked() {
     int char_count, word_count, row_count;
     int tasks_open, tasks_doing, tasks_done;
@@ -675,10 +731,11 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
   }
 
-  /* Adds the export functionality */
+  //-------------------------------------------------------------
+  // Adds the export functionality
   private void add_export_button() {
 
-    /* Create export menu */
+    // Create export menu
     _exporter = new Exporter( this ) {
       margin_start = 10,
       margin_end   = 10
@@ -691,7 +748,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     export_menu.append_item( export_menu_item );
 
     var print_menu = new GLib.Menu();
-    print_menu.append( _( "Print…" ), "win.action_print" );
+    append_menu_item( print_menu, KeyCommand.FILE_PRINT, _( "Print…" ) );
 
     var menu = new GLib.Menu();
     menu.append_section( null, export_menu );
@@ -703,7 +760,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
     _export.add_child( _exporter, "exporter" );
 
-    /* Create the menu button */
+    // Create the menu button
     var menu_btn = new MenuButton() {
       icon_name    = (on_elementary ? "document-export" : "document-send-symbolic"),
       tooltip_text = _( "Export" ),
@@ -741,8 +798,8 @@ public class MainWindow : Gtk.ApplicationWindow {
         tooltip_text = theme.label,
         group        = rb
       };
-      button.get_style_context().add_class( theme.name );
-      button.get_style_context().add_class( "color-button" );
+      button.add_css_class( theme.name );
+      button.add_css_class( "color-button" );
       button.toggled.connect(() => {
         var table = get_current_table();
         table.set_theme( theme );
@@ -763,16 +820,17 @@ public class MainWindow : Gtk.ApplicationWindow {
     theme_box.append( theme_lbl );
     theme_box.append( _themes );
 
-    update_themes();
+    update_themes( "create-theme-selector" );
 
     return( theme_box );
 
   }
 
-  /* Adds the property functionality */
+  //-------------------------------------------------------------
+  // Adds the property functionality
   private void add_properties_button() {
 
-    /* Add zoom widget */
+    // Add zoom widget
     _zoom = new ZoomWidget( 100, 225, 25 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -784,13 +842,13 @@ public class MainWindow : Gtk.ApplicationWindow {
     var zoom_mi = new GLib.MenuItem( null, null );
     zoom_mi.set_attribute( "custom", "s", "zoom" );
 
-    /* Add theme selector */
+    // Add theme selector
     var theme_box = create_theme_selector();
 
     var theme_mi = new GLib.MenuItem( null, null );
     theme_mi.set_attribute( "custom", "s", "theme" );
 
-    /* Add list type selector */
+    // Add list type selector
     var ltbox = new Box( Orientation.HORIZONTAL, 10 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -817,7 +875,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     var list_type_mi = new GLib.MenuItem( null, null );
     list_type_mi.set_attribute( "custom", "s", "list_type" );
 
-    /* Add condensed mode switch */
+    // Add condensed mode switch
     var cbox = new Box( Orientation.HORIZONTAL, 10 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -841,7 +899,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     var condensed_mi = new GLib.MenuItem( null, null );
     condensed_mi.set_attribute( "custom", "s", "condensed" );
 
-    /* Add show tasks switch */
+    // Add show tasks switch
     var tbox = new Box( Orientation.HORIZONTAL, 10 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -865,7 +923,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     var tasks_mi = new GLib.MenuItem( null, null );
     tasks_mi.set_attribute( "custom", "s", "tasks" );
 
-    /* Add show depth switch */
+    // Add show depth switch
     var dbox = new Box( Orientation.HORIZONTAL, 10 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -889,7 +947,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     var depth_mi = new GLib.MenuItem( null, null );
     depth_mi.set_attribute( "custom", "s", "depth" );
 
-    /* Add blank rows switch */
+    // Add blank rows switch
     var brbox = new Box( Orientation.HORIZONTAL, 10 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -913,7 +971,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     var blank_mi = new GLib.MenuItem( null, null );
     blank_mi.set_attribute( "custom", "s", "blank" );
 
-    /* Add header sizing switch */
+    // Add header sizing switch
     var asbox = new Box( Orientation.HORIZONTAL, 10 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -937,7 +995,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     var size_mi = new GLib.MenuItem( null, null );
     size_mi.set_attribute( "custom", "s", "size" );
 
-    /* Add the Markdown switch */
+    // Add the Markdown switch
     var mbox = new Box( Orientation.HORIZONTAL, 10 ) {
       margin_start  = 10,
       margin_end    = 10,
@@ -972,16 +1030,24 @@ public class MainWindow : Gtk.ApplicationWindow {
     top_menu.append_item( size_mi );
     top_menu.append_item( markdown_mi );
 
+    var edit_menu = new GLib.Menu();
+    append_menu_item( edit_menu, KeyCommand.EDIT_TITLE, _( "Edit Title" ) );
+
     var misc_menu = new GLib.Menu();
-    misc_menu.append( _( "Preferences" ),                 "win.action_preferences" );
-    misc_menu.append( _( "Shortcuts Cheatsheet" ),        "win.action_shortcuts" );
-    misc_menu.append( _( "Enter Distraction-Free Mode" ), "win.action_focus_mode" );
+    append_menu_item( misc_menu, KeyCommand.SHOW_PREFERENCES,  _( "Preferences" ) );
+    append_menu_item( misc_menu, KeyCommand.SHOW_SHORTCUTS,    _( "Shortcuts Cheatsheet" ) );
+    append_menu_item( misc_menu, KeyCommand.TOGGLE_FOCUS_MODE, _( "Enter Distraction-Free Mode" ) );
+
+    var about_menu = new GLib.Menu();
+    append_menu_item( about_menu, KeyCommand.SHOW_ABOUT, _( "About Outliner" ) );
 
     var menu = new GLib.Menu();
     menu.append_section( null, top_menu );
+    menu.append_section( null, edit_menu );
     menu.append_section( null, misc_menu );
+    menu.append_section( null, about_menu );
 
-    /* Create the popover and associate it with the menu button */
+    // Create the popover and associate it with the menu button
     var prop_popover = new PopoverMenu.from_model( menu );
     prop_popover.add_child( _zoom,     "zoom" );
     prop_popover.add_child( theme_box, "theme" );
@@ -993,9 +1059,9 @@ public class MainWindow : Gtk.ApplicationWindow {
     prop_popover.add_child( asbox,     "size" );
     prop_popover.add_child( mbox,      "markdown" );
 
-    /* Add the button */
+    // Add the button
     var prop_btn = new MenuButton() {
-      icon_name    = get_icon_name( "open-menu" ),
+      icon_name    = get_header_icon_name( "open-menu" ),
       tooltip_text = _( "Properties" ),
       popover      = prop_popover
     };
@@ -1005,14 +1071,19 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
-  /* Called whenever the themes need to be updated */
-  private void update_themes() {
+  //-------------------------------------------------------------
+  // Called whenever the themes need to be updated
+  private void update_themes( string msg = "" ) {
+
+    if( _themes == null ) {
+      return;
+    }
 
     var settings = Granite.Settings.get_default();
     var dark     = settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
     var hide     = true;
 
-    /* Remove all of the themes */
+    // Remove all of the themes
     while( _themes.get_first_child() != null ) {
       _themes.remove( _themes.get_first_child() );
     }
@@ -1030,12 +1101,14 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
-  /* Returns the current zoom factor */
+  //-------------------------------------------------------------
+  // Returns the current zoom factor
   public double get_zoom_factor() {
     return( _zoom.factor );
   }
 
-  /* Called whenever the user changes the zoom level */
+  //-------------------------------------------------------------
+  // Called whenever the user changes the zoom level
   private void zoom_changed( double factor ) {
 
     var table = get_current_table( "zoom_changed" );
@@ -1045,7 +1118,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
-  /* Causes the link type to change */
+  //-------------------------------------------------------------
+  // Causes the link type to change
   private void link_type_changed() {
     var selected = _list_types.selected;
     if( selected < NodeListType.LENGTH ) {
@@ -1053,7 +1127,8 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
   }
 
-  /* Displays the save warning dialog window */
+  //-------------------------------------------------------------
+  // Displays the save warning dialog window
   public void show_save_warning( OutlineTable ot ) {
 
     var dialog = new Granite.MessageDialog.with_image_from_icon_name(
@@ -1070,7 +1145,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     dialog.add_action_widget( cancel, ResponseType.CANCEL );
 
     var save = new Button.with_label( _( "Save" ) );
-    save.get_style_context().add_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
+    save.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
     dialog.add_action_widget( save, ResponseType.ACCEPT );
 
     dialog.set_transient_for( this );
@@ -1095,27 +1170,28 @@ public class MainWindow : Gtk.ApplicationWindow {
 
   }
 
-  /* Creates a new document and adds it to the notebook */
+  //-------------------------------------------------------------
+  // Creates a new document and adds it to the notebook
   public void do_new_file() {
 
     var ot = add_tab( null, TabAddReason.NEW );
 
-    /* Set the title to indicate that we have a new document */
+    // Set the title to indicate that we have a new document
     update_title( ot );
 
   }
 
-  /* Allow the user to open a Outliner file */
+  //-------------------------------------------------------------
+  // Allow the user to open a Outliner file
   public void do_open_file() {
 
-    /* Get the file to open from the user */
-    FileChooserNative dialog = new FileChooserNative( _( "Open File" ), this, FileChooserAction.OPEN, _( "Open" ), _( "Cancel" ) );
-
-    /* Create file filters */
+    // Create file filters
     var filter = new FileFilter();
     filter.set_filter_name( "Outliner" );
     filter.add_pattern( "*.outliner" );
-    dialog.add_filter( filter );
+
+    var filters = new GLib.ListStore( typeof( FileFilter ) );
+    filters.append( filter );
 
     for( int i=0; i<exports.length(); i++ ) {
       if( exports.index( i ).importable ) {
@@ -1124,23 +1200,33 @@ public class MainWindow : Gtk.ApplicationWindow {
         foreach( string extension in exports.index( i ).extensions ) {
           filter.add_pattern( "*" + extension );
         }
-        dialog.add_filter( filter );
+        filters.append( filter );
       }
     }
 
-    dialog.response.connect((id) => {
-      if( id == ResponseType.ACCEPT ) {
-        open_file( dialog.get_file().get_path() );
-        get_current_table( "do_open_file" ).grab_focus();
-      }
-      dialog.destroy();
-    });
+    // Get the file to open from the user
+    var dialog = new FileDialog() {
+      modal = true,
+      title = _( "Open File" ),
+      accept_label = _( "Open" ),
+      filters = filters
+    };
 
-    dialog.show();
+    Utils.set_chooser_folder( dialog );
+
+    dialog.open.begin( this, null, (obj, res) => {
+      try {
+        var file = dialog.open.end( res );
+        open_file( file.get_path() );
+        get_current_table( "do_open_file" ).grab_focus();
+        Utils.store_chooser_folder( file.get_path(), false );
+      } catch( Error e ) {}
+    });
 
   }
 
-  /* Opens the file and display it in the table */
+  //-------------------------------------------------------------
+  // Opens the file and display it in the table
   public bool open_file( string fname ) {
     if( !FileUtils.test( fname, FileTest.IS_REGULAR ) ) {
       return( false );
@@ -1159,7 +1245,7 @@ public class MainWindow : Gtk.ApplicationWindow {
             var table = add_tab_conditionally( new_fname, TabAddReason.IMPORT );
             update_title( table );
             if( exports.index( i ).import( fname, table ) ) {
-              save_tab_state();
+              save_tab_state( _nb.page );
               return( true );
             }
             close_current_tab();
@@ -1170,7 +1256,8 @@ public class MainWindow : Gtk.ApplicationWindow {
     return( false );
   }
 
-  /* Perform an undo action */
+  //-------------------------------------------------------------
+  // Perform an undo action
   public void do_undo() {
     var table = get_current_table( "do_undo" );
     if( table.is_node_editable() || table.is_note_editable() ) {
@@ -1181,7 +1268,8 @@ public class MainWindow : Gtk.ApplicationWindow {
     table.grab_focus();
   }
 
-  /* Perform a redo action */
+  //-------------------------------------------------------------
+  // Perform a redo action
   public void do_redo() {
     var table = get_current_table( "do_redo" );
     if( table.is_node_editable() || table.is_note_editable() ) {
@@ -1192,12 +1280,14 @@ public class MainWindow : Gtk.ApplicationWindow {
     table.grab_focus();
   }
 
-  /* Called when the outline table is initially mapped */
+  //-------------------------------------------------------------
+  // Called when the outline table is initially mapped
   private void on_table_mapped() {
     get_current_table().queue_draw();
   }
 
-  /* Called whenever the theme is changed */
+  //-------------------------------------------------------------
+  // Called whenever the theme is changed
   private void theme_changed( OutlineTable ot ) {
     Gtk.Settings? settings = Gtk.Settings.get_default();
     if( settings != null ) {
@@ -1205,10 +1295,9 @@ public class MainWindow : Gtk.ApplicationWindow {
     }
   }
 
-  /*
-   Called whenever the undo buffer changes state.  Updates the state of
-   the undo and redo buffer buttons.
-  */
+  //-------------------------------------------------------------
+  // Called whenever the undo buffer changes state.  Updates the
+  // state of the undo and redo buffer buttons.
   public void do_buffer_changed( UndoBuffer buf ) {
     _undo_btn.set_sensitive( buf.undoable() );
     _undo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.undo_tooltip(), "<Control>z" ) );
@@ -1216,115 +1305,98 @@ public class MainWindow : Gtk.ApplicationWindow {
     _redo_btn.set_tooltip_markup( Utils.tooltip_with_accel( buf.redo_tooltip(), "<Control><Shift>z" ) );
   }
 
-  /* Allow the user to select a filename to save the document as */
+  //-------------------------------------------------------------
+  // Allow the user to select a filename to save the document as
   public void save_file( OutlineTable ot, bool close_tab = false ) {
 
-    FileChooserDialog dialog = new FileChooserDialog( _( "Save File" ), this, FileChooserAction.SAVE,
-      _( "Cancel" ), ResponseType.CANCEL, _( "Save" ), ResponseType.ACCEPT );
-    FileFilter        filter = new FileFilter();
-
+    var filter = new FileFilter();
     filter.set_filter_name( _( "Outliner" ) );
     filter.add_pattern( "*.outliner" );
-    dialog.add_filter( filter );
 
-    dialog.response.connect((id) => {
-      if( id == ResponseType.ACCEPT ) {
-        var fname = dialog.get_file().get_path();
+    var filters = new GLib.ListStore( typeof( Filter ) );
+    filters.append( filter );
+
+    var dialog = new FileDialog() {
+      modal = true,
+      title = _( "Save File" ),
+      accept_label = _( "Save" ),
+      filters = filters
+    };
+
+    Utils.set_chooser_folder( dialog );
+
+    dialog.save.begin( this, null, (obj, res) => {
+      try {
+        var file  = dialog.save.end( res );
+        var fname = file.get_path();
         if( fname.substring( -9, -1 ) != ".outliner" ) {
           fname += ".outliner";
         }
         ot.document.filename = fname;
         ot.document.save();
+        Utils.store_chooser_folder( fname, false );
         var page = _nb.get_nth_page( _nb.page );
         var tab_box = (Box)_nb.get_tab_label( page );
         var tab_label = (Label)Utils.get_child_at_index( tab_box, 0 );
         tab_label.label = ot.document.label;
         tab_label.tooltip_text = fname;
         update_title( ot );
-        save_tab_state();
+        save_tab_state( _nb.page );
         if( close_tab ) {
           _nb.detach_tab( _nb.get_nth_page( _nb.page ) );
         } else {
           ot.grab_focus();
         }
-      }
-      dialog.destroy();
+      } catch( Error e ) {}
     });
-
-    dialog.show();
 
   }
 
-  /* Called when the save as button is clicked */
+  //-------------------------------------------------------------
+  // Called when the save as button is clicked
   public void do_save_as_file() {
     save_file( get_current_table( "do_save_as_file" ) );
   }
 
-  /* Called when the user uses the Control-n keyboard shortcut */
-  private void action_new() {
-    do_new_file();
+  //-------------------------------------------------------------
+  // Called when the user uses the Control-f keyboard shortcut
+  public void do_search() {
+    toggle_search_bar();
   }
 
-  /* Called when the user uses the Control-o keyboard shortcut */
-  private void action_open() {
-    do_open_file();
-  }
-
-  /* Called when the user uses the Control-s keyboard shortcut */
-  private void action_save() {
-    var table = get_current_table( "action_save" );
-    if( table.document.is_saved() ) {
-      table.document.save();
-    } else {
-      save_file( table );
-    }
-  }
-
-  /* Called when the user uses the Control-S keyboard shortcut */
-  private void action_save_as() {
-    do_save_as_file();
-  }
-
-  /* Called when the user uses the Control-z keyboard shortcut */
-  private void action_undo() {
-    do_undo();
-  }
-
-  /* Called when the user uses the Control-Z keyboard shortcut */
-  private void action_redo() {
-    do_redo();
-  }
-
-  /* Called when the user uses the Control-f keyboard shortcut */
-  private void action_search() {
-    _search_btn.clicked();
-  }
-
-  /* Called when the user uses the Control-Plus/Equal shortcut */
-  private void action_zoom_in() {
+  //-------------------------------------------------------------
+  // Called when the user uses the Control-Plus/Equal shortcut
+  public void do_zoom_in() {
     _zoom.zoom_in();
   }
 
-  /* Called when the user uses the Control-Minus shortcut */
-  private void action_zoom_out() {
+  //-------------------------------------------------------------
+  // Called when the user uses the Control-Minus shortcut
+  public void do_zoom_out() {
     _zoom.zoom_out();
   }
 
-  /* Called when the user uses the Control-0 shortcut */
-  private void action_zoom_actual() {
+  //-------------------------------------------------------------
+  // Called when the user uses the Control-0 shortcut
+  public void do_zoom_actual() {
     _zoom.zoom_actual();
   }
 
-  /* Called when the user uses the Control-q keyboard shortcut */
-  private void action_quit() {
-    destroy();
+  //-------------------------------------------------------------
+  // Forces all tabs to save when the application is quit.
+  private void save_tabs() {
+    for( int i=0; i<_nb.get_n_pages(); i++ ) {
+      var ot = get_table( i );
+      ot.changed();
+    }
+    save_tab_state( _nb.page );
   }
 
-  /*
-   Checks the given filename to see if it contains any of the given suffixes.
-   If a valid suffix is found, return the filename without modification; otherwise,
-   returns the filename with the extension added.
-  */
+  //-------------------------------------------------------------
+  // Checks the given filename to see if it contains any of the
+  // given suffixes.  If a valid suffix is found, return the
+  // filename without modification; otherwise, returns the
+  // filename with the extension added.
   public string repair_filename( string fname, string[] extensions ) {
     foreach (string ext in extensions) {
       if( fname.has_suffix( ext ) ) {
@@ -1334,13 +1406,8 @@ public class MainWindow : Gtk.ApplicationWindow {
     return( fname + extensions[0] );
   }
 
-  /* Exports the model to the printer */
-  private void action_print() {
-    var print = new ExportPrint();
-    print.print( get_current_table( "action_print" ), this );
-  }
-
-  /* Called whenever the properties button is clicked */
+  //-------------------------------------------------------------
+  // Called whenever the properties button is clicked
   private void properties_clicked() {
     var table      = get_current_table( "properties_clicked" );
     var theme_name = table.get_theme().name;
@@ -1352,69 +1419,49 @@ public class MainWindow : Gtk.ApplicationWindow {
     _auto_sizing.state   = table.auto_sizing;
     _markdown.state      = table.markdown;
     _list_types.selected = table.list_type;
+    menu_set_enabled( KeyCommand.EDIT_TITLE, table.has_title() );
   }
 
-  /* Displays the preferences window */
-  private void action_preferences() {
+  //-------------------------------------------------------------
+  // Sets the focus mode to the given value.
+  private void set_focus_mode( bool enable ) {
 
-    var prefs = new Preferences( this, _settings );
-    prefs.show();
-
-  }
-
-  /* Displays the shortcuts cheatsheet */
-  private void action_shortcuts() {
-
-    var builder = new Builder.from_resource( "/com/github/phase1geo/outliner/shortcuts/shortcuts.ui" );
-    var win     = builder.get_object( "shortcuts" ) as ShortcutsWindow;
-    var table   = get_current_table( "action_shortcuts" );
-
-    win.transient_for = this;
-    win.view_name     = null;
-
-    /* Display the most relevant information based on the current state */
-    if( table.selected != null ) {
-      if( (table.selected.mode == NodeMode.EDITABLE) ||
-          (table.selected.mode == NodeMode.NOTEEDIT) ) {
-        win.section_name = "text-editing";
-      } else {
-        win.section_name = "node";
-      }
-    } else {
-      win.section_name = "general";
-    }
-
-    win.show();
-
-  }
-
-  /* Hides the header bar */
-  public void action_focus_mode() {
-
-    var enable = _header.visible;
-
-    /* Hide the header bar */
+    // Hide the header bar
     if( enable ) {
-      get_titlebar().hide();
+      get_titlebar().visible = false;
       fullscreen();
     } else {
-      get_titlebar().show();
+      get_titlebar().visible = true;
       unfullscreen();
     }
 
     _nb.show_tabs = !enable;
-    _settings.set_boolean( "focus-mode", enable );
 
   }
 
-  /* Returns the height of a single line label */
+  //-------------------------------------------------------------
+  // Hides the header bar
+  public void toggle_focus_mode() {
+
+    var enable = Outliner.settings.get_boolean( "focus-mode" );
+
+    // Toggle the focus mode
+    set_focus_mode( !enable );
+
+    Outliner.settings.set_boolean( "focus-mode", !enable ); 
+
+  }
+
+  //-------------------------------------------------------------
+  // Returns the height of a single line label
   public int get_label_height() {
     Requisition min_size, nat_size;
     _stats_chars.get_preferred_size( out min_size, out nat_size );
     return( nat_size.height );
   }
 
-  /* Generate a notification */
+  //-------------------------------------------------------------
+  // Generate a notification
   public void notification( string title, string msg, NotificationPriority priority = NotificationPriority.NORMAL ) {
 
     GLib.Application? app = null;
@@ -1424,9 +1471,92 @@ public class MainWindow : Gtk.ApplicationWindow {
       var notification = new Notification( title );
       notification.set_body( msg );
       notification.set_priority( priority );
-      app.send_notification( "com.github.phase1geo.outliner", notification );
+      app.send_notification( "io.github.phase1geo.outliner", notification );
     }
 
+  }
+
+  //-------------------------------------------------------------
+  // SHORTCUT HANDLING
+  //-------------------------------------------------------------
+
+  //-------------------------------------------------------------
+  // Adds and action for the given command.
+  private void set_action_for_command( KeyCommand command ) {
+
+    // Create action to execute
+    var action = new SimpleAction( command.to_string(), null );
+    action.activate.connect((v) => {
+      var func = command.get_func();
+      func( get_current_table( "set_action_for_command" ) );
+    });
+    _actions.add_action( action );
+
+    var shortcut = shortcuts.get_shortcut( command );
+    if( shortcut != null ) {
+      application.set_accels_for_action( "win.%s".printf( command.to_string() ), { shortcut.get_accelerator() } );
+    }
+
+  }
+
+  //-------------------------------------------------------------
+  // Appends a command with the given command to the specified menu.
+  private void append_menu_item( GLib.Menu menu, KeyCommand command, string label ) {
+    menu.append( label, "win.%s".printf( command.to_string() ) );
+    set_action_for_command( command );
+  }
+
+  //-------------------------------------------------------------
+  // Registers a widget when only a tooltip label update
+  // is needed.
+  public void register_widget_for_tooltip( Gtk.Widget w, KeyCommand command, string label ) {
+    var tooltip = new ShortcutTooltip( w, label );
+    _shortcut_widgets.set( command, tooltip );
+    var shortcut = shortcuts.get_shortcut( command );
+    if( shortcut != null ) {
+      tooltip.set_tooltip( shortcut );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Updates registers for shortcuts
+  public void register_widget_for_shortcut( Gtk.Widget w, KeyCommand command, string label ) {
+    register_widget_for_tooltip( w, command, label );
+    set_action_for_command( command );
+  }
+
+  //-------------------------------------------------------------
+  // Handles any changes to shortcuts.  If a shortcut is used by
+  // the main window, update the shortcut and associated tooltips.
+  private void shortcut_changed( KeyCommand command, Shortcut? shortcut ) {
+    var action = _actions.lookup_action( command.to_string() );
+    if( action != null ) {
+      var detail_name = "win.%s".printf( command.to_string() );
+      if( shortcut == null ) {
+        application.set_accels_for_action( detail_name, {} );
+      } else {
+        application.set_accels_for_action( detail_name, { shortcut.get_accelerator() } );
+      }
+    }
+    if( _shortcut_widgets.has_key( command ) ) {
+      _shortcut_widgets.get( command ).set_tooltip( shortcut );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Sets the action enable for the given command to the given value.
+  private void menu_set_enabled( KeyCommand command, bool enable ) {
+    var action = (SimpleAction)_actions.lookup_action( command.to_string() );
+    if( action != null ) {
+      action.set_enabled( enable );
+    }
+  }
+
+  //-------------------------------------------------------------
+  // Execute command.
+  public void execute_command( KeyCommand command ) {
+    var func = command.get_func();
+    func( get_current_table( "execute_command" ) );
   }
 
 }

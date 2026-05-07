@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -24,14 +24,16 @@ public class UndoNodeUnindent : UndoItem {
   private Node _node;
   private int  _num_children;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoNodeUnindent( Node node ) {
     base( _( "unindent item" ) );
     _node         = node;
     _num_children = (int)node.children.length;
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo( OutlineTable table ) {
     table.indent_node( _node );
     var children = (int)_node.children.length;
@@ -42,7 +44,8 @@ public class UndoNodeUnindent : UndoItem {
     }
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo( OutlineTable table ) {
     table.unindent_node( _node );
   }

@@ -27,7 +27,7 @@ function test {
     initialize
 
     export DISPLAY=:0
-    ./com.github.phase1geo.outliner --run-tests
+    ./io.github.phase1geo.outliner --run-tests
     result=$?
 
     export DISPLAY=":0.0"
@@ -47,10 +47,10 @@ case $1 in
     ;;
 "generate-i18n")
     grep -rc _\( * | grep ^src | grep -v :0 | cut -d : -f 1 | sort -o po/POTFILES
-    echo "data/com.github.phase1geo.outliner.shortcuts.ui" >> po/POTFILES
+    echo "data/io.github.phase1geo.outliner.shortcuts.ui" >> po/POTFILES
     initialize
-    ninja com.github.phase1geo.outliner-pot
-    ninja com.github.phase1geo.outliner-update-po
+    ninja io.github.phase1geo.outliner-pot
+    ninja io.github.phase1geo.outliner-update-po
     ninja extra-pot
     ninja extra-update-po
     cp data/* ../data
@@ -77,26 +77,34 @@ case $1 in
     ;;
 "run")
     initialize
-    ./com.github.phase1geo.outliner "${@:2}"
+    ./io.github.phase1geo.outliner "${@:2}"
+    ;;
+"run-flatpak")
+    flatpak run io.github.phase1geo.outliner
     ;;
 "debug")
     initialize
-    G_DEBUG=fatal-criticals gdb --args ./com.github.phase1geo.outliner "${@:2}"
-    #G_DEBUG=fatal-warnings gdb --args ./com.github.phase1geo.outliner "${@:2}"
+    G_DEBUG=fatal-criticals gdb --args ./io.github.phase1geo.outliner "${@:2}"
+    #G_DEBUG=fatal-warnings gdb --args ./io.github.phase1geo.outliner "${@:2}"
     ;;
 "test")
     test
     ;;
 "test-run")
     test
-    ./com.github.phase1geo.outliner "${@:2}"
+    ./io.github.phase1geo.outliner "${@:2}"
     ;;
 "uninstall")
     initialize
     sudo ninja uninstall
     ;;
-"flatpak")
-    sudo flatpak-builder --install --force-clean ../build-outliner com.github.phase1geo.outliner.yml
+"elementary")
+    flatpak-builder --user --install --force-clean ../build-outliner-elementary elementary/io.github.phase1geo.outliner.yml
+    flatpak install --user --reinstall --assumeyes "$(pwd)/.flatpak-builder/cache" io.github.phase1geo.outliner.Debug
+    ;;
+"flathub")
+    flatpak-builder --user --install --force-clean ../build-outliner-flathub flathub/io.github.phase1geo.outliner.yml
+    flatpak install --user --reinstall --assumeyes "$(pwd)/.flatpak-builder/cache" io.github.phase1geo.outliner.Debug
     ;;
 *)
     echo "Usage:"

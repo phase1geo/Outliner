@@ -36,26 +36,61 @@ These dependencies must be present before building:
  - `meson`
  - `valac`
  - `debhelper`
- - `libgranite-dev`
- - `libgtk-3-dev`
+ - `libgranite-7-dev`
+ - `libcairo-dev`
+ - `libgtk-4-dev`
  - `libxml2-dev`
- - `libwebkit2gtk-4.1-dev`
+ - `libwebkitgtk-6.0-dev`
  - `libmarkdown2-dev`
+ - `libarchive-dev`
+ - `pandoc`
 
 Use the App script to simplify installation by running `./app install-deps`
 
-### Building
+### Building Executable
+
+Use Git to download Outliner to your local directory:
 
 ```
-git clone git@github.com:phase1geo/Outliner.git com.github.phase1geo.outliner && cd com.github.phase1geo.outliner
-./app install-deps && ./app install
+> git clone git@github.com:phase1geo/Outliner.git
+> cd Outliner
+```
+
+Make sure that all dependencies are installed and install the application from the source to an executable binary (called com.github.phase1geo.outliner)
+
+```
+> ./app install-deps && ./app install
+```
+
+### Building Flatpak
+
+If you want to build and install the Flatpak for elementary (based on the io.elementary.Sdk, version 8.2), run the following command instead:
+
+```
+> ./app elementary
+```
+
+If you want to build and install the Flatpak for Flathub (based on the com.gnome.Sdk, version 49), run the following command instead:
+
+```
+> ./app flathub
+```
+
+After installing one of the above Flatpak builds, you can run the Flatpak from the terminal using the following command:
+
+```
+> ./app run-flatpak
 ```
 
 ### Deconstruct
 
+The following command will uninstall the installed executable.
+
 ```
 ./app uninstall
 ```
+
+Refer to the `flatpak` command for uninstalling an installed Flatpak.
 
 ### Development & Testing
 
@@ -74,16 +109,14 @@ Options:
   test              Builds and runs testing for the application
   test-run          Builds application, runs testing and if successful application is started
   uninstall         Removes the application from the system (requires sudo)
+  elementary        Builds and installs the elementary Flatpak
+  flathub           BUilds and installs the Flathub Flatpak
+  run-flatpak       Runs the currently installed Flatpak
 ```
 
 ### License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE.md) file for details.
-
-### Iconography
-
-The Outliner icon was created by Nararyans R.I. (@Fatih20 on GitHub).  He has produced a video showing the process of
-creating this icon with Inkscape [here](https://open.lbry.com/@Fatih109:4/Outliner:b?r=Cg1pp5MCWV1a5Nj5jDumPs9b13dNZqWG)
 
 <p align="center">
     <a href="https://appcenter.elementary.io/com.github.phase1geo.outliner">

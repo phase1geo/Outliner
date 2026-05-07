@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 (https://github.com/phase1geo/Outliner)
+* Copyright (c) 2020-2026 (https://github.com/phase1geo/Outliner)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -25,7 +25,8 @@ public class UndoNodeName : UndoItem {
   private CanvasText _text;
   private CanvasText _orig_text;
 
-  /* Default constructor */
+  //-------------------------------------------------------------
+  // Default constructor
   public UndoNodeName( OutlineTable ot, Node node, CanvasText orig_text ) {
     base( _( "title change" ) );
     _node      = node;
@@ -35,7 +36,8 @@ public class UndoNodeName : UndoItem {
     _orig_text.copy( orig_text );
   }
 
-  /* Causes the stored item to be put into the before state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the before state
   public override void undo( OutlineTable table ) {
     table.tagger.preedit_load_tags( _node.name.text );
     _node.name.copy( _orig_text );
@@ -44,7 +46,8 @@ public class UndoNodeName : UndoItem {
     table.changed();
   }
 
-  /* Causes the stored item to be put into the after state */
+  //-------------------------------------------------------------
+  // Causes the stored item to be put into the after state
   public override void redo( OutlineTable table ) {
     table.tagger.preedit_load_tags( _node.name.text );
     _node.name.copy( _text );
