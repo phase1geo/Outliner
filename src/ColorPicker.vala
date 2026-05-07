@@ -37,8 +37,10 @@ public enum ColorPickerType {
   public void set_image( ToggleButton btn ) {
     switch( this ) {
       case HCOLOR :
-        btn.icon_name = "format-text-highlight";
-        btn.child     = null;
+        var lbl = new Label( "<span size=\"large\">\u25c9</span>" ) {
+          use_markup = true
+        };
+        btn.child = lbl;
         break;
       case FCOLOR : {
         var lbl = new Label( "<span size=\"large\">A</span>" ) {
@@ -53,7 +55,7 @@ public enum ColorPickerType {
 
 }
 
-public class ColorPicker : Box {
+public class ColorPicker : Granite.Box {
 
   private ColorPickerType _type;
   private ToggleButton    _toggle;
@@ -64,6 +66,8 @@ public class ColorPicker : Box {
   public signal void color_changed( RGBA? color );
 
   public ColorPicker( MainWindow win, RGBA init_color, ColorPickerType type ) {
+
+    Object( orientation: Orientation.HORIZONTAL, child_spacing: Granite.Box.Spacing.LINKED );
 
     _type  = type;
     _color = init_color.copy();
@@ -105,8 +109,6 @@ public class ColorPicker : Box {
 
     update_css( _color );
 
-    add_css_class( Granite.STYLE_CLASS_LINKED );
-
   }
 
   public void set_toggle_tooltip( string tooltip ) {
@@ -125,7 +127,8 @@ public class ColorPicker : Box {
 
   private void update_css( RGBA rgba ) {
     var provider = new CssProvider();
-    var css_data = ".%s { background: %s; }".printf( _type.get_css_class(), rgba.to_string() );
+    var fg       = Granite.contrasting_foreground_color( rgba );
+    var css_data = ".%s { background: %s; color: %s; }".printf( _type.get_css_class(), rgba.to_string(), fg.to_string() );
     provider.load_from_string( css_data );
     StyleContext.add_provider_for_display(
       Display.get_default(),

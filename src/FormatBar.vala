@@ -129,7 +129,9 @@ public class FormatBar : Box {
     }
     add_markup( _header, false, "H<i>x</i>" );
 
-    _hilite = new ColorPicker( table.win, get_hilite_color(), ColorPickerType.HCOLOR );
+    _hilite = new ColorPicker( table.win, get_hilite_color(), ColorPickerType.HCOLOR ) {
+      margin_end = 5
+    };
     _hilite.set_toggle_tooltip( _( "Apply Highlight Color" ) );
     _hilite.set_select_tooltip( _( "Change Highlight Color" ) );
     _hilite.color_changed.connect( handle_hilite );

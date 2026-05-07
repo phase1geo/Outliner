@@ -55,8 +55,8 @@ public class LinkEditor : Popover {
       halign       = Align.START,
       tooltip_text = _( "Apply" )
     };
-    _apply.add_css_class( Granite.STYLE_CLASS_CIRCULAR );
-    _apply.add_css_class( Granite.STYLE_CLASS_SUGGESTED_ACTION );
+    _apply.add_css_class( Granite.CssClass.CIRCULAR );
+    _apply.add_css_class( Granite.CssClass.SUGGESTED );
     _apply.clicked.connect(() => {
       set_url();
       show_popover( false );
@@ -66,7 +66,7 @@ public class LinkEditor : Popover {
       halign       = Align.START,
       tooltip_text = _( "Cancel" )
     };
-    cancel.add_css_class( Granite.STYLE_CLASS_CIRCULAR );
+    cancel.add_css_class( Granite.CssClass.CIRCULAR );
     cancel.clicked.connect(() => {
       _text.clear_selection();
       show_popover( false );
