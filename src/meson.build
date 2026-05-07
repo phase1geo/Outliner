@@ -23,6 +23,7 @@ sources += files(
   'OutlineTable.vala',
   'Preferences.vala',
   'SearchBar.vala',
+  'SettingsUpdater.vala',
   'Shortcuts.vala',
   'Tagger.vala',
   'TextCompletion.vala',

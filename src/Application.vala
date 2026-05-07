@@ -32,7 +32,7 @@ public class Outliner : Gtk.Application {
   public Outliner () {
 
     Object(
-      application_id: "com.github.phase1geo.outliner",
+      application_id: "io.github.phase1geo.outliner",
       flags: ApplicationFlags.HANDLES_COMMAND_LINE,
       version: "2.0.0"
     );
@@ -52,15 +52,18 @@ public class Outliner : Gtk.Application {
   private void start_application() {
 
     // Initialize the settings
-    settings = new GLib.Settings( "com.github.phase1geo.outliner" );
+    settings = new GLib.Settings( "io.github.phase1geo.outliner" );
+
+    // Update the settings value, if necessary
+    SettingsUpdater.update( settings );
 
     // Add the application-specific icons
     weak IconTheme default_theme = IconTheme.get_for_display( Gdk.Display.get_default() );
-    default_theme.add_resource_path( "/com/github/phase1geo/outliner" );
+    default_theme.add_resource_path( "/io/github/phase1geo/outliner" );
 
     // Add the application CSS
     var provider = new Gtk.CssProvider ();
-    provider.load_from_resource( "/com/github/phase1geo/outliner/css/style.css" );
+    provider.load_from_resource( "/io/github/phase1geo/outliner/css/style.css" );
     StyleContext.add_provider_for_display( Gdk.Display.get_default(), provider, STYLE_PROVIDER_PRIORITY_APPLICATION );
 
     // Create the main window

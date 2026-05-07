@@ -54,6 +54,7 @@ src/undo_actions/UndoTextMultiInsert.vala
 src/undo_actions/UndoTextReplace.vala
 src/undo_actions/UndoTextTagAdd.vala
 src/undo_actions/UndoTextTagRemove.vala
+src/undo_actions/UndoTextTagReplace.vala
 src/undo_actions/UndoTitleChange.vala
 src/UndoBuffer.vala
 src/UnicodeInsert.vala

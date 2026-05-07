@@ -1,8 +1,8 @@
-app-id: com.github.phase1geo.outliner
+app-id: io.github.phase1geo.outliner
 runtime: io.elementary.Platform
 runtime-version: '8.2'
 sdk: io.elementary.Sdk
-command: com.github.phase1geo.outliner
+command: io.github.phase1geo.outliner
 
 finish-args:
   - '--share=ipc'
@@ -39,4 +39,4 @@ modules:
     buildsystem: meson
     sources:
       - type: dir
-        path: .
+        path: ..
