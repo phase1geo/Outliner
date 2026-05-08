@@ -57,7 +57,7 @@ dependencies = [
     dependency('glib-2.0'),
     dependency('cairo'),
     dependency('gee-0.8'),
-    dependency('granite-7'),
+    dependency('granite-7', version: '>=7.7.0'),
     dependency('gtk4'),
     dependency('libxml-2.0'),
     dependency('libarchive'),
@@ -77,12 +77,9 @@ e = executable('io.github.phase1geo.outliner',
     install : true
 )
 
-#test('tests', e, args : ['--run-tests'])
-
 gnome.post_install(
   glib_compile_schemas: true,
   gtk_update_icon_cache: true,
   update_mime_database: true,
   update_desktop_database: true
 )
-

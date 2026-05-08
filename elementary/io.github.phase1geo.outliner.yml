@@ -23,6 +23,42 @@ modules:
         url: https://github.com/Orc/discount/archive/refs/tags/v2.2.4.tar.gz
         sha256: 918905377e6ed3d0a7158cac0a4a18ed3c4cc0cad8ee95dddd82cb86ba9dd044
 
+  - name: sassc
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://github.com/sass/sassc/archive/3.6.2.tar.gz
+        sha256: 608dc9002b45a91d11ed59e352469ecc05e4f58fc1259fc9a9f5b8f0f8348a03
+      - type: script
+        dest-filename: autogen.sh
+        commands:
+          - autoreconf -si
+    modules:
+      - name: libsass
+        buildsystem: autotools
+        sources:
+          - type: archive
+            url: https://github.com/sass/libsass/archive/3.6.5.tar.gz
+            sha256: 89d8f2c46ae2b1b826b58ce7dde966a176bac41975b82e84ad46b01a55080582
+          - type: script
+            dest-filename: autogen.sh
+            commands:
+              - autoreconf -si
+
+  - name: granite-7
+    buildsystem: meson
+    config-opts:
+      - -Ddocumentation=false
+      - -Ddemo=false
+      -  --libdir=lib
+    cleanup:
+      - /share/icons
+      - /share/metainfo
+    sources:
+      - type: archive
+        url: https://github.com/elementary/granite/archive/refs/tags/7.8.1.tar.gz
+        sha256: bc8e7946ca091fdeeeebeb64db4e95d33a3ffb879048137f8d8a41ecd76caa3f
+
   - name: pandoc
     sources:
       - type: archive
