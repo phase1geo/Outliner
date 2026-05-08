@@ -60,4 +60,4 @@ src/UndoBuffer.vala
 src/UnicodeInsert.vala
 src/Utils.vala
 src/ZoomWidget.vala
-data/com.github.phase1geo.outliner.shortcuts.ui
+data/io.github.phase1geo.outliner.shortcuts.ui

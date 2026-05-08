@@ -66,7 +66,7 @@
     </custom>
     <content_rating type="oars-1.1" />
     <releases>
-      <release version="2.0.0" date="2026-01-18">
+      <release version="2.0.0" date="2026-05-10">
         <description>
           <p>New</p>
           <ul>
@@ -82,6 +82,7 @@
           <ul>
             <li>Updated from gtk3 to gtk4.</li>
             <li>Changed application icon.</li>
+            <li>Changed application ID from com.github.phase1geo.outliner to io.github.phase1geo.outliner.</li>
             <li>Updated Minder import and export support for Minder version 2.x.</li>
             <li>Improved title support for Minder maps with multiple root nodes.</li>
           </ul>
@@ -98,6 +99,7 @@
             <li>Fixed various issues with mouse clicking in outline.</li>
             <li>Fixed tag filtering support.</li>
             <li>Fixed find functionality.</li>
+            <li>Fixed compiler warnings and removed obsolete code.</li>
           </ul>
         </description>
       </release>

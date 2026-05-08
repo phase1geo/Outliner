@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2020 Trevor Williams <phase1geo@gmail.com> -->
 <component type="desktop-application">
-  <id>com.github.phase1geo.outliner</id>
+  <id>io.github.phase1geo.outliner</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Outliner</name>
@@ -64,9 +64,9 @@
       <li xml:lang="fr">Prise en charge de l'impression.</li>
     </ul>
   </description>
-  <launchable type="desktop-id">com.github.phase1geo.outliner.desktop</launchable>
+  <launchable type="desktop-id">io.github.phase1geo.outliner.desktop</launchable>
   <provides>
-    <binary>com.github.phase1geo.outliner</binary>
+    <binary>io.github.phase1geo.outliner</binary>
   </provides>
   <screenshots>
     <screenshot type="default">
@@ -82,7 +82,7 @@
       <image>https://raw.githubusercontent.com/phase1geo/Outliner/master/data/screenshots/screenshot-dark.png</image>
     </screenshot>
   </screenshots>
-  <developer id="com.github.phase1geo">
+  <developer id="io.github.phase1geo">
     <name>Trevor Williams</name>
     <name xml:lang="nl">Trevor Williams</name>
     <name xml:lang="fr">Trevor Williams</name>
@@ -99,7 +99,7 @@
   </custom>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="2.0.0" date="2026-01-18">
+    <release version="2.0.0" date="2026-05-10">
       <description>
         <p>New</p>
         <p xml:lang="nl">Nieuw</p>
@@ -119,6 +119,7 @@
         <ul>
           <li>Updated from gtk3 to gtk4.</li>
           <li>Changed application icon.</li>
+          <li>Changed application ID from com.github.phase1geo.outliner to io.github.phase1geo.outliner.</li>
           <li>Updated Minder import and export support for Minder version 2.x.</li>
           <li>Improved title support for Minder maps with multiple root nodes.</li>
         </ul>
@@ -137,6 +138,7 @@
           <li>Fixed various issues with mouse clicking in outline.</li>
           <li>Fixed tag filtering support.</li>
           <li>Fixed find functionality.</li>
+          <li>Fixed compiler warnings and removed obsolete code.</li>
         </ul>
       </description>
     </release>
