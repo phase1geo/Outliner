@@ -2335,47 +2335,69 @@ public class OutlineTable : DrawingArea {
   }
 
   //-------------------------------------------------------------
+  // Positions the format bar based on the location of the currently selected
+  // text.
+  private void place_format_bar() {
+
+    int selstart, selend, cursor;
+    var text = (selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note;
+
+    text.get_cursor_info( out cursor, out selstart, out selend );
+
+    // Position the popover
+    double left, top, bottom;
+    int    line;
+    text.get_char_pos( cursor, out left, out top, out bottom, out line );
+
+    var width  = (_format_bar.get_width() / 2);
+    var height = _format_bar.get_height();
+
+    // If this is the first line of the first row, change the popover point to the bottom of the text
+    if( (selected == root_node.children.index( 0 )) && (line == 0) ) {
+      _format_bar.margin_start = (int)((left < width) ? 0 : (left - width));
+      _format_bar.margin_top   = (int)(bottom + 10);
+    } else {
+      _format_bar.margin_start = (int)((left < width) ? 0 : (left - width));
+      _format_bar.margin_top   = (int)(top - (height + 30));
+    }
+
+  }
+
+  //-------------------------------------------------------------
   // If the format bar needs to be created, create it.  Place it
   // at the current cursor position and make sure that it is visible.
   private void show_format_bar() {
 
     // If the format bar is currently displayed, just reposition it
     if( _format_bar == null ) {
-      _format_bar        = new FormatBar( this );
-      _format_bar.halign = Align.START;
-      _format_bar.valign = Align.START;
+      _format_bar = new FormatBar( this ) {
+        halign = Align.START,
+        valign = Align.START,
+        opacity = 0.0
+      };
       _format_bar.add_css_class( "overlay-box" );
       _format_bar.close_requested.connect(() => {
         hide_format_bar();
+      });
+
+      zoom_changed.connect(() => {
+        Idle.add(() => {
+          place_format_bar();
+          return( false );
+        });
       });
 
       var ol = (Overlay)this.parent;
       ol.add_overlay( _format_bar );
     }
 
-    Idle.add(() => {
+    Timeout.add( 100, () => {
 
-      int selstart, selend, cursor;
-      var text = (selected.mode == NodeMode.EDITABLE) ? selected.name : selected.note;
+      // Place the format bar
+      place_format_bar();
 
-      text.get_cursor_info( out cursor, out selstart, out selend );
-
-      // Position the popover
-      double left, top, bottom;
-      int    line;
-      text.get_char_pos( cursor, out left, out top, out bottom, out line );
-
-      var width  = (_format_bar.get_width() / 2);
-      var height = _format_bar.get_height();
-
-      // If this is the first line of the first row, change the popover point to the bottom of the text
-      if( (selected == root_node.children.index( 0 )) && (line == 0) ) {
-        _format_bar.margin_start = (int)((left < width) ? 0 : (left - width));
-        _format_bar.margin_top   = (int)(bottom + 10);
-      } else {
-        _format_bar.margin_start = (int)((left < width) ? 0 : (left - width));
-        _format_bar.margin_top   = (int)(top - (height + 10));
-      }
+      // Make it visible to the user (this avoid visible format bar "jumping")
+      _format_bar.opacity = 1.0;
 
       // Keep the keyboard focus on the OutlineTable
       grab_focus();
