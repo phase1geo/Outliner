@@ -18,6 +18,7 @@
 @define-color colorPrimary           #D48E15;
 @define-color textColorPrimary       @BLACK_500;
 @define-color textColorPrimaryShadow #D48E15;
+@define-color tab_fg_color           #FFFFFF;
 
 /*
 .color-button radio,
@@ -54,3 +55,12 @@
   border-radius: 6px;
   padding: 8px;
 }
+
+notebook > header > tabs > tab {
+  color: @tab_fg_color;
+}
+
+.tab-close {
+  color: @tab_fg_color;
+}
+

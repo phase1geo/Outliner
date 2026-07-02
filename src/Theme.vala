@@ -74,6 +74,7 @@ public class Theme : Object {
 
     var provider = new CssProvider();
     var css_data = "@define-color tab_base_color " + background.to_string() + ";" +
+                   "@define-color tab_fg_color " + Granite.contrasting_foreground_color( background ).to_string() + ";" +
                    ".canvas { background: " + background.to_string() + "; } " +
                    ".color_chooser { padding-right: 0px; padding-left: 0px; margin-right: 0px; margin-left: 0px; }";
 

@@ -428,6 +428,8 @@ public class MainWindow : Gtk.ApplicationWindow {
       margin_bottom = 5
     };
 
+    tab_close.add_css_class( "tab-close" );
+
     var tab_revealer = new Revealer() {
       reveal_child = true,
       transition_type = RevealerTransitionType.CROSSFADE,
