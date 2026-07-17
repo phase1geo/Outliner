@@ -42,6 +42,8 @@ public class Outliner : Gtk.Application {
     Intl.bind_textdomain_codeset( GETTEXT_PACKAGE, "UTF-8" );
     Intl.textdomain( GETTEXT_PACKAGE );
 
+    Environment.set_application_name( _( "Outliner" ) );
+
     startup.connect( start_application );
     command_line.connect( handle_command_line );
 
