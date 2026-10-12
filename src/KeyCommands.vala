@@ -51,6 +51,7 @@ public enum KeyCommand {
     MISCELLANEOUS_START,
       SHOW_PREFERENCES,
       SHOW_SHORTCUTS,
+      SHOW_DOCUMENTATION,
       SHOW_RELEASES,
       SHOW_CONTEXTUAL_MENU,
       SHOW_ABOUT,
@@ -223,6 +224,7 @@ public enum KeyCommand {
       case ZOOM_ACTUAL               :  return( "zoom-actual" );
       case SHOW_PREFERENCES          :  return( "show-preferences" );
       case SHOW_SHORTCUTS            :  return( "show-shortcuts" );
+      case SHOW_DOCUMENTATION        :  return( "show-documentation" );
       case SHOW_RELEASES             :  return( "show-releases" );
       case SHOW_CONTEXTUAL_MENU      :  return( "show-contextual_menu" );
       case SHOW_ABOUT                :  return( "show-about" );
@@ -366,6 +368,7 @@ public enum KeyCommand {
       case "zoom-actual"               :  return( ZOOM_ACTUAL );
       case "show-preferences"          :  return( SHOW_PREFERENCES );
       case "show-shortcuts"            :  return( SHOW_SHORTCUTS );
+      case "show-documentation"        :  return( SHOW_DOCUMENTATION );
       case "show-releases"             :  return( SHOW_RELEASES );
       case "show-contextual-menu"      :  return( SHOW_CONTEXTUAL_MENU );
       case "show-about"                :  return( SHOW_ABOUT );
@@ -513,6 +516,7 @@ public enum KeyCommand {
       case MISCELLANEOUS_START       :  return( _( "Miscellaneous Commands" ) );
       case SHOW_PREFERENCES          :  return( _( "Show preferences window" ) );
       case SHOW_SHORTCUTS            :  return( _( "Show shortcuts cheatsheet" ) );
+      case SHOW_DOCUMENTATION        :  return( _( "Show user documentation" ) );
       case SHOW_RELEASES             :  return( _( "Show release notes" ) );
       case SHOW_CONTEXTUAL_MENU      :  return( _( "Show contextual menu" ) );
       case SHOW_ABOUT                :  return( _( "Show About window" ) );
@@ -659,6 +663,7 @@ public enum KeyCommand {
       case ZOOM_ACTUAL               :  return( zoom_actual );
       case SHOW_PREFERENCES          :  return( show_preferences );
       case SHOW_SHORTCUTS            :  return( show_shortcuts );
+      case SHOW_DOCUMENTATION        :  return( show_documentation );
       case SHOW_RELEASES             :  return( show_releases );
       case SHOW_CONTEXTUAL_MENU      :  return( show_contextual_menu );
       case SHOW_ABOUT                :  return( show_about );
@@ -1075,6 +1080,10 @@ public enum KeyCommand {
 
     win.present();
 
+  }
+
+  public static void show_documentation( OutlineTable ot ) {
+    Utils.open_url( "https://phase1geo.github.io/Outliner/" );
   }
 
   public static void show_releases( OutlineTable ot ) {
