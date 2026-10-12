@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-11 23:07-0500\n"
+"POT-Creation-Date: 2026-10-12 08:52-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "Outliner in AppCenter"
 msgstr ""
 
-#: src/Application.vala:48 src/MainWindow.vala:129 src/MainWindow.vala:1316
+#: src/Application.vala:48 src/MainWindow.vala:129 src/MainWindow.vala:1320
 msgid "Outliner"
 msgstr ""
 
@@ -211,567 +211,571 @@ msgstr ""
 msgid "Clear all formatting"
 msgstr ""
 
-#: src/KeyCommands.vala:495 data/io.github.phase1geo.outliner.shortcuts.ui:12
+#: src/KeyCommands.vala:498 data/io.github.phase1geo.outliner.shortcuts.ui:12
 msgid "General"
 msgstr ""
 
-#: src/KeyCommands.vala:496
+#: src/KeyCommands.vala:499
 msgid "File Commands"
 msgstr ""
 
-#: src/KeyCommands.vala:497
+#: src/KeyCommands.vala:500
 msgid "Create new outline"
 msgstr ""
 
-#: src/KeyCommands.vala:498
+#: src/KeyCommands.vala:501
 msgid "Open saved outline"
 msgstr ""
 
-#: src/KeyCommands.vala:499
+#: src/KeyCommands.vala:502
 msgid "Save outline to current file"
 msgstr ""
 
-#: src/KeyCommands.vala:500
+#: src/KeyCommands.vala:503
 msgid "Save outline to new file"
 msgstr ""
 
-#: src/KeyCommands.vala:501
+#: src/KeyCommands.vala:504
 msgid "Show print dialog for current outline"
 msgstr ""
 
-#: src/KeyCommands.vala:502
+#: src/KeyCommands.vala:505
 msgid "Tab Commands"
 msgstr ""
 
-#: src/KeyCommands.vala:503
+#: src/KeyCommands.vala:506
 msgid "Select next tab"
 msgstr ""
 
-#: src/KeyCommands.vala:504
+#: src/KeyCommands.vala:507
 msgid "Select previous tab"
 msgstr ""
 
-#: src/KeyCommands.vala:505
+#: src/KeyCommands.vala:508
 msgid "Close the current mindmap"
 msgstr ""
 
-#: src/KeyCommands.vala:506
+#: src/KeyCommands.vala:509
 msgid "Undo/Redo Commands"
 msgstr ""
 
-#: src/KeyCommands.vala:507
+#: src/KeyCommands.vala:510
 msgid "Undo last action"
 msgstr ""
 
-#: src/KeyCommands.vala:508
+#: src/KeyCommands.vala:511
 msgid "Redo last undone action"
 msgstr ""
 
-#: src/KeyCommands.vala:509
+#: src/KeyCommands.vala:512
 msgid "Zoom Commands"
 msgstr ""
 
-#: src/KeyCommands.vala:510
+#: src/KeyCommands.vala:513
 msgid "Zoom in"
 msgstr ""
 
-#: src/KeyCommands.vala:511
+#: src/KeyCommands.vala:514
 msgid "Zoom out"
 msgstr ""
 
-#: src/KeyCommands.vala:512
+#: src/KeyCommands.vala:515
 msgid "Zoom to 100%"
 msgstr ""
 
-#: src/KeyCommands.vala:513
+#: src/KeyCommands.vala:516
 msgid "Miscellaneous Commands"
 msgstr ""
 
-#: src/KeyCommands.vala:514
+#: src/KeyCommands.vala:517
 msgid "Show preferences window"
 msgstr ""
 
-#: src/KeyCommands.vala:515
+#: src/KeyCommands.vala:518
 msgid "Show shortcuts cheatsheet"
 msgstr ""
 
-#: src/KeyCommands.vala:516
-msgid "Show release notes"
-msgstr ""
-
-#: src/KeyCommands.vala:517
-msgid "Show contextual menu"
-msgstr ""
-
-#: src/KeyCommands.vala:518
-msgid "Show About window"
-msgstr ""
-
 #: src/KeyCommands.vala:519
-msgid "Toggle focus mode"
+msgid "Show user documentation"
 msgstr ""
 
 #: src/KeyCommands.vala:520
-msgid "Toggle display of all notes"
+msgid "Show release notes"
 msgstr ""
 
 #: src/KeyCommands.vala:521
-msgid "Display search panel"
+msgid "Show contextual menu"
 msgstr ""
 
 #: src/KeyCommands.vala:522
-msgid "Edit the document title"
+msgid "Show About window"
 msgstr ""
 
 #: src/KeyCommands.vala:523
-msgid "Quit the application"
+msgid "Toggle focus mode"
 msgstr ""
 
 #: src/KeyCommands.vala:524
-msgid "Node"
+msgid "Toggle display of all notes"
 msgstr ""
 
 #: src/KeyCommands.vala:525
-msgid "Creation/Deletion Commands"
+msgid "Display search panel"
 msgstr ""
 
-#: src/KeyCommands.vala:526 src/KeyCommands.vala:604
-msgid "Clipboard Commands"
+#: src/KeyCommands.vala:526
+msgid "Edit the document title"
 msgstr ""
 
 #: src/KeyCommands.vala:527
-msgid "Add new row above current row"
+msgid "Quit the application"
 msgstr ""
 
 #: src/KeyCommands.vala:528
-msgid "Add new row below current row"
+msgid "Node"
 msgstr ""
 
 #: src/KeyCommands.vala:529
-msgid "Add new child row to current row"
+msgid "Creation/Deletion Commands"
 msgstr ""
 
-#: src/KeyCommands.vala:530
-msgid "Add new parent row of current row"
+#: src/KeyCommands.vala:530 src/KeyCommands.vala:608
+msgid "Clipboard Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:531
-msgid "Creates a clone copy of the current row"
+msgid "Add new row above current row"
 msgstr ""
 
 #: src/KeyCommands.vala:532
-msgid "Pastes the cloned row from the clipboard"
+msgid "Add new row below current row"
 msgstr ""
 
 #: src/KeyCommands.vala:533
-msgid "Unclones the current row if it is a clone"
+msgid "Add new child row to current row"
 msgstr ""
 
 #: src/KeyCommands.vala:534
-msgid "Remove current row"
+msgid "Add new parent row of current row"
 msgstr ""
 
 #: src/KeyCommands.vala:535
-msgid "Replace current row with clipboard content"
+msgid "Creates a clone copy of the current row"
 msgstr ""
 
 #: src/KeyCommands.vala:536
-msgid "View Commands"
+msgid "Pastes the cloned row from the clipboard"
 msgstr ""
 
 #: src/KeyCommands.vala:537
-msgid "Expand current row by one level"
+msgid "Unclones the current row if it is a clone"
 msgstr ""
 
 #: src/KeyCommands.vala:538
-msgid "Expand current row completely"
+msgid "Remove current row"
 msgstr ""
 
 #: src/KeyCommands.vala:539
-msgid "Collapse current row by one level"
+msgid "Replace current row with clipboard content"
 msgstr ""
 
 #: src/KeyCommands.vala:540
-msgid "Collapse current row completely"
+msgid "View Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:541
-msgid "Page the document up from the current row"
+msgid "Expand current row by one level"
 msgstr ""
 
 #: src/KeyCommands.vala:542
-msgid "Page the document down from the current row"
+msgid "Expand current row completely"
 msgstr ""
 
 #: src/KeyCommands.vala:543
-msgid "Adjust document view to show current row at the top"
+msgid "Collapse current row by one level"
 msgstr ""
 
 #: src/KeyCommands.vala:544
-msgid "Focus on current row"
+msgid "Collapse current row completely"
 msgstr ""
 
 #: src/KeyCommands.vala:545
-msgid "Change Commands"
+msgid "Page the document up from the current row"
 msgstr ""
 
 #: src/KeyCommands.vala:546
-msgid "Edit current row text"
+msgid "Page the document down from the current row"
 msgstr ""
 
 #: src/KeyCommands.vala:547
-msgid "Edit current row note"
+msgid "Adjust document view to show current row at the top"
 msgstr ""
 
 #: src/KeyCommands.vala:548
-msgid "Toggle task status of current row"
+msgid "Focus on current row"
 msgstr ""
 
 #: src/KeyCommands.vala:549
-msgid "Add tags to current row"
+msgid "Change Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:550
-msgid "Join current row with previous row"
+msgid "Edit current row text"
 msgstr ""
 
-#: src/KeyCommands.vala:551 src/KeyCommands.vala:623
-msgid "Selection Commands"
+#: src/KeyCommands.vala:551
+msgid "Edit current row note"
 msgstr ""
 
 #: src/KeyCommands.vala:552
-msgid "Select top-most row"
+msgid "Toggle task status of current row"
 msgstr ""
 
 #: src/KeyCommands.vala:553
-msgid "Select bottom-most row"
+msgid "Add tags to current row"
 msgstr ""
 
 #: src/KeyCommands.vala:554
-msgid "Select row at the top of the current view"
+msgid "Join current row with previous row"
 msgstr ""
 
-#: src/KeyCommands.vala:555
-msgid "Select row at the bottom of the current view"
+#: src/KeyCommands.vala:555 src/KeyCommands.vala:627
+msgid "Selection Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:556
-msgid "Select row below the current row"
+msgid "Select top-most row"
 msgstr ""
 
 #: src/KeyCommands.vala:557
-msgid "Select row above the current row"
+msgid "Select bottom-most row"
 msgstr ""
 
 #: src/KeyCommands.vala:558
-msgid "Select parent of current row"
+msgid "Select row at the top of the current view"
 msgstr ""
 
 #: src/KeyCommands.vala:559
-msgid "Select last child row of current row"
+msgid "Select row at the bottom of the current view"
 msgstr ""
 
 #: src/KeyCommands.vala:560
-msgid "Select next sibling row of current row"
+msgid "Select row below the current row"
 msgstr ""
 
 #: src/KeyCommands.vala:561
-msgid "Select previous sibling row of current row"
+msgid "Select row above the current row"
 msgstr ""
 
 #: src/KeyCommands.vala:562
-msgid "Move Commands"
+msgid "Select parent of current row"
 msgstr ""
 
 #: src/KeyCommands.vala:563
-msgid "Indent currently selected row"
+msgid "Select last child row of current row"
 msgstr ""
 
 #: src/KeyCommands.vala:564
-msgid "Unindent currently selected row"
+msgid "Select next sibling row of current row"
 msgstr ""
 
 #: src/KeyCommands.vala:565
-msgid "Move current row to top of document"
+msgid "Select previous sibling row of current row"
 msgstr ""
 
 #: src/KeyCommands.vala:566
-msgid "Move current row to bottom of document"
+msgid "Move Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:567
-msgid "Move current row down"
+msgid "Indent currently selected row"
 msgstr ""
 
 #: src/KeyCommands.vala:568
-msgid "Move current row up"
+msgid "Unindent currently selected row"
 msgstr ""
 
 #: src/KeyCommands.vala:569
-msgid "Move current row above parent"
+msgid "Move current row to top of document"
 msgstr ""
 
 #: src/KeyCommands.vala:570
-msgid "Move current row below parent"
+msgid "Move current row to bottom of document"
 msgstr ""
 
 #: src/KeyCommands.vala:571
-msgid "Move current row to label 1"
+msgid "Move current row down"
 msgstr ""
 
 #: src/KeyCommands.vala:572
-msgid "Move current row to label 2"
+msgid "Move current row up"
 msgstr ""
 
 #: src/KeyCommands.vala:573
-msgid "Move current row to label 3"
+msgid "Move current row above parent"
 msgstr ""
 
 #: src/KeyCommands.vala:574
-msgid "Move current row to label 4"
+msgid "Move current row below parent"
 msgstr ""
 
 #: src/KeyCommands.vala:575
-msgid "Move current row to label 5"
+msgid "Move current row to label 1"
 msgstr ""
 
 #: src/KeyCommands.vala:576
-msgid "Move current row to label 6"
+msgid "Move current row to label 2"
 msgstr ""
 
 #: src/KeyCommands.vala:577
-msgid "Move current row to label 7"
+msgid "Move current row to label 3"
 msgstr ""
 
 #: src/KeyCommands.vala:578
-msgid "Move current row to label 8"
+msgid "Move current row to label 4"
 msgstr ""
 
 #: src/KeyCommands.vala:579
-msgid "Move current row to label 9"
+msgid "Move current row to label 5"
 msgstr ""
 
-#: src/KeyCommands.vala:580 data/io.github.phase1geo.outliner.shortcuts.ui:444
-msgid "Label Commands"
+#: src/KeyCommands.vala:580
+msgid "Move current row to label 6"
 msgstr ""
 
 #: src/KeyCommands.vala:581
-msgid "Toggle label for current row"
+msgid "Move current row to label 7"
 msgstr ""
 
 #: src/KeyCommands.vala:582
-msgid "Clear all set labels"
+msgid "Move current row to label 8"
 msgstr ""
 
 #: src/KeyCommands.vala:583
-msgid "Select row marked with label-1"
+msgid "Move current row to label 9"
 msgstr ""
 
-#: src/KeyCommands.vala:584
-msgid "Select row marked with label-2"
+#: src/KeyCommands.vala:584 data/io.github.phase1geo.outliner.shortcuts.ui:444
+msgid "Label Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:585
-msgid "Select row marked with label-3"
+msgid "Toggle label for current row"
 msgstr ""
 
 #: src/KeyCommands.vala:586
-msgid "Select row marked with label-4"
+msgid "Clear all set labels"
 msgstr ""
 
 #: src/KeyCommands.vala:587
-msgid "Select row marked with label-5"
+msgid "Select row marked with label-1"
 msgstr ""
 
 #: src/KeyCommands.vala:588
-msgid "Select row marked with label-6"
+msgid "Select row marked with label-2"
 msgstr ""
 
 #: src/KeyCommands.vala:589
-msgid "Select row marked with label-7"
+msgid "Select row marked with label-3"
 msgstr ""
 
 #: src/KeyCommands.vala:590
-msgid "Select row marked with label-8"
+msgid "Select row marked with label-4"
 msgstr ""
 
 #: src/KeyCommands.vala:591
-msgid "Select row marked with label-9"
+msgid "Select row marked with label-5"
 msgstr ""
 
-#: src/KeyCommands.vala:592 data/io.github.phase1geo.outliner.shortcuts.ui:609
-msgid "Text Editing"
+#: src/KeyCommands.vala:592
+msgid "Select row marked with label-6"
 msgstr ""
 
 #: src/KeyCommands.vala:593
-msgid "Insertion/Deletion Commands"
+msgid "Select row marked with label-7"
 msgstr ""
 
 #: src/KeyCommands.vala:594
-msgid "Insert newline character"
+msgid "Select row marked with label-8"
 msgstr ""
 
 #: src/KeyCommands.vala:595
-msgid "Split current line at current character"
+msgid "Select row marked with label-9"
 msgstr ""
 
-#: src/KeyCommands.vala:596
-msgid "Insert TAB character"
+#: src/KeyCommands.vala:596 data/io.github.phase1geo.outliner.shortcuts.ui:609
+msgid "Text Editing"
 msgstr ""
 
 #: src/KeyCommands.vala:597
-msgid "Insert emoji"
+msgid "Insertion/Deletion Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:598
-msgid "Remove next word"
+msgid "Insert newline character"
 msgstr ""
 
 #: src/KeyCommands.vala:599
-msgid "Remove previous word"
+msgid "Split current line at current character"
 msgstr ""
 
 #: src/KeyCommands.vala:600
-msgid "Bold selected text"
+msgid "Insert TAB character"
 msgstr ""
 
 #: src/KeyCommands.vala:601
-msgid "Italicize selected text"
+msgid "Insert emoji"
 msgstr ""
 
 #: src/KeyCommands.vala:602
-msgid "Underline selected text"
+msgid "Remove next word"
 msgstr ""
 
 #: src/KeyCommands.vala:603
-msgid "Strike-out selected text"
+msgid "Remove previous word"
+msgstr ""
+
+#: src/KeyCommands.vala:604
+msgid "Bold selected text"
 msgstr ""
 
 #: src/KeyCommands.vala:605
-msgid "Copy selected nodes or text"
+msgid "Italicize selected text"
 msgstr ""
 
 #: src/KeyCommands.vala:606
-msgid "Cut selected nodes or text"
+msgid "Underline selected text"
 msgstr ""
 
 #: src/KeyCommands.vala:607
-msgid "Paste nodes or text from clipboard"
-msgstr ""
-
-#: src/KeyCommands.vala:608
-msgid "URL Link Commands"
+msgid "Strike-out selected text"
 msgstr ""
 
 #: src/KeyCommands.vala:609
-msgid "Open the URL link under the current cursor"
+msgid "Copy selected nodes or text"
 msgstr ""
 
 #: src/KeyCommands.vala:610
-msgid "Add URL link to selected text or edit URL link at the current cursor"
+msgid "Cut selected nodes or text"
 msgstr ""
 
 #: src/KeyCommands.vala:611
-msgid "Remove the URL link under the current cursor"
+msgid "Paste nodes or text from clipboard"
 msgstr ""
 
 #: src/KeyCommands.vala:612
-msgid "Cursor Commands"
+msgid "URL Link Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:613
-msgid "Move cursor to next character"
+msgid "Open the URL link under the current cursor"
 msgstr ""
 
 #: src/KeyCommands.vala:614
-msgid "Move cursor to previous character"
+msgid "Add URL link to selected text or edit URL link at the current cursor"
 msgstr ""
 
 #: src/KeyCommands.vala:615
-msgid "Move cursor up one line"
+msgid "Remove the URL link under the current cursor"
 msgstr ""
 
 #: src/KeyCommands.vala:616
-msgid "Move cursor down one line"
+msgid "Cursor Commands"
 msgstr ""
 
 #: src/KeyCommands.vala:617
-msgid "Move cursor to beginning of next word"
+msgid "Move cursor to next character"
 msgstr ""
 
 #: src/KeyCommands.vala:618
-msgid "Move cursor to beginning of previous word"
+msgid "Move cursor to previous character"
 msgstr ""
 
 #: src/KeyCommands.vala:619
-msgid "Move cursor to start of text"
+msgid "Move cursor up one line"
 msgstr ""
 
 #: src/KeyCommands.vala:620
-msgid "Move cursor to end of text"
+msgid "Move cursor down one line"
 msgstr ""
 
 #: src/KeyCommands.vala:621
-msgid "Move cursor to start of current line"
+msgid "Move cursor to beginning of next word"
 msgstr ""
 
 #: src/KeyCommands.vala:622
-msgid "Move cursor to end of current line"
+msgid "Move cursor to beginning of previous word"
+msgstr ""
+
+#: src/KeyCommands.vala:623
+msgid "Move cursor to start of text"
 msgstr ""
 
 #: src/KeyCommands.vala:624
-msgid "Add next character to current selection"
+msgid "Move cursor to end of text"
 msgstr ""
 
 #: src/KeyCommands.vala:625
-msgid "Add previous character to current selection"
+msgid "Move cursor to start of current line"
 msgstr ""
 
 #: src/KeyCommands.vala:626
-msgid "Add line up to current selection"
-msgstr ""
-
-#: src/KeyCommands.vala:627
-msgid "Add line down to current selection"
+msgid "Move cursor to end of current line"
 msgstr ""
 
 #: src/KeyCommands.vala:628
-msgid "Add next word to current selection"
+msgid "Add next character to current selection"
 msgstr ""
 
 #: src/KeyCommands.vala:629
-msgid "Add previous word to current selection"
+msgid "Add previous character to current selection"
 msgstr ""
 
 #: src/KeyCommands.vala:630
-msgid "Add start of text to current selection (Control-Up)"
+msgid "Add line up to current selection"
 msgstr ""
 
 #: src/KeyCommands.vala:631
-msgid "Add start of text to current selection (Control-Home)"
+msgid "Add line down to current selection"
 msgstr ""
 
 #: src/KeyCommands.vala:632
-msgid "Add end of text to current selection (Control-Down)"
+msgid "Add next word to current selection"
 msgstr ""
 
 #: src/KeyCommands.vala:633
-msgid "Add end of text to current selection (Control-End)"
+msgid "Add previous word to current selection"
 msgstr ""
 
 #: src/KeyCommands.vala:634
-msgid "Add start of current line to current selection"
+msgid "Add start of text to current selection (Control-Up)"
 msgstr ""
 
 #: src/KeyCommands.vala:635
-msgid "Add end of current line to current selection"
+msgid "Add start of text to current selection (Control-Home)"
 msgstr ""
 
 #: src/KeyCommands.vala:636
-msgid "Select all text"
+msgid "Add end of text to current selection (Control-Down)"
 msgstr ""
 
 #: src/KeyCommands.vala:637
+msgid "Add end of text to current selection (Control-End)"
+msgstr ""
+
+#: src/KeyCommands.vala:638
+msgid "Add start of current line to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:639
+msgid "Add end of current line to current selection"
+msgstr ""
+
+#: src/KeyCommands.vala:640
+msgid "Select all text"
+msgstr ""
+
+#: src/KeyCommands.vala:641
 msgid "Deselect all text"
 msgstr ""
 
@@ -783,7 +787,7 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/LinkEditor.vala:67 src/MainWindow.vala:1147
+#: src/LinkEditor.vala:67 src/MainWindow.vala:1151
 msgid "Cancel"
 msgstr ""
 
@@ -791,7 +795,7 @@ msgstr ""
 msgid "New File"
 msgstr ""
 
-#: src/MainWindow.vala:172 src/MainWindow.vala:1213
+#: src/MainWindow.vala:172 src/MainWindow.vala:1217
 #: data/io.github.phase1geo.outliner.shortcuts.ui:28
 msgid "Open File"
 msgstr ""
@@ -904,43 +908,47 @@ msgstr ""
 msgid "Shortcuts Cheatsheet"
 msgstr ""
 
-#: src/MainWindow.vala:1041 src/ReleaseNotes.vala:36
+#: src/MainWindow.vala:1041
+msgid "Documentation"
+msgstr ""
+
+#: src/MainWindow.vala:1042 src/ReleaseNotes.vala:36
 msgid "Release Notes"
 msgstr ""
 
-#: src/MainWindow.vala:1042
+#: src/MainWindow.vala:1045
 msgid "Enter Distraction-Free Mode"
 msgstr ""
 
-#: src/MainWindow.vala:1045
+#: src/MainWindow.vala:1048
 msgid "About Outliner"
 msgstr ""
 
-#: src/MainWindow.vala:1068
+#: src/MainWindow.vala:1072
 msgid "Properties"
 msgstr ""
 
-#: src/MainWindow.vala:1138
+#: src/MainWindow.vala:1142
 msgid "Save current unnamed document?"
 msgstr ""
 
-#: src/MainWindow.vala:1139
+#: src/MainWindow.vala:1143
 msgid "Changes will be permanently lost if not saved."
 msgstr ""
 
-#: src/MainWindow.vala:1144
+#: src/MainWindow.vala:1148
 msgid "Discard Changes"
 msgstr ""
 
-#: src/MainWindow.vala:1150 src/MainWindow.vala:1325
+#: src/MainWindow.vala:1154 src/MainWindow.vala:1329
 msgid "Save"
 msgstr ""
 
-#: src/MainWindow.vala:1214
+#: src/MainWindow.vala:1218
 msgid "Open"
 msgstr ""
 
-#: src/MainWindow.vala:1324
+#: src/MainWindow.vala:1328
 msgid "Save File"
 msgstr ""
 
