@@ -24,9 +24,3 @@ Select a topic below:
 - [Importing/Exporting](Importing-Exporting.md)
 - [Printing](Printing.md)
 - [Miscellaneous](Miscellaneous.md)
-
-## For Developers
-
-If you want some information about how Outliner is designed, read further.
-
-- [Outliner File Format](Outliner-File-Format.md)

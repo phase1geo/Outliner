@@ -5,6 +5,7 @@ nav_order: 1
 permalink: /
 ---
 
-# Welcome to Outliner!
+## Outliner Documentation
 
 - [User Guide](User-Guide.md)
+- [Developer Guide](Developer-Guide.md)
