@@ -1,8 +1,8 @@
 ---
 layout: default
 title: Outliner File Format
-parent: User Guide
-nav_order: 15
+parent: Developer Guide
+nav_order: 1
 ---
 
 # Outliner File Format
