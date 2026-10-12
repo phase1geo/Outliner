@@ -133,6 +133,10 @@ public class Preferences : Granite.Dialog {
     grid.attach( make_spinner( "max-auto-completion-items", 1, 15, 1 ), 1, row );
     row++;
 
+    grid.attach( make_label( _( "Show release notes on startup after upgrade" ) ), 0, row );
+    grid.attach( make_switch( "upgrade-release-notes" ), 1, row );
+    row++;
+
     return( grid );
 
   }

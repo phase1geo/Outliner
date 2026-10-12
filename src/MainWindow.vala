@@ -1038,6 +1038,7 @@ public class MainWindow : Gtk.ApplicationWindow {
     var misc_menu = new GLib.Menu();
     append_menu_item( misc_menu, KeyCommand.SHOW_PREFERENCES,  _( "Preferences" ) );
     append_menu_item( misc_menu, KeyCommand.SHOW_SHORTCUTS,    _( "Shortcuts Cheatsheet" ) );
+    append_menu_item( misc_menu, KeyCommand.SHOW_RELEASES,     _( "Release Notes" ) );
     append_menu_item( misc_menu, KeyCommand.TOGGLE_FOCUS_MODE, _( "Enter Distraction-Free Mode" ) );
 
     var about_menu = new GLib.Menu();

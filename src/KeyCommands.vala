@@ -51,6 +51,7 @@ public enum KeyCommand {
     MISCELLANEOUS_START,
       SHOW_PREFERENCES,
       SHOW_SHORTCUTS,
+      SHOW_RELEASES,
       SHOW_CONTEXTUAL_MENU,
       SHOW_ABOUT,
       TOGGLE_FOCUS_MODE,
@@ -222,6 +223,7 @@ public enum KeyCommand {
       case ZOOM_ACTUAL               :  return( "zoom-actual" );
       case SHOW_PREFERENCES          :  return( "show-preferences" );
       case SHOW_SHORTCUTS            :  return( "show-shortcuts" );
+      case SHOW_RELEASES             :  return( "show-releases" );
       case SHOW_CONTEXTUAL_MENU      :  return( "show-contextual_menu" );
       case SHOW_ABOUT                :  return( "show-about" );
       case SEARCH                    :  return( "search" );
@@ -364,6 +366,7 @@ public enum KeyCommand {
       case "zoom-actual"               :  return( ZOOM_ACTUAL );
       case "show-preferences"          :  return( SHOW_PREFERENCES );
       case "show-shortcuts"            :  return( SHOW_SHORTCUTS );
+      case "show-releases"             :  return( SHOW_RELEASES );
       case "show-contextual-menu"      :  return( SHOW_CONTEXTUAL_MENU );
       case "show-about"                :  return( SHOW_ABOUT );
       case "toggle-focus-mode"         :  return( TOGGLE_FOCUS_MODE );
@@ -510,6 +513,7 @@ public enum KeyCommand {
       case MISCELLANEOUS_START       :  return( _( "Miscellaneous Commands" ) );
       case SHOW_PREFERENCES          :  return( _( "Show preferences window" ) );
       case SHOW_SHORTCUTS            :  return( _( "Show shortcuts cheatsheet" ) );
+      case SHOW_RELEASES             :  return( _( "Show release notes" ) );
       case SHOW_CONTEXTUAL_MENU      :  return( _( "Show contextual menu" ) );
       case SHOW_ABOUT                :  return( _( "Show About window" ) );
       case TOGGLE_FOCUS_MODE         :  return( _( "Toggle focus mode" ) );
@@ -655,6 +659,7 @@ public enum KeyCommand {
       case ZOOM_ACTUAL               :  return( zoom_actual );
       case SHOW_PREFERENCES          :  return( show_preferences );
       case SHOW_SHORTCUTS            :  return( show_shortcuts );
+      case SHOW_RELEASES             :  return( show_releases );
       case SHOW_CONTEXTUAL_MENU      :  return( show_contextual_menu );
       case SHOW_ABOUT                :  return( show_about );
       case TOGGLE_FOCUS_MODE         :  return( toggle_focus_mode );
@@ -1070,6 +1075,11 @@ public enum KeyCommand {
 
     win.present();
 
+  }
+
+  public static void show_releases( OutlineTable ot ) {
+    var release_notes = new ReleaseNotes( ot.win );
+    release_notes.show_notes();
   }
 
   public static void show_contextual_menu( OutlineTable ot ) {

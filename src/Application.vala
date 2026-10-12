@@ -24,6 +24,9 @@ using GLib;
 
 public class Outliner : Gtk.Application {
 
+  public const string static_version      = "2.0.0";
+  public const bool   force_startup_notes = true;
+
   public  static GLib.Settings settings;
   private        MainWindow    appwin;
 
@@ -34,7 +37,7 @@ public class Outliner : Gtk.Application {
     Object(
       application_id: "io.github.phase1geo.outliner",
       flags: ApplicationFlags.HANDLES_COMMAND_LINE,
-      version: "2.0.0"
+      version: static_version
     );
 
     Intl.setlocale( LocaleCategory.ALL, "" );
@@ -73,6 +76,10 @@ public class Outliner : Gtk.Application {
 
     // Load the tab information
     appwin.load_tab_state();
+
+    // Show startup release notes
+    var release_notes = new ReleaseNotes( appwin );
+    release_notes.startup();
 
   }
 

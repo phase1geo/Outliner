@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-    <gresource prefix="/io/github/phase1geo/outliner/css">
-        <file alias="style.css" compressed="true">css/style.css</file>
-    </gresource>
-    <gresource prefix="/io/github/phase1geo/outliner/shortcuts">
-        <file alias="shortcuts.ui" compressed="true">io.github.phase1geo.outliner.shortcuts.ui</file>
-    </gresource>
-    <gresource prefix="/io/github/phase1geo/outliner/images">
-        <file alias="accessories-text-editor-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/accessories-text-editor-symbolic.svg</file>
-        <file alias="outliner-logo" compressed="true" preprocess="xml-stripblanks">images/icons/scalable/io.github.phase1geo.outliner.svg</file>
-    </gresource>
+  <gresource prefix="/io/github/phase1geo/outliner">
+    <file alias="appdata.xml">io.github.phase1geo.outliner.appdata.xml.in</file> 
+  </gresource>
+  <gresource prefix="/io/github/phase1geo/outliner/css">
+    <file alias="style.css" compressed="true">css/style.css</file>
+  </gresource>
+  <gresource prefix="/io/github/phase1geo/outliner/shortcuts">
+    <file alias="shortcuts.ui" compressed="true">io.github.phase1geo.outliner.shortcuts.ui</file>
+  </gresource>
+  <gresource prefix="/io/github/phase1geo/outliner/images">
+    <file alias="accessories-text-editor-symbolic" compressed="true" preprocess="xml-stripblanks">images/icons/16/accessories-text-editor-symbolic.svg</file>
+    <file alias="outliner-logo" compressed="true" preprocess="xml-stripblanks">images/icons/scalable/io.github.phase1geo.outliner.svg</file>
+  </gresource>
 </gresources>

@@ -22,6 +22,7 @@ sources += files(
   'NodeMenu.vala',
   'OutlineTable.vala',
   'Preferences.vala',
+  'ReleaseNotes.vala',
   'SearchBar.vala',
   'SettingsUpdater.vala',
   'Shortcuts.vala',
