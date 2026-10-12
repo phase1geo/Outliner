@@ -19,6 +19,7 @@ src/NodeMenu.vala
 src/Node.vala
 src/OutlineTable.vala
 src/Preferences.vala
+src/ReleaseNotes.vala
 src/SearchBar.vala
 src/Shortcuts.vala
 src/Tagger.vala

@@ -112,6 +112,7 @@
           <li>Added autoscroll behavior when dragging node.</li>
           <li>Added export support for ODT and RTF formats.</li>
           <li>Added find-replace skip button.</li>
+          <li>Added support for showing release notes.</li>
         </ul>
         <p>Changes</p>
         <p xml:lang="nl">Wijzigingen</p>
