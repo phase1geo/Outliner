@@ -92,6 +92,10 @@ The following command will uninstall the installed executable.
 
 Refer to the `flatpak` command for uninstalling an installed Flatpak.
 
+### Documentation
+
+Officially supported documentation can be found [here](https://phase1geo.github.io/Outliner/)
+
 ### Development & Testing
 
 Outliner includes a script to simplify the development process. This script can be accessed in the main project directory through `./app`.
