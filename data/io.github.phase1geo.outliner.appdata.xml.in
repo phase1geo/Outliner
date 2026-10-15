@@ -56,7 +56,7 @@
     </developer>
     <url type="homepage">https://github.com/phase1geo/Outliner</url>
     <url type="bugtracker">https://github.com/phase1geo/Outliner/issues</url>
-    <url type="help">https://github.com/phase1geo/Outliner/wiki</url>
+    <url type="help">https://phase1geo.github.io/Outliner</url>
     <update_contact>phase1geo@gmail.com</update_contact>
     <custom>
       <value key="x-appcenter-color-primary">#D48E15</value>
