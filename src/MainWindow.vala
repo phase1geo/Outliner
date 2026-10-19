@@ -1298,7 +1298,7 @@ public class MainWindow : Gtk.ApplicationWindow {
   private void theme_changed( OutlineTable ot ) {
     Gtk.Settings? settings = Gtk.Settings.get_default();
     if( settings != null ) {
-      settings.gtk_application_prefer_dark_theme = ot.get_theme().prefer_dark;
+      settings.gtk_interface_color_scheme = ot.get_theme().prefer_dark ? Gtk.InterfaceColorScheme.DARK : Gtk.InterfaceColorScheme.LIGHT;
     }
   }
 

@@ -87,6 +87,10 @@ case $1 in
     G_DEBUG=fatal-criticals gdb --args ./io.github.phase1geo.outliner "${@:2}"
     #G_DEBUG=fatal-warnings gdb --args ./io.github.phase1geo.outliner "${@:2}"
     ;;
+"debug-flatpak")
+    echo "Run command at prompt: G_DEBUG=fatal-criticals gdb /app/bin/io.github.phase1geo.outliner"
+    flatpak run --devel --command=sh io.github.phase1geo.outliner
+    ;;
 "test")
     test
     ;;
