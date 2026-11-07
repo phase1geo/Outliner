@@ -39,7 +39,7 @@ public class About {
       copyright          = _( "Copyright © 2018-2026 Trevor Williams" ),
       version            = win.application.version,
       license_type       = License.GPL_3_0,
-      website            = "https://appcenter.elementary.io/com.github.phase1geo.outliner/",
+      website            = "https://appcenter.elementary.io/io.github.phase1geo.outliner/",
       website_label      = _( "Outliner in AppCenter" ),
       system_information = get_system_info(),
       logo               = image.get_paintable()
