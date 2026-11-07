@@ -24,7 +24,7 @@ using GLib;
 
 public class Outliner : Gtk.Application {
 
-  public const string static_version      = "2.0.0";
+  public const string static_version      = "2.0.1";
   public const bool   force_startup_notes = false;
 
   public  static GLib.Settings settings;

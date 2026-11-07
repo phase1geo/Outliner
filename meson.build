@@ -1,5 +1,5 @@
- project('io.github.phase1geo.outliner', ['vala', 'c'],
-    version : '2.0.0',
+project('io.github.phase1geo.outliner', ['vala', 'c'],
+    version : '2.0.1',
     license: 'GPL-3.0'
 )
 
@@ -43,6 +43,12 @@ libmarkdown = cc.find_library('markdown', required: true)
 # Check externally used programs
 pandoc = find_program('pandoc', required: true)
 
+# Figure out Gtk version
+gtk_dep = dependency('gtk4')
+if gtk_dep.version().version_compare('>=4.20')
+    add_project_arguments(['--define=GTK_4_20'], language: 'vala')
+endif
+
 add_project_arguments([
         '--vapidir', join_paths(meson.current_source_dir(), 'vapi')
         #        '--disable-warnings'
@@ -58,7 +64,7 @@ dependencies = [
     dependency('cairo'),
     dependency('gee-0.8'),
     dependency('granite-7', version: '>=7.7.0'),
-    dependency('gtk4'),
+    gtk_dep,
     dependency('libxml-2.0'),
     dependency('libarchive'),
     dependency('webkitgtk-6.0'),

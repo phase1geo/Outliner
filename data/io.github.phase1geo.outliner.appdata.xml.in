@@ -66,6 +66,17 @@
     </custom>
     <content_rating type="oars-1.1" />
     <releases>
+      <release version="2.0.1" date="2026-11-06">
+        <description>
+          <p>Changes</p>
+          <ul>
+            <li>Updated documentation link in appdata.</li>
+            <li>Updated Flathub manifest.</li>
+            <li>Updated code for setting dark mode.</li>
+            <li>Added Flatpak debug command in app script.</li>
+          </ul>
+        </description>
+      </release>
       <release version="2.0.0" date="2026-05-10">
         <description>
           <p>New</p>

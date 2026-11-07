@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 20:09-0500\n"
+"POT-Creation-Date: 2026-11-06 23:47-0600\n"
 "PO-Revision-Date: 2020-04-10 21:50+0200\n"
 "Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
 "Language-Team: none\n"
@@ -30,7 +30,7 @@ msgstr ""
 msgid "Outliner in AppCenter"
 msgstr ""
 
-#: src/Application.vala:48 src/MainWindow.vala:129 src/MainWindow.vala:1320
+#: src/Application.vala:48 src/MainWindow.vala:129 src/MainWindow.vala:1325
 msgid "Outliner"
 msgstr "Outliner"
 
@@ -1017,7 +1017,7 @@ msgstr ""
 msgid "Discard Changes"
 msgstr "Abandonner les modifications"
 
-#: src/MainWindow.vala:1154 src/MainWindow.vala:1329
+#: src/MainWindow.vala:1154 src/MainWindow.vala:1334
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -1025,7 +1025,7 @@ msgstr "Enregistrer"
 msgid "Open"
 msgstr "Ouvrir"
 
-#: src/MainWindow.vala:1328
+#: src/MainWindow.vala:1333
 msgid "Save File"
 msgstr "Enregistrer le fichier"
 

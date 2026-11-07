@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.phase1geo.outliner\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 20:09-0500\n"
+"POT-Creation-Date: 2026-11-06 23:47-0600\n"
 "PO-Revision-Date: 2023-05-21 10:26+0200\n"
 "Last-Translator: Alexandre Prokoudine <alexandre.prokoudine@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@lists.gnome.org>\n"
@@ -33,7 +33,7 @@ msgstr ""
 msgid "Outliner in AppCenter"
 msgstr ""
 
-#: src/Application.vala:48 src/MainWindow.vala:129 src/MainWindow.vala:1320
+#: src/Application.vala:48 src/MainWindow.vala:129 src/MainWindow.vala:1325
 msgid "Outliner"
 msgstr "Outliner"
 
@@ -1011,7 +1011,7 @@ msgstr "Если не сохранить документ, изменения б
 msgid "Discard Changes"
 msgstr "Отказаться от изменений"
 
-#: src/MainWindow.vala:1154 src/MainWindow.vala:1329
+#: src/MainWindow.vala:1154 src/MainWindow.vala:1334
 msgid "Save"
 msgstr "Сохранить"
 
@@ -1019,7 +1019,7 @@ msgstr "Сохранить"
 msgid "Open"
 msgstr "Открыть"
 
-#: src/MainWindow.vala:1328
+#: src/MainWindow.vala:1333
 msgid "Save File"
 msgstr "Сохранить документ"
 
